@@ -64,7 +64,8 @@ function handleBoyfriend(hasBoyfriend) {
  */
 function handleScore(score) {
   if (score <= 5) {
-    window.location.href = 'https://youtu.be/Km4BayZykwE';
+    closeGate();
+    openVideoModal('https://youtu.be/Km4BayZykwE');
   } else {
     videoUrl = 'https://youtu.be/H2aCYA9TN1A';
     showStep('gateStepQuote');
@@ -75,7 +76,8 @@ function handleScore(score) {
  * Proceder al video final
  */
 function proceedToVideo() {
-  window.location.href = videoUrl;
+  closeGate();
+  openVideoModal(videoUrl);
 }
 
 /**

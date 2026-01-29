@@ -1,0 +1,131 @@
+/* ============================================
+   VIDEO MODAL - YouTube embeds responsive
+   ============================================ */
+
+/* Overlay */
+.video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.video-modal-overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Modal Container */
+.video-modal-container {
+  position: relative;
+  width: 90%;
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.9);
+  transition: transform var(--transition-base);
+}
+
+.video-modal-overlay.active .video-modal-container {
+  transform: scale(1);
+}
+
+/* Close Button */
+.video-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  z-index: 10001;
+}
+
+.video-modal-close:hover {
+  background: rgba(255, 59, 48, 0.9);
+  border-color: #fff;
+  transform: scale(1.15) rotate(90deg);
+  box-shadow: 0 6px 20px rgba(255, 59, 48, 0.5);
+}
+
+.video-modal-close:active {
+  transform: scale(1.0) rotate(90deg);
+}
+
+/* YouTube Iframe */
+.video-modal-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .video-modal-container {
+    width: 95%;
+    max-width: none;
+    /* Optimizado para vertical: más altura */
+    aspect-ratio: 9 / 16;
+    max-height: 80vh;
+  }
+
+  .video-modal-close {
+    top: 16px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+    font-size: 28px;
+    background: rgba(0, 0, 0, 0.85);
+    border-width: 3px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .video-modal-container {
+    aspect-ratio: 16 / 9;
+    max-height: 85vh;
+    width: 90%;
+  }
+}
+
+/* Accessibility */
+.video-modal-overlay:focus-within .video-modal-close {
+  outline: 2px solid var(--accent-red);
+  outline-offset: 2px;
+}
+
+/* Prevent body scroll when modal open */
+body.video-modal-open {
+  overflow: hidden;
+}
