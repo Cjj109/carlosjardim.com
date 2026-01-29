@@ -63,24 +63,26 @@ function applyRandomness() {
 }
 
 /**
- * Auto-hide del hint arrow después de unos segundos
+ * Auto-hide del hint arrow después de unos segundos (FIX: más tiempo en mobile)
  */
 function setupHintBehavior() {
   const hint = document.getElementById('hintArrow');
-  setTimeout(() => hint?.classList.add('hidden'), 6500);
+  const isMobile = window.innerWidth < 768;
+  const delay = isMobile ? 15000 : 12000; // 15s en mobile, 12s en desktop
+  setTimeout(() => hint?.classList.add('hidden'), delay);
 }
 
 /**
- * Parallax suave con mouse/touch (sin permisos de deviceorientation)
+ * Parallax suave con mouse/touch (FIX: con throttle para mejor rendimiento)
  */
 function setupParallax() {
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-  
+
   const setParallax = (x, y) => {
     document.documentElement.style.setProperty('--px', `${x}px`);
     document.documentElement.style.setProperty('--py', `${y}px`);
   };
-  
+
   const handleMovement = (clientX, clientY) => {
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
@@ -89,18 +91,28 @@ function setupParallax() {
     // Suavizar el movimiento
     setParallax(dx * 0.35, dy * 0.35);
   };
-  
+
+  // FIX: Throttle helper (limitar ejecución a cada 16ms ≈ 60fps)
+  let rafId = null;
+  const throttledHandle = (clientX, clientY) => {
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      handleMovement(clientX, clientY);
+      rafId = null;
+    });
+  };
+
   // Mouse
   window.addEventListener('mousemove', (e) => {
-    handleMovement(e.clientX, e.clientY);
+    throttledHandle(e.clientX, e.clientY);
   }, { passive: true });
-  
+
   // Touch
   window.addEventListener('touchmove', (e) => {
     if (!e.touches || !e.touches[0]) return;
-    handleMovement(e.touches[0].clientX, e.touches[0].clientY);
+    throttledHandle(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
-  
+
   // Reset al salir
   window.addEventListener('mouseleave', () => setParallax(0, 0), { passive: true });
   window.addEventListener('touchend', () => setParallax(0, 0), { passive: true });

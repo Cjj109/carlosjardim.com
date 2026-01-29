@@ -1,0 +1,14 @@
+# robots.txt para carlosjardim.com
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://carlosjardim.com/sitemap.xml
+
+# Crawl delay para bots pesados
+User-agent: Bingbot
+Crawl-delay: 1
+
+User-agent: Slurp
+Crawl-delay: 1

@@ -201,9 +201,18 @@ ul.cv-list li {
   cursor: pointer;
   position: relative;
   z-index: 1;
+  border: none; /* FIX: Sin borde para button */
   transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
   box-shadow: 0 8px 22px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.25);
   will-change: transform;
+}
+
+/* FIX: Tamaño touch-friendly en mobile (44x44px mínimo) */
+@media (max-width: 768px) {
+  .bonbon-icon {
+    width: 48px;
+    height: 44px;
+  }
 }
 
 .bonbon-icon:hover {
@@ -245,13 +254,20 @@ ul.cv-list li {
   margin-top: 14px;
   font-family: var(--mono);
   font-size: 11px;
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.65); /* FIX: Mejor contraste (4.5:1) */
   letter-spacing: 0.6px;
   user-select: none;
   opacity: 0;
   transform: translateY(4px);
   transition: opacity 0.45s ease, transform 0.45s ease;
   text-align: center;
+}
+
+/* Mobile: Texto más grande y legible */
+@media (max-width: 768px) {
+  .micro-line {
+    font-size: 13px;
+  }
 }
 
 .micro-line.visible {

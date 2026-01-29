@@ -20,23 +20,36 @@ const pong = {
   vy: 0,
   keyUp: false,
   keyDown: false,
-  touchY: null
-};
+  touchY: null,
+  targetPaddleY: null,
 
-const modal = () => document.getElementById('pongModal');
-const canvas = () => document.getElementById('pongCanvas');
-const stage = () => document.getElementById('pongStage');
+  // FIX: Cache de referencias DOM
+  modal: null,
+  canvas: null,
+  stage: null,
+  ctx: null,
+  accentColor: null,
+
+  // FIX: Referencias a event listeners para poder eliminarlos
+  listeners: {
+    keydown: null,
+    keyup: null,
+    mousemove: null,
+    mouseup: null,
+    resize: null
+  }
+};
 
 /**
  * Abrir modal de Pong
  */
 function openPong() {
-  const m = document.getElementById('pongModal');
-  m.style.display = 'flex';
-  m.classList.add('active');
-  m.setAttribute('aria-hidden', 'false');
+  pong.modal = document.getElementById('pongModal');
+  pong.modal.style.display = 'flex';
+  pong.modal.classList.add('active');
+  pong.modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-  
+
   initPong();
   restartPong();
   startLoop();
@@ -47,25 +60,60 @@ function openPong() {
  */
 function closePong() {
   stopLoop();
-  const m = document.getElementById('pongModal');
-  m.style.display = 'none';
-  m.classList.remove('active');
-  m.setAttribute('aria-hidden', 'true');
+  cleanupPongListeners(); // FIX: Limpiar listeners
+
+  if (pong.modal) {
+    pong.modal.style.display = 'none';
+    pong.modal.classList.remove('active');
+    pong.modal.setAttribute('aria-hidden', 'true');
+  }
   document.body.style.overflow = '';
   pong.touchY = null;
+  pong.targetPaddleY = null;
+}
+
+/**
+ * Limpiar event listeners (FIX: Memory leak)
+ */
+function cleanupPongListeners() {
+  if (pong.listeners.keydown) {
+    window.removeEventListener('keydown', pong.listeners.keydown);
+  }
+  if (pong.listeners.keyup) {
+    window.removeEventListener('keyup', pong.listeners.keyup);
+  }
+  if (pong.listeners.mousemove) {
+    window.removeEventListener('mousemove', pong.listeners.mousemove);
+  }
+  if (pong.listeners.mouseup) {
+    window.removeEventListener('mouseup', pong.listeners.mouseup);
+  }
+  if (pong.listeners.resize) {
+    window.removeEventListener('resize', pong.listeners.resize);
+  }
 }
 
 /**
  * Inicializar canvas y controles
  */
 function initPong() {
-  const c = canvas();
-  const s = stage();
-  
+  // FIX: Cache de referencias DOM
+  pong.canvas = pong.canvas || document.getElementById('pongCanvas');
+  pong.stage = pong.stage || document.getElementById('pongStage');
+
+  const c = pong.canvas;
+  const s = pong.stage;
+
   if (!c || !s) return;
-  
-  const ctx = c.getContext('2d');
-  
+
+  pong.ctx = c.getContext('2d');
+
+  // FIX: Cache de accent color
+  if (!pong.accentColor) {
+    pong.accentColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--accent').trim();
+  }
+
   // Ajustar resolución
   const rect = s.getBoundingClientRect();
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -73,54 +121,78 @@ function initPong() {
   c.height = Math.floor(rect.height * dpr);
   pong.w = c.width;
   pong.h = c.height;
-  
+
   pong.pY = (pong.h - pong.paddleH) / 2;
   pong.aY = pong.pY;
-  
-  // Touch controls
+
+  // Touch controls (MEJORADOS)
   if (!c.dataset.bound) {
     c.dataset.bound = "1";
-    
+
     const onTouch = (e) => {
       if (!e.touches || !e.touches[0]) return;
       const r = c.getBoundingClientRect();
       const y = e.touches[0].clientY - r.top;
       pong.touchY = y * (pong.h / r.height);
+      pong.targetPaddleY = pong.touchY - pong.paddleH / 2;
     };
-    
+
     c.addEventListener('touchstart', onTouch, { passive: true });
     c.addEventListener('touchmove', onTouch, { passive: true });
-    c.addEventListener('touchend', () => { pong.touchY = null; }, { passive: true });
-    
-    // Mouse drag
+    c.addEventListener('touchend', () => {
+      pong.touchY = null;
+      pong.targetPaddleY = null;
+    }, { passive: true });
+
+    // Mouse drag (MEJORADO)
     let dragging = false;
     const onMouse = (e) => {
       const r = c.getBoundingClientRect();
       const y = e.clientY - r.top;
       pong.touchY = y * (pong.h / r.height);
+      pong.targetPaddleY = pong.touchY - pong.paddleH / 2;
     };
-    
-    c.addEventListener('mousedown', (e) => { dragging = true; onMouse(e); }, { passive: true });
-    window.addEventListener('mousemove', (e) => { if (dragging) onMouse(e); }, { passive: true });
-    window.addEventListener('mouseup', () => { dragging = false; pong.touchY = null; }, { passive: true });
-    
-    // Keyboard
-    window.addEventListener('keydown', (e) => {
-      if (!modal().classList.contains('active')) return;
+
+    c.addEventListener('mousedown', (e) => {
+      dragging = true;
+      onMouse(e);
+    }, { passive: true });
+
+    // FIX: Guardar referencias para poder eliminarlos
+    pong.listeners.mousemove = (e) => {
+      if (dragging) onMouse(e);
+    };
+    pong.listeners.mouseup = () => {
+      dragging = false;
+      pong.touchY = null;
+      pong.targetPaddleY = null;
+    };
+
+    window.addEventListener('mousemove', pong.listeners.mousemove, { passive: true });
+    window.addEventListener('mouseup', pong.listeners.mouseup, { passive: true });
+
+    // Keyboard - FIX: Guardar referencias
+    pong.listeners.keydown = (e) => {
+      if (!pong.modal || !pong.modal.classList.contains('active')) return;
       if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') pong.keyUp = true;
       if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') pong.keyDown = true;
-    });
-    
-    window.addEventListener('keyup', (e) => {
+    };
+
+    pong.listeners.keyup = (e) => {
       if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') pong.keyUp = false;
       if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') pong.keyDown = false;
-    });
-    
-    // Resize
-    window.addEventListener('resize', () => {
-      if (!modal().classList.contains('active')) return;
+    };
+
+    window.addEventListener('keydown', pong.listeners.keydown);
+    window.addEventListener('keyup', pong.listeners.keyup);
+
+    // Resize - FIX: Guardar referencia
+    pong.listeners.resize = () => {
+      if (!pong.modal || !pong.modal.classList.contains('active')) return;
       initPong();
-    }, { passive: true });
+    };
+
+    window.addEventListener('resize', pong.listeners.resize, { passive: true });
   }
 }
 
@@ -171,19 +243,25 @@ function startLoop() {
 }
 
 /**
- * Actualizar lógica del juego
+ * Actualizar lógica del juego (MEJORADO)
  */
 function update() {
   if (!pong.running) return;
   
-  // Control del jugador
+  // Control del jugador (MEJORADO - movimiento suavizado)
   const speed = Math.max(5.2, pong.h / 85);
-  if (pong.touchY !== null) {
-    pong.pY = pong.touchY - pong.paddleH / 2;
+  
+  if (pong.targetPaddleY !== null) {
+    // Touch/Mouse: movimiento suavizado hacia el target
+    const diff = pong.targetPaddleY - pong.pY;
+    const smoothing = 0.25; // Factor de suavizado (0-1, menor = más suave)
+    pong.pY += diff * smoothing;
   } else {
+    // Keyboard: movimiento directo
     if (pong.keyUp) pong.pY -= speed;
     if (pong.keyDown) pong.pY += speed;
   }
+  
   pong.pY = Math.max(0, Math.min(pong.h - pong.paddleH, pong.pY));
   
   // IA sigue la pelota
@@ -251,20 +329,22 @@ function update() {
  * Dibujar frame del juego
  */
 function draw() {
-  const c = canvas();
-  const ctx = c.getContext('2d');
+  // FIX: Usar cache de ctx
+  const ctx = pong.ctx;
+  if (!ctx) return;
+
   const w = pong.w;
   const h = pong.h;
-  
+
   ctx.clearRect(0, 0, w, h);
-  
-  // Colores desde CSS
+
+  // FIX: Usar color cacheado (calculado una sola vez en initPong)
   const styles = getComputedStyle(document.documentElement);
   const ar = styles.getPropertyValue('--accent-r').trim();
   const ag = styles.getPropertyValue('--accent-g').trim();
   const ab = styles.getPropertyValue('--accent-b').trim();
   const accent = `rgb(${ar},${ag},${ab})`;
-  
+
   // Línea central
   ctx.strokeStyle = 'rgba(255,255,255,0.10)';
   ctx.setLineDash([8, 10]);
@@ -274,12 +354,12 @@ function draw() {
   ctx.lineTo(w / 2, h - 18);
   ctx.stroke();
   ctx.setLineDash([]);
-  
+
   // Paletas
   ctx.fillStyle = 'rgba(255,255,255,0.85)';
   ctx.fillRect(22, pong.pY, pong.paddleW, pong.paddleH);
   ctx.fillRect(w - 22 - pong.paddleW, pong.aY, pong.paddleW, pong.paddleH);
-  
+
   // Pelota con glow
   ctx.shadowColor = `rgba(${ar},${ag},${ab},0.45)`;
   ctx.shadowBlur = 14;
@@ -299,7 +379,7 @@ function draw() {
   // Label
   ctx.font = `${Math.floor(h / 32)}px JetBrains Mono, monospace`;
   ctx.fillStyle = 'rgba(255,255,255,0.28)';
-  ctx.fillText('ARRASTRA / W-S', w / 2, h - 18);
+  ctx.fillText('TOCA Y ARRASTRA', w / 2, h - 18);
 }
 
 // Cerrar modal al hacer clic fuera

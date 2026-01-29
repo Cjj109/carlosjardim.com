@@ -1,0 +1,40 @@
+/* ============================================
+   TETRIS.CSS - Estilos específicos de Tetris
+   ============================================ */
+
+/* Los estilos del modal están en pong.css como .game-modal */
+/* Este archivo contiene personalizaciones futuras específicas de Tetris */
+
+/* Personalización del canvas de Tetris */
+#tetrisCanvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Personalización del stage de Tetris */
+#tetrisStage {
+  /* Tamaño fijo para mantener proporción 10x20 */
+  max-width: 300px;
+  max-height: 600px;
+}
+
+/* Hint específico de Tetris con instrucciones más claras */
+#tetrisModal .game-hint {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Animación sutil para score incrementándose */
+@keyframes tetris-score-bump {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+#tetrisScore {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+#tetrisScore.bump {
+  animation: tetris-score-bump 0.3s ease;
+}

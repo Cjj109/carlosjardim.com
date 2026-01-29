@@ -5,13 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
   <meta name="description" content="Carlos Jardim - Economista. Constancia > Ruido">
   <meta name="author" content="Carlos Jardim">
-  
+  <meta name="theme-color" content="#ff3b30">
+
+  <!-- Performance optimizations -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://carlosjardim.com">
   <meta property="og:title" content="Carlos Jardim | Perfil">
   <meta property="og:description" content="Economista • Constancia > Ruido">
-  
+  <meta property="og:locale" content="es_ES">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Carlos Jardim | Perfil">
+  <meta name="twitter:description" content="Economista • Constancia > Ruido">
+
   <title>Carlos Jardim | Perfil</title>
   
   <!-- Styles -->
@@ -20,7 +31,16 @@
   <link rel="stylesheet" href="css/cv.css">
   <link rel="stylesheet" href="css/alt.css">
   <link rel="stylesheet" href="css/pong.css">
+  <link rel="stylesheet" href="css/tetris.css">
   <link rel="stylesheet" href="css/games-menu.css">
+
+  <!-- Scripts optimizados con defer para carga paralela -->
+  <script src="js/main.js" defer></script>
+  <script src="js/gates.js" defer></script>
+  <script src="js/games-menu.js" defer></script>
+  <script src="js/pong.js" defer></script>
+  <script src="js/tetris.js" defer></script>
+  <script src="js/snake.js" defer></script>
 </head>
 
 <body>
@@ -62,7 +82,7 @@
         <div class="hint-arrow" id="hintArrow">Muerde el dulce ↓</div>
 
         <div class="bonbon-container">
-          <div class="bonbon-icon" id="bonbon" onclick="startBiteSequence()" aria-label="Acceso"></div>
+          <button class="bonbon-icon" id="bonbon" onclick="startBiteSequence()" aria-label="Acceso al lado alternativo" type="button"></button>
         </div>
 
         <div class="micro-line" id="microLine"></div>
@@ -190,10 +210,10 @@
        ============================================ -->
   
   <!-- PONG MODAL -->
-  <div class="game-modal" id="pongModal" aria-hidden="true" style="display:none;">
+  <div class="game-modal" id="pongModal" role="dialog" aria-modal="true" aria-labelledby="pongTitle" aria-hidden="true" style="display:none;">
     <div class="game-card">
       <div class="game-top">
-        <div><strong>PONG</strong> · 1 vs IA</div>
+        <div id="pongTitle"><strong>PONG</strong> · 1 vs IA</div>
         <div class="game-actions">
           <button class="game-btn" onclick="restartPong()">reiniciar</button>
           <button class="game-btn" onclick="closePong()">cerrar</button>
@@ -201,7 +221,7 @@
       </div>
       
       <div class="game-stage" id="pongStage">
-        <canvas id="pongCanvas"></canvas>
+        <canvas id="pongCanvas" aria-label="Área de juego Pong: juego de pelota contra IA"></canvas>
         <div class="game-hint" id="pongHint">
           PC: W/S o ↑/↓ · Teléfono: arrastra el dedo arriba/abajo
         </div>
@@ -210,10 +230,10 @@
   </div>
 
   <!-- TETRIS MODAL -->
-  <div class="game-modal" id="tetrisModal" aria-hidden="true" style="display:none;">
+  <div class="game-modal" id="tetrisModal" role="dialog" aria-modal="true" aria-labelledby="tetrisTitle" aria-hidden="true" style="display:none;">
     <div class="game-card">
       <div class="game-top">
-        <div><strong>TETRIS</strong> · Puntos: <span id="tetrisScore">0</span></div>
+        <div id="tetrisTitle"><strong>TETRIS</strong> · Puntos: <span id="tetrisScore">0</span></div>
         <div class="game-actions">
           <button class="game-btn" onclick="restartTetris()">reiniciar</button>
           <button class="game-btn" onclick="closeTetris()">cerrar</button>
@@ -221,7 +241,7 @@
       </div>
       
       <div class="game-stage" id="tetrisStage">
-        <canvas id="tetrisCanvas"></canvas>
+        <canvas id="tetrisCanvas" aria-label="Área de juego Tetris: encaja bloques cayendo"></canvas>
         <div class="game-hint">
           PC: ←→ mover · ↑ rotar · ↓ bajar rápido<br>
           Móvil: desliza ←→ para mover · tap para rotar
@@ -231,10 +251,10 @@
   </div>
 
   <!-- SNAKE MODAL -->
-  <div class="game-modal" id="snakeModal" aria-hidden="true" style="display:none;">
+  <div class="game-modal" id="snakeModal" role="dialog" aria-modal="true" aria-labelledby="snakeTitle" aria-hidden="true" style="display:none;">
     <div class="game-card">
       <div class="game-top">
-        <div><strong>SNAKE</strong> · Puntos: <span id="snakeScore">0</span></div>
+        <div id="snakeTitle"><strong>SNAKE</strong> · Puntos: <span id="snakeScore">0</span></div>
         <div class="game-actions">
           <button class="game-btn" onclick="restartSnake()">reiniciar</button>
           <button class="game-btn" onclick="closeSnake()">cerrar</button>
@@ -242,7 +262,7 @@
       </div>
       
       <div class="game-stage" id="snakeStage">
-        <canvas id="snakeCanvas"></canvas>
+        <canvas id="snakeCanvas" aria-label="Área de juego Snake: controla la serpiente y come comida"></canvas>
         <div class="game-hint">
           PC: flechas ↑↓←→ · Móvil: desliza en cualquier dirección
         </div>
@@ -287,13 +307,5 @@
       </div>
     </div>
   </div>
-
-  <!-- Scripts -->
-  <script src="js/main.js"></script>
-  <script src="js/gates.js"></script>
-  <script src="js/games-menu.js"></script>
-  <script src="js/pong.js"></script>
-  <script src="js/tetris.js"></script>
-  <script src="js/snake.js"></script>
 </body>
 </html>
