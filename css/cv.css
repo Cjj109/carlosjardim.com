@@ -1,0 +1,260 @@
+/* ============================================
+   CV STYLES - Lado A (Ventana profesional)
+   ============================================ */
+
+.window {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: all var(--transition-slow);
+  position: relative;
+  z-index: 10;
+  transform: translate(calc(var(--px) * 0.06), calc(var(--py) * 0.06));
+  will-change: transform;
+}
+
+/* Mancha sutil del accent con parallax */
+.window::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(
+    circle at calc(50% + (var(--px) * 0.5)) calc(80% + (var(--py) * 0.5)),
+    rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.10),
+    rgba(255, 255, 255, 0) 55%
+  );
+  transform: rotate(6deg);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+@media (min-width: 1024px) {
+  .window {
+    max-width: 480px;
+  }
+}
+
+/* Header de la ventana (estilo macOS) */
+.window-header {
+  padding: 18px var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  background: #fafafa;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  z-index: 1;
+}
+
+.traffic-lights {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.red { background: #ff5f56; }
+.orange { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+/* Contenido del CV */
+.window-content {
+  padding: var(--spacing-xl);
+  position: relative;
+  z-index: 1;
+}
+
+.cv-title {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.cv-title h1 {
+  font-size: 38px;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -1.5px;
+  color: #000;
+}
+
+.cv-title .subtitle {
+  font-size: 14px;
+  color: #888;
+  margin-top: var(--spacing-xs);
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 35px 0 15px;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.cv-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+}
+
+ul.cv-list {
+  padding-left: 18px;
+  margin: 15px 0;
+  list-style: none;
+}
+
+ul.cv-list li::before {
+  content: "→";
+  color: var(--accent-red);
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+ul.cv-list li {
+  margin-bottom: var(--spacing-sm);
+  font-size: 15px;
+  color: #444;
+}
+
+/* Trigger del bombón */
+.trigger-wrapper {
+  text-align: center;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.hint-arrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent-red);
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  animation: blink 1.5s infinite;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  opacity: 1;
+  user-select: none;
+}
+
+.hint-arrow.hidden {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* Contenedor del bombón con sonar */
+.bonbon-container {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bonbon-container::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--accent-red);
+  border-radius: 50%;
+  opacity: 0;
+  animation: sonar 2s infinite;
+  filter: blur(0.2px);
+}
+
+@keyframes sonar {
+  0% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* El bombón clickeable */
+.bonbon-icon {
+  width: 40px;
+  height: 32px;
+  background: var(--accent-red);
+  border-radius: var(--radius-sm) var(--radius-sm) 4px 4px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 8px 22px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.25);
+  will-change: transform;
+}
+
+.bonbon-icon:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.32);
+}
+
+/* Respiración lenta */
+.bonbon-icon.breathing {
+  animation: breathe 7.5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.035);
+  }
+}
+
+/* Animación de mordida */
+.bonbon-icon.biting {
+  animation: biteEffect 0.6s forwards;
+}
+
+@keyframes biteEffect {
+  30% {
+    transform: scale(1.4) rotate(-15deg);
+  }
+  100% {
+    clip-path: polygon(0% 0%, 60% 0%, 55% 20%, 70% 30%, 55% 45%, 70% 60%, 55% 75%, 70% 90%, 60% 100%, 0% 100%);
+  }
+}
+
+/* Micro-frase debajo del bombón */
+.micro-line {
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.45);
+  letter-spacing: 0.6px;
+  user-select: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  text-align: center;
+}
+
+.micro-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -1,0 +1,299 @@
+\<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <meta name="description" content="Carlos Jardim - Economista. Constancia > Ruido">
+  <meta name="author" content="Carlos Jardim">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://carlosjardim.com">
+  <meta property="og:title" content="Carlos Jardim | Perfil">
+  <meta property="og:description" content="Economista • Constancia > Ruido">
+  
+  <title>Carlos Jardim | Perfil</title>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/cv.css">
+  <link rel="stylesheet" href="css/alt.css">
+  <link rel="stylesheet" href="css/pong.css">
+  <link rel="stylesheet" href="css/games-menu.css">
+</head>
+
+<body>
+  <!-- Efectos de fondo -->
+  <div class="scanlines"></div>
+  <div class="lightleak"></div>
+
+  <!-- ============================================
+       LADO A - CV Profesional
+       ============================================ -->
+  <div class="window">
+    <div class="window-header">
+      <div class="traffic-lights">
+        <div class="light red"></div>
+        <div class="light orange"></div>
+        <div class="light green"></div>
+      </div>
+    </div>
+
+    <div class="window-content">
+      <div class="cv-title">
+        <h1>Carlos Jardim</h1>
+        <span class="subtitle">Economista • Constancia > Ruido</span>
+      </div>
+
+      <div class="section-label">Perfil</div>
+      <p class="cv-text">
+        Me muevo entre datos y decisiones, pero lo mío es la calma: constancia, humor seco y cero necesidad de impresionar.
+      </p>
+
+      <div class="section-label">Lo visible</div>
+      <ul class="cv-list">
+        <li>Entrenamiento de alta intensidad.</li>
+        <li>Proyectos, negocios y orden mental aplicado.</li>
+        <li>176 cm de estabilidad funcional.</li>
+      </ul>
+
+      <div class="trigger-wrapper">
+        <div class="hint-arrow" id="hintArrow">Muerde el dulce ↓</div>
+
+        <div class="bonbon-container">
+          <div class="bonbon-icon" id="bonbon" onclick="startBiteSequence()" aria-label="Acceso"></div>
+        </div>
+
+        <div class="micro-line" id="microLine"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       LADO B - Vista Alternativa
+       ============================================ -->
+  <div class="alt-view">
+    <div class="sync-bar"></div>
+
+    <div class="alt-grid">
+      <div class="alt-card span-4 breath-accent">
+        <span class="label-alt">Registro: Acceso concedido</span>
+        <div class="white-title">Esto no es el CV.</div>
+        <div class="text-alt">Es el residuo de lo que no se dice.</div>
+      </div>
+
+      <div class="alt-card span-2">
+        <span class="label-alt">Intenciones</span>
+        <div class="text-alt">
+          No busco atención, busco química. Si no hay conexión genuina, no fuerzo nada.
+        </div>
+      </div>
+
+      <div class="alt-card span-2 breath-accent">
+        <span class="label-alt">Diagnóstico</span>
+        <div class="text-alt">
+          Si estás aquí, la curiosidad pudo más. Es un buen indicador.
+        </div>
+      </div>
+
+      <div class="alt-card span-4">
+        <span class="label-alt">Evidencia</span>
+        <div class="text-alt">
+          • Humor seco nivel desierto.<br>
+          • Cero dramas performativos.<br>
+          • Me voy cuando el valor de quedarme es menor al de irme.
+        </div>
+      </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div style="text-align:center; margin-top:60px; font-family:var(--mono);">
+      <a href="https://instagram.com/cjj109" 
+         target="_blank"
+         rel="noopener noreferrer"
+         style="color:var(--accent-red); text-decoration:none; border:1px solid; padding:18px 40px; display:inline-block; font-weight:bold; border-radius:4px; letter-spacing:2px; transition:0.3s;">
+        SOLICITAR ACCESO
+      </a>
+
+      <div>
+        <button class="easter-btn" onclick="openGamesMenu()">
+          toca si tu novia estuvo aquí
+        </button>
+      </div>
+
+      <p onclick="toggleMode(false)" 
+         style="color:#666; cursor:pointer; margin-top:40px; font-size:11px; letter-spacing:1px; opacity:0.7;">
+        ← REVERTIR SISTEMA
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================
+       GATE - Sistema de Cuestionarios
+       ============================================ -->
+  <div class="gender-gate" id="genderGate">
+    <div class="gate-card">
+      <div class="close-gate" onclick="closeGate()">✕</div>
+
+      <!-- Paso 1: Género -->
+      <div id="gateStepGender">
+        <p style="letter-spacing:2px; font-size:12px; margin-bottom:18px; color:#888;">
+          Antes de seguir…
+        </p>
+        <button onclick="handleGender('female')">Soy mujer</button>
+        <button onclick="handleGender('male')">Soy hombre</button>
+      </div>
+
+      <!-- Paso 2: Pádel (hombres) -->
+      <div id="gateStepPadel" style="display:none;">
+        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+          ¿TE GUSTA EL PÁDEL?
+        </p>
+        <button onclick="window.location.href='https://youtu.be/PMZy53PHbY0?si=tgLltHAJP7Vgmj4v'">
+          Sí, me encanta
+        </button>
+        <button onclick="window.location.href='https://youtu.be/5hFd6zGkxLE'">
+          No mucho
+        </button>
+      </div>
+
+      <!-- Paso 3: Estado civil (mujeres) -->
+      <div id="gateStepBoyfriend" style="display:none;">
+        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+          ESTADO CIVIL
+        </p>
+        <button onclick="handleBoyfriend(false)">No tengo novio</button>
+        <button onclick="handleBoyfriend(true)">Tengo novio</button>
+      </div>
+
+      <!-- Paso 4: Escala de estabilidad -->
+      <div id="gateStepScale" style="display:none;">
+        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+          ESTABILIDAD DE LA RELACIÓN (1-10)
+        </p>
+        <div class="scale-grid" id="scaleGrid"></div>
+      </div>
+
+      <!-- Paso 5: Quote final -->
+      <div id="gateStepQuote" style="display:none;">
+        <p style="font-size:16px; color:var(--accent-red); margin: 30px 0;">
+          "Cosas más grandes se han caído."
+        </p>
+        <button onclick="proceedToVideo()">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MODALES DE JUEGOS
+       ============================================ -->
+  
+  <!-- PONG MODAL -->
+  <div class="game-modal" id="pongModal" aria-hidden="true" style="display:none;">
+    <div class="game-card">
+      <div class="game-top">
+        <div><strong>PONG</strong> · 1 vs IA</div>
+        <div class="game-actions">
+          <button class="game-btn" onclick="restartPong()">reiniciar</button>
+          <button class="game-btn" onclick="closePong()">cerrar</button>
+        </div>
+      </div>
+      
+      <div class="game-stage" id="pongStage">
+        <canvas id="pongCanvas"></canvas>
+        <div class="game-hint" id="pongHint">
+          PC: W/S o ↑/↓ · Teléfono: arrastra el dedo arriba/abajo
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TETRIS MODAL -->
+  <div class="game-modal" id="tetrisModal" aria-hidden="true" style="display:none;">
+    <div class="game-card">
+      <div class="game-top">
+        <div><strong>TETRIS</strong> · Puntos: <span id="tetrisScore">0</span></div>
+        <div class="game-actions">
+          <button class="game-btn" onclick="restartTetris()">reiniciar</button>
+          <button class="game-btn" onclick="closeTetris()">cerrar</button>
+        </div>
+      </div>
+      
+      <div class="game-stage" id="tetrisStage">
+        <canvas id="tetrisCanvas"></canvas>
+        <div class="game-hint">
+          PC: ←→ mover · ↑ rotar · ↓ bajar rápido<br>
+          Móvil: desliza ←→ para mover · tap para rotar
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SNAKE MODAL -->
+  <div class="game-modal" id="snakeModal" aria-hidden="true" style="display:none;">
+    <div class="game-card">
+      <div class="game-top">
+        <div><strong>SNAKE</strong> · Puntos: <span id="snakeScore">0</span></div>
+        <div class="game-actions">
+          <button class="game-btn" onclick="restartSnake()">reiniciar</button>
+          <button class="game-btn" onclick="closeSnake()">cerrar</button>
+        </div>
+      </div>
+      
+      <div class="game-stage" id="snakeStage">
+        <canvas id="snakeCanvas"></canvas>
+        <div class="game-hint">
+          PC: flechas ↑↓←→ · Móvil: desliza en cualquier dirección
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MENÚ DE JUEGOS
+       ============================================ -->
+  <div id="gamesMenu">
+    <div class="games-menu-card">
+      <div class="games-menu-header">
+        <span>ELIGE UN JUEGO</span>
+        <button class="close-menu-btn" onclick="closeGamesMenu()">✕</button>
+      </div>
+      
+      <div class="games-grid">
+        <button class="game-option" onclick="selectGame('pong')">
+          <div class="game-icon">🏓</div>
+          <div class="game-info">
+            <div class="game-name">PONG</div>
+            <div class="game-desc">Clásico arcade</div>
+          </div>
+        </button>
+        
+        <button class="game-option" onclick="selectGame('tetris')">
+          <div class="game-icon">🧱</div>
+          <div class="game-info">
+            <div class="game-name">TETRIS</div>
+            <div class="game-desc">Bloques caen</div>
+          </div>
+        </button>
+        
+        <button class="game-option" onclick="selectGame('snake')">
+          <div class="game-icon">🐍</div>
+          <div class="game-info">
+            <div class="game-name">SNAKE</div>
+            <div class="game-desc">Come y crece</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/gates.js"></script>
+  <script src="js/games-menu.js"></script>
+  <script src="js/pong.js"></script>
+  <script src="js/tetris.js"></script>
+  <script src="js/snake.js"></script>
+</body>
+</html>

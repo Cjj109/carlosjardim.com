@@ -1,0 +1,188 @@
+/* ============================================
+   PONG GAME MODAL - Sistema de juego
+   ============================================ */
+
+/* Gates (cuestionarios) */
+.gender-gate {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.96);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  padding: 16px;
+}
+
+.gender-gate.active {
+  display: flex;
+}
+
+.gate-card {
+  text-align: center;
+  font-family: var(--mono);
+  color: #fff;
+  width: 90%;
+  max-width: 380px;
+  position: relative;
+  border: 1px solid #333;
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-alt);
+  box-shadow: 0 0 0 1px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.08);
+}
+
+.close-gate {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  color: #555;
+  font-size: 20px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.close-gate:hover {
+  color: #fff;
+}
+
+.gate-card button {
+  display: block;
+  width: 100%;
+  margin: var(--spacing-sm) 0;
+  padding: 16px;
+  background: transparent;
+  border: 1px solid #333;
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--mono);
+  transition: var(--transition-base);
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 12px;
+}
+
+.gate-card button:hover {
+  border-color: var(--accent-red);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.10);
+  box-shadow: 0 0 15px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
+}
+
+.scale-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+/* Modal del juego Pong */
+.game-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+}
+
+.game-modal.active {
+  display: flex;
+}
+
+.game-card {
+  width: min(820px, 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(8, 8, 8, 0.80);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+
+.game-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.game-top strong {
+  color: #fff;
+  font-weight: 500;
+}
+
+.game-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.game-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: var(--transition-base);
+  user-select: none;
+}
+
+.game-btn:hover {
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.65);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.10);
+  box-shadow: 0 0 16px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12);
+}
+
+.game-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  max-height: 70vh;
+  background: 
+    radial-gradient(
+      900px 700px at 20% 30%,
+      rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12),
+      rgba(0, 0, 0, 0) 60%
+    ),
+    #070707;
+}
+
+@media (max-width: 520px) {
+  .game-stage {
+    aspect-ratio: 9/16;
+    max-height: 74vh;
+  }
+}
+
+canvas#pongCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.game-hint {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.6px;
+  text-align: center;
+  pointer-events: none;
+}
