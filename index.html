@@ -34,10 +34,12 @@
   <link rel="stylesheet" href="css/tetris.css">
   <link rel="stylesheet" href="css/games-menu.css">
   <link rel="stylesheet" href="css/video-modal.css">
+  <link rel="stylesheet" href="css/compatibility-test.css">
 
   <!-- Scripts optimizados con defer para carga paralela -->
   <script src="js/main.js" defer></script>
   <script src="js/video-modal.js" defer></script>
+  <script src="js/compatibility-test.js" defer></script>
   <script src="js/gates.js" defer></script>
   <script src="js/games-menu.js" defer></script>
   <script src="js/pong.js" defer></script>
@@ -129,8 +131,15 @@
       </div>
     </div>
 
+    <!-- Compatibility Test -->
+    <div style="text-align:center; margin-top:50px;">
+      <button class="easter-btn" onclick="openCompatibilityTest()" style="margin-bottom: 20px;">
+        Test de Compatibilidad 💘
+      </button>
+    </div>
+
     <!-- Call to Action -->
-    <div style="text-align:center; margin-top:60px; font-family:var(--mono);">
+    <div style="text-align:center; margin-top:10px; font-family:var(--mono);">
       <a href="https://instagram.com/cjj109" 
          target="_blank"
          rel="noopener noreferrer"
@@ -321,6 +330,32 @@
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen>
       </iframe>
+    </div>
+  </div>
+
+  <!-- ============================================
+       COMPATIBILITY TEST MODAL
+       ============================================ -->
+  <div class="compat-test-overlay" id="compatTestModal" role="dialog" aria-modal="true" aria-label="Test de Compatibilidad">
+    <div class="compat-test-container">
+      <button class="compat-test-close" onclick="closeCompatibilityTest()" aria-label="Cerrar test">✕</button>
+
+      <div class="compat-test-header">
+        <div class="compat-test-title">Test de Compatibilidad</div>
+        <div class="compat-test-subtitle">¿Quién es tu match perfecto?</div>
+      </div>
+
+      <div class="compat-test-progress">
+        <div class="compat-test-progress-bar"></div>
+      </div>
+
+      <div id="compatQuestions">
+        <!-- Questions will be rendered here by JS -->
+      </div>
+
+      <div id="compatResults">
+        <!-- Results will be rendered here by JS -->
+      </div>
     </div>
   </div>
 </body>

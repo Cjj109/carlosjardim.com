@@ -67,7 +67,7 @@ function handleScore(score) {
     closeGate();
     openVideoModal('https://youtu.be/Km4BayZykwE');
   } else {
-    videoUrl = 'https://youtu.be/H2aCYA9TN1A';
+    videoUrl = 'https://www.youtube.com/watch?v=3sIkdOqePUg';
     showStep('gateStepQuote');
   }
 }
