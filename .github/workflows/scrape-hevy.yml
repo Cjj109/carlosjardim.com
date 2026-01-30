@@ -19,14 +19,25 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install beautifulsoup4 requests lxml
+          pip install selenium
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
+
+      - name: Install ChromeDriver
+        run: |
+          # ChromeDriver is usually installed with chrome, but ensure it's in PATH
+          which chromedriver || echo "ChromeDriver not found in PATH"
+          chromedriver --version || echo "ChromeDriver version check failed"
 
       - name: Run scraper
         run: python scripts/scrape_hevy.py
-        timeout-minutes: 1
+        timeout-minutes: 3
 
       - name: Commit and push if changed
         run: |
