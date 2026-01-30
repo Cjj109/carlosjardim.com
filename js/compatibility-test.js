@@ -2,42 +2,56 @@
    COMPATIBILITY TEST - Match scoring system
    ============================================ */
 
-// Database de perfiles
+// Database de perfiles (todos los chocolates de la chocolatería)
 const profiles = {
-  carlos: {
-    name: "Carlos Jardim",
-    instagram: "@cjj109",
-    answers: ["blanco", "portugues", "liso", "gym"],
-    taken: false,
-    description: "Economista amante del gym. Constancia > Ruido. Si no está analizando datos, está levantando hierro."
-  },
-  anthonny: {
-    name: "Anthonny Baladi",
-    instagram: "@anthonny.123",
-    answers: ["blanco", "arabe", "calvo", "videojuegos"],
-    taken: true,
-    description: "Gamer árabe sin cabello. Experto en rage quits y combos imposibles."
-  },
-  zachiro: {
-    name: "Zachiro",
-    instagram: "@zachiroj",
+  jesus: {
+    name: "Jesús",
+    instagram: "@elyizus",
     answers: ["blanco", "venezolano", "liso", "videojuegos"],
-    taken: false,
-    description: "Fanático máximo de los RPGs. Si tiene más de 100 horas de gameplay, Zachiro ya lo platinó."
-  },
-  ricardo: {
-    name: "Ricardo de Sousa",
-    instagram: "@radsl",
-    answers: ["blanco", "portugues", "catire", "pollo"],
-    taken: false,
-    description: "Portugués rubio obsesionado con el pollo. Probablemente esté en Cabo Kenedy ahora mismo."
+    taken: true,
+    description: "Dulce en fase beta. Vive tranquilo comiendo perros calientes y jugando LoL. Extremadamente apartado."
   },
   miguel: {
     name: "Miguel Acosta",
     instagram: "@miguex94",
     answers: ["caribeño", "español", "afro", "moteles"],
     taken: true,
-    description: "Crítico profesional de moteles. Si tiene espejo en el techo, él ya estuvo ahí."
+    description: "En su momento fue el terror de cierto sitio. Hoy su vida gira alrededor de la iglesia y la fe. Un hombre totalmente cambiado."
+  },
+  zachiro: {
+    name: "Zachiro",
+    instagram: "@zachiroj",
+    answers: ["asiatico", "chino", "liso", "videojuegos"],
+    taken: false,
+    description: "El primer asiático nacido de dos padres venezolanos. Fanático de los videojuegos. Cuenta con una moto y un tatuaje."
+  },
+  anthonny: {
+    name: "Anthonny",
+    instagram: "@anthonny.123",
+    answers: ["blanco", "arabe", "calvo", "videojuegos"],
+    taken: true,
+    description: "El Benjamín Button del cabello. Ya a los 13 años tenía barba. Este es un dulce tipo Di Caprio (no apto para mayores de 23)."
+  },
+  ricardo: {
+    name: "Ricardo",
+    instagram: "@radsl",
+    answers: ["blanco", "portugues", "catire", "pollo"],
+    taken: false,
+    description: "Este caramelo es conocido por partir. Con ligero sabor y olor a pollo a la brasa. Prohibición de venta en Tanaguarenas."
+  },
+  mike: {
+    name: "Miguel Angelo",
+    instagram: "@miguel267",
+    answers: ["caribeño", "venezolano", "liso", "ice"],
+    taken: false,
+    description: "De fabricación venezolana, actualmente en el mercado estadounidense. Cuenta con un legendario movimiento de caderas (Magic Mike)."
+  },
+  david: {
+    name: "David Pereira",
+    instagram: "@davidapereiraf",
+    answers: ["blanco", "portugues", "liso", "iglesia"],
+    taken: false,
+    description: "Chocolate que se doró en Los Caracas. Busca alemana que disfrute su sabor. Hoy está más cerca del lado oscuro."
   }
 };
 
@@ -78,10 +92,11 @@ const questions = [
     id: 4,
     text: "Plan ideal de sábado",
     options: [
-      { value: "moteles", emoji: "🏨", label: "Review de moteles" },
+      { value: "iglesia", emoji: "⛪", label: "Ir a la iglesia" },
       { value: "pollo", emoji: "🍗", label: "Comer pollo" },
       { value: "videojuegos", emoji: "🎮", label: "Videojuegos" },
-      { value: "gym", emoji: "💪", label: "Gym" }
+      { value: "ice", emoji: "🧊", label: "Escapar del ICE" },
+      { value: "moteles", emoji: "🏨", label: "Review de moteles" }
     ]
   }
 ];
@@ -105,6 +120,14 @@ function openCompatibilityTest() {
   const resultsContainer = document.getElementById('compatResults');
   if (resultsContainer) {
     resultsContainer.innerHTML = '';
+  }
+
+  // Limpiar y mostrar contenedor de preguntas
+  const questionsContainer = document.getElementById('compatQuestions');
+  if (questionsContainer) {
+    questionsContainer.innerHTML = '';
+    questionsContainer.style.opacity = '1';
+    questionsContainer.style.display = 'block';
   }
 
   // Mostrar modal
@@ -238,58 +261,74 @@ function showResults() {
 
   if (!questionsContainer || !resultsContainer) return;
 
-  // Ocultar preguntas
-  questionsContainer.innerHTML = '';
+  // Ocultar preguntas con fade out
+  questionsContainer.style.opacity = '0';
+  questionsContainer.style.transition = 'opacity 0.3s ease';
 
-  // Determinar veredicto
-  let verdict = "";
-  if (topMatch.score === 100) {
-    verdict = "¡MATCH PERFECTO! 🎯";
-  } else if (topMatch.score >= 75) {
-    verdict = "Altamente compatible ✨";
-  } else if (topMatch.score >= 50) {
-    verdict = "Hay química 🔥";
-  } else {
-    verdict = "Interesante... 🤔";
-  }
+  setTimeout(() => {
+    questionsContainer.innerHTML = '';
 
-  // Mensaje si está apartado
-  const takenBadge = topMatch.taken
-    ? '<div class="result-status">⚠️ ACTUALMENTE APARTADO</div>'
-    : '';
+    // Obtener datos del chocolate desde la base de datos
+    const chocolate = window.chocolates ? window.chocolates[topMatch.key] : null;
 
-  // Renderizar resultados
-  resultsContainer.innerHTML = `
-    <div class="compat-test-results active">
-      <div class="result-match-score">${topMatch.score}%</div>
-      <div class="result-verdict">${verdict}</div>
+    if (!chocolate) {
+      // Fallback si no se encuentra el chocolate
+      closeCompatibilityTest();
+      return;
+    }
 
-      <div class="result-profile">
-        <div class="result-name">${topMatch.name}</div>
-        <div class="result-instagram">${topMatch.instagram}</div>
-        ${takenBadge}
-        <div class="result-description">${topMatch.description}</div>
+    // Renderizar el detalle del chocolate directamente en el modal del test
+    const statusBadge = chocolate.status
+      ? `<div class="detail-status ${chocolate.status === 'extremadamente apartado' ? 'extreme' : ''}">
+           ${chocolate.status === 'extremadamente apartado' ? '🚨 EXTREMADAMENTE APARTADO' : '⚠️ APARTADO'}
+         </div>`
+      : '';
+
+    resultsContainer.innerHTML = `
+      <div class="chocolate-detail active" style="animation: fadeIn 0.5s ease;">
+        <div style="font-size: 48px; margin-bottom: 20px;">🎯</div>
+        <div style="font-size: 18px; color: #ffd700; margin-bottom: 30px; font-family: var(--mono); letter-spacing: 2px;">
+          TU MATCH PERFECTO
+        </div>
+
+        <img src="${chocolate.image}" alt="${chocolate.name}" class="detail-img" onerror="this.src='images/placeholder.png'">
+        <div class="detail-name">${chocolate.name}</div>
+        ${statusBadge}
+        <div class="detail-description">${chocolate.description}</div>
+
+        <div class="detail-actions">
+          <a href="https://instagram.com/${chocolate.instagram.replace('@', '')}"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="detail-btn">
+            Ver Perfil
+          </a>
+          <button onclick="viewAllChocolates()" class="detail-btn secondary">
+            Ver Otros Chocolates
+          </button>
+          <button onclick="closeCompatibilityTest()" class="detail-btn secondary">
+            Cerrar
+          </button>
+        </div>
       </div>
+    `;
 
-      <div class="result-actions">
-        <a href="https://instagram.com/${topMatch.instagram.replace('@', '')}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="result-btn">
-          VER PERFIL
-        </a>
-        <button onclick="closeCompatibilityTest()" class="result-btn secondary">
-          CERRAR
-        </button>
-        <button onclick="openCompatibilityTest()" class="result-btn secondary">
-          REPETIR TEST
-        </button>
-      </div>
-    </div>
-  `;
+    // Actualizar progreso a 100%
+    const progressBar = document.querySelector('.compat-test-progress-bar');
+    if (progressBar) {
+      progressBar.style.width = '100%';
+    }
+  }, 300);
+}
 
-  // Actualizar progreso a 100%
-  updateProgress();
+/**
+ * Ver todos los chocolates desde el resultado del test
+ */
+function viewAllChocolates() {
+  closeCompatibilityTest();
+  setTimeout(() => {
+    openChocolateShop();
+  }, 300);
 }
 
 /**

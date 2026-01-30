@@ -1,0 +1,36 @@
+name: Scrape Hevy Workout Data
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install beautifulsoup4 requests lxml
+
+      - name: Run scraper
+        run: python scripts/scrape_hevy.py
+        timeout-minutes: 1
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add data/gym-data.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update gym data from Hevy [automated]" && git push)

@@ -35,11 +35,17 @@
   <link rel="stylesheet" href="css/games-menu.css">
   <link rel="stylesheet" href="css/video-modal.css">
   <link rel="stylesheet" href="css/compatibility-test.css">
+  <link rel="stylesheet" href="css/chocolate-shop.css">
+  <link rel="stylesheet" href="css/side-a-enhancements.css">
+  <link rel="stylesheet" href="css/matrix-mode.css">
 
   <!-- Scripts optimizados con defer para carga paralela -->
   <script src="js/main.js" defer></script>
   <script src="js/video-modal.js" defer></script>
   <script src="js/compatibility-test.js" defer></script>
+  <script src="js/chocolate-shop.js" defer></script>
+  <script src="js/side-a-enhancements.js" defer></script>
+  <script src="js/gym-widget.js" defer></script>
   <script src="js/gates.js" defer></script>
   <script src="js/games-menu.js" defer></script>
   <script src="js/pong.js" defer></script>
@@ -67,7 +73,7 @@
     <div class="window-content">
       <div class="cv-title">
         <h1>Carlos Jardim</h1>
-        <span class="subtitle">Economista • Constancia > Ruido</span>
+        <span class="subtitle"><span class="clickable" onclick="openAcademicTimeline()">Economista</span></span>
       </div>
 
       <div class="section-label">Perfil</div>
@@ -75,12 +81,85 @@
         Me muevo entre datos y decisiones, pero lo mío es la calma: constancia, humor seco y cero necesidad de impresionar.
       </p>
 
-      <div class="section-label">Lo visible</div>
-      <ul class="cv-list">
-        <li>Entrenamiento de alta intensidad.</li>
-        <li>Proyectos, negocios y orden mental aplicado.</li>
-        <li>176 cm de estabilidad funcional.</li>
+      <div class="section-label">Habilidades</div>
+      <div class="skills-section">
+        <div class="skill-item">
+          <div class="skill-label">
+            <span class="skill-name">Economía</span>
+          </div>
+          <div class="skill-bar-container">
+            <div class="skill-bar" style="width: 0%" data-width="100%"></div>
+          </div>
+          <div class="skill-tooltip">Aprendí a ahorrar en latas de atún</div>
+        </div>
+
+        <div class="skill-item">
+          <div class="skill-label">
+            <span class="skill-name">Excel</span>
+          </div>
+          <div class="skill-bar-container">
+            <div class="skill-bar" style="width: 0%" data-width="90%"></div>
+          </div>
+          <div class="skill-tooltip">Sé sumar y restar como nadie</div>
+        </div>
+
+        <div class="skill-item">
+          <div class="skill-label">
+            <span class="skill-name">Creatividad</span>
+          </div>
+          <div class="skill-bar-container">
+            <div class="skill-bar" style="width: 0%" data-width="100%"></div>
+          </div>
+          <div class="skill-tooltip">La página lo demuestra</div>
+        </div>
+      </div>
+
+      <!-- Matrix Stats (hidden by default, shown in Matrix mode) -->
+      <div class="matrix-stats">
+        <div class="matrix-stat-item">
+          <div class="matrix-stat-label">NIVEL DE PROCRASTINACIÓN</div>
+          <div class="matrix-stat-bar-container">
+            <div class="matrix-stat-bar" style="width: 0%" data-width="30%"></div>
+          </div>
+        </div>
+
+        <div class="matrix-stat-item">
+          <div class="matrix-stat-label">SARCASMO</div>
+          <div class="matrix-stat-bar-container">
+            <div class="matrix-stat-bar" style="width: 0%" data-width="100%"></div>
+          </div>
+        </div>
+
+        <div class="matrix-stat-item">
+          <div class="matrix-stat-label">ABURRIMIENTO QUE ME LLEVÓ A HACER LA PÁGINA</div>
+          <div class="matrix-stat-bar-container">
+            <div class="matrix-stat-bar" style="width: 0%" data-width="100%"></div>
+          </div>
+        </div>
+
+        <div class="matrix-stat-item">
+          <div class="matrix-stat-label">DEDICACIÓN AL GYM</div>
+          <div class="matrix-stat-bar-container">
+            <div class="matrix-stat-bar" style="width: 0%" data-width="80%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Intereses</div>
+      <ul class="interests-list">
+        <li onclick="openGymWidget()">Gym</li>
+        <li onclick="openGamesMenu()">Gaming</li>
+        <li onclick="activateMatrixMode()">Tecnología</li>
       </ul>
+
+      <p class="cv-text" style="margin-top: 20px;">
+        <span class="clickable" onclick="openHeightScale()">176 cm</span> de estabilidad funcional.
+      </p>
+
+      <!-- Mini Golden Ticket (appears after first chocolatería visit) -->
+      <div id="miniGoldenTicket" class="mini-golden-ticket" onclick="openChocolateShop()" style="display: none;">
+        🎫 Chocolatería
+      </div>
 
       <div class="trigger-wrapper">
         <div class="hint-arrow" id="hintArrow">Muerde el dulce ↓</div>
@@ -131,32 +210,24 @@
       </div>
     </div>
 
-    <!-- Compatibility Test -->
-    <div style="text-align:center; margin-top:50px;">
-      <button class="easter-btn" onclick="openCompatibilityTest()" style="margin-bottom: 20px;">
-        Test de Compatibilidad 💘
-      </button>
-    </div>
-
     <!-- Call to Action -->
-    <div style="text-align:center; margin-top:10px; font-family:var(--mono);">
-      <a href="https://instagram.com/cjj109" 
+    <div style="text-align:center; margin-top:60px; font-family:var(--mono); display:flex; flex-direction:column; align-items:center; gap:16px;">
+      <a href="https://instagram.com/cjj109"
          target="_blank"
          rel="noopener noreferrer"
-         style="color:var(--accent-red); text-decoration:none; border:1px solid; padding:18px 40px; display:inline-block; font-weight:bold; border-radius:4px; letter-spacing:2px; transition:0.3s;">
+         class="main-cta-button">
         SOLICITAR ACCESO
       </a>
 
-      <div>
+      <button onclick="toggleMode(false)" class="return-button">
+        ¿No estás convencida? 🎫
+      </button>
+
+      <div style="margin-top:14px;">
         <button class="easter-btn" onclick="openGamesMenu()">
           toca si tu novia estuvo aquí
         </button>
       </div>
-
-      <p onclick="toggleMode(false)" 
-         style="color:#666; cursor:pointer; margin-top:40px; font-size:11px; letter-spacing:1px; opacity:0.7;">
-        ← REVERTIR SISTEMA
-      </p>
     </div>
   </div>
 
@@ -358,5 +429,203 @@
       </div>
     </div>
   </div>
+
+  <!-- ============================================
+       ACADEMIC TIMELINE MODAL
+       ============================================ -->
+  <div class="timeline-modal" id="timelineModal" role="dialog" aria-modal="true" aria-label="Carrera Académica">
+    <div class="timeline-container">
+      <button class="timeline-close" onclick="closeAcademicTimeline()" aria-label="Cerrar timeline">✕</button>
+
+      <div class="timeline-header">
+        <div class="timeline-title">Carrera Académica</div>
+        <div class="timeline-subtitle">El camino del conocimiento</div>
+      </div>
+
+      <div class="timeline-track">
+        <!-- La Merced -->
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2003 - 2016</div>
+          <div class="timeline-institution">Unidad Educativa Colegio "La Merced"</div>
+          <div class="timeline-degree">Educación Primaria y Secundaria</div>
+          <div class="timeline-achievement">⭐ Promedio: 18.99 puntos</div>
+        </div>
+
+        <!-- UCAB -->
+        <div class="timeline-item" onclick="toggleUCABAchievements()">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2016 - 2020</div>
+          <div class="timeline-institution">Universidad Católica Andrés Bello (UCAB)</div>
+          <div class="timeline-degree">Licenciatura en Economía</div>
+          <div class="timeline-achievement">🏆 Summa Cum Laude (Mención Honorífica)</div>
+          <a href="https://www.instagram.com/s/aGlnaGxpZ2h0OjE3ODk5OTczMjczMTA3NDIw?story_media_id=2612784630106730737&igsh=MXR2aW1iY2RnaHh2eQ=="
+             target="_blank"
+             rel="noopener noreferrer"
+             class="timeline-link"
+             onclick="event.stopPropagation()">
+            Ver Historia de Graduación →
+          </a>
+
+          <!-- UCAB Details (expandible) -->
+          <div class="ucab-details" id="ucabDetails">
+            <div class="ucab-section">
+              <div class="ucab-section-title">Logros Desbloqueados</div>
+              <ul class="ucab-list">
+                <li>Sobrevivió a econometría</li>
+                <li>Master en Excel (nivel Dios)</li>
+                <li>Puede explicar inflación venezolana en 3 idiomas</li>
+              </ul>
+            </div>
+
+            <div class="ucab-section">
+              <div class="ucab-section-title">Habilidades Adquiridas</div>
+              <ul class="ucab-list skills">
+                <li>Conversión de datos en decisiones</li>
+                <li>Tolerancia al estrés académico</li>
+                <li>Café como combustible principal</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       HEIGHT SCALE MODAL
+       ============================================ -->
+  <div class="height-scale-modal" id="heightScaleModal" role="dialog" aria-modal="true" aria-label="Comparación de Altura">
+    <div class="height-scale-container">
+      <button class="height-scale-close" onclick="closeHeightScale()" aria-label="Cerrar escala">✕</button>
+
+      <div class="height-scale-header">
+        <div class="height-scale-title">Escala de Altura</div>
+        <div class="height-scale-subtitle">Perspectiva relativa</div>
+      </div>
+
+      <div class="height-chart">
+        <div class="height-person">
+          <div class="height-bar" style="height: 44%;">
+            <div class="height-value">120 cm</div>
+            <div class="height-icon">🧙‍♂️</div>
+          </div>
+          <div class="height-label">Hobbit<br>(El Señor de los Anillos)</div>
+        </div>
+
+        <div class="height-person">
+          <div class="height-bar" style="height: 55%;">
+            <div class="height-value">150 cm</div>
+            <div class="height-icon">👩</div>
+          </div>
+          <div class="height-label">Promedio<br>Femenino Global</div>
+        </div>
+
+        <div class="height-person">
+          <div class="height-bar" style="height: 61%;">
+            <div class="height-value">165 cm</div>
+            <div class="height-icon">🧍</div>
+          </div>
+          <div class="height-label">Promedio<br>Latinoamericano</div>
+        </div>
+
+        <div class="height-person highlight">
+          <div class="height-bar" style="height: 65%;">
+            <div class="height-value">176 cm</div>
+            <div class="height-icon">🕺</div>
+          </div>
+          <div class="height-label">Yo<br>(Carlos)</div>
+        </div>
+
+        <div class="height-person">
+          <div class="height-bar" style="height: 72%;">
+            <div class="height-value">195 cm</div>
+            <div class="height-icon">🏀</div>
+          </div>
+          <div class="height-label">Jugador NBA<br>Promedio</div>
+        </div>
+
+        <div class="height-person">
+          <div class="height-bar" style="height: 100%;">
+            <div class="height-value">272 cm</div>
+            <div class="height-icon">🗼</div>
+          </div>
+          <div class="height-label">Robert Wadlow<br>(Más alto registrado)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       GYM WIDGET MODAL
+       ============================================ -->
+  <div class="gym-widget-modal" id="gymWidgetModal" role="dialog" aria-modal="true" aria-label="Estadísticas de Gym">
+    <div class="gym-widget-container">
+      <button class="gym-widget-close" onclick="closeGymWidget()" aria-label="Cerrar widget de gym">✕</button>
+
+      <div class="gym-widget-header">
+        <div class="gym-widget-title">💪 Gym Stats</div>
+        <div class="gym-widget-subtitle">Powered by Hevy.com</div>
+      </div>
+
+      <div id="gymWidgetContent">
+        <!-- Content will be loaded by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       GOLDEN TICKET
+       ============================================ -->
+  <div class="golden-ticket" id="goldenTicket">
+    <button class="golden-ticket-close" onclick="closeGoldenTicket()" aria-label="Cerrar">×</button>
+    <div class="ticket-header">🎫 TICKET DORADO</div>
+    <div class="ticket-text">
+      Hiciste el tour completo. ¿Nada te convenció? Fair. Te tengo un plan B:
+      <br><br>
+      <strong>Abrir chocolatería</strong>
+    </div>
+    <button class="ticket-button" onclick="openChocolateShop()">
+      Ver Chocolates
+    </button>
+  </div>
+
+  <!-- ============================================
+       CHOCOLATE SHOP MODAL
+       ============================================ -->
+  <div class="chocolate-shop-overlay" id="chocolateShopModal" role="dialog" aria-modal="true" aria-label="Chocolatería">
+    <div class="chocolate-shop-container">
+      <button class="chocolate-shop-close" onclick="closeChocolateShop()" aria-label="Cerrar chocolatería">✕</button>
+
+      <div class="shop-header">
+        <div class="shop-title">🍫 La Chocolatería</div>
+        <div class="shop-subtitle">Selecciona tu dulce favorito</div>
+      </div>
+
+      <!-- Grid View -->
+      <div id="chocolatesGridView">
+        <div class="chocolates-grid" id="chocolatesGrid">
+          <!-- Chocolates will be rendered here by JS -->
+        </div>
+
+        <!-- Compatibility Test Button -->
+        <div style="text-align: center; margin-top: 30px;">
+          <button class="compat-test-btn" onclick="openCompatibilityTestFromShop()">
+            ¿Ninguno te convence? 💘 Haz el test
+          </button>
+        </div>
+      </div>
+
+      <!-- Detail View -->
+      <div id="chocolateDetailView" style="display: none;">
+        <!-- Chocolate detail will be rendered here by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Exit Matrix Button -->
+  <button class="exit-matrix-btn" onclick="deactivateMatrixMode()">
+    Salir del Matrix
+  </button>
 </body>
 </html>
