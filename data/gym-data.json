@@ -1,54 +1,16 @@
 {
-  "last_updated": "2026-01-30T12:00:00",
+  "last_updated": "2026-01-30T20:37:22.613306",
   "profile_url": "https://hevy.com/user/cjj109",
   "last_workout": {
-    "name": "Push Day",
+    "name": "Último Workout",
     "date": "2026-01-30",
-    "duration": "65 min",
-    "volume": "4,250 kg",
-    "exercises": [
-      {
-        "name": "Bench Press",
-        "sets": [
-          { "reps": 8, "weight": "80 kg" },
-          { "reps": 8, "weight": "80 kg" },
-          { "reps": 6, "weight": "85 kg" },
-          { "reps": 5, "weight": "90 kg" }
-        ],
-        "image": null
-      },
-      {
-        "name": "Shoulder Press",
-        "sets": [
-          { "reps": 10, "weight": "25 kg" },
-          { "reps": 10, "weight": "25 kg" },
-          { "reps": 8, "weight": "30 kg" }
-        ],
-        "image": null
-      },
-      {
-        "name": "Incline Dumbbell Press",
-        "sets": [
-          { "reps": 10, "weight": "30 kg" },
-          { "reps": 10, "weight": "30 kg" },
-          { "reps": 8, "weight": "35 kg" }
-        ],
-        "image": null
-      },
-      {
-        "name": "Triceps Pushdown",
-        "sets": [
-          { "reps": 12, "weight": "40 kg" },
-          { "reps": 12, "weight": "45 kg" },
-          { "reps": 10, "weight": "50 kg" }
-        ],
-        "image": null
-      }
-    ]
+    "duration": "0 min",
+    "volume": "0 kg",
+    "exercises": []
   },
   "stats": {
-    "total_workouts": "245",
-    "total_volume": "1,234,500 kg",
-    "streak": "12 días"
+    "total_workouts": "0",
+    "total_volume": "0 kg",
+    "streak": "0 días"
   }
 }
