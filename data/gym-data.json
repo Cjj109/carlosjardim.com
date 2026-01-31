@@ -1,12 +1,99 @@
 {
-  "last_updated": "2026-01-30T20:37:22.613306",
+  "last_updated": "2026-01-30T20:29:42.318978",
   "profile_url": "https://hevy.com/user/cjj109",
   "last_workout": {
-    "name": "Último Workout",
+    "name": "Pierna 2",
     "date": "2026-01-30",
-    "duration": "0 min",
-    "volume": "0 kg",
-    "exercises": []
+    "duration": "57 min",
+    "volume": "10,607 kg",
+    "exercises": [
+      {
+        "name": "Romanian Deadlift (Barbell)",
+        "sets": [
+          {
+            "reps": 8,
+            "weight": "110 kg"
+          },
+          {
+            "reps": 8,
+            "weight": "110 kg"
+          },
+          {
+            "reps": 8,
+            "weight": "110 kg"
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Lying Leg Curl (Machine)",
+        "sets": [
+          {
+            "reps": 11,
+            "weight": "31 kg"
+          },
+          {
+            "reps": 8,
+            "weight": "31 kg"
+          },
+          {
+            "reps": 7,
+            "weight": "31 kg"
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Leg Press (Machine)",
+        "sets": [
+          {
+            "reps": 10,
+            "weight": "154 kg"
+          },
+          {
+            "reps": 10,
+            "weight": "154 kg"
+          },
+          {
+            "reps": 10,
+            "weight": "154 kg"
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Leg Extension (Machine)",
+        "sets": [
+          {
+            "reps": 12,
+            "weight": "38 kg"
+          },
+          {
+            "reps": 12,
+            "weight": "38 kg"
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Single Leg Standing Calf Raise (Machine)",
+        "sets": [
+          {
+            "reps": 12,
+            "weight": "45.24 kg"
+          },
+          {
+            "reps": 12,
+            "weight": "45.24 kg"
+          },
+          {
+            "reps": 12,
+            "weight": "45.24 kg"
+          }
+        ],
+        "image": null
+      }
+    ]
   },
   "stats": {
     "total_workouts": "0",

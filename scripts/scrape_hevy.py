@@ -58,19 +58,45 @@ def scrape_hevy_profile():
         print(f"Loading {HEVY_PROFILE_URL}...")
         driver.get(HEVY_PROFILE_URL)
 
-        # Wait for page to load - wait for workout cards or profile stats
+        # Wait for page to load
         print("Waiting for page to load...")
         wait = WebDriverWait(driver, TIMEOUT)
+        time.sleep(3)  # Give page time to render
 
-        # Try to wait for workout content to appear
+        # Look for "See more exercises" link or button
+        print("Looking for workout details link...")
+        workout_url = None
+
         try:
-            wait.until(
-                lambda d: len(d.find_elements(By.CSS_SELECTOR, '[class*="workout"], [class*="Workout"], article, .card')) > 0
-            )
-            print("✓ Page loaded")
-            time.sleep(2)  # Additional wait for dynamic content
-        except TimeoutException:
-            print("WARNING: Timeout waiting for workout content. Trying to extract anyway...")
+            # Try to find "See more exercises" link/button
+            see_more_selectors = [
+                "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'see more')]",
+                "//button[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'see more')]",
+                "//a[contains(@href, '/workout/')]",
+                "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'view workout')]"
+            ]
+
+            for selector in see_more_selectors:
+                try:
+                    elements = driver.find_elements(By.XPATH, selector)
+                    if elements:
+                        # Get the first workout link
+                        element = elements[0]
+                        workout_url = element.get_attribute('href')
+                        if workout_url:
+                            print(f"✓ Found workout link: {workout_url}")
+                            break
+                except:
+                    continue
+
+            if workout_url:
+                # Navigate to the workout detail page
+                print(f"Loading workout details from {workout_url}...")
+                driver.get(workout_url)
+                time.sleep(3)  # Wait for workout page to load
+
+        except Exception as e:
+            print(f"WARNING: Could not find workout detail link: {e}")
 
         # Extract data
         workout_data = {
@@ -95,6 +121,8 @@ def scrape_hevy_profile():
 
 def extract_last_workout(driver):
     """Extract last workout details from page"""
+    import re
+
     workout = {
         "name": "Último Workout",
         "date": datetime.now().strftime("%Y-%m-%d"),
@@ -104,129 +132,85 @@ def extract_last_workout(driver):
     }
 
     try:
-        # Try multiple selectors for workout cards
-        workout_selectors = [
-            'article',
-            '[class*="WorkoutCard"]',
-            '[class*="workout-card"]',
-            '.card',
-            '[data-testid*="workout"]'
-        ]
+        # Wait for dynamic content to load
+        time.sleep(5)
 
-        workout_element = None
-        for selector in workout_selectors:
-            elements = driver.find_elements(By.CSS_SELECTOR, selector)
-            if elements:
-                workout_element = elements[0]
-                print(f"✓ Found workout with selector: {selector}")
-                break
+        # Get all text content from the page
+        page_text = driver.find_element(By.TAG_NAME, 'body').text
+        print(f"Page text preview: {page_text[:500]}...")
 
-        if not workout_element:
-            print("WARNING: No workout element found. Using default values.")
-            return workout
-
-        # Extract workout name/title
-        title_selectors = ['h1', 'h2', 'h3', '[class*="title"]', '[class*="Title"]']
+        # Try to find workout name in page title or h1/h2
+        title_selectors = ['h1', 'h2', '[class*="title" i]', '[class*="Title" i]']
         for selector in title_selectors:
             try:
-                title = workout_element.find_element(By.CSS_SELECTOR, selector)
-                if title and title.text.strip():
-                    workout["name"] = title.text.strip()
-                    print(f"✓ Workout name: {workout['name']}")
+                elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                for elem in elements:
+                    text = elem.text.strip()
+                    if text and len(text) > 2 and text != "Loading..." and "Sign Up" not in text and "Log in" not in text:
+                        workout["name"] = text
+                        print(f"✓ Workout name: {workout['name']}")
+                        break
+                if workout["name"] != "Último Workout":
                     break
-            except NoSuchElementException:
+            except:
                 continue
 
-        # Extract date
-        time_element = workout_element.find_elements(By.TAG_NAME, 'time')
-        if time_element:
-            workout["date"] = time_element[0].get_attribute('datetime') or time_element[0].text.strip()
-            print(f"✓ Date: {workout['date']}")
+        # If still not found, try to extract from page text (format: "username\ntime ago\nWorkout Name\nDuration")
+        if workout["name"] == "Último Workout":
+            name_match = re.search(r'(?:a day ago|[\d]+ (?:days?|hours?|minutes?) ago)\s+([A-Z][A-Za-z0-9\s]+)\s+Duration', page_text)
+            if name_match:
+                workout["name"] = name_match.group(1).strip()
+                print(f"✓ Workout name (from text): {workout['name']}")
 
-        # Extract all text from workout card to find duration/volume
-        workout_text = workout_element.text
-        print(f"Workout card text preview: {workout_text[:200]}...")
-
-        # Look for patterns like "65 min", "1h 5min", "4,250 kg", "4250kg"
+        # Extract all visible text and parse with regex
         import re
 
-        # Duration patterns
-        duration_patterns = [
-            r'(\d+)\s*h\s*(\d+)\s*min',  # 1h 30min
-            r'(\d+)\s*min',               # 65 min
-            r'(\d+)\s*m(?!g|uscle)'       # 65m (but not mg or muscle)
-        ]
-        for pattern in duration_patterns:
-            match = re.search(pattern, workout_text, re.IGNORECASE)
-            if match:
-                if len(match.groups()) == 2:
-                    workout["duration"] = f"{int(match.group(1))*60 + int(match.group(2))} min"
-                else:
-                    workout["duration"] = f"{match.group(1)} min"
-                print(f"✓ Duration: {workout['duration']}")
-                break
+        # Duration pattern - "Duration\n57min"
+        duration_match = re.search(r'Duration\s*(\d+)\s*min', page_text, re.IGNORECASE)
+        if duration_match:
+            workout["duration"] = f"{duration_match.group(1)} min"
+            print(f"✓ Duration: {workout['duration']}")
 
-        # Volume patterns
-        volume_patterns = [
-            r'([\d,]+)\s*kg',             # 4,250 kg
-            r'([\d,]+)\s*lbs'             # 9,370 lbs
-        ]
-        for pattern in volume_patterns:
-            match = re.search(pattern, workout_text, re.IGNORECASE)
-            if match:
-                workout["volume"] = f"{match.group(1)} kg"
-                print(f"✓ Volume: {workout['volume']}")
-                break
+        # Volume pattern - "Volume\n10,607 kg"
+        volume_match = re.search(r'Volume\s*([\d,]+)\s*kg', page_text, re.IGNORECASE)
+        if volume_match:
+            workout["volume"] = f"{volume_match.group(1)} kg"
+            print(f"✓ Volume: {workout['volume']}")
 
-        # Try to extract exercises
-        exercise_elements = workout_element.find_elements(By.CSS_SELECTOR, '[class*="exercise"], [class*="Exercise"]')
+        # Extract exercises
+        # Pattern: Exercise Name (Equipment)\nSETS\nWEIGHT & REPS\n1\n110kg x 8 reps\n2\n110kg x 8 reps
+        # Split by exercise sections
+        exercise_sections = re.split(r'(?=^[A-Z][a-zA-Z\s]+\([A-Za-z]+\))', page_text, flags=re.MULTILINE)
 
-        if not exercise_elements:
-            # Try finding exercises by looking for lists or repeated elements
-            exercise_elements = workout_element.find_elements(By.CSS_SELECTOR, 'li, [role="listitem"]')
+        for section in exercise_sections:
+            # Check if this is an exercise section
+            exercise_name_match = re.match(r'^([A-Z][a-zA-Z\s]+\([A-Za-z]+\))', section)
+            if not exercise_name_match:
+                continue
 
-        print(f"Found {len(exercise_elements)} exercise elements")
+            exercise_name = exercise_name_match.group(1).strip()
 
-        for i, ex_elem in enumerate(exercise_elements[:5]):  # Limit to 5 exercises
-            try:
-                ex_text = ex_elem.text.strip()
-                if not ex_text or len(ex_text) < 3:
-                    continue
+            # Find all sets in this exercise: "110kg x 8 reps"
+            set_matches = re.findall(r'([\d.]+)\s*kg\s*x\s*(\d+)\s*reps?', section, re.IGNORECASE)
 
+            if set_matches:
                 exercise = {
-                    "name": ex_text.split('\n')[0] if '\n' in ex_text else ex_text,
+                    "name": exercise_name,
                     "sets": [],
                     "image": None
                 }
 
-                # Try to parse sets from text
-                # Look for patterns like "3 × 10 @ 50kg" or "10 reps × 50kg"
-                set_patterns = [
-                    r'(\d+)\s*×\s*(\d+)\s*@\s*([\d.]+)\s*kg',
-                    r'(\d+)\s*reps?\s*×\s*([\d.]+)\s*kg'
-                ]
+                for weight, reps in set_matches:
+                    exercise["sets"].append({
+                        "reps": int(reps),
+                        "weight": f"{weight} kg"
+                    })
 
-                for pattern in set_patterns:
-                    matches = re.findall(pattern, ex_text, re.IGNORECASE)
-                    for match in matches:
-                        if len(match) == 3:
-                            # sets × reps @ weight
-                            num_sets = int(match[0])
-                            reps = int(match[1])
-                            weight = match[2]
-                            for _ in range(num_sets):
-                                exercise["sets"].append({
-                                    "reps": reps,
-                                    "weight": f"{weight} kg"
-                                })
+                workout["exercises"].append(exercise)
+                print(f"  ✓ Exercise: {exercise_name} - {len(set_matches)} sets")
 
-                if exercise["sets"] or len(exercise["name"]) > 3:
-                    workout["exercises"].append(exercise)
-                    print(f"  ✓ Exercise {i+1}: {exercise['name']}")
-
-            except Exception as e:
-                print(f"  ⚠ Error parsing exercise {i+1}: {e}")
-                continue
+        if len(workout["exercises"]) > 5:
+            workout["exercises"] = workout["exercises"][:5]  # Limit to 5 exercises
 
     except Exception as e:
         print(f"WARNING: Error extracting workout details: {e}")
@@ -244,53 +228,9 @@ def extract_stats(driver):
         "streak": "0 días"
     }
 
-    try:
-        # Look for stats in various places
-        stat_selectors = [
-            '[class*="stat"]',
-            '[class*="Stat"]',
-            '[class*="metric"]',
-            '[data-testid*="stat"]'
-        ]
-
-        stat_elements = []
-        for selector in stat_selectors:
-            elements = driver.find_elements(By.CSS_SELECTOR, selector)
-            if elements:
-                stat_elements = elements
-                print(f"✓ Found {len(elements)} stat elements with selector: {selector}")
-                break
-
-        # Parse stat text
-        import re
-        for stat in stat_elements[:10]:  # Check first 10 stats
-            text = stat.text.strip()
-            if not text:
-                continue
-
-            # Workout count
-            if re.search(r'workout', text, re.IGNORECASE):
-                match = re.search(r'(\d+)', text)
-                if match:
-                    stats["total_workouts"] = match.group(1)
-                    print(f"✓ Total workouts: {stats['total_workouts']}")
-
-            # Volume
-            elif 'kg' in text.lower() or 'volume' in text.lower():
-                match = re.search(r'([\d,]+)\s*kg', text, re.IGNORECASE)
-                if match:
-                    stats["total_volume"] = f"{match.group(1)} kg"
-                    print(f"✓ Total volume: {stats['total_volume']}")
-
-            # Streak
-            elif 'streak' in text.lower() or 'día' in text.lower() or 'day' in text.lower():
-                match = re.search(r'(\d+)', text)
-                if match:
-                    stats["streak"] = f"{match.group(1)} días"
-                    print(f"✓ Streak: {stats['streak']}")
-
-    except Exception as e:
-        print(f"WARNING: Error extracting stats: {e}")
+    # Stats are usually on the profile page, not the workout detail page
+    # For now, return default values since we're on the workout page
+    # In the future, we could navigate back to profile or extract from profile page first
 
     return stats
 
