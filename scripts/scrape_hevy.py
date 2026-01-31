@@ -240,10 +240,24 @@ def load_existing_data():
     if os.path.exists(OUTPUT_FILE):
         try:
             with open(OUTPUT_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                # Initialize previous_workouts if it doesn't exist
+                if "previous_workouts" not in data:
+                    data["previous_workouts"] = []
+                return data
         except (json.JSONDecodeError, IOError):
             return None
     return None
+
+
+def is_new_workout(new_workout, old_workout):
+    """Check if the new workout is different from the old one"""
+    if not old_workout:
+        return True
+
+    # Compare by date and name to determine if it's a new workout
+    return (new_workout.get("date") != old_workout.get("date") or
+            new_workout.get("name") != old_workout.get("name"))
 
 
 def save_data(data):
@@ -270,10 +284,34 @@ def main():
     print("Hevy Workout Scraper (Selenium)")
     print("=" * 50)
 
+    # Load existing data
+    existing_data = load_existing_data()
+
     # Scrape new data
     new_data = scrape_hevy_profile()
 
     if new_data and (new_data["last_workout"]["name"] != "Último Workout" or new_data["stats"]["total_workouts"] != "0"):
+        # Check if this is a new workout
+        if existing_data and is_new_workout(new_data["last_workout"], existing_data.get("last_workout")):
+            print("→ New workout detected! Saving previous workout to history...")
+
+            # Add the old workout to the previous workouts list
+            previous_workouts = existing_data.get("previous_workouts", [])
+            previous_workouts.insert(0, existing_data["last_workout"])
+
+            # Keep only the last 6 previous workouts (7 total including current)
+            new_data["previous_workouts"] = previous_workouts[:6]
+
+            print(f"  ✓ Now tracking {len(new_data['previous_workouts']) + 1} workouts total")
+        elif existing_data:
+            # Same workout, keep existing previous workouts
+            new_data["previous_workouts"] = existing_data.get("previous_workouts", [])
+            print("→ Same workout as before, updating timestamp only")
+        else:
+            # First time running
+            new_data["previous_workouts"] = []
+            print("→ First workout saved!")
+
         # Save new data if we got something useful
         if save_data(new_data):
             print("✓ Scraping completed successfully")
@@ -284,7 +322,6 @@ def main():
     else:
         print("✗ Scraping failed or no data found")
         # Keep existing data if scraping fails
-        existing_data = load_existing_data()
         if existing_data:
             print("→ Keeping existing data")
             return 0

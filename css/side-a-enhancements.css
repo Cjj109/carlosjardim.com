@@ -1017,6 +1017,77 @@ body.gym-widget-open {
   overflow: hidden;
 }
 
+/* Gym Navigation Controls */
+.gym-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 24px 0;
+  padding: 16px;
+  background: rgba(255, 59, 48, 0.05);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.gym-nav-btn {
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.gym-nav-btn:hover:not(.disabled) {
+  background: var(--accent-red);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+}
+
+.gym-nav-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-color: rgba(255, 59, 48, 0.3);
+}
+
+.gym-nav-indicator {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .gym-navigation {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .gym-nav-btn {
+    width: 100%;
+    padding: 12px 16px;
+  }
+
+  .gym-nav-indicator {
+    order: -1;
+    font-size: 11px;
+  }
+}
+
 /* ============================================
    SIDE B CTA BUTTONS
    ============================================ */

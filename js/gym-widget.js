@@ -27,6 +27,10 @@ function closeGymWidget() {
   document.body.classList.remove('gym-widget-open');
 }
 
+// Global variable to track current workout index and data
+let gymData = null;
+let currentWorkoutIndex = 0;
+
 /**
  * Load gym data from JSON file
  */
@@ -45,10 +49,11 @@ async function loadGymData() {
       throw new Error('Failed to fetch gym data');
     }
 
-    const data = await response.json();
+    gymData = await response.json();
+    currentWorkoutIndex = 0; // Always start with latest workout
 
     // Render data
-    renderWorkoutData(data);
+    renderWorkoutData();
 
   } catch (error) {
     console.error('Error loading gym data:', error);
@@ -64,11 +69,25 @@ async function loadGymData() {
 /**
  * Render workout data
  */
-function renderWorkoutData(data) {
+function renderWorkoutData() {
   const container = document.getElementById('gymWidgetContent');
-  if (!container) return;
+  if (!container || !gymData) return;
 
-  const workout = data.last_workout;
+  // Get the workout to display based on current index
+  const workout = currentWorkoutIndex === 0
+    ? gymData.last_workout
+    : gymData.previous_workouts[currentWorkoutIndex - 1];
+
+  if (!workout) {
+    container.innerHTML = '<div class="gym-error">No hay datos de entrenamiento disponibles</div>';
+    return;
+  }
+
+  // Check if there are previous workouts
+  const hasPreviousWorkouts = gymData.previous_workouts && gymData.previous_workouts.length > 0;
+  const totalWorkouts = 1 + (gymData.previous_workouts?.length || 0);
+  const canGoPrevious = currentWorkoutIndex > 0;
+  const canGoNext = currentWorkoutIndex < totalWorkouts - 1;
 
   const exercisesHTML = workout.exercises.map(exercise => `
     <div class="gym-exercise">
@@ -83,6 +102,27 @@ function renderWorkoutData(data) {
       </div>
     </div>
   `).join('');
+
+  // Navigation buttons HTML (only show if there are previous workouts)
+  const navigationHTML = hasPreviousWorkouts ? `
+    <div class="gym-navigation">
+      <button
+        class="gym-nav-btn ${!canGoPrevious ? 'disabled' : ''}"
+        onclick="navigateWorkout(-1)"
+        ${!canGoPrevious ? 'disabled' : ''}>
+        ← Anterior
+      </button>
+      <div class="gym-nav-indicator">
+        ${currentWorkoutIndex === 0 ? '🔥 Más Reciente' : `Entrenamiento ${currentWorkoutIndex + 1} de ${totalWorkouts}`}
+      </div>
+      <button
+        class="gym-nav-btn ${!canGoNext ? 'disabled' : ''}"
+        onclick="navigateWorkout(1)"
+        ${!canGoNext ? 'disabled' : ''}>
+        Siguiente →
+      </button>
+    </div>
+  ` : '';
 
   container.innerHTML = `
     <div class="gym-workout-name">${workout.name}</div>
@@ -102,21 +142,39 @@ function renderWorkoutData(data) {
       </div>
     </div>
 
+    ${navigationHTML}
+
     <div class="gym-exercises">
       <div class="gym-exercises-title">💪 Ejercicios Realizados</div>
       ${exercisesHTML}
     </div>
 
     <div style="text-align: center;">
-      <a href="${data.profile_url}" target="_blank" rel="noopener noreferrer" class="gym-link">
+      <a href="${gymData.profile_url}" target="_blank" rel="noopener noreferrer" class="gym-link">
         Ver Perfil Completo en Hevy →
       </a>
     </div>
 
     <div style="text-align: center; margin-top: 16px; font-size: 11px; color: rgba(255,255,255,0.3); font-family: var(--mono);">
-      Última actualización: ${formatDateTime(data.last_updated)}
+      Última actualización: ${formatDateTime(gymData.last_updated)}
     </div>
   `;
+}
+
+/**
+ * Navigate between workouts
+ */
+function navigateWorkout(direction) {
+  if (!gymData) return;
+
+  const totalWorkouts = 1 + (gymData.previous_workouts?.length || 0);
+  const newIndex = currentWorkoutIndex + direction;
+
+  // Check bounds
+  if (newIndex >= 0 && newIndex < totalWorkouts) {
+    currentWorkoutIndex = newIndex;
+    renderWorkoutData();
+  }
 }
 
 /**

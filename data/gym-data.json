@@ -99,5 +99,6 @@
     "total_workouts": "0",
     "total_volume": "0 kg",
     "streak": "0 días"
-  }
+  },
+  "previous_workouts": []
 }
