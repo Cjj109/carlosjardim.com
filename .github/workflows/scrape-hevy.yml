@@ -44,4 +44,4 @@ jobs:
           git config --global user.name 'GitHub Actions Bot'
           git config --global user.email 'actions@github.com'
           git add data/gym-data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update gym data from Hevy [automated]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update gym data from Hevy [automated]" && git pull --rebase origin main && git push)
