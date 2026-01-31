@@ -1,0 +1,49 @@
+name: Auto Update Cache Version
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    # Skip if the commit message contains [skip ci] or if it's from the bot
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, 'Update cache busting version')"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Run version update script
+        run: |
+          chmod +x update-version.sh
+          ./update-version.sh
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet index.html; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add index.html
+          VERSION=$(grep -o 'v=[0-9]\{14\}' index.html | head -1 | cut -d= -f2)
+          git commit -m "Update cache busting version to $VERSION [skip ci]"
+          git push
