@@ -26,31 +26,33 @@
   <title>Carlos Jardim | Perfil</title>
   
   <!-- Styles -->
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/cv.css">
-  <link rel="stylesheet" href="css/alt.css">
-  <link rel="stylesheet" href="css/pong.css">
-  <link rel="stylesheet" href="css/tetris.css">
-  <link rel="stylesheet" href="css/games-menu.css">
-  <link rel="stylesheet" href="css/video-modal.css">
-  <link rel="stylesheet" href="css/compatibility-test.css">
-  <link rel="stylesheet" href="css/chocolate-shop.css">
-  <link rel="stylesheet" href="css/side-a-enhancements.css">
-  <link rel="stylesheet" href="css/matrix-mode.css">
+  <link rel="stylesheet" href="css/variables.css?v=20260131">
+  <link rel="stylesheet" href="css/base.css?v=20260131">
+  <link rel="stylesheet" href="css/cv.css?v=20260131">
+  <link rel="stylesheet" href="css/alt.css?v=20260131">
+  <link rel="stylesheet" href="css/pong.css?v=20260131">
+  <link rel="stylesheet" href="css/tetris.css?v=20260131">
+  <link rel="stylesheet" href="css/games-menu.css?v=20260131">
+  <link rel="stylesheet" href="css/video-modal.css?v=20260131">
+  <link rel="stylesheet" href="css/compatibility-test.css?v=20260131">
+  <link rel="stylesheet" href="css/chocolate-shop.css?v=20260131">
+  <link rel="stylesheet" href="css/side-a-enhancements.css?v=20260131">
+  <link rel="stylesheet" href="css/matrix-mode.css?v=20260131">
+  <link rel="stylesheet" href="css/new-features.css?v=20260131">
 
   <!-- Scripts optimizados con defer para carga paralela -->
-  <script src="js/main.js" defer></script>
-  <script src="js/video-modal.js" defer></script>
-  <script src="js/compatibility-test.js" defer></script>
-  <script src="js/chocolate-shop.js" defer></script>
-  <script src="js/side-a-enhancements.js" defer></script>
-  <script src="js/gym-widget.js" defer></script>
-  <script src="js/gates.js" defer></script>
-  <script src="js/games-menu.js" defer></script>
-  <script src="js/pong.js" defer></script>
-  <script src="js/tetris.js" defer></script>
-  <script src="js/snake.js" defer></script>
+  <script src="js/main.js?v=20260131" defer></script>
+  <script src="js/video-modal.js?v=20260131" defer></script>
+  <script src="js/compatibility-test.js?v=20260131" defer></script>
+  <script src="js/chocolate-shop.js?v=20260131" defer></script>
+  <script src="js/side-a-enhancements.js?v=20260131" defer></script>
+  <script src="js/gym-widget.js?v=20260131" defer></script>
+  <script src="js/gates.js?v=20260131" defer></script>
+  <script src="js/games-menu.js?v=20260131" defer></script>
+  <script src="js/pong.js?v=20260131" defer></script>
+  <script src="js/tetris.js?v=20260131" defer></script>
+  <script src="js/snake.js?v=20260131" defer></script>
+  <script src="js/new-features.js?v=20260131" defer></script>
 </head>
 
 <body>
@@ -212,12 +214,9 @@
 
     <!-- Call to Action -->
     <div style="text-align:center; margin-top:60px; font-family:var(--mono); display:flex; flex-direction:column; align-items:center; gap:16px;">
-      <a href="https://instagram.com/cjj109"
-         target="_blank"
-         rel="noopener noreferrer"
-         class="main-cta-button">
+      <button onclick="openInstagramChoice()" class="main-cta-button">
         SOLICITAR ACCESO
-      </a>
+      </button>
 
       <button onclick="toggleMode(false)" class="return-button">
         ¿No estás convencida? 🎫
@@ -226,6 +225,12 @@
       <div style="margin-top:14px;">
         <button class="easter-btn" onclick="openGamesMenu()">
           toca si tu novia estuvo aquí
+        </button>
+      </div>
+
+      <div style="margin-top:14px;">
+        <button class="zodiac-btn" onclick="openZodiacCompatibility()">
+          🌟 Para las locas de la astronomía
         </button>
       </div>
     </div>
@@ -600,6 +605,19 @@
       <div class="shop-header">
         <div class="shop-title">🍫 La Chocolatería</div>
         <div class="shop-subtitle">Selecciona tu dulce favorito</div>
+        <button class="random-chocolate-btn" onclick="startSlotMachine()">
+          🎰 Al Azar
+        </button>
+      </div>
+
+      <!-- Slot Machine -->
+      <div id="slotMachineContainer" class="slot-machine-container" style="display: none;">
+        <div class="slot-machine">
+          <div class="slot-reel" id="slotReel">
+            <!-- Chocolate images will be duplicated here for animation -->
+          </div>
+        </div>
+        <div class="slot-machine-overlay"></div>
       </div>
 
       <!-- Grid View -->
@@ -623,9 +641,85 @@
     </div>
   </div>
 
-  <!-- Exit Matrix Button -->
-  <button class="exit-matrix-btn" onclick="deactivateMatrixMode()">
-    Salir del Matrix
-  </button>
+  <!-- ============================================
+       ZODIAC COMPATIBILITY MODAL
+       ============================================ -->
+  <div class="zodiac-overlay" id="zodiacModal" role="dialog" aria-modal="true" aria-label="Compatibilidad Zodiacal">
+    <div class="zodiac-container">
+      <button class="zodiac-close" onclick="closeZodiacCompatibility()" aria-label="Cerrar">✕</button>
+
+      <div class="zodiac-header">
+        <div class="zodiac-title">🌟 Compatibilidad Zodiacal</div>
+        <div class="zodiac-subtitle">¿Qué tan compatibles somos según las estrellas?</div>
+      </div>
+
+      <!-- Sign Selection -->
+      <div id="zodiacSelection" class="zodiac-selection">
+        <p class="zodiac-question">Selecciona tu signo:</p>
+        <div class="zodiac-signs-grid">
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('aries')">♈ Aries</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('tauro')">♉ Tauro</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('geminis')">♊ Géminis</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('cancer')">♋ Cáncer</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('leo')">♌ Leo</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('virgo')">♍ Virgo</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('libra')">♎ Libra</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('escorpio')">♏ Escorpio</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('sagitario')">♐ Sagitario</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('capricornio')">♑ Capricornio</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('acuario')">♒ Acuario</button>
+          <button class="zodiac-sign-btn" onclick="checkZodiacCompatibility('piscis')">♓ Piscis</button>
+        </div>
+      </div>
+
+      <!-- Result Display -->
+      <div id="zodiacResult" class="zodiac-result" style="display: none;">
+        <!-- Result will be rendered here by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       INSTAGRAM CHOICE MODAL
+       ============================================ -->
+  <div class="instagram-choice-overlay" id="instagramChoiceModal" role="dialog" aria-modal="true" aria-label="Elige tu opción">
+    <div class="instagram-choice-container">
+      <button class="instagram-choice-close" onclick="closeInstagramChoice()" aria-label="Cerrar">✕</button>
+
+      <div class="instagram-choice-header">
+        <div class="instagram-choice-title">📸 ¿Cuál eres?</div>
+        <div class="instagram-choice-subtitle">Escoge sabiamente...</div>
+      </div>
+
+      <div class="instagram-choice-buttons">
+        <a href="https://www.instagram.com/901jjc?igsh=cXh4b3g1enp2azJy&utm_source=qr"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="instagram-btn instagram-bad"
+           onclick="closeInstagramChoice()">
+          <div class="instagram-btn-icon">😈</div>
+          <div class="instagram-btn-label">Para las malas</div>
+          <div class="instagram-btn-subtitle">El lado oscuro</div>
+        </a>
+
+        <a href="https://instagram.com/cjj109"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="instagram-btn instagram-good"
+           onclick="closeInstagramChoice()">
+          <div class="instagram-btn-icon">😇</div>
+          <div class="instagram-btn-label">Para las buenas</div>
+          <div class="instagram-btn-subtitle">El lado oficial</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exit Matrix Phone (like the movie) -->
+  <div class="exit-matrix-phone" onclick="deactivateMatrixMode()">
+    <div class="phone-icon">📞</div>
+    <div class="phone-text">Contestar</div>
+    <div class="phone-subtitle">Despierta...</div>
+  </div>
 </body>
 </html>

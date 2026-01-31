@@ -193,44 +193,80 @@ body.matrix-mode .window {
 }
 
 /* Exit Matrix Button */
-.exit-matrix-btn {
+/* Matrix Exit Phone - Like the movie */
+.exit-matrix-phone {
   position: fixed;
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  background: #000;
+  background: rgba(0, 0, 0, 0.9);
   color: #00ff00;
-  border: 2px solid #00ff00;
-  padding: 14px 32px;
-  border-radius: 0;
-  font-size: 14px;
-  font-weight: 700;
+  border: 3px solid #00ff00;
+  padding: 20px 40px;
+  border-radius: var(--radius-md);
   font-family: 'Courier New', monospace;
   cursor: pointer;
   z-index: 10000;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+  display: none;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+body.matrix-mode .exit-matrix-phone {
+  display: block;
+  animation: matrixPhonePulse 1.5s infinite, phoneRing 0.5s ease infinite;
+}
+
+.phone-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  animation: phoneShake 0.5s ease infinite;
+}
+
+.phone-text {
+  font-size: 16px;
+  font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-  animation: matrixPulse 2s infinite;
-  display: none;
+  margin-bottom: 4px;
 }
 
-body.matrix-mode .exit-matrix-btn {
-  display: block;
+.phone-subtitle {
+  font-size: 12px;
+  opacity: 0.8;
+  letter-spacing: 1px;
 }
 
-@keyframes matrixPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
-  50% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.8); }
+@keyframes matrixPhonePulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(0, 255, 0, 0.6); }
+  50% { box-shadow: 0 0 50px rgba(0, 255, 0, 0.9); }
 }
 
-.exit-matrix-btn:hover {
-  background: #00ff00;
-  color: #000;
+@keyframes phoneRing {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(-5deg); }
+  75% { transform: translateX(-50%) rotate(5deg); }
+}
+
+@keyframes phoneShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.exit-matrix-phone:hover {
+  background: rgba(0, 255, 0, 0.2);
+  border-color: #00ff00;
   transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 0 60px rgba(0, 255, 0, 1);
 }
 
-.exit-matrix-btn:active {
+.exit-matrix-phone:hover .phone-icon {
+  transform: scale(1.1);
+}
+
+.exit-matrix-phone:active {
   transform: translateX(-50%) scale(0.95);
 }
 
@@ -241,9 +277,20 @@ body.matrix-mode .interests-section {
 
 /* Mobile */
 @media (max-width: 768px) {
-  .exit-matrix-btn {
+  .exit-matrix-phone {
     bottom: 20px;
-    padding: 12px 24px;
-    font-size: 12px;
+    padding: 16px 30px;
+  }
+
+  .phone-icon {
+    font-size: 40px;
+  }
+
+  .phone-text {
+    font-size: 14px;
+  }
+
+  .phone-subtitle {
+    font-size: 11px;
   }
 }

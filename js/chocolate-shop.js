@@ -294,3 +294,88 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
+/**
+ * Start slot machine animation
+ */
+function startSlotMachine() {
+  const container = document.getElementById('slotMachineContainer');
+  const reel = document.getElementById('slotReel');
+  const gridView = document.getElementById('chocolatesGridView');
+
+  if (!container || !reel) return;
+
+  // Hide grid view and show slot machine
+  if (gridView) gridView.style.display = 'none';
+  container.style.display = 'flex';
+
+  // Build the reel with all chocolates repeated multiple times
+  const chocolateKeys = Object.keys(chocolates);
+  const reelItems = [];
+
+  // Repeat chocolates 20 times for smooth animation
+  for (let i = 0; i < 20; i++) {
+    chocolateKeys.forEach(key => {
+      reelItems.push({
+        key: key,
+        image: chocolates[key].image
+      });
+    });
+  }
+
+  // Render reel
+  reel.innerHTML = reelItems.map(item => `
+    <div class="slot-item" data-key="${item.key}">
+      <img src="${item.image}" alt="${chocolates[item.key].name}">
+    </div>
+  `).join('');
+
+  // Select a random winner
+  const winnerIndex = Math.floor(Math.random() * chocolateKeys.length);
+  const winnerKey = chocolateKeys[winnerIndex];
+
+  // Calculate final position (center the winner in the viewport)
+  // Each item is 100px (80px for mobile)
+  const itemHeight = window.innerWidth <= 768 ? 80 : 100;
+  const totalItems = reelItems.length;
+  const middleItem = Math.floor(totalItems / 2);
+
+  // Find the winner's position near the middle
+  let winnerPosition = -1;
+  for (let i = middleItem; i < totalItems; i++) {
+    if (reelItems[i].key === winnerKey) {
+      winnerPosition = i;
+      break;
+    }
+  }
+
+  // Calculate offset to center the winner (account for container height 300px / 2 = 150px)
+  const centerOffset = window.innerWidth <= 768 ? 120 : 150; // Half of container height
+  const finalPosition = -(winnerPosition * itemHeight) + centerOffset - (itemHeight / 2);
+
+  // Start spinning animation
+  reel.classList.add('spinning');
+
+  // After 2 seconds, stop and show winner
+  setTimeout(() => {
+    reel.classList.remove('spinning');
+    reel.style.transform = `translateY(${finalPosition}px)`;
+
+    // After animation completes, show the winner detail
+    setTimeout(() => {
+      container.style.display = 'none';
+      if (gridView) gridView.style.display = 'block';
+      showChocolateDetail(winnerKey);
+
+      // Reset reel for next time
+      setTimeout(() => {
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
+        reel.classList.remove('spinning');
+        setTimeout(() => {
+          reel.style.transition = 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        }, 50);
+      }, 500);
+    }, 3000);
+  }, 2000);
+}
