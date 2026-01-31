@@ -76,8 +76,8 @@ function renderWorkoutData(data) {
       <div class="gym-sets">
         ${exercise.sets.map((set, index) => `
           <div class="gym-set">
-            <div class="gym-set-number">Set ${index + 1}</div>
-            <div class="gym-set-value">${set.reps}x${set.weight}</div>
+            <div class="gym-set-number">Serie ${index + 1}</div>
+            <div class="gym-set-value">${set.reps} reps × ${set.weight}</div>
           </div>
         `).join('')}
       </div>
@@ -103,6 +103,7 @@ function renderWorkoutData(data) {
     </div>
 
     <div class="gym-exercises">
+      <div class="gym-exercises-title">💪 Ejercicios Realizados</div>
       ${exercisesHTML}
     </div>
 
