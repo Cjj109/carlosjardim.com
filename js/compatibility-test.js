@@ -228,6 +228,11 @@ function calculateMatches() {
   const matches = [];
 
   Object.keys(profiles).forEach(key => {
+    // Excluir a Jesus del test (extremadamente apartado)
+    if (key === 'jesus') {
+      return;
+    }
+
     const profile = profiles[key];
     let score = 0;
 

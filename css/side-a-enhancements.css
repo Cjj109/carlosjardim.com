@@ -527,14 +527,14 @@ body.timeline-open {
   justify-content: space-around;
   height: 400px;
   margin-bottom: 20px;
-  padding: 0 20px;
+  padding: 0 20px 60px 20px;
   position: relative;
 }
 
 .height-chart::before {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: 60px;
   left: 0;
   right: 0;
   height: 2px;
@@ -545,9 +545,12 @@ body.timeline-open {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
   flex: 1;
   max-width: 120px;
+  height: 100%;
   animation: growUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
 }
 
 @keyframes growUp {
@@ -566,13 +569,12 @@ body.timeline-open {
   background: linear-gradient(180deg, rgba(255, 59, 48, 0.3), var(--accent-red));
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   position: relative;
-  margin-bottom: 8px;
   transition: all var(--transition-fast);
   border: 2px solid transparent;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
-  padding-bottom: 8px;
+  padding-top: 8px;
 }
 
 .height-person.highlight .height-bar {
@@ -586,7 +588,7 @@ body.timeline-open {
 }
 
 .height-icon {
-  font-size: 24px;
+  font-size: 20px;
   opacity: 0.8;
   filter: grayscale(20%);
   transition: all var(--transition-fast);
@@ -599,34 +601,43 @@ body.timeline-open {
 }
 
 .height-person.highlight .height-icon {
-  font-size: 28px;
+  font-size: 24px;
   opacity: 1;
   filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
 }
 
 .height-value {
   position: absolute;
-  top: -25px;
+  top: -22px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--accent-red);
   font-family: var(--mono);
   white-space: nowrap;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .height-person.highlight .height-value {
   color: #ffd700;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .height-label {
-  font-size: 12px;
+  position: absolute;
+  bottom: -55px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.7);
   text-align: center;
   font-family: var(--mono);
-  line-height: 1.4;
+  line-height: 1.3;
+  white-space: nowrap;
+  width: 100px;
 }
 
 .height-person.highlight .height-label {
@@ -641,33 +652,41 @@ body.timeline-open {
   }
 
   .height-chart {
-    height: 300px;
-    padding: 0 10px;
+    height: 280px;
+    padding: 0 10px 70px 10px;
+  }
+
+  .height-chart::before {
+    bottom: 70px;
   }
 
   .height-bar {
-    width: 40px;
+    width: 35px;
   }
 
   .height-icon {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .height-person.highlight .height-icon {
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .height-value {
-    font-size: 11px;
+    font-size: 10px;
     top: -20px;
+    padding: 1px 4px;
   }
 
   .height-label {
-    font-size: 10px;
+    font-size: 9px;
+    bottom: -65px;
+    width: 80px;
+    line-height: 1.2;
   }
 
   .height-person {
-    max-width: 80px;
+    max-width: 60px;
   }
 }
 

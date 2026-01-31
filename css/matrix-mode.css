@@ -5,7 +5,6 @@
 /* Matrix Mode Active State */
 body.matrix-mode {
   background: #000;
-  overflow: hidden;
 }
 
 body.matrix-mode .window {

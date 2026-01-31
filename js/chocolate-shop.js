@@ -34,7 +34,7 @@ const chocolates = {
   },
   ricardo: {
     name: "Ricardo",
-    image: "images/ricardo.png",
+    image: "images/Ricardo.png",
     instagram: "@radsl",
     status: null,
     description: "Este caramelo es conocido por partir. Tiene prohibición de venta en Tanaguarenas. Con ligero sabor y olor a pollo a la brasa y con un trauma a los carros Chrysler (con este le pago la universidad al hijo de su mecánico)."
@@ -48,7 +48,7 @@ const chocolates = {
   },
   david: {
     name: "David Pereira",
-    image: "images/david.png",
+    image: "images/David.png",
     instagram: "@davidapereiraf",
     status: null,
     description: "Este chocolate era un poco más blanco, pero se doró (de más) en sus viajes a Los Caracas. Su sueño es encontrar una alemana que disfrute su sabor ¿el problema? Hoy está más cerca del lado oscuro."

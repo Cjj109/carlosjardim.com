@@ -163,10 +163,12 @@
   border-radius: var(--radius-lg);
   max-width: 900px;
   width: 100%;
-  padding: 40px 30px;
+  padding: 50px 30px 40px 30px;
   position: relative;
   transform: scale(0.95);
   transition: transform var(--transition-base);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .chocolate-shop-overlay.active .chocolate-shop-container {
