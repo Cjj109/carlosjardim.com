@@ -397,34 +397,67 @@ body.timeline-open {
   font-size: 16px;
   color: var(--text-main);
   margin-bottom: 12px;
-  padding-left: 24px;
+  padding: 8px 12px 8px 24px;
   position: relative;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-family: var(--font-sans);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 59, 48, 0.3);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
 }
 
 .interests-list li::before {
-  content: '•';
+  content: '→';
   position: absolute;
   left: 8px;
   color: var(--accent-red);
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
+  transition: all var(--transition-fast);
+}
+
+.interests-list li::after {
+  content: '👆';
+  position: absolute;
+  right: 8px;
+  opacity: 0;
+  transition: all var(--transition-fast);
+  font-size: 14px;
 }
 
 .interests-list li:hover {
   color: var(--accent-red);
   transform: translateX(6px);
+  background: rgba(255, 59, 48, 0.08);
+  border-color: rgba(255, 59, 48, 0.3);
+  text-decoration-color: var(--accent-red);
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.15);
 }
 
 .interests-list li:hover::before {
   animation: bounce 0.5s ease;
+  transform: translateX(3px);
+}
+
+.interests-list li:hover::after {
+  opacity: 0.8;
+  animation: wiggle 0.6s ease infinite;
 }
 
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
 }
 
 /* Mobile */
