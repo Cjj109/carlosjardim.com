@@ -361,7 +361,7 @@ function startSlotMachine() {
     reel.classList.remove('spinning');
     reel.style.transform = `translateY(${finalPosition}px)`;
 
-    // After animation completes, show the winner detail
+    // After animation completes, show the winner detail (reduced from 3000ms to 800ms)
     setTimeout(() => {
       container.style.display = 'none';
       if (gridView) gridView.style.display = 'block';
@@ -375,7 +375,7 @@ function startSlotMachine() {
         setTimeout(() => {
           reel.style.transition = 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         }, 50);
-      }, 500);
-    }, 3000);
+      }, 300);
+    }, 800);
   }, 2000);
 }

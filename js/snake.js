@@ -97,12 +97,12 @@ function initSnake() {
   
   snake.ctx = snake.canvas.getContext('2d');
   
-  // Tamaño fijo
+  // Tamaño fijo - Ensure exact pixel dimensions
   snake.canvas.width = 400;
   snake.canvas.height = 400;
-  
+
   snake.tileCount = snake.gridSize;
-  snake.tileSize = snake.canvas.width / snake.tileCount;
+  snake.tileSize = Math.floor(snake.canvas.width / snake.tileCount); // Use floor to avoid subpixel rendering
   
   console.log('Snake inicializado:', snake.canvas.width, 'x', snake.canvas.height);
   
@@ -397,8 +397,9 @@ function drawSnake() {
 
   // Dibujar serpiente
   snake.snake.forEach((segment, index) => {
-    const x = segment.x * ts;
-    const y = segment.y * ts;
+    // Ensure integer pixel positions to avoid rendering outside canvas
+    const x = Math.floor(segment.x * ts);
+    const y = Math.floor(segment.y * ts);
 
     if (index === 0) {
       // Cabeza con glow
@@ -421,7 +422,8 @@ function drawSnake() {
   ctx.fillStyle = '#00ff00';
   ctx.shadowColor = 'rgba(0,255,0,0.8)';
   ctx.shadowBlur = 15;
-  ctx.fillRect(snake.food.x * ts + 2, snake.food.y * ts + 2, ts - 4, ts - 4);
+  // Ensure integer pixel positions
+  ctx.fillRect(Math.floor(snake.food.x * ts) + 2, Math.floor(snake.food.y * ts) + 2, ts - 4, ts - 4);
   ctx.shadowBlur = 0;
 
   // FIX: Mostrar mensaje de game over si existe

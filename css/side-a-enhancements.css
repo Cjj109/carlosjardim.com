@@ -686,41 +686,44 @@ body.timeline-open {
 
   .height-chart {
     height: 280px;
-    padding: 0 10px 70px 10px;
+    padding: 0 5px 85px 5px; /* Increased bottom padding for labels */
   }
 
   .height-chart::before {
-    bottom: 70px;
+    bottom: 85px;
   }
 
   .height-bar {
-    width: 35px;
+    width: 32px; /* Slightly smaller bars */
   }
 
   .height-icon {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .height-person.highlight .height-icon {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .height-value {
-    font-size: 10px;
-    top: -20px;
-    padding: 1px 4px;
+    font-size: 9px;
+    top: -18px;
+    padding: 1px 3px;
   }
 
   .height-label {
-    font-size: 10px;
-    bottom: -70px;
-    width: 90px;
-    line-height: 1.3;
+    font-size: 9px;
+    bottom: -80px; /* Moved down more */
+    width: 55px; /* Reduced width to prevent overlap */
+    line-height: 1.2;
     white-space: normal; /* Allow text wrapping on mobile */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 28px; /* Limit to 2 lines */
   }
 
   .height-person {
-    max-width: 60px;
+    max-width: 55px; /* Match label width */
   }
 }
 
