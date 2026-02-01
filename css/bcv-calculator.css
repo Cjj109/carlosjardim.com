@@ -113,9 +113,10 @@
 }
 
 .bcv-rate-symbol {
-  font-size: 32px;
-  margin-bottom: 8px;
-  opacity: 0.8;
+  font-size: 56px;
+  margin-bottom: 12px;
+  opacity: 1;
+  font-weight: bold;
 }
 
 /* Calculator */
@@ -263,7 +264,7 @@ body.bcv-open {
   }
 
   .bcv-rate-symbol {
-    font-size: 28px;
+    font-size: 44px;
   }
 
   .bcv-rate-value {

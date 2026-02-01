@@ -73,15 +73,16 @@ function renderWorkoutData() {
   const container = document.getElementById('gymWidgetContent');
   if (!container || !gymData) return;
 
-  // Get the workout to display based on current index
-  const workout = currentWorkoutIndex === 0
-    ? gymData.last_workout
-    : gymData.previous_workouts[currentWorkoutIndex - 1];
+  try {
+    // Get the workout to display based on current index
+    const workout = currentWorkoutIndex === 0
+      ? gymData.last_workout
+      : gymData.previous_workouts[currentWorkoutIndex - 1];
 
-  if (!workout) {
-    container.innerHTML = '<div class="gym-error">No hay datos de entrenamiento disponibles</div>';
-    return;
-  }
+    if (!workout) {
+      container.innerHTML = '<div class="gym-error">No hay datos de entrenamiento disponibles</div>';
+      return;
+    }
 
   // Check if there are previous workouts
   const hasPreviousWorkouts = gymData.previous_workouts && gymData.previous_workouts.length > 0;
@@ -159,6 +160,15 @@ function renderWorkoutData() {
       Última actualización: ${formatDateTime(gymData.last_updated)}
     </div>
   `;
+  } catch (error) {
+    console.error('Error rendering workout data:', error);
+    container.innerHTML = `
+      <div class="gym-error">
+        Error mostrando datos del entrenamiento.<br>
+        <small>${error.message}</small>
+      </div>
+    `;
+  }
 }
 
 /**
@@ -181,39 +191,49 @@ function navigateWorkout(direction) {
  * Format date
  */
 function formatDate(dateString) {
-  if (!dateString) return 'Fecha no disponible';
+  try {
+    if (!dateString) return 'Fecha no disponible';
 
-  const date = new Date(dateString);
+    const date = new Date(dateString);
 
-  // Validate date
-  if (isNaN(date.getTime())) {
-    return dateString; // Return original string if invalid
+    // Validate date
+    if (isNaN(date.getTime())) {
+      return dateString; // Return original string if invalid
+    }
+
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    return date.toLocaleDateString('es-ES', options);
+  } catch (error) {
+    console.error('Error formatting date:', error, dateString);
+    return String(dateString || 'Fecha no disponible');
   }
-
-  const options = { day: 'numeric', month: 'short', year: 'numeric' };
-  return date.toLocaleDateString('es-ES', options);
 }
 
 /**
  * Format datetime
  */
 function formatDateTime(dateTimeString) {
-  if (!dateTimeString) return 'Fecha no disponible';
+  try {
+    if (!dateTimeString) return 'Fecha no disponible';
 
-  const date = new Date(dateTimeString);
+    const date = new Date(dateTimeString);
 
-  // Validate date
-  if (isNaN(date.getTime())) {
-    return dateTimeString; // Return original string if invalid
+    // Validate date
+    if (isNaN(date.getTime())) {
+      return dateTimeString; // Return original string if invalid
+    }
+
+    const options = {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return date.toLocaleString('es-ES', options);
+  } catch (error) {
+    console.error('Error formatting datetime:', error, dateTimeString);
+    return String(dateTimeString || 'Fecha no disponible');
   }
-
-  const options = {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
-  };
-  return date.toLocaleString('es-ES', options);
 }
 
 /**
