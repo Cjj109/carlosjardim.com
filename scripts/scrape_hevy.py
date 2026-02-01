@@ -122,6 +122,7 @@ def scrape_hevy_profile():
 def extract_last_workout(driver):
     """Extract last workout details from page"""
     import re
+    from datetime import datetime, timedelta
 
     workout = {
         "name": "Último Workout",
@@ -138,6 +139,56 @@ def extract_last_workout(driver):
         # Get all text content from the page
         page_text = driver.find_element(By.TAG_NAME, 'body').text
         print(f"Page text preview: {page_text[:500]}...")
+
+        # Extract date - Hevy shows dates like "2 days ago" or "29 Jan 2026"
+        date_patterns = [
+            # Format: "29 Jan 2026" or "31 January 2026"
+            (r'(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{4})', 'date_format'),
+            # Format: "X days ago", "X hours ago", "a day ago"
+            (r'(\d+)\s+days?\s+ago', 'days_ago'),
+            (r'a\s+day\s+ago', 'one_day_ago'),
+            (r'(\d+)\s+hours?\s+ago', 'hours_ago'),
+        ]
+
+        for pattern, pattern_type in date_patterns:
+            match = re.search(pattern, page_text, re.IGNORECASE)
+            if match:
+                if pattern_type == 'date_format':
+                    # Parse "29 Jan 2026" format
+                    day = int(match.group(1))
+                    month_abbr = match.group(2).capitalize()
+                    year = int(match.group(3))
+
+                    month_map = {
+                        'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+                        'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+                    }
+                    month = month_map.get(month_abbr, 1)
+
+                    workout["date"] = f"{year}-{month:02d}-{day:02d}"
+                    print(f"✓ Workout date: {workout['date']} (from date format)")
+                    break
+
+                elif pattern_type == 'days_ago':
+                    # Calculate date from "X days ago"
+                    days = int(match.group(1))
+                    date = datetime.now() - timedelta(days=days)
+                    workout["date"] = date.strftime("%Y-%m-%d")
+                    print(f"✓ Workout date: {workout['date']} ({days} days ago)")
+                    break
+
+                elif pattern_type == 'one_day_ago':
+                    # "a day ago" = yesterday
+                    date = datetime.now() - timedelta(days=1)
+                    workout["date"] = date.strftime("%Y-%m-%d")
+                    print(f"✓ Workout date: {workout['date']} (1 day ago)")
+                    break
+
+                elif pattern_type == 'hours_ago':
+                    # Same day if hours ago
+                    workout["date"] = datetime.now().strftime("%Y-%m-%d")
+                    print(f"✓ Workout date: {workout['date']} (today - {match.group(1)} hours ago)")
+                    break
 
         # Try to find workout name in page title or h1/h2
         title_selectors = ['h1', 'h2', '[class*="title" i]', '[class*="Title" i]']
