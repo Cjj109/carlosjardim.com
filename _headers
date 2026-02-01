@@ -13,9 +13,13 @@
   # Performance
   X-DNS-Prefetch-Control: on
 
-# HTML - Sin cache para siempre tener la última versión
+# HTML - Cache corto con stale-while-revalidate para mejor rendimiento
 /*.html
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+  Content-Type: text/html; charset=utf-8
+
+/
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
   Content-Type: text/html; charset=utf-8
 
 # CSS - Cache agresivo (1 año) con revalidación
