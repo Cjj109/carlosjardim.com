@@ -296,7 +296,7 @@ function showResults() {
           TU MATCH PERFECTO
         </div>
 
-        <img src="${chocolate.image}" alt="${chocolate.name}" class="detail-img" onerror="this.src='images/placeholder.png'">
+        <img src="${chocolate.image}" alt="${chocolate.name}" class="detail-img" loading="lazy" decoding="async" onerror="this.src='images/placeholder.png'">
         <div class="detail-name">${chocolate.name}</div>
         ${statusBadge}
         <div class="detail-description">${chocolate.description}</div>

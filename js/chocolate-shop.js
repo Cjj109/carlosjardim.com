@@ -192,7 +192,7 @@ function renderChocolatesGrid() {
 
     return `
       <div class="chocolate-card" onclick="showChocolateDetail('${key}')">
-        <img src="${choc.image}" alt="${choc.name}" class="chocolate-img" onerror="this.src='images/placeholder.png'">
+        <img src="${choc.image}" alt="${choc.name}" class="chocolate-img" loading="lazy" decoding="async" onerror="this.src='images/placeholder.png'">
         <div class="chocolate-name">${choc.name}</div>
         ${statusBadge}
       </div>
@@ -228,7 +228,7 @@ function showChocolateDetail(chocolateKey) {
 
   detailView.innerHTML = `
     <div class="chocolate-detail active">
-      <img src="${choc.image}" alt="${choc.name}" class="detail-img" onerror="this.src='images/placeholder.png'">
+      <img src="${choc.image}" alt="${choc.name}" class="detail-img" loading="lazy" decoding="async" onerror="this.src='images/placeholder.png'">
       <div class="detail-name">${choc.name}</div>
       ${statusBadge}
       <div class="detail-description">${choc.description}</div>

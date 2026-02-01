@@ -48,5 +48,5 @@
   --transition-smooth: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Fuentes externas */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+/* Fuentes externas - Moved to index.html <link> for better performance */
+/* @import removed - now loaded asynchronously in HTML head */
