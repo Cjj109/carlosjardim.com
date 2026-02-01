@@ -241,11 +241,21 @@ function updateFingerUI() {
     autoChooseTimer = null;
   }
 
+  // Remove suspense class from all touches
+  activeTouches.forEach(touchData => {
+    touchData.element.classList.remove('suspense');
+  });
+
   if (count === 0) {
     instructions.textContent = 'Esperando dedos... (0)';
   } else if (count === 1) {
     instructions.textContent = '1 dedo detectado - Necesitas al menos 2';
   } else {
+    // Add suspense animation to all circles
+    activeTouches.forEach(touchData => {
+      touchData.element.classList.add('suspense');
+    });
+
     // Show countdown
     let secondsLeft = 3;
     instructions.textContent = `${count} dedos detectados - Eligiendo en ${secondsLeft}...`;
@@ -284,6 +294,11 @@ function chooseFinger() {
     autoChooseTimer = null;
   }
 
+  // Remove suspense class from all touches
+  activeTouches.forEach(touchData => {
+    touchData.element.classList.remove('suspense');
+  });
+
   // Get all touches as array
   const touchArray = Array.from(activeTouches.values());
 
@@ -296,30 +311,46 @@ function chooseFinger() {
 
   // Update instructions
   const instructions = document.getElementById('fingerInstructions');
-  if (eliminateCount === 1) {
-    instructions.textContent = '🎯 Eliminando 1 dedo...';
-  } else {
-    instructions.textContent = `🎯 Eliminando ${eliminateCount} dedos...`;
-  }
+  instructions.textContent = '🎲 Eligiendo...';
 
-  // Eliminate with animation
+  // Phase 1: Make all circles grow for suspense (300ms)
+  activeTouches.forEach(touchData => {
+    touchData.element.classList.add('suspense');
+  });
+
   setTimeout(() => {
+    // Phase 2: Add pre-explode animation to selected circles (500ms)
     toEliminate.forEach(touchData => {
-      touchData.element.classList.add('eliminated');
+      touchData.element.classList.remove('suspense');
+      touchData.element.classList.add('about-to-explode');
     });
 
-    // Show result after animation
-    setTimeout(() => {
-      const remaining = activeTouches.size - eliminateCount;
-      if (remaining === 1) {
-        instructions.textContent = '✅ ¡Este dedo SALE del padel!';
-      } else {
-        instructions.textContent = `✅ ${remaining} dedos siguen - ¡Juegan padel!`;
-      }
+    if (eliminateCount === 1) {
+      instructions.textContent = '🎯 Eliminando...';
+    } else {
+      instructions.textContent = `🎯 Eliminando ${eliminateCount}...`;
+    }
 
-      isChoosingInProgress = false;
+    setTimeout(() => {
+      // Phase 3: Final explosion (600ms)
+      toEliminate.forEach(touchData => {
+        touchData.element.classList.remove('about-to-explode');
+        touchData.element.classList.add('eliminated');
+      });
+
+      // Show result after explosion animation
+      setTimeout(() => {
+        const remaining = activeTouches.size - eliminateCount;
+        if (remaining === 1) {
+          instructions.textContent = '✅ ¡Este dedo SALE del padel!';
+        } else {
+          instructions.textContent = `✅ ${remaining} dedos siguen - ¡Juegan padel!`;
+        }
+
+        isChoosingInProgress = false;
+      }, 600);
     }, 500);
-  }, 800);
+  }, 300);
 }
 
 /**
