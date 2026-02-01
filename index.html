@@ -847,6 +847,44 @@
           <div class="utility-icon">👆</div>
           <div class="utility-name">¿Quién Sale?</div>
         </div>
+
+        <div class="utility-card" onclick="openMonetaryFromUtilities()">
+          <div class="utility-icon">📊</div>
+          <div class="utility-name">Indicadores</div>
+          <div class="utility-description">Liquidez monetaria BCV</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MONETARY INDICATORS MODAL
+       ============================================ -->
+  <div class="monetary-overlay" id="monetaryModal" role="dialog" aria-modal="true" aria-label="Indicadores Monetarios">
+    <div class="monetary-container">
+      <button class="monetary-close" onclick="closeMonetaryIndicators()" aria-label="Cerrar">✕</button>
+
+      <div class="monetary-header">
+        <div class="monetary-title">📊 Liquidez Monetaria</div>
+        <div class="monetary-subtitle">Banco Central de Venezuela</div>
+      </div>
+
+      <!-- Main indicator -->
+      <div class="monetary-main">
+        <div class="monetary-label">Liquidez Monetaria (M2)</div>
+        <div class="monetary-value" id="m2Value">---</div>
+        <div class="monetary-unit">Billones de Bolívares</div>
+        <div class="monetary-variation" id="liquidityVariation">---</div>
+        <div class="monetary-date" id="liquidityDate">Cargando...</div>
+      </div>
+
+      <!-- History Section -->
+      <div class="liquidity-history" id="liquidityHistory">
+        <div class="liquidity-history-empty">Cargando historial...</div>
+      </div>
+
+      <div class="monetary-update-info" id="liquidityUpdateInfo">
+        Cargando...
       </div>
     </div>
   </div>
