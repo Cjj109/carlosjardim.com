@@ -11,9 +11,11 @@ function closeGate() {
   document.getElementById('genderGate').classList.remove('active');
   const bonbon = document.getElementById('bonbon');
   bonbon.classList.remove('biting');
-  void bonbon.offsetWidth; // Force reflow
-  bonbon.style.clipPath = '';
-  bonbon.classList.add('breathing');
+  // Use requestAnimationFrame instead of forced reflow for better performance
+  requestAnimationFrame(() => {
+    bonbon.style.clipPath = '';
+    bonbon.classList.add('breathing');
+  });
 }
 
 /**

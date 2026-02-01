@@ -21,6 +21,12 @@
   <link rel="dns-prefetch" href="https://ve.dolarapi.com">
   <link rel="dns-prefetch" href="https://www.instagram.com">
   <link rel="dns-prefetch" href="https://bcvapi.tech">
+  <!-- Preload critical CSS to load in parallel instead of chain -->
+  <link rel="preload" href="css/variables.css" as="style">
+  <link rel="preload" href="css/base.css" as="style">
+  <link rel="preload" href="css/cv.css" as="style">
+  <link rel="preload" href="css/alt.css" as="style">
+  <link rel="preload" href="css/side-a-enhancements.css" as="style">
   <!-- Google Fonts - moved from CSS @import for better performance -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap"></noscript>
