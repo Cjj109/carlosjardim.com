@@ -188,51 +188,30 @@ function navigateWorkout(direction) {
 }
 
 /**
- * Format date
+ * Format date - Simple version to avoid formatting errors
  */
 function formatDate(dateString) {
   try {
     if (!dateString) return 'Fecha no disponible';
-
-    const date = new Date(dateString);
-
-    // Validate date
-    if (isNaN(date.getTime())) {
-      return dateString; // Return original string if invalid
-    }
-
-    const options = { day: 'numeric', month: 'short', year: 'numeric' };
-    return date.toLocaleDateString('es-ES', options);
+    // Just return the date string as-is if it's already in YYYY-MM-DD format
+    return String(dateString);
   } catch (error) {
     console.error('Error formatting date:', error, dateString);
-    return String(dateString || 'Fecha no disponible');
+    return 'Fecha no disponible';
   }
 }
 
 /**
- * Format datetime
+ * Format datetime - Simple version to avoid formatting errors
  */
 function formatDateTime(dateTimeString) {
   try {
     if (!dateTimeString) return 'Fecha no disponible';
-
-    const date = new Date(dateTimeString);
-
-    // Validate date
-    if (isNaN(date.getTime())) {
-      return dateTimeString; // Return original string if invalid
-    }
-
-    const options = {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return date.toLocaleString('es-ES', options);
+    // Just return a simplified version without complex formatting
+    return String(dateTimeString).split('T')[0] || String(dateTimeString);
   } catch (error) {
     console.error('Error formatting datetime:', error, dateTimeString);
-    return String(dateTimeString || 'Fecha no disponible');
+    return 'Fecha no disponible';
   }
 }
 
