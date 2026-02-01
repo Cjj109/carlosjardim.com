@@ -192,82 +192,264 @@ body.matrix-mode .window {
   z-index: 2;
 }
 
-/* Exit Matrix Button */
-/* Matrix Exit Phone - Like the movie */
+/* ============================================
+   EXIT MATRIX PHONE - Nokia 8110 Style
+   The iconic "banana phone" from the movie
+   ============================================ */
+
 .exit-matrix-phone {
   position: fixed;
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
   color: #00ff00;
-  border: 3px solid #00ff00;
-  padding: 20px 40px;
-  border-radius: var(--radius-md);
   font-family: 'Courier New', monospace;
   cursor: pointer;
   z-index: 10000;
-  box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
   display: none;
   text-align: center;
-  transition: all var(--transition-fast);
+  transition: all 0.3s ease;
 }
 
 body.matrix-mode .exit-matrix-phone {
-  display: block;
-  animation: matrixPhonePulse 1.5s infinite, phoneRing 0.5s ease infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: phoneFloat 3s ease-in-out infinite;
 }
 
-.phone-icon {
-  font-size: 48px;
+/* Phone container with sonar effect */
+.matrix-phone-container {
+  position: relative;
+  width: 80px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+/* Sonar pulse effect like the bonbon */
+.matrix-phone-sonar {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #00ff00;
+  border-radius: 40px;
+  opacity: 0;
+  animation: phoneSonar 2s infinite;
+  filter: blur(2px);
+}
+
+@keyframes phoneSonar {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* The phone device - Nokia 8110 banana shape */
+.matrix-phone-device {
+  position: relative;
+  width: 60px;
+  height: 140px;
+  background: linear-gradient(180deg, #001a00 0%, #003300 50%, #001a00 100%);
+  border: 2px solid #00ff00;
+  border-radius: 30px 30px 40px 40px;
+  box-shadow:
+    0 0 20px rgba(0, 255, 0, 0.6),
+    inset 0 0 20px rgba(0, 255, 0, 0.1),
+    0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px;
+  z-index: 1;
+  overflow: hidden;
+  animation: phoneVibrate 0.15s linear infinite;
+}
+
+@keyframes phoneVibrate {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+/* Phone screen */
+.phone-screen {
+  width: 44px;
+  height: 35px;
+  background: #000;
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 10px rgba(0, 255, 0, 0.3),
+    0 0 5px rgba(0, 255, 0, 0.5);
+  overflow: hidden;
+}
+
+.phone-screen-text {
+  font-size: 6px;
+  color: #00ff00;
+  letter-spacing: 1px;
+  animation: screenBlink 1s infinite;
+}
+
+.phone-screen-caller {
+  font-size: 7px;
+  font-weight: bold;
+  color: #00ff00;
+  text-shadow: 0 0 5px #00ff00;
+  animation: callerPulse 0.8s infinite;
+}
+
+@keyframes screenBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes callerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Speaker grill */
+.phone-speaker {
+  width: 20px;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    #00ff00 0px,
+    #00ff00 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  border-radius: 3px;
   margin-bottom: 8px;
-  animation: phoneShake 0.5s ease infinite;
+  opacity: 0.6;
 }
 
+/* Keypad */
+.phone-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  padding: 4px;
+}
+
+.phone-key {
+  width: 10px;
+  height: 8px;
+  background: linear-gradient(180deg, #004400 0%, #002200 100%);
+  border: 1px solid #00ff00;
+  border-radius: 2px;
+  box-shadow: 0 0 3px rgba(0, 255, 0, 0.3);
+}
+
+/* Slider bottom part (the banana curve) */
+.phone-slider {
+  position: absolute;
+  bottom: -5px;
+  width: 50px;
+  height: 30px;
+  background: linear-gradient(180deg, #002200 0%, #001100 100%);
+  border: 2px solid #00ff00;
+  border-top: none;
+  border-radius: 0 0 25px 25px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  animation: sliderPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sliderPulse {
+  0%, 100% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 255, 0, 0.3); }
+  50% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 255, 0, 0.6); }
+}
+
+/* Text labels */
 .phone-text {
   font-size: 16px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   text-transform: uppercase;
+  color: #00ff00;
+  text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
   margin-bottom: 4px;
 }
 
 .phone-subtitle {
-  font-size: 12px;
-  opacity: 0.8;
-  letter-spacing: 1px;
+  font-size: 11px;
+  opacity: 0.7;
+  letter-spacing: 2px;
+  color: #00ff00;
+  animation: subtitleFlicker 2s infinite;
 }
 
-@keyframes matrixPhonePulse {
-  0%, 100% { box-shadow: 0 0 30px rgba(0, 255, 0, 0.6); }
-  50% { box-shadow: 0 0 50px rgba(0, 255, 0, 0.9); }
+@keyframes subtitleFlicker {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.4; }
+  52% { opacity: 0.9; }
+  54% { opacity: 0.4; }
 }
 
-@keyframes phoneRing {
-  0%, 100% { transform: translateX(-50%) rotate(0deg); }
-  25% { transform: translateX(-50%) rotate(-5deg); }
-  75% { transform: translateX(-50%) rotate(5deg); }
+/* Floating animation */
+@keyframes phoneFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
 }
 
-@keyframes phoneShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  75% { transform: translateX(3px); }
-}
-
+/* Hover effects */
 .exit-matrix-phone:hover {
-  background: rgba(0, 255, 0, 0.2);
-  border-color: #00ff00;
-  transform: translateX(-50%) scale(1.05);
-  box-shadow: 0 0 60px rgba(0, 255, 0, 1);
+  animation: none;
+  transform: translateX(-50%) scale(1.1);
 }
 
-.exit-matrix-phone:hover .phone-icon {
-  transform: scale(1.1);
+.exit-matrix-phone:hover .matrix-phone-device {
+  box-shadow:
+    0 0 40px rgba(0, 255, 0, 0.9),
+    inset 0 0 30px rgba(0, 255, 0, 0.2),
+    0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.exit-matrix-phone:hover .matrix-phone-sonar {
+  animation: phoneSonarFast 1s infinite;
+}
+
+@keyframes phoneSonarFast {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.exit-matrix-phone:hover .phone-text {
+  text-shadow: 0 0 15px #00ff00, 0 0 30px #00ff00, 0 0 45px #00ff00;
 }
 
 .exit-matrix-phone:active {
   transform: translateX(-50%) scale(0.95);
+}
+
+.exit-matrix-phone:active .matrix-phone-device {
+  animation: phoneAnswer 0.3s forwards;
+}
+
+@keyframes phoneAnswer {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(0.8); opacity: 0.5; }
 }
 
 /* Hide interests in matrix mode */
@@ -275,15 +457,44 @@ body.matrix-mode .interests-section {
   display: none;
 }
 
-/* Mobile */
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .exit-matrix-phone {
-    bottom: 20px;
-    padding: 16px 30px;
+    bottom: 25px;
   }
 
-  .phone-icon {
-    font-size: 40px;
+  .matrix-phone-container {
+    width: 70px;
+    height: 140px;
+  }
+
+  .matrix-phone-device {
+    width: 52px;
+    height: 120px;
+    padding: 8px 6px;
+  }
+
+  .phone-screen {
+    width: 38px;
+    height: 30px;
+  }
+
+  .phone-screen-text {
+    font-size: 5px;
+  }
+
+  .phone-screen-caller {
+    font-size: 6px;
+  }
+
+  .phone-key {
+    width: 8px;
+    height: 6px;
+  }
+
+  .phone-slider {
+    width: 42px;
+    height: 25px;
   }
 
   .phone-text {
@@ -291,6 +502,6 @@ body.matrix-mode .interests-section {
   }
 
   .phone-subtitle {
-    font-size: 11px;
+    font-size: 10px;
   }
 }
