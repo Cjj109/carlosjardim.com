@@ -13,11 +13,11 @@
   backdrop-filter: blur(8px);
   z-index: 9999;
   display: none;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   opacity: 0;
   transition: opacity var(--transition-base);
-  padding: 20px;
+  padding: 40px 20px;
   overflow-y: auto;
 }
 
@@ -88,6 +88,11 @@
   margin-bottom: 32px;
 }
 
+.bcv-rates.bcv-rates-3 {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
 .bcv-rate-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(46, 204, 113, 0.2);
@@ -113,13 +118,27 @@
 }
 
 .bcv-rate-symbol {
-  font-size: 56px;
-  margin-bottom: 12px;
+  font-size: 48px;
+  margin-bottom: 10px;
   opacity: 1;
   font-weight: bold;
   color: #2ecc71;
   text-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* USDT specific styling */
+.bcv-rate-usdt .bcv-rate-symbol {
+  color: #26a17b;
+  text-shadow: 0 0 20px rgba(38, 161, 123, 0.4);
+}
+
+.bcv-rate-usdt {
+  border-color: rgba(38, 161, 123, 0.3);
+}
+
+.bcv-rate-usdt .bcv-rate-value {
+  color: #26a17b;
 }
 
 /* Calculator */
@@ -280,12 +299,35 @@ body.bcv-open {
   overflow: hidden;
 }
 
+/* Desktop - center when enough space */
+@media (min-height: 700px) {
+  .bcv-overlay {
+    align-items: center;
+    padding: 20px;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 769px) {
+  .bcv-rates.bcv-rates-3 .bcv-rate-card {
+    padding: 16px 12px;
+  }
+
+  .bcv-rates.bcv-rates-3 .bcv-rate-symbol {
+    font-size: 40px;
+  }
+
+  .bcv-rates.bcv-rates-3 .bcv-rate-value {
+    font-size: 20px;
+  }
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .bcv-overlay {
     padding: 10px;
     align-items: flex-start;
-    padding-top: 40px;
+    padding-top: 20px;
   }
 
   .bcv-container {
@@ -300,6 +342,28 @@ body.bcv-open {
   .bcv-rates {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .bcv-rates.bcv-rates-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .bcv-rates.bcv-rates-3 .bcv-rate-card {
+    padding: 12px 8px;
+  }
+
+  .bcv-rates.bcv-rates-3 .bcv-rate-symbol {
+    font-size: 28px;
+    margin-bottom: 6px;
+  }
+
+  .bcv-rates.bcv-rates-3 .bcv-rate-label {
+    font-size: 9px;
+  }
+
+  .bcv-rates.bcv-rates-3 .bcv-rate-value {
+    font-size: 14px;
   }
 
   .bcv-rate-card {

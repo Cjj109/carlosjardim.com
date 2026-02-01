@@ -752,22 +752,28 @@
       <button class="bcv-close" onclick="closeBCVCalculator()" aria-label="Cerrar">✕</button>
 
       <div class="bcv-header">
-        <div class="bcv-title">💱 Tasas BCV</div>
-        <div class="bcv-subtitle">Tasas oficiales del Banco Central de Venezuela</div>
+        <div class="bcv-title">💱 Tasas de Cambio</div>
+        <div class="bcv-subtitle">BCV Oficial + USDT Paralelo</div>
       </div>
 
       <!-- Current Rates -->
-      <div class="bcv-rates">
+      <div class="bcv-rates bcv-rates-3">
         <div class="bcv-rate-card">
           <div class="bcv-rate-symbol">$</div>
-          <div class="bcv-rate-label">USD / Bs.</div>
+          <div class="bcv-rate-label">USD BCV</div>
           <div class="bcv-rate-value" id="bcvUsdRate">---</div>
         </div>
 
         <div class="bcv-rate-card">
           <div class="bcv-rate-symbol">€</div>
-          <div class="bcv-rate-label">EUR / Bs.</div>
+          <div class="bcv-rate-label">EUR BCV</div>
           <div class="bcv-rate-value" id="bcvEurRate">---</div>
+        </div>
+
+        <div class="bcv-rate-card bcv-rate-usdt">
+          <div class="bcv-rate-symbol">₮</div>
+          <div class="bcv-rate-label">USDT P2P</div>
+          <div class="bcv-rate-value" id="bcvUsdtRate">---</div>
         </div>
       </div>
 
@@ -789,6 +795,7 @@
             <select id="bcvFromCurrency" class="bcv-select">
               <option value="USD" selected>USD</option>
               <option value="EUR">EUR</option>
+              <option value="USDT">USDT</option>
               <option value="BS">Bs.</option>
             </select>
           </div>
@@ -803,6 +810,7 @@
               <option value="BS" selected>Bs.</option>
               <option value="USD">USD</option>
               <option value="EUR">EUR</option>
+              <option value="USDT">USDT</option>
             </select>
           </div>
         </div>

@@ -72,6 +72,12 @@ function displayRates() {
     eurRate.textContent = formatRate(bcvRates.eur.rate);
   }
 
+  // USDT rate
+  const usdtRate = document.getElementById('bcvUsdtRate');
+  if (usdtRate && bcvRates.usdt) {
+    usdtRate.textContent = formatRate(bcvRates.usdt.rate);
+  }
+
   // Update timestamp
   const updateInfo = document.getElementById('bcvUpdateInfo');
   if (updateInfo && bcvRates.last_updated) {
@@ -142,33 +148,55 @@ function calculateConversion() {
     return;
   }
 
+  // Get rates (with USDT fallback)
+  const usdRate = bcvRates.usd.rate;
+  const eurRate = bcvRates.eur.rate;
+  const usdtRate = bcvRates.usdt ? bcvRates.usdt.rate : usdRate;
+
   // Perform conversion
   let result = 0;
 
   if (fromCurrency === 'BS') {
     // From Bs to other currency
     if (toCurrency === 'USD') {
-      result = amount / bcvRates.usd.rate;
+      result = amount / usdRate;
     } else if (toCurrency === 'EUR') {
-      result = amount / bcvRates.eur.rate;
+      result = amount / eurRate;
+    } else if (toCurrency === 'USDT') {
+      result = amount / usdtRate;
     }
   } else if (fromCurrency === 'USD') {
     // From USD
     if (toCurrency === 'BS') {
-      result = amount * bcvRates.usd.rate;
+      result = amount * usdRate;
     } else if (toCurrency === 'EUR') {
-      // USD to EUR: convert USD to Bs, then Bs to EUR
-      const bsAmount = amount * bcvRates.usd.rate;
-      result = bsAmount / bcvRates.eur.rate;
+      const bsAmount = amount * usdRate;
+      result = bsAmount / eurRate;
+    } else if (toCurrency === 'USDT') {
+      const bsAmount = amount * usdRate;
+      result = bsAmount / usdtRate;
     }
   } else if (fromCurrency === 'EUR') {
     // From EUR
     if (toCurrency === 'BS') {
-      result = amount * bcvRates.eur.rate;
+      result = amount * eurRate;
     } else if (toCurrency === 'USD') {
-      // EUR to USD: convert EUR to Bs, then Bs to USD
-      const bsAmount = amount * bcvRates.eur.rate;
-      result = bsAmount / bcvRates.usd.rate;
+      const bsAmount = amount * eurRate;
+      result = bsAmount / usdRate;
+    } else if (toCurrency === 'USDT') {
+      const bsAmount = amount * eurRate;
+      result = bsAmount / usdtRate;
+    }
+  } else if (fromCurrency === 'USDT') {
+    // From USDT
+    if (toCurrency === 'BS') {
+      result = amount * usdtRate;
+    } else if (toCurrency === 'USD') {
+      const bsAmount = amount * usdtRate;
+      result = bsAmount / usdRate;
+    } else if (toCurrency === 'EUR') {
+      const bsAmount = amount * usdtRate;
+      result = bsAmount / eurRate;
     }
   }
 
@@ -195,7 +223,8 @@ function getCurrencySymbol(currency) {
   const symbols = {
     'BS': 'Bs.',
     'USD': '$',
-    'EUR': '€'
+    'EUR': '€',
+    'USDT': '₮'
   };
   return symbols[currency] || '';
 }
