@@ -7,9 +7,8 @@ VERSION=$(date +%Y%m%d%H%M%S)
 
 echo "📦 Updating cache busting version to: $VERSION"
 
-# Update version in index.html
-sed -i.bak "s/\?v=[0-9]\{14\}/\?v=$VERSION/g" index.html
-sed -i.bak "s/\?v=[0-9]\{8\}/\?v=$VERSION/g" index.html
+# Update version in index.html (match 14+ digit version strings to clean up any accumulated versions)
+sed -i.bak "s/\?v=[0-9]\{14,\}/\?v=$VERSION/g" index.html
 
 # Remove backup file
 rm -f index.html.bak

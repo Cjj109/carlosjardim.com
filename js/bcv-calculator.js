@@ -34,14 +34,17 @@ function closeBCVCalculator() {
 }
 
 /**
- * Load BCV rates from JSON file
+ * Load BCV rates from JSON file + live USDT from API
  */
 async function loadBCVRates() {
   try {
     const cacheBuster = new Date().getTime();
-    const [ratesResponse, historyResponse] = await Promise.all([
+
+    // Fetch cached rates (USD, EUR) and history in parallel with live USDT
+    const [ratesResponse, historyResponse, usdtResponse] = await Promise.all([
       fetch('data/bcv-rates.json?' + cacheBuster),
-      fetch('data/bcv-rates-history.json?' + cacheBuster)
+      fetch('data/bcv-rates-history.json?' + cacheBuster),
+      fetch('https://ve.dolarapi.com/v1/dolares/paralelo').catch(() => null)
     ]);
 
     if (!ratesResponse.ok) {
@@ -49,6 +52,21 @@ async function loadBCVRates() {
     }
 
     bcvRates = await ratesResponse.json();
+
+    // Update USDT with live data if available
+    if (usdtResponse && usdtResponse.ok) {
+      try {
+        const usdtData = await usdtResponse.json();
+        bcvRates.usdt = {
+          rate: usdtData.promedio,
+          date: usdtData.fechaActualizacion ? usdtData.fechaActualizacion.split('T')[0] : new Date().toISOString().split('T')[0],
+          symbol: '₮',
+          live: true
+        };
+      } catch (e) {
+        console.warn('Could not parse live USDT data, using cached');
+      }
+    }
 
     // Load history if available
     if (historyResponse.ok) {
@@ -87,6 +105,11 @@ function displayRates() {
   const usdtRate = document.getElementById('bcvUsdtRate');
   if (usdtRate && bcvRates.usdt) {
     usdtRate.textContent = formatRate(bcvRates.usdt.rate);
+    // Add live indicator if fetched in real-time
+    const liveIndicator = document.getElementById('usdtLiveIndicator');
+    if (liveIndicator) {
+      liveIndicator.style.display = bcvRates.usdt.live ? 'inline-flex' : 'none';
+    }
   }
 
   // Update timestamp

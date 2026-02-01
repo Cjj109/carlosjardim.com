@@ -107,7 +107,20 @@
   font-family: var(--mono);
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+}
+
+/* Live indicator for real-time USDT */
+.live-indicator {
+  color: #2ecc71;
+  font-size: 8px;
+  animation: pulse-live 1.5s ease-in-out infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 .bcv-rate-value {

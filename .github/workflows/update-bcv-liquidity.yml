@@ -1,9 +1,9 @@
 name: Update BCV Liquidity Data
 
 on:
-  # Run weekly on Mondays at 10:00 UTC (after BCV typically updates)
+  # Run every 3 days at 10:00 UTC (BCV updates irregularly)
   schedule:
-    - cron: '0 10 * * 1'
+    - cron: '0 10 */3 * *'
 
   # Allow manual trigger
   workflow_dispatch:
