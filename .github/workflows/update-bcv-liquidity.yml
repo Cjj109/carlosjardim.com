@@ -54,5 +54,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/bcv-liquidity.json
-          git commit -m "Update BCV liquidity data [skip ci]"
+          git commit -m "Update BCV monetary indicators (M2 + Base) [skip ci]"
           git push

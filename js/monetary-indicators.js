@@ -1,5 +1,5 @@
 /* ============================================
-   MONETARY INDICATORS - BCV Liquidity Data
+   MONETARY INDICATORS - BCV Liquidity & Base Monetaria
    ============================================ */
 
 // Global variables
@@ -45,6 +45,7 @@ async function loadLiquidityData() {
 
     liquidityData = await response.json();
     displayLiquidityData();
+    displayBaseMonetariaData();
 
   } catch (error) {
     console.error('Error loading liquidity data:', error);
@@ -95,6 +96,49 @@ function displayLiquidityData() {
 }
 
 /**
+ * Display base monetaria data in the UI
+ */
+function displayBaseMonetariaData() {
+  if (!liquidityData || !liquidityData.base_monetaria) {
+    // Hide base monetaria section if no data
+    const bmSection = document.getElementById('baseMonetariaSection');
+    if (bmSection) bmSection.style.display = 'none';
+    return;
+  }
+
+  const bmSection = document.getElementById('baseMonetariaSection');
+  if (bmSection) bmSection.style.display = '';
+
+  const latest = liquidityData.base_monetaria.latest;
+
+  // Update BM value
+  const bmValue = document.getElementById('bmValue');
+  if (bmValue) {
+    bmValue.textContent = formatBillions(latest.value_billions);
+  }
+
+  // Update variation
+  const variationEl = document.getElementById('bmVariation');
+  if (variationEl && latest.variation_pct !== null) {
+    const isPositive = latest.variation_pct > 0;
+    const isNegative = latest.variation_pct < 0;
+    const symbol = isPositive ? '↑' : isNegative ? '↓' : '';
+    const varClass = isPositive ? 'up' : isNegative ? 'down' : 'neutral';
+
+    variationEl.innerHTML = `<span class="var-${varClass}">${symbol} ${Math.abs(latest.variation_pct)}%</span>`;
+  }
+
+  // Update date
+  const dateEl = document.getElementById('bmDate');
+  if (dateEl) {
+    dateEl.textContent = `Semana del ${formatLiquidityDate(latest.date)}`;
+  }
+
+  // Update history
+  displayBaseMonetariaHistory();
+}
+
+/**
  * Display liquidity history
  */
 function displayLiquidityHistory() {
@@ -132,6 +176,43 @@ function displayLiquidityHistory() {
 }
 
 /**
+ * Display base monetaria history
+ */
+function displayBaseMonetariaHistory() {
+  const historyContainer = document.getElementById('bmHistory');
+  if (!historyContainer || !liquidityData || !liquidityData.base_monetaria) return;
+
+  const entries = liquidityData.base_monetaria.history;
+  if (!entries || entries.length === 0) {
+    historyContainer.innerHTML = '<div class="liquidity-history-empty">Sin historial</div>';
+    return;
+  }
+
+  let html = '<div class="liquidity-history-header">Historial Semanal (BM)</div>';
+  html += '<div class="liquidity-history-list">';
+
+  entries.forEach((entry, index) => {
+    const date = formatLiquidityDate(entry.date);
+    const value = formatBillions(entry.value_billions);
+    const variation = entry.variation_pct;
+    const varClass = variation > 0 ? 'up' : variation < 0 ? 'down' : 'neutral';
+    const varSymbol = variation > 0 ? '↑' : variation < 0 ? '↓' : '';
+    const varText = variation !== null ? `${varSymbol} ${Math.abs(variation)}%` : '—';
+
+    html += `
+      <div class="liquidity-history-item ${index === 0 ? 'current' : ''}">
+        <span class="liquidity-history-date">${date}</span>
+        <span class="liquidity-history-value">${value} B</span>
+        <span class="liquidity-history-var ${varClass}">${varText}</span>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  historyContainer.innerHTML = html;
+}
+
+/**
  * Display error message
  */
 function displayLiquidityError() {
@@ -140,6 +221,9 @@ function displayLiquidityError() {
 
   const variationEl = document.getElementById('liquidityVariation');
   if (variationEl) variationEl.textContent = '';
+
+  const bmValue = document.getElementById('bmValue');
+  if (bmValue) bmValue.textContent = 'Error';
 }
 
 /**

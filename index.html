@@ -898,22 +898,39 @@
       <button class="monetary-close" onclick="closeMonetaryIndicators()" aria-label="Cerrar">✕</button>
 
       <div class="monetary-header">
-        <div class="monetary-title">📊 Liquidez Monetaria</div>
+        <div class="monetary-title">📊 Indicadores Monetarios</div>
         <div class="monetary-subtitle">Banco Central de Venezuela</div>
       </div>
 
-      <!-- Main indicator -->
-      <div class="monetary-main">
-        <div class="monetary-label">Liquidez Monetaria (M2)</div>
-        <div class="monetary-value" id="m2Value">---</div>
-        <div class="monetary-unit">Billones de Bolívares</div>
-        <div class="monetary-variation" id="liquidityVariation">---</div>
-        <div class="monetary-date" id="liquidityDate">Cargando...</div>
+      <!-- Main indicators grid -->
+      <div class="monetary-indicators-grid">
+        <!-- Liquidez Monetaria (M2) -->
+        <div class="monetary-main">
+          <div class="monetary-label">Liquidez Monetaria (M2)</div>
+          <div class="monetary-value" id="m2Value">---</div>
+          <div class="monetary-unit">Billones de Bolívares</div>
+          <div class="monetary-variation" id="liquidityVariation">---</div>
+          <div class="monetary-date" id="liquidityDate">Cargando...</div>
+        </div>
+
+        <!-- Base Monetaria -->
+        <div class="monetary-main base-monetaria" id="baseMonetariaSection">
+          <div class="monetary-label">Base Monetaria (BM)</div>
+          <div class="monetary-value" id="bmValue">---</div>
+          <div class="monetary-unit">Billones de Bolívares</div>
+          <div class="monetary-variation" id="bmVariation">---</div>
+          <div class="monetary-date" id="bmDate">Cargando...</div>
+        </div>
       </div>
 
-      <!-- History Section -->
-      <div class="liquidity-history" id="liquidityHistory">
-        <div class="liquidity-history-empty">Cargando historial...</div>
+      <!-- History Section - Two columns -->
+      <div class="monetary-history-grid">
+        <div class="liquidity-history" id="liquidityHistory">
+          <div class="liquidity-history-empty">Cargando historial...</div>
+        </div>
+        <div class="liquidity-history" id="bmHistory">
+          <div class="liquidity-history-empty">Cargando historial...</div>
+        </div>
       </div>
 
       <div class="monetary-update-info" id="liquidityUpdateInfo">
