@@ -197,7 +197,7 @@ function formatDateTime(dateTimeString) {
     hour: '2-digit',
     minute: '2-digit'
   };
-  return date.toLocaleDateString('es-ES', options);
+  return date.toLocaleString('es-ES', options);
 }
 
 /**
