@@ -39,6 +39,7 @@
   <link rel="stylesheet" href="css/side-a-enhancements.css?v=20260131195638">
   <link rel="stylesheet" href="css/matrix-mode.css?v=20260131195638">
   <link rel="stylesheet" href="css/new-features.css?v=20260131195638">
+  <link rel="stylesheet" href="css/bcv-calculator.css?v=20260131195638">
 
   <!-- Scripts optimizados con defer para carga paralela -->
   <script src="js/main.js?v=20260131195638" defer></script>
@@ -47,6 +48,7 @@
   <script src="js/chocolate-shop.js?v=20260131195638" defer></script>
   <script src="js/side-a-enhancements.js?v=20260131195638" defer></script>
   <script src="js/gym-widget.js?v=20260131195638" defer></script>
+  <script src="js/bcv-calculator.js?v=20260131195638" defer></script>
   <script src="js/gates.js?v=20260131195638" defer></script>
   <script src="js/games-menu.js?v=20260131195638" defer></script>
   <script src="js/pong.js?v=20260131195638" defer></script>
@@ -78,7 +80,7 @@
         <span class="subtitle"><span class="clickable" onclick="openAcademicTimeline()">Economista</span></span>
       </div>
 
-      <div class="section-label">Perfil</div>
+      <div class="section-label clickable" onclick="openBCVCalculator()" style="cursor: pointer;">Perfil 💱</div>
       <p class="cv-text">
         Me muevo entre datos y decisiones, pero lo mío es la calma: constancia, humor seco y cero necesidad de impresionar.
       </p>
@@ -709,6 +711,80 @@
           <div class="instagram-btn-label">Para las buenas</div>
           <div class="instagram-btn-subtitle">El lado oficial</div>
         </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       BCV CALCULATOR MODAL
+       ============================================ -->
+  <div class="bcv-overlay" id="bcvCalculatorModal" role="dialog" aria-modal="true" aria-label="Calculadora BCV">
+    <div class="bcv-container">
+      <button class="bcv-close" onclick="closeBCVCalculator()" aria-label="Cerrar">✕</button>
+
+      <div class="bcv-header">
+        <div class="bcv-title">💱 Tasas BCV</div>
+        <div class="bcv-subtitle">Tasas oficiales del Banco Central de Venezuela</div>
+      </div>
+
+      <!-- Current Rates -->
+      <div class="bcv-rates">
+        <div class="bcv-rate-card">
+          <div class="bcv-rate-symbol">$</div>
+          <div class="bcv-rate-label">USD / Bs.</div>
+          <div class="bcv-rate-value" id="bcvUsdRate">---</div>
+        </div>
+
+        <div class="bcv-rate-card">
+          <div class="bcv-rate-symbol">€</div>
+          <div class="bcv-rate-label">EUR / Bs.</div>
+          <div class="bcv-rate-value" id="bcvEurRate">---</div>
+        </div>
+      </div>
+
+      <!-- Calculator -->
+      <div class="bcv-calculator">
+        <div class="bcv-calc-title">🧮 Calculadora de Divisas</div>
+
+        <div class="bcv-input-group">
+          <label class="bcv-input-label">Cantidad</label>
+          <div class="bcv-input-wrapper">
+            <input
+              type="number"
+              id="bcvAmount"
+              class="bcv-input"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+            <select id="bcvFromCurrency" class="bcv-select">
+              <option value="BS">Bs.</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bcv-swap-icon">⇅</div>
+
+        <div class="bcv-input-group">
+          <label class="bcv-input-label">Convertir a</label>
+          <div class="bcv-input-wrapper">
+            <select id="bcvToCurrency" class="bcv-select">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="BS">Bs.</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bcv-result" id="bcvResult">
+          <div class="bcv-result-empty">Resultado aparecerá aquí</div>
+        </div>
+      </div>
+
+      <div class="bcv-update-info" id="bcvUpdateInfo">
+        Cargando...
       </div>
     </div>
   </div>

@@ -1,0 +1,58 @@
+name: Update BCV Exchange Rates
+
+on:
+  # Run every 3 hours
+  schedule:
+    - cron: '0 */3 * * *'
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+  # Run on push to test (will be removed by path filter if no relevant changes)
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/fetch_bcv_rates.py'
+      - '.github/workflows/update-bcv-rates.yml'
+
+jobs:
+  update-rates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Fetch BCV rates
+        run: |
+          python scripts/fetch_bcv_rates.py
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet data/bcv-rates.json; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/bcv-rates.json
+          git commit -m "Update BCV exchange rates [skip ci]"
+          git push
