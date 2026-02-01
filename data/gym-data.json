@@ -1,9 +1,9 @@
 {
-  "last_updated": "2026-02-01T01:09:39.669817",
+  "last_updated": "2026-02-01T06:35:11.409395",
   "profile_url": "https://hevy.com/user/cjj109",
   "last_workout": {
     "name": "Pierna 2",
-    "date": "2026-02-01",
+    "date": "2026-01-29",
     "duration": "57 min",
     "volume": "10,607 kg",
     "exercises": [
@@ -101,6 +101,100 @@
     "streak": "0 días"
   },
   "previous_workouts": [
+    {
+      "name": "Pierna 2",
+      "date": "2026-02-01",
+      "duration": "57 min",
+      "volume": "10,607 kg",
+      "exercises": [
+        {
+          "name": "Romanian Deadlift (Barbell)",
+          "sets": [
+            {
+              "reps": 8,
+              "weight": "110 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "110 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "110 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Lying Leg Curl (Machine)",
+          "sets": [
+            {
+              "reps": 11,
+              "weight": "31 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "31 kg"
+            },
+            {
+              "reps": 7,
+              "weight": "31 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Leg Press (Machine)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "154 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "154 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "154 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Leg Extension (Machine)",
+          "sets": [
+            {
+              "reps": 12,
+              "weight": "38 kg"
+            },
+            {
+              "reps": 12,
+              "weight": "38 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Single Leg Standing Calf Raise (Machine)",
+          "sets": [
+            {
+              "reps": 12,
+              "weight": "45.24 kg"
+            },
+            {
+              "reps": 12,
+              "weight": "45.24 kg"
+            },
+            {
+              "reps": 12,
+              "weight": "45.24 kg"
+            }
+          ],
+          "image": null
+        }
+      ]
+    },
     {
       "name": "Pierna 2",
       "date": "2026-01-31",
