@@ -131,7 +131,7 @@ function renderWorkoutData() {
     <div class="gym-workout-meta">
       <div class="gym-meta-item">
         <div class="gym-meta-label">Fecha</div>
-        <div class="gym-meta-value">${formatDate(workout.date)}</div>
+        <div class="gym-meta-value">${formatGymDate(workout.date)}</div>
       </div>
       <div class="gym-meta-item">
         <div class="gym-meta-label">Duración</div>
@@ -157,7 +157,7 @@ function renderWorkoutData() {
     </div>
 
     <div style="text-align: center; margin-top: 16px; font-size: 11px; color: rgba(255,255,255,0.3); font-family: var(--mono);">
-      Última actualización: ${formatDateTime(gymData.last_updated)}
+      Última actualización: ${formatGymDateTime(gymData.last_updated)}
     </div>
   `;
   } catch (error) {
@@ -190,7 +190,7 @@ function navigateWorkout(direction) {
 /**
  * Format date - Simple version to avoid formatting errors
  */
-function formatDate(dateString) {
+function formatGymDate(dateString) {
   try {
     if (!dateString) return 'Fecha no disponible';
     // Just return the date string as-is if it's already in YYYY-MM-DD format
@@ -204,7 +204,7 @@ function formatDate(dateString) {
 /**
  * Format datetime - Simple version to avoid formatting errors
  */
-function formatDateTime(dateTimeString) {
+function formatGymDateTime(dateTimeString) {
   try {
     if (!dateTimeString) return 'Fecha no disponible';
     // Just return a simplified version without complex formatting
