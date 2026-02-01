@@ -67,7 +67,8 @@ function applyRandomness() {
  */
 function setupHintBehavior() {
   const hint = document.getElementById('hintArrow');
-  const isMobile = window.innerWidth < 768;
+  // Use matchMedia instead of window.innerWidth to avoid forced reflow
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
   const delay = isMobile ? 15000 : 12000; // 15s en mobile, 12s en desktop
   setTimeout(() => hint?.classList.add('hidden'), delay);
 }

@@ -91,6 +91,8 @@ function showGoldenTicket() {
   if (!ticket || goldenTicketShown) return;
 
   goldenTicketShown = true;
+  // Remove inline display:none before showing
+  ticket.style.display = '';
   ticket.classList.add('show');
 }
 
