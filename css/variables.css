@@ -50,3 +50,25 @@
 
 /* Fuentes externas - Moved to index.html <link> for better performance */
 /* @import removed - now loaded asynchronously in HTML head */
+
+/* Font fallbacks with size-adjust to prevent CLS during font loading */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: local('Inter');
+  size-adjust: 100%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: local('JetBrains Mono');
+  size-adjust: 100%;
+}
