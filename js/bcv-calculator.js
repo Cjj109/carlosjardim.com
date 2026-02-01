@@ -4,6 +4,7 @@
 
 // Global variables
 let bcvRates = null;
+let bcvHistory = null;
 
 /**
  * Open BCV calculator modal
@@ -37,16 +38,26 @@ function closeBCVCalculator() {
  */
 async function loadBCVRates() {
   try {
-    const response = await fetch('data/bcv-rates.json?' + new Date().getTime());
+    const cacheBuster = new Date().getTime();
+    const [ratesResponse, historyResponse] = await Promise.all([
+      fetch('data/bcv-rates.json?' + cacheBuster),
+      fetch('data/bcv-rates-history.json?' + cacheBuster)
+    ]);
 
-    if (!response.ok) {
+    if (!ratesResponse.ok) {
       throw new Error('Failed to fetch BCV rates');
     }
 
-    bcvRates = await response.json();
+    bcvRates = await ratesResponse.json();
+
+    // Load history if available
+    if (historyResponse.ok) {
+      bcvHistory = await historyResponse.json();
+    }
 
     // Update UI with rates
     displayRates();
+    displayHistory();
 
   } catch (error) {
     console.error('Error loading BCV rates:', error);
@@ -95,6 +106,54 @@ function displayError() {
 
   if (usdRate) usdRate.textContent = 'Error';
   if (eurRate) eurRate.textContent = 'Error';
+}
+
+/**
+ * Display rate history
+ */
+function displayHistory() {
+  const historyContainer = document.getElementById('bcvHistory');
+  if (!historyContainer || !bcvHistory || !bcvHistory.entries) return;
+
+  const entries = bcvHistory.entries.slice(0, 7); // Show last 7 entries
+  if (entries.length === 0) {
+    historyContainer.innerHTML = '<div class="bcv-history-empty">Sin historial disponible</div>';
+    return;
+  }
+
+  let html = '<div class="bcv-history-header">Historial USD (BCV)</div>';
+  html += '<div class="bcv-history-list">';
+
+  entries.forEach((entry, index) => {
+    const date = formatHistoryDate(entry.date);
+    const rate = formatRate(entry.usd.rate);
+    const variation = entry.usd.variation;
+    const varClass = variation > 0 ? 'up' : variation < 0 ? 'down' : 'neutral';
+    const varSymbol = variation > 0 ? '↑' : variation < 0 ? '↓' : '';
+    const varText = variation !== 0 ? `${varSymbol} ${Math.abs(variation)}%` : '—';
+
+    html += `
+      <div class="bcv-history-item ${index === 0 ? 'current' : ''}">
+        <span class="bcv-history-date">${date}</span>
+        <span class="bcv-history-rate">${rate} Bs.</span>
+        <span class="bcv-history-var ${varClass}">${varText}</span>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  historyContainer.innerHTML = html;
+}
+
+/**
+ * Format date for history display
+ */
+function formatHistoryDate(dateStr) {
+  const date = new Date(dateStr + 'T12:00:00');
+  return new Intl.DateTimeFormat('es-VE', {
+    day: 'numeric',
+    month: 'short'
+  }).format(date);
 }
 
 /**
