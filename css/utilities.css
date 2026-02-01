@@ -1,0 +1,333 @@
+/* ============================================
+   UTILITIES MENU & FINGER CHOOSER
+   ============================================ */
+
+/* Utilities Menu Overlay */
+.utilities-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.utilities-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+.utilities-container {
+  background: #1a1a1a;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  padding: 40px 35px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.utilities-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.utilities-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.utilities-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.utilities-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #2ecc71;
+  margin-bottom: 8px;
+}
+
+.utilities-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono);
+}
+
+.utilities-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.utility-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(46, 204, 113, 0.2);
+  border-radius: var(--radius-md);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.utility-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(46, 204, 113, 0.4);
+  transform: translateY(-2px);
+}
+
+.utility-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.utility-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+}
+
+.utility-description {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--mono);
+}
+
+/* Finger Chooser Overlay */
+.finger-chooser-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.finger-chooser-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+.finger-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  z-index: 10;
+}
+
+.finger-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.finger-header {
+  text-align: center;
+  padding: 30px 20px 20px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.finger-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2ecc71;
+  margin-bottom: 8px;
+}
+
+.finger-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--mono);
+}
+
+.finger-instructions {
+  text-align: center;
+  padding: 16px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--mono);
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.finger-canvas {
+  flex: 1;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.finger-touch {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid white;
+  transform: translate(-50%, -50%);
+  transition: all 0.1s ease;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+.finger-touch.eliminated {
+  animation: explode 0.5s ease-out forwards;
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+}
+
+.finger-choose-btn {
+  margin: 20px auto 10px;
+  padding: 16px 40px;
+  background: rgba(46, 204, 113, 0.2);
+  border: 2px solid rgba(46, 204, 113, 0.5);
+  border-radius: var(--radius-md);
+  color: #2ecc71;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: block;
+  width: calc(100% - 40px);
+  max-width: 300px;
+}
+
+.finger-choose-btn:hover:not(:disabled) {
+  background: rgba(46, 204, 113, 0.3);
+  border-color: rgba(46, 204, 113, 0.7);
+  transform: translateY(-2px);
+}
+
+.finger-choose-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.finger-reset-btn {
+  margin: 0 auto 20px;
+  padding: 12px 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: block;
+  width: calc(100% - 40px);
+  max-width: 300px;
+}
+
+.finger-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.utilities-open {
+  overflow: hidden;
+}
+
+body.finger-chooser-open {
+  overflow: hidden;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .utilities-container {
+    padding: 32px 24px;
+  }
+
+  .utilities-title {
+    font-size: 22px;
+  }
+
+  .utilities-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .utility-icon {
+    font-size: 40px;
+  }
+
+  .finger-title {
+    font-size: 24px;
+  }
+
+  .finger-subtitle {
+    font-size: 12px;
+  }
+
+  .finger-touch {
+    width: 70px;
+    height: 70px;
+  }
+
+  .finger-choose-btn {
+    font-size: 16px;
+    padding: 14px 32px;
+  }
+}

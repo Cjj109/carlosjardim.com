@@ -40,6 +40,7 @@
   <link rel="stylesheet" href="css/matrix-mode.css?v=20260201003532003532003217002616002253002029001850001442">
   <link rel="stylesheet" href="css/new-features.css?v=20260201003532003532003217002616002253002029001850001442">
   <link rel="stylesheet" href="css/bcv-calculator.css?v=20260201003532003532003217002616002253002029001850001442">
+  <link rel="stylesheet" href="css/utilities.css?v=20260201003532003532003217002616002253002029001850001442">
 
   <!-- Scripts optimizados con defer para carga paralela -->
   <script src="js/main.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
@@ -49,6 +50,7 @@
   <script src="js/side-a-enhancements.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
   <script src="js/gym-widget.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
   <script src="js/bcv-calculator.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
+  <script src="js/utilities.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
   <script src="js/gates.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
   <script src="js/games-menu.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
   <script src="js/pong.js?v=20260201003532003532003217002616002253002029001850001442" defer></script>
@@ -80,7 +82,7 @@
         <span class="subtitle"><span class="clickable" onclick="openAcademicTimeline()">Economista</span></span>
       </div>
 
-      <div class="section-label clickable" onclick="openBCVCalculator()" style="cursor: pointer;">Perfil 💱</div>
+      <div class="section-label clickable" onclick="openUtilitiesMenu()" style="cursor: pointer;">Perfil 🛠️</div>
       <p class="cv-text">
         Me muevo entre datos y decisiones, pero lo mío es la calma: constancia, humor seco y cero necesidad de impresionar.
       </p>
@@ -787,6 +789,58 @@
         Cargando...
       </div>
     </div>
+  </div>
+
+  <!-- Utilities Menu Modal -->
+  <div class="utilities-overlay" id="utilitiesModal">
+    <div class="utilities-container">
+      <button class="utilities-close" onclick="closeUtilitiesMenu()">×</button>
+
+      <div class="utilities-header">
+        <div class="utilities-title">🛠️ Utilidades</div>
+        <div class="utilities-subtitle">Herramientas útiles</div>
+      </div>
+
+      <div class="utilities-grid">
+        <div class="utility-card" onclick="openBCVCalculator()">
+          <div class="utility-icon">💱</div>
+          <div class="utility-name">Calculadora BCV</div>
+          <div class="utility-description">Convertir divisas con tasas BCV</div>
+        </div>
+
+        <div class="utility-card" onclick="openFingerChooser()">
+          <div class="utility-icon">👆</div>
+          <div class="utility-name">¿Quién Sale?</div>
+          <div class="utility-description">Selector de dedos para padel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Finger Chooser Modal -->
+  <div class="finger-chooser-overlay" id="fingerChooserModal">
+    <button class="finger-close" onclick="closeFingerChooser()">×</button>
+
+    <div class="finger-header">
+      <div class="finger-title">👆 ¿Quién Sale?</div>
+      <div class="finger-subtitle">Todos coloquen un dedo en la pantalla</div>
+    </div>
+
+    <div class="finger-instructions" id="fingerInstructions">
+      Esperando dedos... (0)
+    </div>
+
+    <div class="finger-canvas" id="fingerCanvas">
+      <!-- Touch circles will be added here dynamically -->
+    </div>
+
+    <button class="finger-choose-btn" id="fingerChooseBtn" onclick="chooseFinger()" disabled>
+      🎲 Elegir
+    </button>
+
+    <button class="finger-reset-btn" id="fingerResetBtn" onclick="resetFingerChooser()">
+      🔄 Reiniciar
+    </button>
   </div>
 
   <!-- Exit Matrix Phone (like the movie) -->
