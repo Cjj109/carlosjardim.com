@@ -1,23 +1,23 @@
-name: Update BCV Exchange Rates
+name: Update BCV Liquidity Data
 
 on:
-  # Run every 3 hours
+  # Run weekly on Mondays at 10:00 UTC (after BCV typically updates)
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '0 10 * * 1'
 
   # Allow manual trigger
   workflow_dispatch:
 
-  # Run on push to test (will be removed by path filter if no relevant changes)
+  # Run on push to test
   push:
     branches:
       - main
     paths:
-      - 'scripts/fetch_bcv_rates.py'
-      - '.github/workflows/update-bcv-rates.yml'
+      - 'scripts/fetch_bcv_liquidity.py'
+      - '.github/workflows/update-bcv-liquidity.yml'
 
 jobs:
-  update-rates:
+  update-liquidity:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,16 +33,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests
+          pip install requests beautifulsoup4 xlrd
 
-      - name: Fetch BCV rates
+      - name: Fetch BCV liquidity data
         run: |
-          python scripts/fetch_bcv_rates.py
+          python scripts/fetch_bcv_liquidity.py
 
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet data/bcv-rates.json data/bcv-rates-history.json 2>/dev/null; then
+          if git diff --quiet data/bcv-liquidity.json; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
@@ -53,6 +53,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/bcv-rates.json data/bcv-rates-history.json
-          git commit -m "Update BCV exchange rates [skip ci]"
+          git add data/bcv-liquidity.json
+          git commit -m "Update BCV liquidity data [skip ci]"
           git push

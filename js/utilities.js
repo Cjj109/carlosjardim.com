@@ -38,6 +38,19 @@ function openBCVFromUtilities() {
 }
 
 /**
+ * Open monetary indicators from utilities menu
+ */
+function openMonetaryFromUtilities() {
+  // Close utilities menu first
+  closeUtilitiesMenu();
+
+  // Small delay to allow menu to close smoothly
+  setTimeout(() => {
+    openMonetaryIndicators();
+  }, 100);
+}
+
+/**
  * Open finger chooser from utilities menu
  */
 function openFingerChooser() {

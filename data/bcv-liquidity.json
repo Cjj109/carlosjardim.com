@@ -1,0 +1,52 @@
+{
+  "last_updated": "2026-02-01T16:09:04.047357",
+  "latest": {
+    "date": "23/01/2026",
+    "m1_billions": 969.09,
+    "m2_billions": 969.99,
+    "variation_pct": 2.27,
+    "variation_direction": "up"
+  },
+  "history": [
+    {
+      "date": "23/01/2026",
+      "m2_billions": 969.99,
+      "variation_pct": 2.27
+    },
+    {
+      "date": "16/01/2026",
+      "m2_billions": 948.42,
+      "variation_pct": 8.0
+    },
+    {
+      "date": "09/01/2026",
+      "m2_billions": 878.17,
+      "variation_pct": -6.57
+    },
+    {
+      "date": "02/01/2026",
+      "m2_billions": 939.92,
+      "variation_pct": 4.54
+    },
+    {
+      "date": "26/12/2025",
+      "m2_billions": 899.11,
+      "variation_pct": 5.8
+    },
+    {
+      "date": "19/12/2025",
+      "m2_billions": 849.84,
+      "variation_pct": 14.27
+    },
+    {
+      "date": "12/12/2025",
+      "m2_billions": 743.69,
+      "variation_pct": 2.02
+    },
+    {
+      "date": "05/12/2025",
+      "m2_billions": 728.99,
+      "variation_pct": -4.21
+    }
+  ]
+}

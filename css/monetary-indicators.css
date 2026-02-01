@@ -1,0 +1,278 @@
+/* ============================================
+   MONETARY INDICATORS MODAL
+   BCV Liquidity tracking
+   ============================================ */
+
+.monetary-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+
+.monetary-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+.monetary-container {
+  background: #1a1a1a;
+  border: 1px solid rgba(230, 126, 34, 0.3);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  padding: 36px 30px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.monetary-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.monetary-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.monetary-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.monetary-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #e67e22;
+  margin-bottom: 6px;
+}
+
+.monetary-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono);
+}
+
+/* Main indicator card */
+.monetary-main {
+  background: rgba(230, 126, 34, 0.08);
+  border: 1px solid rgba(230, 126, 34, 0.25);
+  border-radius: var(--radius-md);
+  padding: 28px 24px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.monetary-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.monetary-value {
+  font-size: 42px;
+  font-weight: 700;
+  color: #e67e22;
+  font-family: var(--mono);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.monetary-unit {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono);
+  margin-bottom: 16px;
+}
+
+.monetary-variation {
+  font-size: 18px;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.monetary-variation .var-up {
+  color: #e74c3c;
+}
+
+.monetary-variation .var-down {
+  color: #2ecc71;
+}
+
+.monetary-variation .var-neutral {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.monetary-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--mono);
+  margin-top: 12px;
+}
+
+/* History section */
+.liquidity-history {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.liquidity-history-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.liquidity-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.liquidity-history-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 60px;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 12px;
+  align-items: center;
+}
+
+.liquidity-history-item.current {
+  background: rgba(230, 126, 34, 0.1);
+  border: 1px solid rgba(230, 126, 34, 0.2);
+}
+
+.liquidity-history-date {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.liquidity-history-value {
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+.liquidity-history-var {
+  text-align: right;
+  font-weight: 600;
+}
+
+.liquidity-history-var.up {
+  color: #e74c3c;
+}
+
+.liquidity-history-var.down {
+  color: #2ecc71;
+}
+
+.liquidity-history-var.neutral {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.liquidity-history-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-family: var(--mono);
+  padding: 8px;
+}
+
+/* Update info */
+.monetary-update-info {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: var(--mono);
+  margin-top: 20px;
+}
+
+body.monetary-open {
+  overflow: hidden;
+}
+
+/* Desktop - center when enough space */
+@media (min-height: 700px) {
+  .monetary-overlay {
+    align-items: center;
+    padding: 20px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .monetary-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .monetary-container {
+    padding: 28px 20px;
+    max-width: 100%;
+  }
+
+  .monetary-title {
+    font-size: 20px;
+  }
+
+  .monetary-value {
+    font-size: 32px;
+  }
+
+  .monetary-main {
+    padding: 20px 16px;
+  }
+
+  .liquidity-history {
+    padding: 12px;
+  }
+
+  .liquidity-history-item {
+    padding: 6px 10px;
+    font-size: 11px;
+    grid-template-columns: 1fr 1fr 50px;
+  }
+
+  .liquidity-history-header {
+    font-size: 11px;
+  }
+}
