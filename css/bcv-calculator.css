@@ -9,8 +9,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
   z-index: 9999;
   display: none;
   align-items: center;
@@ -27,46 +27,27 @@
 }
 
 .bcv-container {
-  background: linear-gradient(135deg, #0f4d0f 0%, #0a2f0a 50%, #050505 100%);
-  border: 2px solid #27ae60;
+  background: #1a1a1a;
+  border: 1px solid rgba(46, 204, 113, 0.3);
   border-radius: var(--radius-lg);
-  max-width: 650px;
+  max-width: 600px;
   width: 100%;
-  padding: 50px 40px;
+  padding: 40px 35px;
   position: relative;
-  transform: scale(0.95);
-  transition: transform var(--transition-base);
-  box-shadow: 0 20px 60px rgba(46, 204, 113, 0.4),
-              0 0 100px rgba(39, 174, 96, 0.2) inset;
-}
-
-.bcv-overlay.active .bcv-container {
-  transform: scale(1);
-  animation: glow-pulse 3s ease-in-out infinite;
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 20px 60px rgba(46, 204, 113, 0.4),
-                0 0 100px rgba(39, 174, 96, 0.2) inset;
-  }
-  50% {
-    box-shadow: 0 20px 60px rgba(46, 204, 113, 0.6),
-                0 0 120px rgba(39, 174, 96, 0.3) inset;
-  }
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .bcv-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  background: rgba(46, 204, 113, 0.2);
-  border: 2px solid #2ecc71;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  color: #2ecc71;
-  font-size: 22px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -76,138 +57,99 @@
 }
 
 .bcv-close:hover {
-  background: #2ecc71;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
-  transform: rotate(90deg) scale(1.1);
-  box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .bcv-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .bcv-title {
-  font-size: 36px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 50%, #1e8449 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 12px;
-  text-shadow: 0 0 30px rgba(46, 204, 113, 0.5);
-  letter-spacing: -1px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #2ecc71;
+  margin-bottom: 8px;
 }
 
 .bcv-subtitle {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
   font-family: var(--mono);
-  letter-spacing: 0.5px;
 }
 
 /* Current Rates Display */
 .bcv-rates {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
 .bcv-rate-card {
-  background: linear-gradient(135deg, rgba(46, 204, 113, 0.15) 0%, rgba(39, 174, 96, 0.05) 100%);
-  border: 2px solid rgba(46, 204, 113, 0.4);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(46, 204, 113, 0.2);
   border-radius: var(--radius-md);
-  padding: 24px 20px;
+  padding: 20px 16px;
   text-align: center;
-  transition: all var(--transition-fast);
-  position: relative;
-  overflow: hidden;
-}
-
-.bcv-rate-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg,
-    transparent 30%,
-    rgba(46, 204, 113, 0.1) 50%,
-    transparent 70%);
-  animation: shimmer 3s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-.bcv-rate-card:hover {
-  transform: translateY(-4px);
-  border-color: #2ecc71;
-  box-shadow: 0 8px 24px rgba(46, 204, 113, 0.3);
 }
 
 .bcv-rate-label {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   font-family: var(--mono);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .bcv-rate-value {
-  font-size: 28px;
-  font-weight: 900;
+  font-size: 24px;
+  font-weight: 700;
   color: #2ecc71;
   font-family: var(--mono);
-  text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
 }
 
 .bcv-rate-symbol {
-  font-size: 48px;
-  margin-bottom: 12px;
-  filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.4));
+  font-size: 32px;
+  margin-bottom: 8px;
+  opacity: 0.8;
 }
 
 /* Calculator */
 .bcv-calculator {
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
-  border: 2px solid rgba(46, 204, 113, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
-  padding: 32px 28px;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) inset;
-}
-
-.bcv-calc-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: #2ecc71;
-  margin-bottom: 28px;
-  font-family: var(--mono);
-  text-align: center;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.bcv-input-group {
+  padding: 28px 24px;
   margin-bottom: 20px;
 }
 
-.bcv-input-label {
-  font-size: 12px;
+.bcv-calc-title {
+  font-size: 14px;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 24px;
   font-family: var(--mono);
-  margin-bottom: 10px;
-  display: block;
+  text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-weight: 600;
+}
+
+.bcv-input-group {
+  margin-bottom: 18px;
+}
+
+.bcv-input-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono);
+  margin-bottom: 8px;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .bcv-input-wrapper {
@@ -219,118 +161,75 @@
 .bcv-input {
   flex: 1;
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(46, 204, 113, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  font-size: 22px;
+  padding: 14px 16px;
+  font-size: 18px;
   font-family: var(--mono);
   color: white;
-  font-weight: 700;
+  font-weight: 600;
   transition: all var(--transition-fast);
 }
 
 .bcv-input:focus {
   outline: none;
-  border-color: #2ecc71;
-  background: rgba(46, 204, 113, 0.1);
-  box-shadow: 0 0 20px rgba(46, 204, 113, 0.3),
-              0 0 40px rgba(46, 204, 113, 0.1) inset;
-  transform: translateY(-2px);
+  border-color: rgba(46, 204, 113, 0.5);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .bcv-select {
-  background: rgba(46, 204, 113, 0.15);
-  border: 2px solid rgba(46, 204, 113, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
-  padding: 16px 20px;
-  font-size: 17px;
+  padding: 14px 16px;
+  font-size: 15px;
   font-family: var(--mono);
   color: white;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-width: 110px;
-}
-
-.bcv-select:hover {
-  border-color: #2ecc71;
-  background: rgba(46, 204, 113, 0.25);
+  min-width: 100px;
 }
 
 .bcv-select:focus {
   outline: none;
-  border-color: #2ecc71;
-  box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+  border-color: rgba(46, 204, 113, 0.5);
 }
 
 .bcv-select option {
-  background: #0a0a0a;
+  background: #1a1a1a;
   color: white;
-  padding: 10px;
 }
 
 .bcv-swap-icon {
   text-align: center;
-  font-size: 32px;
-  color: #2ecc71;
-  margin: 4px 0;
-  filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.4));
-  animation: bounce-subtle 2s ease-in-out infinite;
-}
-
-@keyframes bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 8px 0;
 }
 
 .bcv-result {
-  background: linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(39, 174, 96, 0.15) 100%);
-  border: 2px solid rgba(46, 204, 113, 0.5);
+  background: rgba(46, 204, 113, 0.08);
+  border: 1px solid rgba(46, 204, 113, 0.2);
   border-radius: var(--radius-md);
-  padding: 32px 24px;
+  padding: 24px 20px;
   text-align: center;
-  min-height: 100px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 30px rgba(46, 204, 113, 0.2),
-              0 0 50px rgba(46, 204, 113, 0.1) inset;
-  transition: all var(--transition-fast);
-}
-
-.bcv-result:has(.bcv-result-text) {
-  animation: result-appear 0.4s ease;
-}
-
-@keyframes result-appear {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 .bcv-result-text {
-  font-size: 36px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2ecc71;
   font-family: var(--mono);
-  text-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
-  letter-spacing: -1px;
 }
 
 .bcv-result-empty {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
   font-family: var(--mono);
   font-style: italic;
 }
@@ -339,10 +238,9 @@
 .bcv-update-info {
   text-align: center;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   font-family: var(--mono);
-  margin-top: 24px;
-  letter-spacing: 0.5px;
+  margin-top: 20px;
 }
 
 body.bcv-open {
@@ -352,47 +250,42 @@ body.bcv-open {
 /* Mobile */
 @media (max-width: 768px) {
   .bcv-container {
-    padding: 40px 24px;
+    padding: 32px 24px;
   }
 
   .bcv-title {
-    font-size: 28px;
+    font-size: 22px;
   }
 
   .bcv-rates {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
   }
 
   .bcv-rate-symbol {
-    font-size: 40px;
+    font-size: 28px;
   }
 
   .bcv-rate-value {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .bcv-input {
-    font-size: 18px;
-    padding: 14px 16px;
+    font-size: 16px;
+    padding: 12px 14px;
   }
 
   .bcv-select {
-    font-size: 15px;
-    padding: 14px 16px;
-    min-width: 90px;
-  }
-
-  .bcv-swap-icon {
-    font-size: 28px;
+    font-size: 14px;
+    padding: 12px 14px;
+    min-width: 85px;
   }
 
   .bcv-result {
-    padding: 28px 20px;
-    min-height: 90px;
+    padding: 20px 16px;
   }
 
   .bcv-result-text {
-    font-size: 28px;
+    font-size: 24px;
   }
 }

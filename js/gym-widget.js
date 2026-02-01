@@ -181,7 +181,15 @@ function navigateWorkout(direction) {
  * Format date
  */
 function formatDate(dateString) {
+  if (!dateString) return 'Fecha no disponible';
+
   const date = new Date(dateString);
+
+  // Validate date
+  if (isNaN(date.getTime())) {
+    return dateString; // Return original string if invalid
+  }
+
   const options = { day: 'numeric', month: 'short', year: 'numeric' };
   return date.toLocaleDateString('es-ES', options);
 }
@@ -190,7 +198,15 @@ function formatDate(dateString) {
  * Format datetime
  */
 function formatDateTime(dateTimeString) {
+  if (!dateTimeString) return 'Fecha no disponible';
+
   const date = new Date(dateTimeString);
+
+  // Validate date
+  if (isNaN(date.getTime())) {
+    return dateTimeString; // Return original string if invalid
+  }
+
   const options = {
     day: 'numeric',
     month: 'short',
