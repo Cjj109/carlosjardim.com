@@ -25,6 +25,19 @@ function closeUtilitiesMenu() {
 }
 
 /**
+ * Open BCV calculator from utilities menu
+ */
+function openBCVFromUtilities() {
+  // Close utilities menu first
+  closeUtilitiesMenu();
+
+  // Small delay to allow menu to close smoothly
+  setTimeout(() => {
+    openBCVCalculator();
+  }, 100);
+}
+
+/**
  * Open finger chooser from utilities menu
  */
 function openFingerChooser() {
@@ -64,6 +77,7 @@ let activeTouches = new Map();
 let touchColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
 let usedColorIndex = 0;
 let isChoosingInProgress = false;
+let autoChooseTimer = null;
 
 /**
  * Initialize finger chooser event listeners
@@ -220,17 +234,38 @@ function handleMouseUp(e) {
 function updateFingerUI() {
   const count = activeTouches.size;
   const instructions = document.getElementById('fingerInstructions');
-  const chooseBtn = document.getElementById('fingerChooseBtn');
+
+  // Clear any existing timer
+  if (autoChooseTimer) {
+    clearTimeout(autoChooseTimer);
+    autoChooseTimer = null;
+  }
 
   if (count === 0) {
     instructions.textContent = 'Esperando dedos... (0)';
-    chooseBtn.disabled = true;
   } else if (count === 1) {
     instructions.textContent = '1 dedo detectado - Necesitas al menos 2';
-    chooseBtn.disabled = true;
   } else {
-    instructions.textContent = `${count} dedos detectados - ¡Listo para elegir!`;
-    chooseBtn.disabled = false;
+    // Show countdown
+    let secondsLeft = 3;
+    instructions.textContent = `${count} dedos detectados - Eligiendo en ${secondsLeft}...`;
+
+    // Countdown timer
+    const countdownInterval = setInterval(() => {
+      secondsLeft--;
+      if (secondsLeft > 0) {
+        instructions.textContent = `${count} dedos detectados - Eligiendo en ${secondsLeft}...`;
+      }
+    }, 1000);
+
+    // Auto-choose after 3 seconds
+    autoChooseTimer = setTimeout(() => {
+      clearInterval(countdownInterval);
+      // Verify we still have 2+ fingers before choosing
+      if (activeTouches.size >= 2 && !isChoosingInProgress) {
+        chooseFinger();
+      }
+    }, 3000);
   }
 }
 
@@ -242,8 +277,12 @@ function chooseFinger() {
   if (isChoosingInProgress) return;
 
   isChoosingInProgress = true;
-  const chooseBtn = document.getElementById('fingerChooseBtn');
-  chooseBtn.disabled = true;
+
+  // Clear any active timer
+  if (autoChooseTimer) {
+    clearTimeout(autoChooseTimer);
+    autoChooseTimer = null;
+  }
 
   // Get all touches as array
   const touchArray = Array.from(activeTouches.values());
@@ -279,7 +318,6 @@ function chooseFinger() {
       }
 
       isChoosingInProgress = false;
-      chooseBtn.disabled = false;
     }, 500);
   }, 800);
 }
@@ -288,6 +326,12 @@ function chooseFinger() {
  * Reset finger chooser
  */
 function resetFingerChooser() {
+  // Clear timer
+  if (autoChooseTimer) {
+    clearTimeout(autoChooseTimer);
+    autoChooseTimer = null;
+  }
+
   // Clear all touches
   activeTouches.forEach(touchData => {
     if (touchData.element && touchData.element.parentNode) {
