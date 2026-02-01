@@ -188,13 +188,28 @@ function navigateWorkout(direction) {
 }
 
 /**
- * Format date - Simple version to avoid formatting errors
+ * Format date - Format as "DD Mes YYYY" like Hevy
  */
 function formatGymDate(dateString) {
   try {
     if (!dateString) return 'Fecha no disponible';
-    // Just return the date string as-is if it's already in YYYY-MM-DD format
-    return String(dateString);
+
+    // Parse the date string (YYYY-MM-DD format)
+    const parts = String(dateString).split('-');
+    if (parts.length !== 3) return String(dateString);
+
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+
+    // Spanish month names (short form)
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const monthIndex = parseInt(month, 10) - 1;
+
+    if (monthIndex < 0 || monthIndex > 11) return String(dateString);
+
+    // Format as "DD Mes YYYY" (e.g., "31 Ene 2026")
+    return `${parseInt(day, 10)} ${months[monthIndex]} ${year}`;
   } catch (error) {
     console.error('Error formatting date:', error, dateString);
     return 'Fecha no disponible';

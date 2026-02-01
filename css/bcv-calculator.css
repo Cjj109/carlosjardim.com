@@ -250,8 +250,15 @@ body.bcv-open {
 
 /* Mobile */
 @media (max-width: 768px) {
+  .bcv-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
   .bcv-container {
-    padding: 32px 24px;
+    padding: 32px 20px;
+    max-width: 100%;
   }
 
   .bcv-title {
@@ -263,12 +270,20 @@ body.bcv-open {
     gap: 12px;
   }
 
+  .bcv-rate-card {
+    padding: 16px 12px;
+  }
+
   .bcv-rate-symbol {
     font-size: 44px;
   }
 
   .bcv-rate-value {
     font-size: 20px;
+  }
+
+  .bcv-calculator {
+    padding: 24px 20px;
   }
 
   .bcv-input {
@@ -287,6 +302,6 @@ body.bcv-open {
   }
 
   .bcv-result-text {
-    font-size: 24px;
+    font-size: 22px;
   }
 }
