@@ -100,6 +100,18 @@ function initFingerChooser() {
 }
 
 /**
+ * Get touch position relative to canvas
+ */
+function getTouchPositionRelativeToCanvas(touch) {
+  const canvas = document.getElementById('fingerCanvas');
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: touch.clientX - rect.left,
+    y: touch.clientY - rect.top
+  };
+}
+
+/**
  * Handle touch start
  */
 function handleTouchStart(e) {
@@ -114,14 +126,17 @@ function handleTouchStart(e) {
     // Skip if already tracked
     if (activeTouches.has(touchId)) continue;
 
+    // Get position relative to canvas
+    const pos = getTouchPositionRelativeToCanvas(touch);
+
     // Create touch element
     const touchElement = document.createElement('div');
     touchElement.className = 'finger-touch';
     const color = touchColors[usedColorIndex % touchColors.length];
     usedColorIndex++;
     touchElement.style.backgroundColor = color;
-    touchElement.style.left = touch.pageX + 'px';
-    touchElement.style.top = touch.pageY + 'px';
+    touchElement.style.left = pos.x + 'px';
+    touchElement.style.top = pos.y + 'px';
 
     document.getElementById('fingerCanvas').appendChild(touchElement);
 
@@ -129,8 +144,8 @@ function handleTouchStart(e) {
     activeTouches.set(touchId, {
       element: touchElement,
       color: color,
-      x: touch.pageX,
-      y: touch.pageY
+      x: pos.x,
+      y: pos.y
     });
   }
 
@@ -151,10 +166,11 @@ function handleTouchMove(e) {
     const touchData = activeTouches.get(touchId);
 
     if (touchData) {
-      touchData.element.style.left = touch.pageX + 'px';
-      touchData.element.style.top = touch.pageY + 'px';
-      touchData.x = touch.pageX;
-      touchData.y = touch.pageY;
+      const pos = getTouchPositionRelativeToCanvas(touch);
+      touchData.element.style.left = pos.x + 'px';
+      touchData.element.style.top = pos.y + 'px';
+      touchData.x = pos.x;
+      touchData.y = pos.y;
     }
   }
 }
@@ -187,21 +203,26 @@ let mouseTouch = null;
 function handleMouseDown(e) {
   if (isChoosingInProgress) return;
 
+  const canvas = document.getElementById('fingerCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
   const touchElement = document.createElement('div');
   touchElement.className = 'finger-touch';
   const color = touchColors[usedColorIndex % touchColors.length];
   usedColorIndex++;
   touchElement.style.backgroundColor = color;
-  touchElement.style.left = e.pageX + 'px';
-  touchElement.style.top = e.pageY + 'px';
+  touchElement.style.left = x + 'px';
+  touchElement.style.top = y + 'px';
 
-  document.getElementById('fingerCanvas').appendChild(touchElement);
+  canvas.appendChild(touchElement);
 
   mouseTouch = {
     element: touchElement,
     color: color,
-    x: e.pageX,
-    y: e.pageY
+    x: x,
+    y: y
   };
 
   activeTouches.set('mouse', mouseTouch);
@@ -212,10 +233,15 @@ function handleMouseMove(e) {
   if (isChoosingInProgress) return;
   if (!mouseTouch) return;
 
-  mouseTouch.element.style.left = e.pageX + 'px';
-  mouseTouch.element.style.top = e.pageY + 'px';
-  mouseTouch.x = e.pageX;
-  mouseTouch.y = e.pageY;
+  const canvas = document.getElementById('fingerCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  mouseTouch.element.style.left = x + 'px';
+  mouseTouch.element.style.top = y + 'px';
+  mouseTouch.x = x;
+  mouseTouch.y = y;
 }
 
 function handleMouseUp(e) {

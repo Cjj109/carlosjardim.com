@@ -1,0 +1,16 @@
+{
+  "name": "Carlos Jardim | Perfil",
+  "short_name": "Carlos Jardim",
+  "description": "Economista - Constancia > Ruido",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f7f7",
+  "theme_color": "#ff3b30",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

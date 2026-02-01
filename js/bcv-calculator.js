@@ -201,16 +201,15 @@ function getCurrencySymbol(currency) {
 }
 
 /**
- * Copy result to clipboard
+ * Copy result to clipboard with fallback for Android/older browsers
  */
 function copyResult(amount, symbol) {
   const textToCopy = `${amount} ${symbol}`;
+  const btn = event.target.closest('.bcv-copy-btn');
+  const originalText = btn.innerHTML;
 
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    // Show success feedback
-    const btn = event.target.closest('.bcv-copy-btn');
-    const originalText = btn.innerHTML;
-
+  // Function to show success feedback
+  const showSuccess = () => {
     btn.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="20 6 9 17 4 12"></polyline>
@@ -225,10 +224,76 @@ function copyResult(amount, symbol) {
       btn.style.backgroundColor = '';
       btn.style.borderColor = '';
     }, 2000);
-  }).catch(err => {
-    console.error('Error al copiar:', err);
-    alert('No se pudo copiar el resultado');
-  });
+  };
+
+  // Function to show error feedback
+  const showError = () => {
+    btn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+      Error
+    `;
+    btn.style.backgroundColor = 'rgba(231, 76, 60, 0.2)';
+    btn.style.borderColor = 'rgba(231, 76, 60, 0.5)';
+
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.style.backgroundColor = '';
+      btn.style.borderColor = '';
+    }, 2000);
+  };
+
+  // Fallback method using textarea for older browsers/Android
+  const fallbackCopy = () => {
+    const textArea = document.createElement('textarea');
+    textArea.value = textToCopy;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '0';
+    textArea.setAttribute('readonly', '');
+    document.body.appendChild(textArea);
+
+    // Handle iOS
+    const range = document.createRange();
+    range.selectNodeContents(textArea);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    textArea.setSelectionRange(0, textToCopy.length);
+
+    let success = false;
+    try {
+      success = document.execCommand('copy');
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+    }
+
+    document.body.removeChild(textArea);
+    return success;
+  };
+
+  // Try modern Clipboard API first, then fallback
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(textToCopy)
+      .then(showSuccess)
+      .catch(() => {
+        // Try fallback if Clipboard API fails
+        if (fallbackCopy()) {
+          showSuccess();
+        } else {
+          showError();
+        }
+      });
+  } else {
+    // Use fallback for non-secure contexts or older browsers
+    if (fallbackCopy()) {
+      showSuccess();
+    } else {
+      showError();
+    }
+  }
 }
 
 /**

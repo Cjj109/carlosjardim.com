@@ -6,49 +6,49 @@
 const chocolates = {
   jesus: {
     name: "Jesús",
-    image: "images/Jesus.PNG",
+    image: "images/Jesus.webp",
     instagram: "@elyizus",
     status: "extremadamente apartado",
     description: "Dulce en fase beta. En un día de Luz se derritió y dio como resultado otro dulce. Hoy vive una vida tranquila comiendo perros calientes y jugando LoL. No sale en el test de compatibilidad porque es incompatible con otra mujer (nadie fue amenazado para escribir esto)."
   },
   miguel: {
     name: "Miguel Acosta",
-    image: "images/Miguel.PNG",
+    image: "images/Miguel.webp",
     instagram: "@miguex94",
     status: "apartado",
     description: "En su momento fue el terror de cierto sitio que a él no le gusta mencionar ¿hoy? Su vida gira alrededor de la iglesia y la fe. Un hombre totalmente cambiado y apartado ¿su sabor? Solo para una."
   },
   zachiro: {
     name: "Zachiro",
-    image: "images/Zachiro.PNG",
+    image: "images/Zachiro.webp",
     instagram: "@zachiroj",
     status: null,
     description: "El primer asiático nacido de dos padres venezolanos. Fanático de los videojuegos. Cuenta con una moto y un tatuaje de un número. Dispuesto a tatuarse tu nombre, pero solo si tienes el sabor correcto."
   },
   anthonny: {
     name: "Anthonny",
-    image: "images/Anthonny.PNG",
+    image: "images/Anthonny.webp",
     instagram: "@anthonny.123",
     status: "apartado",
     description: "El Benjamín Button del cabello. Ya a los 13 años tenía barba, lo que hacía que lo expulsaran de sitios para menores ¿el problema? Su cabello ya había vivido lo suficiente y decidió abandonarlo ¿hoy? Gracias a un viaje a Rusia volvió a encontrar el camino de Head & Shoulders. Este es un dulce tipo Di Caprio (no apto para mayores de 23)."
   },
   ricardo: {
     name: "Ricardo",
-    image: "images/Ricardo.PNG",
+    image: "images/Ricardo.webp",
     instagram: "@radsl",
     status: null,
     description: "Este caramelo es conocido por partir. Tiene prohibición de venta en Tanaguarenas. Con ligero sabor y olor a pollo a la brasa y con un trauma a los carros Chrysler (con este le pago la universidad al hijo de su mecánico)."
   },
   mike: {
     name: "Miguel Angelo",
-    image: "images/Mike.PNG",
+    image: "images/Mike.webp",
     instagram: "@miguel267",
     status: null,
     description: "De fabricación venezolana, pero actualmente se encuentra en el mercado estadounidense. Su mayor miedo en la actualidad es el hielo (ICE). Cuenta con un legendario movimiento de caderas que le ganó el apodo de Magic Mike (de ahí se inspiró la película)."
   },
   david: {
     name: "David Pereira",
-    image: "images/David.PNG",
+    image: "images/David.webp",
     instagram: "@davidapereiraf",
     status: null,
     description: "Este chocolate era un poco más blanco, pero se doró (de más) en sus viajes a Los Caracas. Su sueño es encontrar una alemana que disfrute su sabor ¿el problema? Hoy está más cerca del lado oscuro."
@@ -61,6 +61,7 @@ window.chocolates = chocolates;
 // Track if user has visited Side B
 let hasVisitedSideB = false;
 let goldenTicketShown = false;
+let scrollPositionBeforeModal = 0;
 
 /**
  * Detect when user toggles to Side B
@@ -117,6 +118,9 @@ function openChocolateShop() {
 
   if (!modal) return;
 
+  // Save scroll position before opening modal
+  scrollPositionBeforeModal = window.scrollY || window.pageYOffset;
+
   // Hide ticket
   if (ticket) {
     ticket.classList.remove('show');
@@ -143,6 +147,11 @@ function closeChocolateShop() {
 
   modal.classList.remove('active');
   document.body.classList.remove('chocolate-shop-open');
+
+  // Restore scroll position after modal closes
+  setTimeout(() => {
+    window.scrollTo(0, scrollPositionBeforeModal);
+  }, 50);
 
   // Reset to grid view
   setTimeout(() => {

@@ -15,7 +15,7 @@ OUTPUT_FILE = 'data/bcv-rates.json'
 
 # API endpoints
 EUR_API = 'https://bcvapi.tech/api/v1/euro/public'
-USD_API = 'https://bcv-api.rafnixg.dev/rates/'
+USD_API = 'https://ve.dolarapi.com/v1/dolares/oficial'
 
 
 def fetch_eur_rate():
@@ -35,15 +35,22 @@ def fetch_eur_rate():
 
 
 def fetch_usd_rate():
-    """Fetch USD rate from bcv-api.rafnixg.dev"""
+    """Fetch USD rate from DolarApi.com (official BCV rate)"""
     try:
         response = requests.get(USD_API, timeout=10)
         response.raise_for_status()
         data = response.json()
 
+        # Parse date from ISO format
+        fecha_str = data.get('fechaActualizacion', '')
+        if fecha_str:
+            date = fecha_str.split('T')[0]
+        else:
+            date = datetime.now().strftime('%Y-%m-%d')
+
         return {
-            'rate': float(data.get('dollar', 0)),
-            'date': data.get('date', datetime.now().strftime('%Y-%m-%d'))
+            'rate': float(data.get('promedio', 0)),
+            'date': date
         }
     except Exception as e:
         print(f"✗ Error fetching USD rate: {e}")
@@ -99,7 +106,7 @@ def main():
     eur_data = fetch_eur_rate()
 
     # Fetch USD rate
-    print("→ Fetching USD rate from bcv-api.rafnixg.dev...")
+    print("→ Fetching USD rate from DolarApi.com...")
     usd_data = fetch_usd_rate()
 
     # Save rates
