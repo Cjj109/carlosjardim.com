@@ -176,8 +176,16 @@ function calculateConversion() {
   const symbol = getCurrencySymbol(toCurrency);
   const formattedResult = formatRate(result);
 
-  document.getElementById('bcvResult').innerHTML =
-    '<div class="bcv-result-text">' + formattedResult + ' ' + symbol + '</div>';
+  document.getElementById('bcvResult').innerHTML = `
+    <div class="bcv-result-text">${formattedResult} ${symbol}</div>
+    <button class="bcv-copy-btn" onclick="copyResult('${formattedResult}', '${symbol}')" title="Copiar resultado">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      Copiar
+    </button>
+  `;
 }
 
 /**
@@ -190,6 +198,37 @@ function getCurrencySymbol(currency) {
     'EUR': '€'
   };
   return symbols[currency] || '';
+}
+
+/**
+ * Copy result to clipboard
+ */
+function copyResult(amount, symbol) {
+  const textToCopy = `${amount} ${symbol}`;
+
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    // Show success feedback
+    const btn = event.target.closest('.bcv-copy-btn');
+    const originalText = btn.innerHTML;
+
+    btn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      ¡Copiado!
+    `;
+    btn.style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+    btn.style.borderColor = 'rgba(46, 204, 113, 0.5)';
+
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.style.backgroundColor = '';
+      btn.style.borderColor = '';
+    }, 2000);
+  }).catch(err => {
+    console.error('Error al copiar:', err);
+    alert('No se pudo copiar el resultado');
+  });
 }
 
 /**
