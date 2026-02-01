@@ -18,7 +18,7 @@ MAX_HISTORY_ENTRIES = 90  # Keep ~3 months of data (updates every 3 hours = 8/da
 # API endpoints
 EUR_API = 'https://bcvapi.tech/api/v1/euro/public'
 USD_API = 'https://ve.dolarapi.com/v1/dolares/oficial'
-USDT_API = 'https://ve.dolarapi.com/v1/dolares/paralelo'  # Paralelo ~= USDT P2P rate
+USDT_API = 'https://ve.dolarapi.com/v1/dolares/paralelo'  # P2P reference rate
 
 
 def fetch_eur_rate():
@@ -61,7 +61,7 @@ def fetch_usd_rate():
 
 
 def fetch_usdt_rate():
-    """Fetch USDT rate from DolarApi.com (paralelo rate ~= P2P)"""
+    """Fetch USDT rate from DolarApi.com (P2P reference)"""
     try:
         response = requests.get(USDT_API, timeout=10)
         response.raise_for_status()
@@ -227,7 +227,7 @@ def main():
     print("→ Fetching USD rate from DolarApi.com...")
     usd_data = fetch_usd_rate()
 
-    # Fetch USDT rate (paralelo)
+    # Fetch USDT rate (P2P)
     print("→ Fetching USDT rate from DolarApi.com...")
     usdt_data = fetch_usdt_rate()
 
