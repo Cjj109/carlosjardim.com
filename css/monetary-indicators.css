@@ -12,18 +12,22 @@
   background: rgba(0, 0, 0, 0.92);
   backdrop-filter: blur(8px);
   z-index: 9999;
-  display: none;
+  display: none !important;
   align-items: flex-start;
   justify-content: center;
   opacity: 0;
-  transition: opacity var(--transition-base);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
   padding: 40px 20px;
   overflow-y: auto;
 }
 
 .monetary-overlay.active {
-  display: flex;
+  display: flex !important;
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .monetary-container {
