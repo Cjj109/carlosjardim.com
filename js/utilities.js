@@ -342,9 +342,9 @@ function chooseFinger() {
       setTimeout(() => {
         const remaining = activeTouches.size - eliminateCount;
         if (remaining === 1) {
-          instructions.textContent = '✅ ¡Este dedo SALE del padel!';
+          instructions.textContent = '✅ ¡Esta persona SALE del padel!';
         } else {
-          instructions.textContent = `✅ ${remaining} dedos siguen - ¡Juegan padel!`;
+          instructions.textContent = `✅ ${remaining} personas siguen - ¡Juegan padel!`;
         }
 
         isChoosingInProgress = false;
