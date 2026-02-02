@@ -1,11 +1,12 @@
 /* ============================================
    COMMODITIES - Real-time price tracker
-   Bitcoin, Ethereum, Gold, Oil (Brent)
+   Bitcoin, Ethereum, Gold, EUR/USD
    ============================================ */
 
 // Global state
 let commoditiesData = null;
 let commoditiesRefreshInterval = null;
+let isRefreshing = false;
 const REFRESH_INTERVAL = 30000; // 30 seconds
 
 /**
@@ -73,14 +74,17 @@ function stopCommoditiesRefresh() {
  * Load all commodity prices
  */
 async function loadCommoditiesPrices() {
+  if (isRefreshing) return;
+  isRefreshing = true;
+
   // Show loading state
   updateLoadingState(true);
 
   // Fetch all prices in parallel
-  const [cryptoData, goldData, oilData] = await Promise.all([
+  const [cryptoData, goldData, eurUsdData] = await Promise.all([
     fetchCryptoPrices(),
     fetchGoldPrice(),
-    fetchOilPrice()
+    fetchEurUsdRate()
   ]);
 
   // Update UI
@@ -92,13 +96,27 @@ async function loadCommoditiesPrices() {
     updateGoldUI(goldData);
   }
 
-  if (oilData) {
-    updateOilUI(oilData);
+  if (eurUsdData) {
+    updateEurUsdUI(eurUsdData);
   }
 
   // Update timestamp
   updateTimestamp();
   updateLoadingState(false);
+  isRefreshing = false;
+}
+
+/**
+ * Manual refresh triggered by clicking on a price
+ */
+function refreshCommodityPrices() {
+  if (isRefreshing) return;
+
+  // Reset auto-refresh timer
+  startCommoditiesRefresh();
+
+  // Load prices
+  loadCommoditiesPrices();
 }
 
 /**
@@ -181,46 +199,81 @@ async function fetchGoldPrice() {
 }
 
 /**
- * Fetch Oil (Brent) price
- * Brent crude is the reference for Venezuelan oil pricing
+ * Fetch EUR/USD exchange rate
+ * Using free forex APIs
  */
-async function fetchOilPrice() {
-  // Try using a public API for oil prices
-  // Note: Most oil APIs require API keys, so we use fallbacks
-
-  // Try CoinGecko's oil-related token or commodity tracker
+async function fetchEurUsdRate() {
+  // Try Frankfurter API (free, no API key required)
   try {
-    // Use a proxy-friendly endpoint or cached data approach
-    // For now, we'll use a static approximation updated periodically
-    // In production, you'd want to use an API like:
-    // - Alpha Vantage (requires free API key)
-    // - Twelve Data (requires free API key)
-    // - Yahoo Finance API
-
-    // Fallback: Use CoinGecko's petro token or similar
     const response = await fetch(
-      'https://api.coingecko.com/api/v3/simple/price?ids=petro&vs_currencies=usd&include_24hr_change=true',
+      'https://api.frankfurter.app/latest?from=EUR&to=USD',
       { cache: 'no-store' }
     );
 
     if (response.ok) {
       const data = await response.json();
-      // Petro is Venezuela's cryptocurrency pegged to oil
-      // Not exact but gives an approximation
-      if (data.petro) {
+      if (data.rates && data.rates.USD) {
+        // Get yesterday's rate for change calculation
+        const yesterdayResponse = await fetch(
+          'https://api.frankfurter.app/latest?from=EUR&to=USD&amount=1',
+          { cache: 'no-store' }
+        );
+
+        let change = null;
+
+        // Try to get historical rate for change
+        try {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const dateStr = yesterday.toISOString().split('T')[0];
+
+          const histResponse = await fetch(
+            `https://api.frankfurter.app/${dateStr}?from=EUR&to=USD`,
+            { cache: 'no-store' }
+          );
+
+          if (histResponse.ok) {
+            const histData = await histResponse.json();
+            if (histData.rates && histData.rates.USD) {
+              const currentRate = data.rates.USD;
+              const previousRate = histData.rates.USD;
+              change = ((currentRate - previousRate) / previousRate) * 100;
+            }
+          }
+        } catch (e) {
+          console.warn('Could not fetch EUR/USD historical rate:', e);
+        }
+
         return {
-          price: data.petro.usd,
-          change: data.petro.usd_24h_change,
-          isProxy: true
+          price: data.rates.USD,
+          change: change
         };
       }
     }
   } catch (e) {
-    console.warn('Oil price fetch failed:', e);
+    console.warn('Frankfurter API failed:', e);
   }
 
-  // Return estimated value with disclaimer
-  // Brent crude typically ranges $70-90 USD
+  // Fallback: Try exchangerate.host
+  try {
+    const response = await fetch(
+      'https://api.exchangerate.host/latest?base=EUR&symbols=USD',
+      { cache: 'no-store' }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.rates && data.rates.USD) {
+        return {
+          price: data.rates.USD,
+          change: null
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Exchangerate.host API failed:', e);
+  }
+
   return {
     price: null,
     change: null,
@@ -283,31 +336,26 @@ function updateGoldUI(data) {
 }
 
 /**
- * Update Oil UI
+ * Update EUR/USD UI
  */
-function updateOilUI(data) {
-  const oilCard = document.querySelector('.commodity-card.oil');
-  const oilPrice = document.getElementById('oilPrice');
-  const oilChange = document.getElementById('oilChange');
+function updateEurUsdUI(data) {
+  const eurUsdCard = document.querySelector('.commodity-card.eurusd');
+  const eurUsdPrice = document.getElementById('eurUsdPrice');
+  const eurUsdChange = document.getElementById('eurUsdChange');
 
   if (data.unavailable) {
-    oilPrice.textContent = 'API limitada';
-    oilChange.textContent = 'Requiere clave API';
-    oilChange.className = 'commodity-change neutral';
-    oilCard?.classList.add('error');
+    eurUsdPrice.textContent = 'No disponible';
+    eurUsdChange.textContent = '';
+    eurUsdCard?.classList.add('error');
   } else if (data.price) {
-    oilPrice.textContent = formatPrice(data.price) + '/bbl';
-    if (data.isProxy) {
-      oilChange.textContent = '~Petro VE';
-      oilChange.className = 'commodity-change neutral';
-    } else {
-      updateChangeElement(oilChange, data.change);
-    }
-    oilCard?.classList.remove('error');
+    // Format as exchange rate (e.g., 1.0850)
+    eurUsdPrice.textContent = data.price.toFixed(4);
+    updateChangeElement(eurUsdChange, data.change);
+    eurUsdCard?.classList.remove('error');
   } else {
-    oilPrice.textContent = 'No disponible';
-    oilChange.textContent = '';
-    oilCard?.classList.add('error');
+    eurUsdPrice.textContent = 'No disponible';
+    eurUsdChange.textContent = '';
+    eurUsdCard?.classList.add('error');
   }
 }
 
@@ -401,6 +449,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Escape' && modal.classList.contains('active')) {
         closeCommodities();
       }
+    });
+
+    // Add click-to-refresh on price elements
+    const priceElements = modal.querySelectorAll('.commodity-price');
+    priceElements.forEach(el => {
+      el.addEventListener('click', () => {
+        refreshCommodityPrices();
+      });
     });
   }
 });

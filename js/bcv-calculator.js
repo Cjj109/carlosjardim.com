@@ -5,6 +5,7 @@
 // Global variables
 let bcvRates = null;
 let bcvHistory = null;
+let isRefreshingUsdt = false;
 
 /**
  * Open BCV calculator modal
@@ -81,6 +82,67 @@ async function loadBCVRates() {
     console.error('Error loading BCV rates:', error);
     displayError();
   }
+}
+
+/**
+ * Refresh USDT rate only (triggered by clicking the rate)
+ */
+async function refreshUsdtRate() {
+  if (isRefreshingUsdt) return;
+  isRefreshingUsdt = true;
+
+  const usdtRate = document.getElementById('bcvUsdtRate');
+  const originalText = usdtRate ? usdtRate.textContent : '';
+
+  // Show loading state
+  if (usdtRate) {
+    usdtRate.textContent = '...';
+    usdtRate.style.opacity = '0.5';
+  }
+
+  try {
+    const response = await fetch('https://ve.dolarapi.com/v1/dolares/paralelo', {
+      cache: 'no-store'
+    });
+
+    if (response.ok) {
+      const usdtData = await response.json();
+      if (bcvRates) {
+        bcvRates.usdt = {
+          rate: usdtData.promedio,
+          date: usdtData.fechaActualizacion ? usdtData.fechaActualizacion.split('T')[0] : new Date().toISOString().split('T')[0],
+          symbol: '₮',
+          live: true
+        };
+      }
+
+      // Update display
+      if (usdtRate) {
+        usdtRate.textContent = formatRate(usdtData.promedio);
+        usdtRate.style.opacity = '1';
+
+        // Flash green to indicate success
+        usdtRate.style.color = '#2ecc71';
+        setTimeout(() => {
+          usdtRate.style.color = '';
+        }, 500);
+      }
+
+      // Recalculate if there's a pending conversion
+      calculateConversion();
+    } else {
+      throw new Error('API error');
+    }
+  } catch (e) {
+    console.error('Error refreshing USDT:', e);
+    // Restore original value
+    if (usdtRate) {
+      usdtRate.textContent = originalText;
+      usdtRate.style.opacity = '1';
+    }
+  }
+
+  isRefreshingUsdt = false;
 }
 
 /**
@@ -451,5 +513,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (toSelect) {
     toSelect.addEventListener('change', calculateConversion);
+  }
+
+  // Add click-to-refresh on USDT rate
+  const usdtRateEl = document.getElementById('bcvUsdtRate');
+  if (usdtRateEl) {
+    usdtRateEl.addEventListener('click', refreshUsdtRate);
   }
 });

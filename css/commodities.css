@@ -1,6 +1,6 @@
 /* ============================================
    COMMODITIES MODAL
-   Real-time prices for BTC, ETH, Gold, Oil
+   Real-time prices for BTC, ETH, Gold, EUR/USD
    ============================================ */
 
 .commodities-overlay {
@@ -139,13 +139,13 @@
   color: #333;
 }
 
-/* Oil styling */
-.commodity-card.oil {
-  border-color: rgba(52, 73, 94, 0.5);
+/* EUR/USD styling */
+.commodity-card.eurusd {
+  border-color: rgba(0, 51, 153, 0.4);
 }
 
-.commodity-card.oil .commodity-icon {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+.commodity-card.eurusd .commodity-icon {
+  background: linear-gradient(135deg, #003399 0%, #0066cc 100%);
   color: white;
 }
 
@@ -181,6 +181,16 @@
   color: white;
   font-family: var(--mono);
   line-height: 1.2;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.commodity-price:hover {
+  color: #2ecc71;
+}
+
+.commodity-price:active {
+  transform: scale(0.98);
 }
 
 .commodity-change {
@@ -225,6 +235,11 @@
   color: rgba(255, 255, 255, 0.4);
   font-family: var(--mono);
   margin-bottom: 12px;
+}
+
+.commodities-update-info .refresh-hint {
+  opacity: 0.6;
+  font-size: 10px;
 }
 
 .commodities-disclaimer {

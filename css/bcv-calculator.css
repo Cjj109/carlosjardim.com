@@ -152,6 +152,16 @@
 
 .bcv-rate-usdt .bcv-rate-value {
   color: #26a17b;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.bcv-rate-usdt .bcv-rate-value:hover {
+  color: #2ecc71;
+}
+
+.bcv-rate-usdt .bcv-rate-value:active {
+  transform: scale(0.98);
 }
 
 /* Calculator */
