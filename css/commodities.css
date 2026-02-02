@@ -1,0 +1,305 @@
+/* ============================================
+   COMMODITIES MODAL
+   Real-time prices for BTC, ETH, Gold, Oil
+   ============================================ */
+
+.commodities-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: none !important;
+  align-items: flex-start;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+
+.commodities-overlay.active {
+  display: flex !important;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.commodities-container {
+  background: #1a1a1a;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: var(--radius-lg);
+  max-width: 600px;
+  width: 100%;
+  padding: 36px 30px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.commodities-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.commodities-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.commodities-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.commodities-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2ecc71;
+  margin-bottom: 6px;
+}
+
+.commodities-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono);
+}
+
+/* Price cards grid */
+.commodities-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Individual commodity card */
+.commodity-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all var(--transition-fast);
+}
+
+.commodity-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Bitcoin styling */
+.commodity-card.btc {
+  border-color: rgba(247, 147, 26, 0.3);
+}
+
+.commodity-card.btc .commodity-icon {
+  background: linear-gradient(135deg, #f7931a 0%, #ff9500 100%);
+  color: white;
+}
+
+/* Ethereum styling */
+.commodity-card.eth {
+  border-color: rgba(98, 126, 234, 0.3);
+}
+
+.commodity-card.eth .commodity-icon {
+  background: linear-gradient(135deg, #627eea 0%, #8c9eff 100%);
+  color: white;
+}
+
+/* Gold styling */
+.commodity-card.gold {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.commodity-card.gold .commodity-icon {
+  background: linear-gradient(135deg, #ffd700 0%, #ffec8b 100%);
+  color: #333;
+}
+
+/* Oil styling */
+.commodity-card.oil {
+  border-color: rgba(52, 73, 94, 0.5);
+}
+
+.commodity-card.oil .commodity-icon {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+}
+
+.commodity-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.commodity-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.commodity-name {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.commodity-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  font-family: var(--mono);
+  line-height: 1.2;
+}
+
+.commodity-change {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--mono);
+  margin-top: 4px;
+}
+
+.commodity-change.up {
+  color: #2ecc71;
+}
+
+.commodity-change.down {
+  color: #e74c3c;
+}
+
+.commodity-change.neutral {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Loading state */
+.commodity-card.loading .commodity-price,
+.commodity-card.loading .commodity-change {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Error state */
+.commodity-card.error {
+  opacity: 0.6;
+}
+
+.commodity-card.error .commodity-price {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+}
+
+/* Update info */
+.commodities-update-info {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--mono);
+  margin-bottom: 12px;
+}
+
+.commodities-disclaimer {
+  text-align: center;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+  font-family: var(--mono);
+}
+
+/* Live indicator pulse */
+.commodities-update-info .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #2ecc71;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: livePulse 2s infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.9); }
+}
+
+body.commodities-open {
+  overflow: hidden;
+}
+
+/* Desktop - center when enough space */
+@media (min-height: 600px) {
+  .commodities-overlay {
+    align-items: center;
+    padding: 20px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+  .commodities-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .commodities-container {
+    padding: 28px 16px;
+    max-width: 100%;
+  }
+
+  .commodities-title {
+    font-size: 20px;
+  }
+
+  /* Stack cards vertically on small screens */
+  .commodities-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .commodity-card {
+    padding: 16px 14px;
+  }
+
+  .commodity-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  .commodity-price {
+    font-size: 18px;
+  }
+
+  .commodity-change {
+    font-size: 12px;
+  }
+}

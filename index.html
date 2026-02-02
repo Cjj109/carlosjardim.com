@@ -21,6 +21,7 @@
   <link rel="dns-prefetch" href="https://ve.dolarapi.com">
   <link rel="dns-prefetch" href="https://www.instagram.com">
   <link rel="dns-prefetch" href="https://bcvapi.tech">
+  <link rel="dns-prefetch" href="https://api.coingecko.com">
   <!-- Preload critical CSS to load in parallel instead of chain -->
   <link rel="preload" href="css/variables.css" as="style">
   <link rel="preload" href="css/base.css" as="style">
@@ -66,55 +67,58 @@
   <title>Carlos Jardim | Economista</title>
   
   <!-- Critical CSS - loads immediately -->
-  <link rel="stylesheet" href="css/variables.css?v=20260202015230">
-  <link rel="stylesheet" href="css/base.css?v=20260202015230">
-  <link rel="stylesheet" href="css/cv.css?v=20260202015230">
-  <link rel="stylesheet" href="css/alt.css?v=20260202015230">
-  <link rel="stylesheet" href="css/side-a-enhancements.css?v=20260202015230">
+  <link rel="stylesheet" href="css/variables.css?v=20260201212705">
+  <link rel="stylesheet" href="css/base.css?v=20260201212705">
+  <link rel="stylesheet" href="css/cv.css?v=20260201212705">
+  <link rel="stylesheet" href="css/alt.css?v=20260201212705">
+  <link rel="stylesheet" href="css/side-a-enhancements.css?v=20260201212705">
 
   <!-- Non-critical CSS - deferred loading for modals/games -->
-  <link rel="stylesheet" href="css/pong.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/tetris.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/games-menu.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/video-modal.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/compatibility-test.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/chocolate-shop.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/matrix-mode.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/new-features.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/bcv-calculator.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/utilities.css?v=20260202015230" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/monetary-indicators.css?v=20260202015230" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/pong.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/tetris.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/games-menu.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/video-modal.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/compatibility-test.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/chocolate-shop.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/matrix-mode.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/new-features.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/bcv-calculator.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/utilities.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/monetary-indicators.css?v=20260201212705" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/commodities.css?v=20260201212705" media="print" onload="this.media='all'">
   <!-- Fallback for browsers without JS -->
   <noscript>
-    <link rel="stylesheet" href="css/pong.css?v=20260202015230">
-    <link rel="stylesheet" href="css/tetris.css?v=20260202015230">
-    <link rel="stylesheet" href="css/games-menu.css?v=20260202015230">
-    <link rel="stylesheet" href="css/video-modal.css?v=20260202015230">
-    <link rel="stylesheet" href="css/compatibility-test.css?v=20260202015230">
-    <link rel="stylesheet" href="css/chocolate-shop.css?v=20260202015230">
-    <link rel="stylesheet" href="css/matrix-mode.css?v=20260202015230">
-    <link rel="stylesheet" href="css/new-features.css?v=20260202015230">
-    <link rel="stylesheet" href="css/bcv-calculator.css?v=20260202015230">
-    <link rel="stylesheet" href="css/utilities.css?v=20260202015230">
-    <link rel="stylesheet" href="css/monetary-indicators.css?v=20260202015230">
+    <link rel="stylesheet" href="css/pong.css?v=20260201212705">
+    <link rel="stylesheet" href="css/tetris.css?v=20260201212705">
+    <link rel="stylesheet" href="css/games-menu.css?v=20260201212705">
+    <link rel="stylesheet" href="css/video-modal.css?v=20260201212705">
+    <link rel="stylesheet" href="css/compatibility-test.css?v=20260201212705">
+    <link rel="stylesheet" href="css/chocolate-shop.css?v=20260201212705">
+    <link rel="stylesheet" href="css/matrix-mode.css?v=20260201212705">
+    <link rel="stylesheet" href="css/new-features.css?v=20260201212705">
+    <link rel="stylesheet" href="css/bcv-calculator.css?v=20260201212705">
+    <link rel="stylesheet" href="css/utilities.css?v=20260201212705">
+    <link rel="stylesheet" href="css/monetary-indicators.css?v=20260201212705">
+    <link rel="stylesheet" href="css/commodities.css?v=20260201212705">
   </noscript>
 
   <!-- Scripts optimizados con defer para carga paralela -->
-  <script src="js/main.js?v=20260202015230" defer></script>
-  <script src="js/video-modal.js?v=20260202015230" defer></script>
-  <script src="js/compatibility-test.js?v=20260202015230" defer></script>
-  <script src="js/chocolate-shop.js?v=20260202015230" defer></script>
-  <script src="js/side-a-enhancements.js?v=20260202015230" defer></script>
-  <script src="js/gym-widget.js?v=20260202015230" defer></script>
-  <script src="js/bcv-calculator.js?v=20260202015230" defer></script>
-  <script src="js/utilities.js?v=20260202015230" defer></script>
-  <script src="js/monetary-indicators.js?v=20260202015230" defer></script>
-  <script src="js/gates.js?v=20260202015230" defer></script>
-  <script src="js/games-menu.js?v=20260202015230" defer></script>
-  <script src="js/pong.js?v=20260202015230" defer></script>
-  <script src="js/tetris.js?v=20260202015230" defer></script>
-  <script src="js/snake.js?v=20260202015230" defer></script>
-  <script src="js/new-features.js?v=20260202015230" defer></script>
+  <script src="js/main.js?v=20260201212705" defer></script>
+  <script src="js/video-modal.js?v=20260201212705" defer></script>
+  <script src="js/compatibility-test.js?v=20260201212705" defer></script>
+  <script src="js/chocolate-shop.js?v=20260201212705" defer></script>
+  <script src="js/side-a-enhancements.js?v=20260201212705" defer></script>
+  <script src="js/gym-widget.js?v=20260201212705" defer></script>
+  <script src="js/bcv-calculator.js?v=20260201212705" defer></script>
+  <script src="js/utilities.js?v=20260201212705" defer></script>
+  <script src="js/monetary-indicators.js?v=20260201212705" defer></script>
+  <script src="js/commodities.js?v=20260201212705" defer></script>
+  <script src="js/gates.js?v=20260201212705" defer></script>
+  <script src="js/games-menu.js?v=20260201212705" defer></script>
+  <script src="js/pong.js?v=20260201212705" defer></script>
+  <script src="js/tetris.js?v=20260201212705" defer></script>
+  <script src="js/snake.js?v=20260201212705" defer></script>
+  <script src="js/new-features.js?v=20260201212705" defer></script>
 </head>
 
 <body>
@@ -886,6 +890,12 @@
           <div class="utility-name">Indicadores</div>
           <div class="utility-description">Liquidez monetaria BCV</div>
         </div>
+
+        <div class="utility-card" onclick="openCommoditiesFromUtilities()">
+          <div class="utility-icon">📈</div>
+          <div class="utility-name">Commodities</div>
+          <div class="utility-description">BTC, ETH, Oro, Petróleo</div>
+        </div>
       </div>
     </div>
   </div>
@@ -935,6 +945,71 @@
 
       <div class="monetary-update-info" id="liquidityUpdateInfo">
         Cargando...
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       COMMODITIES MODAL
+       ============================================ -->
+  <div class="commodities-overlay" id="commoditiesModal" role="dialog" aria-modal="true" aria-label="Precios de Commodities">
+    <div class="commodities-container">
+      <button class="commodities-close" onclick="closeCommodities()" aria-label="Cerrar">✕</button>
+
+      <div class="commodities-header">
+        <div class="commodities-title">📈 Commodities</div>
+        <div class="commodities-subtitle">Precios en tiempo real</div>
+      </div>
+
+      <!-- Price cards grid -->
+      <div class="commodities-grid">
+        <!-- Bitcoin -->
+        <div class="commodity-card btc">
+          <div class="commodity-icon">₿</div>
+          <div class="commodity-info">
+            <div class="commodity-name">Bitcoin</div>
+            <div class="commodity-price" id="btcPrice">---</div>
+            <div class="commodity-change" id="btcChange">---</div>
+          </div>
+        </div>
+
+        <!-- Ethereum -->
+        <div class="commodity-card eth">
+          <div class="commodity-icon">Ξ</div>
+          <div class="commodity-info">
+            <div class="commodity-name">Ethereum</div>
+            <div class="commodity-price" id="ethPrice">---</div>
+            <div class="commodity-change" id="ethChange">---</div>
+          </div>
+        </div>
+
+        <!-- Gold -->
+        <div class="commodity-card gold">
+          <div class="commodity-icon">🥇</div>
+          <div class="commodity-info">
+            <div class="commodity-name">Oro (XAU)</div>
+            <div class="commodity-price" id="goldPrice">---</div>
+            <div class="commodity-change" id="goldChange">---</div>
+          </div>
+        </div>
+
+        <!-- Oil (Brent) -->
+        <div class="commodity-card oil">
+          <div class="commodity-icon">🛢️</div>
+          <div class="commodity-info">
+            <div class="commodity-name">Petróleo Brent</div>
+            <div class="commodity-price" id="oilPrice">---</div>
+            <div class="commodity-change" id="oilChange">---</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="commodities-update-info" id="commoditiesUpdateInfo">
+        Cargando...
+      </div>
+
+      <div class="commodities-disclaimer">
+        Datos de CoinGecko y fuentes públicas. Precios en USD.
       </div>
     </div>
   </div>
