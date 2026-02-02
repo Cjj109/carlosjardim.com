@@ -319,10 +319,11 @@ function updateFingerUI() {
 }
 
 /**
- * Choose finger - eliminate random touches
+ * Choose finger - eliminate exactly ONE random touch
  */
 function chooseFinger() {
-  if (activeTouches.size < 2) return;
+  const currentSize = activeTouches.size;
+  if (currentSize < 2) return;
   if (isChoosingInProgress) return;
 
   isChoosingInProgress = true;
@@ -339,14 +340,14 @@ function chooseFinger() {
   });
 
   // Get all touches as array
-  const touchArray = Array.from(activeTouches.values());
+  const touchArray = Array.from(activeTouches.entries());
 
-  // Determine how many to eliminate (usually 1, sometimes 2)
-  const eliminateCount = Math.random() < 0.8 ? 1 : Math.min(2, touchArray.length - 1);
+  // ALWAYS eliminate exactly 1 person to ensure at least 1 remains
+  const eliminateCount = 1;
 
-  // Shuffle and pick random ones to eliminate
-  const shuffled = touchArray.sort(() => Math.random() - 0.5);
-  const toEliminate = shuffled.slice(0, eliminateCount);
+  // Pick a random one to eliminate
+  const randomIndex = Math.floor(Math.random() * touchArray.length);
+  const [eliminatedKey, eliminatedData] = touchArray[randomIndex];
 
   // Update instructions
   const instructions = document.getElementById('fingerInstructions');
@@ -358,32 +359,30 @@ function chooseFinger() {
   });
 
   setTimeout(() => {
-    // Phase 2: Add pre-explode animation to selected circles (500ms)
-    toEliminate.forEach(touchData => {
-      touchData.element.classList.remove('suspense');
-      touchData.element.classList.add('about-to-explode');
-    });
-
-    if (eliminateCount === 1) {
-      instructions.textContent = '🎯 Eliminando...';
-    } else {
-      instructions.textContent = `🎯 Eliminando ${eliminateCount}...`;
+    // Check if still valid
+    if (!activeTouches.has(eliminatedKey)) {
+      instructions.textContent = '⚠️ Alguien levantó el dedo - Intenta de nuevo';
+      isChoosingInProgress = false;
+      return;
     }
+
+    // Phase 2: Add pre-explode animation to selected circle (500ms)
+    eliminatedData.element.classList.remove('suspense');
+    eliminatedData.element.classList.add('about-to-explode');
+    instructions.textContent = '🎯 Eliminando...';
 
     setTimeout(() => {
       // Phase 3: Final explosion (600ms)
-      toEliminate.forEach(touchData => {
-        touchData.element.classList.remove('about-to-explode');
-        touchData.element.classList.add('eliminated');
-      });
+      eliminatedData.element.classList.remove('about-to-explode');
+      eliminatedData.element.classList.add('eliminated');
 
       // Show result after explosion animation
       setTimeout(() => {
-        const remaining = activeTouches.size - eliminateCount;
+        const remaining = currentSize - eliminateCount;
         if (remaining === 1) {
-          instructions.textContent = '✅ ¡Esta persona SALE del padel!';
+          instructions.textContent = '💥 ¡El dedo explotado SALE del padel!';
         } else {
-          instructions.textContent = `✅ ${remaining} personas siguen - ¡Juegan padel!`;
+          instructions.textContent = `💥 Eliminado 1 - Quedan ${remaining} para jugar padel`;
         }
 
         isChoosingInProgress = false;
