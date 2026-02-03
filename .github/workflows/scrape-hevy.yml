@@ -2,9 +2,11 @@ name: Fetch Hevy Workout Data
 
 on:
   schedule:
-    # Run every 6 hours
+    # Run every 6 hours as fallback
     - cron: '0 */6 * * *'
   workflow_dispatch: # Allow manual trigger
+  repository_dispatch:
+    types: [hevy-workout] # Triggered by Cloudflare Worker on webhook
 
 jobs:
   fetch:
