@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-02-03T06:35:49.849858",
+  "last_updated": "2026-02-03T09:33:50.121517",
   "profile_url": "https://hevy.com/user/cjj109",
   "last_workout": {
     "name": "Torso 1",
-    "date": "2026-02-03",
-    "duration": "0 min",
+    "date": "2026-02-02",
+    "duration": "75 min",
     "volume": "7,528 kg",
     "exercises": [
       {
-        "name": "Incline Bench Press (Dumbbell)",
+        "name": "Press de Banca Inclinado (Mancuerna)",
         "sets": [
           {
             "reps": 11,
@@ -21,7 +21,13 @@
           {
             "reps": 8,
             "weight": "30 kg"
-          },
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Remo Sentado con Cable",
+        "sets": [
           {
             "reps": 10,
             "weight": "60 kg"
@@ -33,7 +39,13 @@
           {
             "reps": 10,
             "weight": "60 kg"
-          },
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Mariposa (Pec Deck)",
+        "sets": [
           {
             "reps": 12,
             "weight": "45 kg"
@@ -46,7 +58,7 @@
         "image": null
       },
       {
-        "name": "Lat Pulldown (Cable)",
+        "name": "Jalón al Pecho (Cable)",
         "sets": [
           {
             "reps": 10,
@@ -64,7 +76,7 @@
         "image": null
       },
       {
-        "name": "Lateral Raise (Dumbbell)",
+        "name": "Elevacion Laterales (Mancuerna)",
         "sets": [
           {
             "reps": 8,
@@ -77,7 +89,13 @@
           {
             "reps": 8,
             "weight": "6 kg"
-          },
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Abdominal Corto con Cable",
+        "sets": [
           {
             "reps": 10,
             "weight": "80 kg"
@@ -96,11 +114,105 @@
     ]
   },
   "stats": {
-    "total_workouts": "0",
+    "total_workouts": "10",
     "total_volume": "0 kg",
     "streak": "0 días"
   },
   "previous_workouts": [
+    {
+      "name": "Torso 1",
+      "date": "2026-02-03",
+      "duration": "0 min",
+      "volume": "7,528 kg",
+      "exercises": [
+        {
+          "name": "Incline Bench Press (Dumbbell)",
+          "sets": [
+            {
+              "reps": 11,
+              "weight": "30 kg"
+            },
+            {
+              "reps": 9,
+              "weight": "30 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "30 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "60 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "60 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "60 kg"
+            },
+            {
+              "reps": 12,
+              "weight": "45 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "45 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Lat Pulldown (Cable)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "50 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "50 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "50 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Lateral Raise (Dumbbell)",
+          "sets": [
+            {
+              "reps": 8,
+              "weight": "10 kg"
+            },
+            {
+              "reps": 7,
+              "weight": "10 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "6 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "80 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "80 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "80 kg"
+            }
+          ],
+          "image": null
+        }
+      ]
+    },
     {
       "name": "Pierna 2",
       "date": "2026-01-29",
