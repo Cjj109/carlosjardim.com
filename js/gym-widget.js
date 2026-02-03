@@ -90,9 +90,14 @@ function renderWorkoutData() {
   const canGoPrevious = currentWorkoutIndex > 0;
   const canGoNext = currentWorkoutIndex < totalWorkouts - 1;
 
-  const exercisesHTML = workout.exercises.map(exercise => `
+  const exercisesHTML = workout.exercises.map(exercise => {
+    const muscleTag = exercise.muscle_group
+      ? `<span class="gym-muscle-tag">${formatMuscleGroup(exercise.muscle_group)}</span>`
+      : '';
+    return `
     <div class="gym-exercise">
       <div class="gym-exercise-name">${exercise.name}</div>
+      ${muscleTag}
       <div class="gym-sets">
         ${exercise.sets.map((set, index) => `
           <div class="gym-set">
@@ -102,7 +107,8 @@ function renderWorkoutData() {
         `).join('')}
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   // Navigation buttons HTML (only show if there are previous workouts)
   const navigationHTML = hasPreviousWorkouts ? `
@@ -228,6 +234,33 @@ function formatGymDateTime(dateTimeString) {
     console.error('Error formatting datetime:', error, dateTimeString);
     return 'Fecha no disponible';
   }
+}
+
+/**
+ * Format muscle group name for display
+ */
+function formatMuscleGroup(muscle) {
+  const names = {
+    'chest': 'Pecho',
+    'back': 'Espalda',
+    'shoulders': 'Hombros',
+    'biceps': 'Bíceps',
+    'triceps': 'Tríceps',
+    'legs': 'Piernas',
+    'glutes': 'Glúteos',
+    'hamstrings': 'Isquiotibiales',
+    'quadriceps': 'Cuádriceps',
+    'calves': 'Pantorrillas',
+    'abs': 'Abdominales',
+    'core': 'Core',
+    'forearms': 'Antebrazos',
+    'traps': 'Trapecios',
+    'lats': 'Dorsales',
+    'full_body': 'Cuerpo Completo',
+    'cardio': 'Cardio',
+    'other': 'Otro'
+  };
+  return names[muscle] || muscle;
 }
 
 /**
