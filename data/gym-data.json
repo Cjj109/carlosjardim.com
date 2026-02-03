@@ -1,94 +1,94 @@
 {
-  "last_updated": "2026-02-02T18:26:31.446312",
+  "last_updated": "2026-02-03T00:35:04.981712",
   "profile_url": "https://hevy.com/user/cjj109",
   "last_workout": {
-    "name": "Pierna 2",
-    "date": "2026-01-29",
-    "duration": "57 min",
-    "volume": "10,607 kg",
+    "name": "Torso 1",
+    "date": "2026-02-03",
+    "duration": "0 min",
+    "volume": "7,528 kg",
     "exercises": [
       {
-        "name": "Romanian Deadlift (Barbell)",
-        "sets": [
-          {
-            "reps": 8,
-            "weight": "110 kg"
-          },
-          {
-            "reps": 8,
-            "weight": "110 kg"
-          },
-          {
-            "reps": 8,
-            "weight": "110 kg"
-          }
-        ],
-        "image": null
-      },
-      {
-        "name": "Lying Leg Curl (Machine)",
+        "name": "Incline Bench Press (Dumbbell)",
         "sets": [
           {
             "reps": 11,
-            "weight": "31 kg"
+            "weight": "30 kg"
+          },
+          {
+            "reps": 9,
+            "weight": "30 kg"
           },
           {
             "reps": 8,
-            "weight": "31 kg"
+            "weight": "30 kg"
+          },
+          {
+            "reps": 10,
+            "weight": "60 kg"
+          },
+          {
+            "reps": 10,
+            "weight": "60 kg"
+          },
+          {
+            "reps": 10,
+            "weight": "60 kg"
+          },
+          {
+            "reps": 12,
+            "weight": "45 kg"
+          },
+          {
+            "reps": 10,
+            "weight": "45 kg"
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Lat Pulldown (Cable)",
+        "sets": [
+          {
+            "reps": 10,
+            "weight": "50 kg"
+          },
+          {
+            "reps": 8,
+            "weight": "50 kg"
+          },
+          {
+            "reps": 8,
+            "weight": "50 kg"
+          }
+        ],
+        "image": null
+      },
+      {
+        "name": "Lateral Raise (Dumbbell)",
+        "sets": [
+          {
+            "reps": 8,
+            "weight": "10 kg"
           },
           {
             "reps": 7,
-            "weight": "31 kg"
-          }
-        ],
-        "image": null
-      },
-      {
-        "name": "Leg Press (Machine)",
-        "sets": [
+            "weight": "10 kg"
+          },
           {
-            "reps": 10,
-            "weight": "154 kg"
+            "reps": 8,
+            "weight": "6 kg"
           },
           {
             "reps": 10,
-            "weight": "154 kg"
+            "weight": "80 kg"
           },
           {
             "reps": 10,
-            "weight": "154 kg"
-          }
-        ],
-        "image": null
-      },
-      {
-        "name": "Leg Extension (Machine)",
-        "sets": [
-          {
-            "reps": 12,
-            "weight": "38 kg"
+            "weight": "80 kg"
           },
           {
-            "reps": 12,
-            "weight": "38 kg"
-          }
-        ],
-        "image": null
-      },
-      {
-        "name": "Single Leg Standing Calf Raise (Machine)",
-        "sets": [
-          {
-            "reps": 12,
-            "weight": "45.24 kg"
-          },
-          {
-            "reps": 12,
-            "weight": "45.24 kg"
-          },
-          {
-            "reps": 12,
-            "weight": "45.24 kg"
+            "reps": 10,
+            "weight": "80 kg"
           }
         ],
         "image": null
@@ -100,5 +100,100 @@
     "total_volume": "0 kg",
     "streak": "0 días"
   },
-  "previous_workouts": []
+  "previous_workouts": [
+    {
+      "name": "Pierna 2",
+      "date": "2026-01-29",
+      "duration": "57 min",
+      "volume": "10,607 kg",
+      "exercises": [
+        {
+          "name": "Romanian Deadlift (Barbell)",
+          "sets": [
+            {
+              "reps": 8,
+              "weight": "110 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "110 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "110 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Lying Leg Curl (Machine)",
+          "sets": [
+            {
+              "reps": 11,
+              "weight": "31 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "31 kg"
+            },
+            {
+              "reps": 7,
+              "weight": "31 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Leg Press (Machine)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "154 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "154 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "154 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Leg Extension (Machine)",
+          "sets": [
+            {
+              "reps": 12,
+              "weight": "38 kg"
+            },
+            {
+              "reps": 12,
+              "weight": "38 kg"
+            }
+          ],
+          "image": null
+        },
+        {
+          "name": "Single Leg Standing Calf Raise (Machine)",
+          "sets": [
+            {
+              "reps": 12,
+              "weight": "45.24 kg"
+            },
+            {
+              "reps": 12,
+              "weight": "45.24 kg"
+            },
+            {
+              "reps": 12,
+              "weight": "45.24 kg"
+            }
+          ],
+          "image": null
+        }
+      ]
+    }
+  ]
 }
