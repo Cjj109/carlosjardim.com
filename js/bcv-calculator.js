@@ -7,6 +7,9 @@ let bcvRates = null;
 let bcvHistory = null;
 let isRefreshingUsdt = false;
 
+// DolarAPI URL for live USDT/parallel dollar rate
+const USDT_API_URL = 'https://ve.dolarapi.com/v1/dolares/paralelo';
+
 /**
  * Open BCV calculator modal
  */
@@ -35,17 +38,38 @@ function closeBCVCalculator() {
 }
 
 /**
+ * Fetch USDT rate from DolarAPI (parallel dollar rate)
+ */
+async function fetchUsdtRate() {
+  try {
+    const response = await fetch(USDT_API_URL, { cache: 'no-store' });
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        rate: data.promedio,
+        date: data.fechaActualizacion ? data.fechaActualizacion.split('T')[0] : new Date().toISOString().split('T')[0],
+        symbol: '₮',
+        live: true
+      };
+    }
+  } catch (e) {
+    console.warn('DolarAPI request failed:', e.message);
+  }
+  return null;
+}
+
+/**
  * Load BCV rates from JSON file + live USDT from API
  */
 async function loadBCVRates() {
   try {
     const cacheBuster = new Date().getTime();
 
-    // Fetch cached rates (USD, EUR) and history in parallel with live USDT
-    const [ratesResponse, historyResponse, usdtResponse] = await Promise.all([
+    // Fetch cached rates (USD, EUR), history, and live USDT in parallel
+    const [ratesResponse, historyResponse, usdtData] = await Promise.all([
       fetch('data/bcv-rates.json?' + cacheBuster),
       fetch('data/bcv-rates-history.json?' + cacheBuster),
-      fetch('https://ve.dolarapi.com/v1/dolares/paralelo').catch(() => null)
+      fetchUsdtRate()
     ]);
 
     if (!ratesResponse.ok) {
@@ -55,18 +79,8 @@ async function loadBCVRates() {
     bcvRates = await ratesResponse.json();
 
     // Update USDT with live data if available
-    if (usdtResponse && usdtResponse.ok) {
-      try {
-        const usdtData = await usdtResponse.json();
-        bcvRates.usdt = {
-          rate: usdtData.promedio,
-          date: usdtData.fechaActualizacion ? usdtData.fechaActualizacion.split('T')[0] : new Date().toISOString().split('T')[0],
-          symbol: '₮',
-          live: true
-        };
-      } catch (e) {
-        console.warn('Could not parse live USDT data, using cached');
-      }
+    if (usdtData) {
+      bcvRates.usdt = usdtData;
     }
 
     // Load history if available
@@ -91,54 +105,44 @@ async function refreshUsdtRate() {
   if (isRefreshingUsdt) return;
   isRefreshingUsdt = true;
 
-  const usdtRate = document.getElementById('bcvUsdtRate');
-  const originalText = usdtRate ? usdtRate.textContent : '';
+  const usdtRateEl = document.getElementById('bcvUsdtRate');
+  const originalText = usdtRateEl ? usdtRateEl.textContent : '';
 
   // Show loading state
-  if (usdtRate) {
-    usdtRate.textContent = '...';
-    usdtRate.style.opacity = '0.5';
+  if (usdtRateEl) {
+    usdtRateEl.textContent = '...';
+    usdtRateEl.style.opacity = '0.5';
   }
 
   try {
-    const response = await fetch('https://ve.dolarapi.com/v1/dolares/paralelo', {
-      cache: 'no-store'
-    });
+    const usdtData = await fetchUsdtRate();
 
-    if (response.ok) {
-      const usdtData = await response.json();
-      if (bcvRates) {
-        bcvRates.usdt = {
-          rate: usdtData.promedio,
-          date: usdtData.fechaActualizacion ? usdtData.fechaActualizacion.split('T')[0] : new Date().toISOString().split('T')[0],
-          symbol: '₮',
-          live: true
-        };
-      }
+    if (usdtData && bcvRates) {
+      bcvRates.usdt = usdtData;
 
       // Update display
-      if (usdtRate) {
-        usdtRate.textContent = formatRate(usdtData.promedio);
-        usdtRate.style.opacity = '1';
+      if (usdtRateEl) {
+        usdtRateEl.textContent = formatRate(usdtData.rate);
+        usdtRateEl.style.opacity = '1';
 
         // Flash green to indicate success
-        usdtRate.style.color = '#2ecc71';
+        usdtRateEl.style.color = '#2ecc71';
         setTimeout(() => {
-          usdtRate.style.color = '';
+          usdtRateEl.style.color = '';
         }, 500);
       }
 
       // Recalculate if there's a pending conversion
       calculateConversion();
     } else {
-      throw new Error('API error');
+      throw new Error('No USDT data available');
     }
   } catch (e) {
     console.error('Error refreshing USDT:', e);
     // Restore original value
-    if (usdtRate) {
-      usdtRate.textContent = originalText;
-      usdtRate.style.opacity = '1';
+    if (usdtRateEl) {
+      usdtRateEl.textContent = originalText;
+      usdtRateEl.style.opacity = '1';
     }
   }
 

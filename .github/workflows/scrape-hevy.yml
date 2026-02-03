@@ -1,4 +1,4 @@
-name: Scrape Hevy Workout Data
+name: Fetch Hevy Workout Data
 
 on:
   schedule:
@@ -7,37 +7,26 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  scrape:
+  fetch:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install selenium
+      - name: Install dependencies
+        run: pip install requests
 
-      - name: Set up Chrome
-        uses: browser-actions/setup-chrome@latest
-        with:
-          chrome-version: stable
-
-      - name: Install ChromeDriver
-        run: |
-          # ChromeDriver is usually installed with chrome, but ensure it's in PATH
-          which chromedriver || echo "ChromeDriver not found in PATH"
-          chromedriver --version || echo "ChromeDriver version check failed"
-
-      - name: Run scraper
+      - name: Fetch workout data
+        env:
+          HEVY_API_KEY: ${{ secrets.HEVY_API_KEY }}
         run: python scripts/scrape_hevy.py
-        timeout-minutes: 3
+        timeout-minutes: 1
 
       - name: Commit and push if changed
         run: |
