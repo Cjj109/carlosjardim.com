@@ -1,6 +1,1094 @@
 {
-  "last_updated": "2026-02-03T09:30:04.031431",
+  "last_updated": "2026-02-12T21:23:35.151621",
   "entries": [
+    {
+      "timestamp": "2026-02-12T21:23:35.151589",
+      "date": "2026-02-12",
+      "eur": {
+        "rate": 467.33207495,
+        "variation": 0.92
+      },
+      "usd": {
+        "rate": 393.2216,
+        "variation": 0.75
+      },
+      "usdt": {
+        "rate": 543.36,
+        "variation": 0.58
+      }
+    },
+    {
+      "timestamp": "2026-02-12T18:45:52.977614",
+      "date": "2026-02-12",
+      "eur": {
+        "rate": 463.0843056,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 390.2944,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 540.25,
+        "variation": -1.15
+      }
+    },
+    {
+      "timestamp": "2026-02-12T15:40:56.995907",
+      "date": "2026-02-12",
+      "eur": {
+        "rate": 463.0843056,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 390.2944,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 546.54,
+        "variation": -0.28
+      }
+    },
+    {
+      "timestamp": "2026-02-12T12:38:56.465607",
+      "date": "2026-02-12",
+      "eur": {
+        "rate": 463.0843056,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 390.2944,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 548.05,
+        "variation": 0.09
+      }
+    },
+    {
+      "timestamp": "2026-02-12T09:37:14.123166",
+      "date": "2026-02-12",
+      "eur": {
+        "rate": 463.0843056,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 390.2944,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.58,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-12T04:52:15.519761",
+      "date": "2026-02-12",
+      "eur": {
+        "rate": 463.0843056,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 390.2944,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.58,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-12T01:10:52.456411",
+      "date": "2026-02-12",
+      "eur": {
+        "rate": 463.0843056,
+        "variation": 0.07
+      },
+      "usd": {
+        "rate": 390.2944,
+        "variation": 0.4
+      },
+      "usdt": {
+        "rate": 547.58,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-11T21:25:32.297679",
+      "date": "2026-02-11",
+      "eur": {
+        "rate": 462.78259351,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 388.7394,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.58,
+        "variation": -0.18
+      }
+    },
+    {
+      "timestamp": "2026-02-11T15:50:07.481128",
+      "date": "2026-02-11",
+      "eur": {
+        "rate": 462.78259351,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 388.7394,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 548.54,
+        "variation": 0.16
+      }
+    },
+    {
+      "timestamp": "2026-02-11T12:42:03.516883",
+      "date": "2026-02-11",
+      "eur": {
+        "rate": 462.78259351,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 388.7394,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.69,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-11T09:42:06.818894",
+      "date": "2026-02-11",
+      "eur": {
+        "rate": 462.78259351,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 388.7394,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.69,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-11T04:56:02.214310",
+      "date": "2026-02-11",
+      "eur": {
+        "rate": 462.78259351,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 388.7394,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.69,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-11T01:18:38.341636",
+      "date": "2026-02-11",
+      "eur": {
+        "rate": 462.78259351,
+        "variation": 0.85
+      },
+      "usd": {
+        "rate": 388.7394,
+        "variation": 0.9
+      },
+      "usdt": {
+        "rate": 547.69,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-10T21:33:46.516673",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.69,
+        "variation": 0.08
+      }
+    },
+    {
+      "timestamp": "2026-02-10T18:53:06.271189",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.23,
+        "variation": 0.3
+      }
+    },
+    {
+      "timestamp": "2026-02-10T15:56:40.178094",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 545.59,
+        "variation": 0.27
+      }
+    },
+    {
+      "timestamp": "2026-02-10T12:46:01.346877",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 544.13,
+        "variation": -0.07
+      }
+    },
+    {
+      "timestamp": "2026-02-10T09:50:11.364007",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 544.49,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-10T06:54:01.324002",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 544.49,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-10T04:57:14.718666",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 544.49,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-10T01:20:32.511940",
+      "date": "2026-02-10",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 544.49,
+        "variation": 0.59
+      }
+    },
+    {
+      "timestamp": "2026-02-09T21:29:55.344095",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 458.8782156,
+        "variation": 1.55
+      },
+      "usd": {
+        "rate": 385.272,
+        "variation": 0.69
+      },
+      "usdt": {
+        "rate": 541.28,
+        "variation": -0.62
+      }
+    },
+    {
+      "timestamp": "2026-02-09T18:43:07.135036",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 544.63,
+        "variation": 1.29
+      }
+    },
+    {
+      "timestamp": "2026-02-09T15:44:16.577560",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 537.68,
+        "variation": 0.26
+      }
+    },
+    {
+      "timestamp": "2026-02-09T12:41:59.539614",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 536.31,
+        "variation": -0.5
+      }
+    },
+    {
+      "timestamp": "2026-02-09T09:51:24.963527",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 538.99,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-09T06:54:05.539471",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 538.99,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-09T04:54:09.785714",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 538.99,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-09T01:12:05.550039",
+      "date": "2026-02-09",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 538.99,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-08T21:17:11.872899",
+      "date": "2026-02-08",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 538.99,
+        "variation": -0.36
+      }
+    },
+    {
+      "timestamp": "2026-02-08T18:22:15.024306",
+      "date": "2026-02-08",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 540.96,
+        "variation": -0.28
+      }
+    },
+    {
+      "timestamp": "2026-02-08T15:16:39.362449",
+      "date": "2026-02-08",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 542.47,
+        "variation": 0.07
+      }
+    },
+    {
+      "timestamp": "2026-02-08T12:26:07.199480",
+      "date": "2026-02-08",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 542.08,
+        "variation": -0.24
+      }
+    },
+    {
+      "timestamp": "2026-02-08T09:21:28.566742",
+      "date": "2026-02-08",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 543.41,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-08T06:37:27.419974",
+      "date": "2026-02-08",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 543.41,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-08T04:56:07.029778",
+      "date": "2026-02-08",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 543.41,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-07T21:16:29.105415",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 543.41,
+        "variation": 0.55
+      }
+    },
+    {
+      "timestamp": "2026-02-07T18:20:08.079364",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 540.43,
+        "variation": -1.38
+      }
+    },
+    {
+      "timestamp": "2026-02-07T15:15:25.679910",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 548.0,
+        "variation": 0.32
+      }
+    },
+    {
+      "timestamp": "2026-02-07T12:24:37.979020",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 546.23,
+        "variation": 0.17
+      }
+    },
+    {
+      "timestamp": "2026-02-07T09:21:13.117733",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 545.33,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-07T06:29:24.011708",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 545.33,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-07T04:24:24.692984",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 545.33,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-07T01:04:37.939020",
+      "date": "2026-02-07",
+      "eur": {
+        "rate": 451.87667684,
+        "variation": 0.45
+      },
+      "usd": {
+        "rate": 382.6318,
+        "variation": 0.4
+      },
+      "usdt": {
+        "rate": 545.33,
+        "variation": -0.45
+      }
+    },
+    {
+      "timestamp": "2026-02-06T18:33:43.040413",
+      "date": "2026-02-06",
+      "eur": {
+        "rate": 449.85917496,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 381.1074,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.78,
+        "variation": 0.03
+      }
+    },
+    {
+      "timestamp": "2026-02-06T15:30:32.295502",
+      "date": "2026-02-06",
+      "eur": {
+        "rate": 449.85917496,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 381.1074,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 547.61,
+        "variation": 1.31
+      }
+    },
+    {
+      "timestamp": "2026-02-06T12:34:27.615114",
+      "date": "2026-02-06",
+      "eur": {
+        "rate": 449.85917496,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 381.1074,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 540.52,
+        "variation": 0.59
+      }
+    },
+    {
+      "timestamp": "2026-02-06T09:33:17.140636",
+      "date": "2026-02-06",
+      "eur": {
+        "rate": 449.85917496,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 381.1074,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 537.34,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-06T04:41:49.482937",
+      "date": "2026-02-06",
+      "eur": {
+        "rate": 449.85917496,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 381.1074,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 537.34,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-06T01:05:35.342481",
+      "date": "2026-02-06",
+      "eur": {
+        "rate": 449.85917496,
+        "variation": 0.59
+      },
+      "usd": {
+        "rate": 381.1074,
+        "variation": 0.7
+      },
+      "usdt": {
+        "rate": 537.34,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-05T21:23:00.150136",
+      "date": "2026-02-05",
+      "eur": {
+        "rate": 447.21648577,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 378.4582,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 537.34,
+        "variation": -0.01
+      }
+    },
+    {
+      "timestamp": "2026-02-05T18:35:39.979318",
+      "date": "2026-02-05",
+      "eur": {
+        "rate": 447.21648577,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 378.4582,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 537.4,
+        "variation": 1.0
+      }
+    },
+    {
+      "timestamp": "2026-02-05T15:32:21.175209",
+      "date": "2026-02-05",
+      "eur": {
+        "rate": 447.21648577,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 378.4582,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 532.1,
+        "variation": 0.82
+      }
+    },
+    {
+      "timestamp": "2026-02-05T12:36:24.537559",
+      "date": "2026-02-05",
+      "eur": {
+        "rate": 447.21648577,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 378.4582,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 527.77,
+        "variation": -0.22
+      }
+    },
+    {
+      "timestamp": "2026-02-05T09:33:44.964393",
+      "date": "2026-02-05",
+      "eur": {
+        "rate": 447.21648577,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 378.4582,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 528.92,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-05T06:44:16.067624",
+      "date": "2026-02-05",
+      "eur": {
+        "rate": 447.21648577,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 378.4582,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 528.92,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-05T01:06:53.689006",
+      "date": "2026-02-05",
+      "eur": {
+        "rate": 447.21648577,
+        "variation": 1.05
+      },
+      "usd": {
+        "rate": 378.4582,
+        "variation": 0.9
+      },
+      "usdt": {
+        "rate": 528.92,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-04T21:23:46.445137",
+      "date": "2026-02-04",
+      "eur": {
+        "rate": 442.58984835,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 375.0825,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 528.92,
+        "variation": 0.72
+      }
+    },
+    {
+      "timestamp": "2026-02-04T18:34:39.673352",
+      "date": "2026-02-04",
+      "eur": {
+        "rate": 442.58984835,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 375.0825,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 525.14,
+        "variation": 0.86
+      }
+    },
+    {
+      "timestamp": "2026-02-04T15:32:35.498526",
+      "date": "2026-02-04",
+      "eur": {
+        "rate": 442.58984835,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 375.0825,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 520.66,
+        "variation": -0.84
+      }
+    },
+    {
+      "timestamp": "2026-02-04T12:34:43.935091",
+      "date": "2026-02-04",
+      "eur": {
+        "rate": 442.58984835,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 375.0825,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 525.08,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-04T09:33:02.141844",
+      "date": "2026-02-04",
+      "eur": {
+        "rate": 442.58984835,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 375.0825,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 525.08,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-04T06:37:31.128652",
+      "date": "2026-02-04",
+      "eur": {
+        "rate": 442.58984835,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 375.0825,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 525.08,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-04T04:24:47.999186",
+      "date": "2026-02-04",
+      "eur": {
+        "rate": 442.58984835,
+        "variation": 0.67
+      },
+      "usd": {
+        "rate": 375.0825,
+        "variation": 0.8
+      },
+      "usdt": {
+        "rate": 525.08,
+        "variation": 0.0
+      }
+    },
+    {
+      "timestamp": "2026-02-03T21:24:23.642637",
+      "date": "2026-02-03",
+      "eur": {
+        "rate": 439.63916349,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 372.1057,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 525.08,
+        "variation": 0.48
+      }
+    },
+    {
+      "timestamp": "2026-02-03T18:41:25.613785",
+      "date": "2026-02-03",
+      "eur": {
+        "rate": 439.63916349,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 372.1057,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 522.59,
+        "variation": 1.24
+      }
+    },
+    {
+      "timestamp": "2026-02-03T15:39:04.943683",
+      "date": "2026-02-03",
+      "eur": {
+        "rate": 439.63916349,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 372.1057,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 516.19,
+        "variation": -1.39
+      }
+    },
+    {
+      "timestamp": "2026-02-03T12:34:48.222100",
+      "date": "2026-02-03",
+      "eur": {
+        "rate": 439.63916349,
+        "variation": 0.0
+      },
+      "usd": {
+        "rate": 372.1057,
+        "variation": 0.0
+      },
+      "usdt": {
+        "rate": 523.49,
+        "variation": 1.38
+      }
+    },
     {
       "timestamp": "2026-02-03T09:30:04.031400",
       "date": "2026-02-03",
