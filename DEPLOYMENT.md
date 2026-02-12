@@ -139,7 +139,10 @@ Para el **panel admin** (temáticas), configura en Cloudflare Dashboard:
    - `ADMIN_USER` — Usuario para acceder al admin
    - `ADMIN_PASS` — Contraseña del admin
 
-**Acceso al admin:** Código Konami (↑↑↓↓←→←→) o triple clic en los traffic lights.
+**Acceso al admin:**
+- URL: `?admin=1` (ej: `https://carlosjardim.com/?admin=1`)
+- Código Konami: ↑↑↓↓←→←→
+- Triple clic en los traffic lights
 
 ---
 

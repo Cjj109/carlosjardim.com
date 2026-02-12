@@ -221,9 +221,14 @@
       </div>
 
       <div class="section-label">Trabajo</div>
-      <p class="cv-text">
-        <a href="https://rpym.net" target="_blank" rel="noopener noreferrer" class="work-link">rpym.net</a> — El Rey de los Pescados y Mariscos. Sitio web para negocio familiar de mariscos en Maiquetía: catálogo, precios en tiempo real con BCV, presupuesto y delivery.
-      </p>
+      <a href="https://rpym.net" target="_blank" rel="noopener noreferrer" class="work-card">
+        <div class="work-card-icon">🦐</div>
+        <div class="work-card-content">
+          <div class="work-card-title">rpym.net</div>
+          <div class="work-card-desc">El Rey de los Pescados y Mariscos — Sitio web para negocio familiar en Maiquetía: catálogo, precios BCV en tiempo real, presupuesto y delivery.</div>
+        </div>
+        <div class="work-card-arrow">→</div>
+      </a>
 
       <div class="section-label">Intereses</div>
       <ul class="interests-list">
@@ -349,6 +354,15 @@
         </p>
         <button onclick="handleBoyfriend(false)">No tengo novio</button>
         <button onclick="handleBoyfriend(true)">Tengo novio</button>
+      </div>
+
+      <!-- Paso 3b: Mayor de 18 (antes de Lado B) -->
+      <div id="gateStepAge" style="display:none;">
+        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+          ¿ERES MAYOR DE 18?
+        </p>
+        <button onclick="handleAgeStep(true)">Sí</button>
+        <button onclick="handleAgeStep(false)">No</button>
       </div>
 
       <!-- Paso 4: Escala de estabilidad -->
@@ -1113,19 +1127,20 @@
   </div>
 
   <!-- ============================================
-       AGE GATE 18+ - Chocolatería y Lado B
+       AGE GATE 18+ - Solo Chocolatería (estilo gate)
        ============================================ -->
-  <div class="age-gate-overlay" id="ageGateModal">
-    <div class="age-gate-card">
-      <div class="age-gate-title">¿Eres mayor de 18?</div>
-      <div class="age-gate-buttons">
-        <button class="age-gate-btn yes" onclick="handleAgeGateResponse(true)">Sí</button>
-        <button class="age-gate-btn no" onclick="handleAgeGateResponse(false)">No</button>
-      </div>
+  <div class="age-gate-overlay gate-style" id="ageGateModal">
+    <div class="gate-card">
+      <div class="close-gate" onclick="closeAgeGateModal()">✕</div>
+      <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px; color:#888;">
+        ¿Eres mayor de 18?
+      </p>
+      <button onclick="handleAgeGateResponse(true)">Sí</button>
+      <button onclick="handleAgeGateResponse(false)">No</button>
     </div>
   </div>
 
-  <!-- Police sirens / chocolate arrested -->
+  <!-- Chocolate detenido (solo Chocolatería) -->
   <div class="police-arrest-overlay" id="policeArrestOverlay">
     <div class="police-arrest-content">
       <div class="police-lights">
@@ -1134,6 +1149,16 @@
       </div>
       <div class="arrest-text">¡Chocolate detenido! 🚔</div>
       <div class="arrest-subtext">Contenido solo para mayores de 18</div>
+    </div>
+  </div>
+
+  <!-- Side B: menor de edad (mensaje simple) -->
+  <div class="underage-overlay" id="underageOverlay">
+    <div class="gate-card">
+      <p style="letter-spacing:2px; font-size:14px; color:#888; margin:0;">
+        Este contenido es solo para mayores de 18.
+      </p>
+      <button onclick="closeUnderageOverlay()" style="margin-top:20px;">Entendido</button>
     </div>
   </div>
 </body>

@@ -158,4 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Aplicar tema guardado al cargar
   setTheme(getStoredTheme());
+
+  // Ruta ?admin=1 para acceder al panel
+  if (new URLSearchParams(location.search).get('admin') === '1') {
+    openAdminPanel();
+  }
 });

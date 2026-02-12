@@ -1,29 +1,27 @@
 /* ============================================
-   AGE GATE 18+ - Chocolatería y Lado B
+   AGE GATE 18+ - Solo Chocolatería
    ============================================ */
 
-let ageGateCallback = null; // Callback cuando responde Sí
-let ageGateContext = null;  // 'chocolate' | 'sideB'
+let ageGateCallback = null;
 
 function showAgeGate(context, onVerified) {
-  ageGateContext = context;
   ageGateCallback = onVerified;
   const modal = document.getElementById('ageGateModal');
   if (modal) modal.classList.add('active');
 }
 
-function hideAgeGate() {
+function closeAgeGateModal() {
   const modal = document.getElementById('ageGateModal');
   if (modal) modal.classList.remove('active');
   ageGateCallback = null;
-  ageGateContext = null;
 }
 
 function handleAgeGateResponse(isAdult) {
-  hideAgeGate();
+  const callback = ageGateCallback;
+  closeAgeGateModal();
 
-  if (isAdult) {
-    if (ageGateCallback) ageGateCallback();
+  if (isAdult && callback) {
+    callback();
   } else {
     showPoliceArrest();
   }
@@ -36,9 +34,19 @@ function showPoliceArrest() {
   overlay.classList.add('active');
   overlay.classList.add('sirens-active');
 
-  // Auto-cerrar después de 4 segundos
   setTimeout(() => {
     overlay.classList.remove('sirens-active');
     overlay.classList.remove('active');
   }, 4000);
+}
+
+/* Side B: menor de edad (mensaje simple, no chocolate) */
+function showUnderageOverlay() {
+  const overlay = document.getElementById('underageOverlay');
+  if (overlay) overlay.classList.add('active');
+}
+
+function closeUnderageOverlay() {
+  const overlay = document.getElementById('underageOverlay');
+  if (overlay) overlay.classList.remove('active');
 }

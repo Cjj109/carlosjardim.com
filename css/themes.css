@@ -46,8 +46,26 @@ body[data-theme="valentine"] .window-content h1 {
   color: #ffe4ec !important;
 }
 
-body[data-theme="valentine"] .window-content .work-link {
+body[data-theme="valentine"] .work-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="valentine"] .work-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 20, 147, 0.4);
+}
+
+body[data-theme="valentine"] .work-card-title {
   color: #ff69b4 !important;
+}
+
+body[data-theme="valentine"] .work-card-desc {
+  color: rgba(255, 228, 236, 0.8);
+}
+
+body[data-theme="valentine"] .work-card-arrow {
+  color: rgba(255, 228, 236, 0.6);
 }
 
 body[data-theme="valentine"] .window-header {
@@ -109,6 +127,24 @@ body[data-theme="carnaval"] .window-content .skill-tooltip {
   color: #fff5e6 !important;
 }
 
+body[data-theme="carnaval"] .work-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="carnaval"] .work-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 107, 0, 0.5);
+}
+
+body[data-theme="carnaval"] .work-card-desc {
+  color: rgba(255, 245, 230, 0.8);
+}
+
+body[data-theme="carnaval"] .work-card-arrow {
+  color: rgba(255, 245, 230, 0.6);
+}
+
 body[data-theme="carnaval"] .window-content .section-label {
   color: rgba(255, 245, 230, 0.7) !important;
 }
@@ -160,6 +196,24 @@ body[data-theme="navidad"] .window-content .cv-text,
 body[data-theme="navidad"] .window-content .skill-name,
 body[data-theme="navidad"] .window-content .skill-tooltip {
   color: #e8f5e9 !important;
+}
+
+body[data-theme="navidad"] .work-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="navidad"] .work-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(198, 40, 40, 0.5);
+}
+
+body[data-theme="navidad"] .work-card-desc {
+  color: rgba(232, 245, 233, 0.8);
+}
+
+body[data-theme="navidad"] .work-card-arrow {
+  color: rgba(232, 245, 233, 0.6);
 }
 
 body[data-theme="navidad"] .window-content .section-label {

@@ -26,6 +26,7 @@ function showStep(stepId) {
     'gateStepGender',
     'gateStepPadel',
     'gateStepBoyfriend',
+    'gateStepAge',
     'gateStepScale',
     'gateStepQuote'
   ];
@@ -54,13 +55,22 @@ function handleGender(gender) {
  */
 function handleBoyfriend(hasBoyfriend) {
   if (!hasBoyfriend) {
-    // 18+ verification before Side B
-    showAgeGate('sideB', () => {
-      closeGate();
-      toggleMode(true);
-    });
+    showStep('gateStepAge');
   } else {
     showStep('gateStepScale');
+  }
+}
+
+/**
+ * Manejar respuesta de "¿Eres mayor de 18?" (Lado B)
+ */
+function handleAgeStep(isAdult) {
+  if (isAdult) {
+    closeGate();
+    toggleMode(true);
+  } else {
+    closeGate();
+    showUnderageOverlay();
   }
 }
 
