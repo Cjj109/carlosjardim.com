@@ -51,9 +51,20 @@ body[data-theme="valentine"] .work-card {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+body[data-theme="valentine"] .work-link-minimal {
+  color: #ff8fc8;
+  border-color: rgba(255, 143, 200, 0.45);
+  background: rgba(255, 143, 200, 0.12);
+}
+
 body[data-theme="valentine"] .work-card:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 20, 147, 0.4);
+}
+
+body[data-theme="valentine"] .work-link-minimal:hover {
+  border-color: rgba(255, 143, 200, 0.75);
+  box-shadow: 0 10px 22px rgba(255, 20, 147, 0.28);
 }
 
 body[data-theme="valentine"] .work-card-title {
@@ -132,6 +143,12 @@ body[data-theme="carnaval"] .work-card {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+body[data-theme="carnaval"] .work-link-minimal {
+  color: #ffd56a;
+  border-color: rgba(255, 213, 106, 0.45);
+  background: rgba(255, 107, 0, 0.14);
+}
+
 body[data-theme="carnaval"] .work-card:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 107, 0, 0.5);
@@ -201,6 +218,12 @@ body[data-theme="navidad"] .window-content .skill-tooltip {
 body[data-theme="navidad"] .work-card {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="navidad"] .work-link-minimal {
+  color: #a5f5c5;
+  border-color: rgba(165, 245, 197, 0.4);
+  background: rgba(46, 125, 50, 0.16);
 }
 
 body[data-theme="navidad"] .work-card:hover {

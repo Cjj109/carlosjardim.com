@@ -63,6 +63,20 @@ let hasVisitedSideB = false;
 let goldenTicketShown = false;
 let scrollPositionBeforeModal = 0;
 
+// Chocolates "detenidos" (dijeron No a 18+) - solo estos muestran rejas
+const arrestedChocolates = new Set();
+
+const FALLBACK_IMAGE_SVG =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'>" +
+    "<rect width='300' height='300' fill='#24150f'/>" +
+    "<circle cx='150' cy='120' r='54' fill='#6b3d1f'/>" +
+    "<rect x='96' y='185' width='108' height='22' rx='11' fill='#8b5a2b'/>" +
+    "<text x='150' y='262' text-anchor='middle' fill='#ffd700' font-family='Inter, Arial, sans-serif' font-size='22'>Chocolate</text>" +
+    "</svg>"
+  );
+
 /**
  * Detect when user toggles to Side B
  */
@@ -191,10 +205,11 @@ function renderChocolatesGrid() {
            ${choc.status === 'extremadamente apartado' ? '🚨 EXTREMADAMENTE APARTADO' : '⚠️ APARTADO'}
          </div>`
       : '';
+    const arrestedClass = arrestedChocolates.has(key) ? ' arrested' : '';
 
     return `
-      <div class="chocolate-card" onclick="showChocolateDetail('${key}')">
-        <img src="${choc.image}" alt="${choc.name}" class="chocolate-img" loading="lazy" decoding="async" onerror="this.src='images/placeholder.png'">
+      <div class="chocolate-card${arrestedClass}" onclick="showChocolateDetail('${key}')">
+        <img src="${choc.image}" alt="${choc.name}" class="chocolate-img" loading="lazy" decoding="async" width="120" height="120" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_SVG}'">
         <div class="chocolate-name">${choc.name}</div>
         ${statusBadge}
       </div>
@@ -209,10 +224,19 @@ function showChocolateDetail(chocolateKey) {
   const choc = chocolates[chocolateKey];
   if (!choc) return;
 
-  // 18+ verification before showing profile
   showAgeGate('chocolate', () => {
     _renderChocolateDetail(chocolateKey);
-  });
+  }, (key) => {
+    arrestChocolate(key);
+  }, chocolateKey);
+}
+
+/**
+ * Marcar chocolate como detenido (dijo No a 18+) y mostrar rejas
+ */
+function arrestChocolate(chocolateKey) {
+  arrestedChocolates.add(chocolateKey);
+  renderChocolatesGrid();
 }
 
 /**
@@ -243,7 +267,7 @@ function _renderChocolateDetail(chocolateKey) {
 
   detailView.innerHTML = `
     <div class="chocolate-detail active">
-      <img src="${choc.image}" alt="${choc.name}" class="detail-img" loading="lazy" decoding="async" onerror="this.src='images/placeholder.png'">
+      <img src="${choc.image}" alt="${choc.name}" class="detail-img" loading="lazy" decoding="async" width="200" height="200" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_SVG}'">
       <div class="detail-name">${choc.name}</div>
       ${statusBadge}
       <div class="detail-description">${choc.description}</div>

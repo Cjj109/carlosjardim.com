@@ -103,6 +103,21 @@ function deactivateMatrixMode() {
   document.body.classList.remove('matrix-mode');
 }
 
+function openValentineFlowers() {
+  if (document.body.dataset.theme !== 'valentine') return;
+  const modal = document.getElementById('valentineFlowersModal');
+  if (!modal) return;
+  modal.classList.add('active');
+  document.body.classList.add('valentine-flowers-open');
+}
+
+function closeValentineFlowers() {
+  const modal = document.getElementById('valentineFlowersModal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  document.body.classList.remove('valentine-flowers-open');
+}
+
 /**
  * Event listeners
  */
@@ -140,6 +155,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && heightScaleModal.classList.contains('active')) {
         closeHeightScale();
+      }
+    });
+  }
+
+  const valentineFlowersModal = document.getElementById('valentineFlowersModal');
+  if (valentineFlowersModal) {
+    valentineFlowersModal.addEventListener('click', (e) => {
+      if (e.target === valentineFlowersModal) {
+        closeValentineFlowers();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && valentineFlowersModal.classList.contains('active')) {
+        closeValentineFlowers();
       }
     });
   }

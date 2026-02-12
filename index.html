@@ -221,13 +221,11 @@
       </div>
 
       <div class="section-label">Trabajo</div>
-      <a href="https://rpym.net" target="_blank" rel="noopener noreferrer" class="work-card">
-        <div class="work-card-icon">🦐</div>
-        <div class="work-card-content">
-          <div class="work-card-title">rpym.net</div>
-          <div class="work-card-desc">El Rey de los Pescados y Mariscos — Sitio web para negocio familiar en Maiquetía: catálogo, precios BCV en tiempo real, presupuesto y delivery.</div>
-        </div>
-        <div class="work-card-arrow">→</div>
+      <a href="https://rpym.net" target="_blank" rel="noopener noreferrer" class="work-link-minimal">
+        <svg class="work-shrimp" viewBox="0 0 48 32" aria-hidden="true">
+          <path fill="currentColor" d="M4 16c0-2 2-6 8-8 4-1 10 0 14 4 2 2 4 4 6 6 2 2 4 4 2 8 0 2-2 4-4 4-2 0-4-2-4-4 0-2 2-4 4-4 2 0 2-2 0-4-2-2-4-4-6-6-2-2-4-4-8-4-4 0-6 2-6 4 0 2 2 4 4 4 2 0 4-2 4-4zm40-4c-2-4-6-6-12-4-4 2-8 6-10 10-1 2-2 4 0 6 2 2 4 2 6 0 2-2 2-4 0-6 2-2 4-4 8-6 4-2 8 0 8 4z"/>
+        </svg>
+        <span class="work-link-text">rpym.net</span>
       </a>
 
       <div class="section-label">Intereses</div>
@@ -235,9 +233,10 @@
         <li onclick="openGymWidget()">Gym</li>
         <li onclick="openGamesMenu()">Gaming</li>
         <li onclick="activateMatrixMode()">Tecnología</li>
+        <li class="valentine-interest-item" onclick="openValentineFlowers()">Tú</li>
       </ul>
 
-      <p class="cv-text" style="margin-top: 20px;">
+      <p class="cv-text cv-text-spaced">
         <span class="clickable" onclick="openHeightScale()">176 cm</span> de estabilidad funcional.
       </p>
 
@@ -296,7 +295,7 @@
     </div>
 
     <!-- Call to Action -->
-    <div style="text-align:center; margin-top:60px; font-family:var(--mono); display:flex; flex-direction:column; align-items:center; gap:16px;">
+    <div class="alt-cta-section">
       <button onclick="openInstagramChoice()" class="main-cta-button">
         SOLICITAR ACCESO
       </button>
@@ -309,7 +308,7 @@
         🌟 Para las locas de la astronomía
       </button>
 
-      <div style="margin-top:14px;">
+      <div class="alt-easter-wrapper">
         <button class="easter-btn" onclick="openGamesMenu()">
           toca si tu novia estuvo aquí
         </button>
@@ -323,11 +322,11 @@
        ============================================ -->
   <div class="gender-gate" id="genderGate">
     <div class="gate-card">
-      <div class="close-gate" onclick="closeGate()">✕</div>
+      <div class="close-gate" onclick="closeGate()" role="button" tabindex="0" aria-label="Cerrar">✕</div>
 
       <!-- Paso 1: Género -->
       <div id="gateStepGender">
-        <p style="letter-spacing:2px; font-size:12px; margin-bottom:18px; color:#888;">
+        <p class="gate-step-text">
           Antes de seguir…
         </p>
         <button onclick="handleGender('female')">Soy mujer</button>
@@ -336,7 +335,7 @@
 
       <!-- Paso 2: Pádel (hombres) -->
       <div id="gateStepPadel" style="display:none;">
-        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+        <p class="gate-step-text">
           ¿TE GUSTA EL PÁDEL?
         </p>
         <button onclick="closeGate(); openVideoModal('https://youtu.be/Kdmf9KKwcjQ')">
@@ -349,7 +348,7 @@
 
       <!-- Paso 3: Estado civil (mujeres) -->
       <div id="gateStepBoyfriend" style="display:none;">
-        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+        <p class="gate-step-text">
           ESTADO CIVIL
         </p>
         <button onclick="handleBoyfriend(false)">No tengo novio</button>
@@ -358,7 +357,7 @@
 
       <!-- Paso 3b: Mayor de 18 (antes de Lado B) -->
       <div id="gateStepAge" style="display:none;">
-        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+        <p class="gate-step-text">
           ¿ERES MAYOR DE 18?
         </p>
         <button onclick="handleAgeStep(true)">Sí</button>
@@ -367,7 +366,7 @@
 
       <!-- Paso 4: Escala de estabilidad -->
       <div id="gateStepScale" style="display:none;">
-        <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px;">
+        <p class="gate-step-text">
           ESTABILIDAD DE LA RELACIÓN (1-10)
         </p>
         <div class="scale-grid" id="scaleGrid"></div>
@@ -649,6 +648,29 @@
           <div class="height-label">Robert Wadlow<br>(Más alto registrado)</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       VALENTINE FLOWERS MODAL
+       ============================================ -->
+  <div class="valentine-flowers-modal" id="valentineFlowersModal" role="dialog" aria-modal="true" aria-label="Detalle de flores eternas">
+    <div class="valentine-flowers-container">
+      <button class="valentine-flowers-close" onclick="closeValentineFlowers()" aria-label="Cerrar detalle">✕</button>
+      <div class="valentine-flowers-bouquet" aria-hidden="true">
+        <span class="flower">❀</span>
+        <span class="flower">✿</span>
+        <span class="flower">❁</span>
+        <span class="flower">✾</span>
+        <span class="flower">❀</span>
+        <span class="flower">✿</span>
+      </div>
+      <div class="valentine-flowers-title">Para ti</div>
+      <p class="valentine-flowers-text">
+        Las flores verdaderas duran solo unos dias.
+        <br>
+        Este detalle durara para toda la vida.
+      </p>
     </div>
   </div>
 
@@ -1129,10 +1151,10 @@
   <!-- ============================================
        AGE GATE 18+ - Solo Chocolatería (estilo gate)
        ============================================ -->
-  <div class="age-gate-overlay gate-style" id="ageGateModal">
+  <div class="age-gate-overlay gate-style" id="ageGateModal" role="dialog" aria-modal="true" aria-label="Verificación de edad">
     <div class="gate-card">
-      <div class="close-gate" onclick="closeAgeGateModal()">✕</div>
-      <p style="letter-spacing:2px; font-size:12px; margin-bottom:20px; color:#888;">
+      <div class="close-gate" onclick="closeAgeGateModal()" role="button" tabindex="0" aria-label="Cerrar">✕</div>
+      <p class="gate-step-text">
         ¿Eres mayor de 18?
       </p>
       <button onclick="handleAgeGateResponse(true)">Sí</button>
@@ -1148,17 +1170,18 @@
         <div class="police-light blue"></div>
       </div>
       <div class="arrest-text">¡Chocolate detenido! 🚔</div>
-      <div class="arrest-subtext">Contenido solo para mayores de 18</div>
+      <div class="arrest-subtext">Este bombón es para mayores de 18</div>
     </div>
   </div>
 
   <!-- Side B: menor de edad (mensaje simple) -->
-  <div class="underage-overlay" id="underageOverlay">
+  <div class="underage-overlay" id="underageOverlay" role="dialog" aria-modal="true" aria-label="Aviso de edad">
     <div class="gate-card">
-      <p style="letter-spacing:2px; font-size:14px; color:#888; margin:0;">
-        Este contenido es solo para mayores de 18.
+      <p class="gate-step-text gate-step-text-underage">
+        Este bombón es para mayores de 18.
       </p>
-      <button onclick="closeUnderageOverlay()" style="margin-top:20px;">Entendido</button>
+      <button onclick="closeUnderageOverlay()" class="underage-btn-spaced">Entendido</button>
+      <button onclick="enterWebAnyway()" class="underage-secondary-btn">Entrar igual a la web</button>
     </div>
   </div>
 </body>

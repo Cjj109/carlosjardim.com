@@ -242,53 +242,57 @@
   overflow: hidden;
 }
 
-/* Chocolates tras las rejas - efecto celda */
-.chocolate-card {
-  box-shadow: inset 0 0 0 3px rgba(100, 100, 100, 0.4);
+/* Solo chocolates "detenidos" (dijeron No a 18+) muestran rejas */
+.chocolate-card.arrested {
+  box-shadow: inset 0 0 0 3px rgba(100, 100, 100, 0.5);
 }
 
-.chocolate-card::before {
+.chocolate-card.arrested::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: 
-    repeating-linear-gradient(
-      90deg,
-      transparent 0px,
-      transparent 20px,
-      rgba(80, 80, 80, 0.7) 20px,
-      rgba(80, 80, 80, 0.7) 24px
-    );
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 18px,
+    rgba(60, 60, 60, 0.8) 18px,
+    rgba(60, 60, 60, 0.8) 22px
+  );
   pointer-events: none;
   z-index: 2;
   border-radius: var(--radius-md);
 }
 
-.chocolate-card::after {
+.chocolate-card.arrested::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: 
-    linear-gradient(to bottom, rgba(80, 80, 80, 0.8) 0%, transparent 8px, transparent calc(100% - 8px), rgba(80, 80, 80, 0.8) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(60, 60, 60, 0.9) 0%,
+    transparent 10px,
+    transparent calc(100% - 10px),
+    rgba(60, 60, 60, 0.9) 100%
+  );
   pointer-events: none;
   z-index: 2;
   border-radius: var(--radius-md);
+}
+
+.chocolate-card.arrested .chocolate-name::after {
+  content: ' 🔒';
+  font-size: 0.85em;
 }
 
 .chocolate-card:hover {
   background: rgba(139, 69, 19, 0.3);
   border-color: rgba(255, 215, 0, 0.6);
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), inset 0 0 0 3px rgba(100, 100, 100, 0.5);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
 }
 
 .chocolate-card:hover .chocolate-img {
-  animation: chocolateBehindBars 0.5s ease;
-}
-
-@keyframes chocolateBehindBars {
-  0%, 100% { transform: scale(1.1); }
-  50% { transform: scale(1.15); }
+  border-color: #ffd700;
 }
 
 .chocolate-img {
@@ -591,6 +595,7 @@ body.chocolate-shop-open {
 }
 
 .slot-reel.spinning {
+  will-change: transform;
   animation: spinReel 0.1s linear infinite;
 }
 
@@ -657,5 +662,16 @@ body.chocolate-shop-open {
   .slot-machine-overlay {
     width: 210px;
     height: 90px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .golden-ticket,
+  .chocolate-card,
+  .slot-reel.spinning,
+  .random-chocolate-btn {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
   }
 }
