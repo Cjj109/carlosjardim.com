@@ -106,6 +106,18 @@
   color: #333;
 }
 
+.cv-text .work-link {
+  color: var(--accent-red);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.cv-text .work-link:hover {
+  border-bottom-color: var(--accent-red);
+}
+
 ul.cv-list {
   padding-left: 18px;
   margin: 15px 0;
@@ -254,7 +266,7 @@ ul.cv-list li {
   margin-top: 14px;
   font-family: var(--mono);
   font-size: 11px;
-  color: rgba(0, 0, 0, 0.65); /* FIX: Mejor contraste (4.5:1) */
+  color: rgba(0, 0, 0, 0.7); /* WCAG AA: contraste 4.5:1+ */
   letter-spacing: 0.6px;
   user-select: none;
   opacity: 0;

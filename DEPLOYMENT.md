@@ -130,7 +130,25 @@ Lighthouse Score:           98-100/100
 
 ---
 
+## ⚙️ Variables de Entorno (Pages Functions)
+
+Para el **panel admin** (temáticas), configura en Cloudflare Dashboard:
+
+1. Pages → tu proyecto → **Settings** → **Functions** → **Environment variables**
+2. Agregar (Production y Preview):
+   - `ADMIN_USER` — Usuario para acceder al admin
+   - `ADMIN_PASS` — Contraseña del admin
+
+**Acceso al admin:** Código Konami (↑↑↓↓←→←→) o triple clic en los traffic lights.
+
+---
+
 ## 🔧 Archivos de Configuración
+
+### [functions/](functions/)
+Cloudflare Pages Functions (edge):
+- `api/bcv.js` — Tasas BCV en tiempo real (SSR, reemplaza GitHub Action para rates)
+- `api/admin/login.js` — Verificación de credenciales admin
 
 ### [_headers](_headers)
 Headers HTTP para cache y seguridad.

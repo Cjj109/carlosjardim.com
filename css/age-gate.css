@@ -1,0 +1,153 @@
+/* ============================================
+   AGE GATE 18+ + Police Arrest
+   ============================================ */
+
+.age-gate-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 10001;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.age-gate-overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+.age-gate-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.age-gate-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 30px;
+  font-family: var(--mono);
+  letter-spacing: 1px;
+}
+
+.age-gate-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.age-gate-btn {
+  padding: 16px 40px;
+  border-radius: var(--radius-md);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--mono);
+  border: 2px solid transparent;
+}
+
+.age-gate-btn.yes {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: #fff;
+  border-color: #4caf50;
+}
+
+.age-gate-btn.yes:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
+
+.age-gate-btn.no {
+  background: linear-gradient(135deg, #c62828, #b71c1c);
+  color: #fff;
+  border-color: #f44336;
+}
+
+.age-gate-btn.no:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+}
+
+/* Police Arrest Overlay */
+.police-arrest-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.98);
+  z-index: 10002;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.police-arrest-overlay.active {
+  display: flex;
+  animation: fadeIn 0.2s ease;
+}
+
+.police-arrest-overlay.sirens-active .police-light {
+  animation: policeFlash 0.15s ease-in-out infinite alternate;
+}
+
+.police-arrest-overlay.sirens-active .police-light.blue {
+  animation-delay: 0.08s;
+}
+
+@keyframes policeFlash {
+  0% { opacity: 1; box-shadow: 0 0 40px currentColor; }
+  100% { opacity: 0.3; box-shadow: 0 0 10px currentColor; }
+}
+
+.police-lights {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.police-light {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  box-shadow: 0 0 50px currentColor;
+}
+
+.police-light.red {
+  background: #e53935;
+  color: #ff5252;
+}
+
+.police-light.blue {
+  background: #1e88e5;
+  color: #42a5f5;
+}
+
+.arrest-text {
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 12px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.arrest-subtext {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}

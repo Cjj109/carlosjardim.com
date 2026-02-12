@@ -54,8 +54,11 @@ function handleGender(gender) {
  */
 function handleBoyfriend(hasBoyfriend) {
   if (!hasBoyfriend) {
-    closeGate();
-    toggleMode(true);
+    // 18+ verification before Side B
+    showAgeGate('sideB', () => {
+      closeGate();
+      toggleMode(true);
+    });
   } else {
     showStep('gateStepScale');
   }

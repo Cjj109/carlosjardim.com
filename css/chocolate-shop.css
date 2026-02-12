@@ -242,11 +242,53 @@
   overflow: hidden;
 }
 
+/* Chocolates tras las rejas - efecto celda */
+.chocolate-card {
+  box-shadow: inset 0 0 0 3px rgba(100, 100, 100, 0.4);
+}
+
+.chocolate-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 20px,
+      rgba(80, 80, 80, 0.7) 20px,
+      rgba(80, 80, 80, 0.7) 24px
+    );
+  pointer-events: none;
+  z-index: 2;
+  border-radius: var(--radius-md);
+}
+
+.chocolate-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(to bottom, rgba(80, 80, 80, 0.8) 0%, transparent 8px, transparent calc(100% - 8px), rgba(80, 80, 80, 0.8) 100%);
+  pointer-events: none;
+  z-index: 2;
+  border-radius: var(--radius-md);
+}
+
 .chocolate-card:hover {
   background: rgba(139, 69, 19, 0.3);
   border-color: rgba(255, 215, 0, 0.6);
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), inset 0 0 0 3px rgba(100, 100, 100, 0.5);
+}
+
+.chocolate-card:hover .chocolate-img {
+  animation: chocolateBehindBars 0.5s ease;
+}
+
+@keyframes chocolateBehindBars {
+  0%, 100% { transform: scale(1.1); }
+  50% { transform: scale(1.15); }
 }
 
 .chocolate-img {
@@ -261,7 +303,6 @@
 
 .chocolate-card:hover .chocolate-img {
   border-color: #ffd700;
-  transform: scale(1.1);
 }
 
 .chocolate-name {

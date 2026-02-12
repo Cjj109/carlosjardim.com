@@ -59,36 +59,36 @@ async function fetchUsdtRate() {
 }
 
 /**
- * Load BCV rates from JSON file + live USDT from API
+ * Load BCV rates from edge API (SSR) with fallback to static JSON
  */
 async function loadBCVRates() {
   try {
     const cacheBuster = new Date().getTime();
 
-    // Fetch cached rates (USD, EUR), history, and live USDT in parallel
-    const [ratesResponse, historyResponse, usdtData] = await Promise.all([
-      fetch('data/bcv-rates.json?' + cacheBuster),
-      fetch('data/bcv-rates-history.json?' + cacheBuster),
-      fetchUsdtRate()
-    ]);
+    // Primary: edge API (SSR). Fallback: static JSON + live USDT
+    let ratesResponse = await fetch('/api/bcv?' + cacheBuster);
+    let data;
 
-    if (!ratesResponse.ok) {
-      throw new Error('Failed to fetch BCV rates');
+    if (ratesResponse.ok) {
+      data = await ratesResponse.json();
+    } else {
+      const [staticRates, usdtData] = await Promise.all([
+        fetch('data/bcv-rates.json?' + cacheBuster),
+        fetchUsdtRate()
+      ]);
+      if (!staticRates.ok) throw new Error('Failed to fetch BCV rates');
+      data = await staticRates.json();
+      if (usdtData) data.usdt = { ...usdtData, live: true };
     }
 
-    bcvRates = await ratesResponse.json();
+    bcvRates = data;
 
-    // Update USDT with live data if available
-    if (usdtData) {
-      bcvRates.usdt = usdtData;
-    }
-
-    // Load history if available
+    // History from static file (updated by GitHub Action)
+    const historyResponse = await fetch('data/bcv-rates-history.json?' + cacheBuster);
     if (historyResponse.ok) {
       bcvHistory = await historyResponse.json();
     }
 
-    // Update UI with rates
     displayRates();
     displayHistory();
 
@@ -157,13 +157,13 @@ function displayRates() {
 
   // USD rate
   const usdRate = document.getElementById('bcvUsdRate');
-  if (usdRate) {
+  if (usdRate && bcvRates.usd) {
     usdRate.textContent = formatRate(bcvRates.usd.rate);
   }
 
   // EUR rate
   const eurRate = document.getElementById('bcvEurRate');
-  if (eurRate) {
+  if (eurRate && bcvRates.eur) {
     eurRate.textContent = formatRate(bcvRates.eur.rate);
   }
 

@@ -203,9 +203,22 @@ function renderChocolatesGrid() {
 }
 
 /**
- * Show chocolate detail
+ * Show chocolate detail (with 18+ gate)
  */
 function showChocolateDetail(chocolateKey) {
+  const choc = chocolates[chocolateKey];
+  if (!choc) return;
+
+  // 18+ verification before showing profile
+  showAgeGate('chocolate', () => {
+    _renderChocolateDetail(chocolateKey);
+  });
+}
+
+/**
+ * Internal: render chocolate detail (after 18+ verified)
+ */
+function _renderChocolateDetail(chocolateKey) {
   const choc = chocolates[chocolateKey];
   if (!choc) return;
 

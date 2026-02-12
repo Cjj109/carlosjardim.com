@@ -1,0 +1,337 @@
+/* ============================================
+   THEMES - Temáticas estacionales
+   ============================================ */
+
+/* Default - Sin tema */
+body[data-theme="default"] {
+  /* Usa variables por defecto */
+}
+
+/* Valentine / Magic Mike - 14 de Febrero */
+body[data-theme="valentine"] {
+  --bg-cv: #1a0a0f;
+  --text-main: #ffe4ec;
+  --accent-red: #ff1493;
+  --accent-r: 255;
+  --accent-g: 20;
+  --accent-b: 147;
+}
+
+body[data-theme="valentine"]::before {
+  background: 
+    radial-gradient(700px 520px at 50% 62%, rgba(255, 20, 147, 0.25), transparent 60%),
+    radial-gradient(400px 400px at 20% 80%, rgba(255, 105, 180, 0.15), transparent 50%),
+    radial-gradient(400px 400px at 80% 20%, rgba(255, 20, 147, 0.12), transparent 50%);
+}
+
+body[data-theme="valentine"] .window {
+  background: linear-gradient(135deg, rgba(26, 10, 15, 0.98) 0%, rgba(50, 15, 30, 0.98) 100%) !important;
+  border: 2px solid rgba(255, 20, 147, 0.4);
+  box-shadow: 0 0 60px rgba(255, 20, 147, 0.2), 0 0 120px rgba(255, 105, 180, 0.1);
+}
+
+body[data-theme="valentine"] .window-content .cv-text,
+body[data-theme="valentine"] .window-content .section-label,
+body[data-theme="valentine"] .window-content .skill-name,
+body[data-theme="valentine"] .window-content .skill-tooltip,
+body[data-theme="valentine"] .window-content .interests-list li {
+  color: #ffe4ec !important;
+}
+
+body[data-theme="valentine"] .window-content .section-label {
+  color: rgba(255, 228, 236, 0.7) !important;
+}
+
+body[data-theme="valentine"] .window-content h1 {
+  color: #ffe4ec !important;
+}
+
+body[data-theme="valentine"] .window-content .work-link {
+  color: #ff69b4 !important;
+}
+
+body[data-theme="valentine"] .window-header {
+  background: rgba(26, 10, 15, 0.9);
+  border-bottom-color: rgba(255, 20, 147, 0.3);
+}
+
+body[data-theme="valentine"] .micro-line {
+  color: rgba(255, 228, 236, 0.85) !important;
+}
+
+body[data-theme="valentine"] .bonbon-icon {
+  background: linear-gradient(135deg, #ff1493, #ff69b4) !important;
+  box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
+}
+
+body[data-theme="valentine"] .bonbon-icon.breathing {
+  animation: valentinePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes valentinePulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 20, 147, 0.5); transform: scale(1); }
+  50% { box-shadow: 0 0 40px rgba(255, 20, 147, 0.8); transform: scale(1.05); }
+}
+
+/* Carnavales */
+body[data-theme="carnaval"] {
+  --bg-cv: #0d0d1a;
+  --text-main: #fff5e6;
+  --accent-red: #ff6b00;
+  --accent-r: 255;
+  --accent-g: 107;
+  --accent-b: 0;
+}
+
+body[data-theme="carnaval"]::before {
+  background: 
+    radial-gradient(700px 520px at 30% 50%, rgba(255, 107, 0, 0.2), transparent 55%),
+    radial-gradient(500px 500px at 70% 50%, rgba(255, 215, 0, 0.15), transparent 55%),
+    radial-gradient(400px 400px at 50% 80%, rgba(255, 0, 128, 0.1), transparent 50%);
+  animation: carnavalShimmer 8s ease-in-out infinite alternate;
+}
+
+@keyframes carnavalShimmer {
+  0% { opacity: 1; }
+  100% { opacity: 0.85; }
+}
+
+body[data-theme="carnaval"] .window {
+  background: linear-gradient(135deg, rgba(13, 13, 26, 0.98) 0%, rgba(30, 20, 40, 0.98) 100%) !important;
+  border: 2px solid;
+  border-image: linear-gradient(135deg, #ff6b00, #ffd700, #ff0080, #ff6b00) 1;
+  box-shadow: 0 0 40px rgba(255, 107, 0, 0.3), 0 0 80px rgba(255, 215, 0, 0.1);
+}
+
+body[data-theme="carnaval"] .window-content .cv-text,
+body[data-theme="carnaval"] .window-content .skill-name,
+body[data-theme="carnaval"] .window-content .skill-tooltip {
+  color: #fff5e6 !important;
+}
+
+body[data-theme="carnaval"] .window-content .section-label {
+  color: rgba(255, 245, 230, 0.7) !important;
+}
+
+body[data-theme="carnaval"] .window-header {
+  background: rgba(13, 13, 26, 0.9);
+  border-bottom-color: rgba(255, 107, 0, 0.4);
+}
+
+body[data-theme="carnaval"] .micro-line {
+  color: rgba(255, 245, 230, 0.85) !important;
+}
+
+body[data-theme="carnaval"] .bonbon-icon {
+  background: linear-gradient(135deg, #ff6b00, #ffd700, #ff0080) !important;
+  background-size: 200% 200%;
+  animation: carnavalGradient 3s ease infinite;
+}
+
+@keyframes carnavalGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Navidad */
+body[data-theme="navidad"] {
+  --bg-cv: #0a1a0f;
+  --text-main: #e8f5e9;
+  --accent-red: #c62828;
+  --accent-r: 198;
+  --accent-g: 40;
+  --accent-b: 40;
+}
+
+body[data-theme="navidad"]::before {
+  background: 
+    radial-gradient(700px 520px at 50% 30%, rgba(198, 40, 40, 0.15), transparent 55%),
+    radial-gradient(500px 500px at 20% 70%, rgba(46, 125, 50, 0.12), transparent 55%),
+    radial-gradient(400px 400px at 80% 70%, rgba(255, 215, 0, 0.08), transparent 50%);
+}
+
+body[data-theme="navidad"] .window {
+  background: linear-gradient(135deg, rgba(10, 26, 15, 0.98) 0%, rgba(20, 40, 25, 0.98) 100%) !important;
+  border-color: rgba(198, 40, 40, 0.5);
+  box-shadow: 0 0 50px rgba(198, 40, 40, 0.15), 0 0 100px rgba(46, 125, 50, 0.1);
+}
+
+body[data-theme="navidad"] .window-content .cv-text,
+body[data-theme="navidad"] .window-content .skill-name,
+body[data-theme="navidad"] .window-content .skill-tooltip {
+  color: #e8f5e9 !important;
+}
+
+body[data-theme="navidad"] .window-content .section-label {
+  color: rgba(232, 245, 233, 0.7) !important;
+}
+
+body[data-theme="navidad"] .window-header {
+  background: rgba(10, 26, 15, 0.9);
+  border-bottom-color: rgba(198, 40, 40, 0.4);
+}
+
+body[data-theme="navidad"] .micro-line {
+  color: rgba(232, 245, 233, 0.85) !important;
+}
+
+body[data-theme="navidad"] .bonbon-icon {
+  background: linear-gradient(135deg, #c62828, #2e7d32) !important;
+  box-shadow: 0 0 25px rgba(198, 40, 40, 0.5);
+}
+
+/* Admin panel */
+.admin-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.admin-panel-overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+.admin-panel {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.admin-panel h2 {
+  color: #fff;
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-family: var(--mono);
+}
+
+.admin-themes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-theme-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-theme-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateX(4px);
+}
+
+.admin-theme-btn.active {
+  border-color: var(--accent-red);
+  background: rgba(255, 59, 48, 0.2);
+}
+
+.admin-theme-btn .theme-emoji {
+  font-size: 28px;
+}
+
+/* Admin Login Form */
+.admin-login-form h2,
+.admin-themes-section h2 {
+  color: #fff;
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-family: var(--mono);
+}
+
+.admin-login-hint {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin: -16px 0 20px 0;
+}
+
+.admin-login-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-login-form input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-family: var(--font-sans);
+}
+
+.admin-login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-login-form input:focus {
+  outline: none;
+  border-color: var(--accent-red);
+}
+
+.admin-login-error {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin: 0;
+}
+
+.admin-login-btn {
+  background: var(--accent-red);
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--mono);
+  transition: all 0.2s;
+}
+
+.admin-login-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.admin-panel-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s;
+}
+
+.admin-panel-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
