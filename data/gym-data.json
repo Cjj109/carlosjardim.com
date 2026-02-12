@@ -1,133 +1,240 @@
 {
-  "last_updated": "2026-02-12T18:44:14.979830",
+  "last_updated": "2026-02-12T22:07:41.483082",
   "profile_url": "https://hevy.com/user/cjj109",
   "last_workout": {
-    "name": "Brazos 1",
-    "date": "2026-02-11",
-    "duration": "77 min",
-    "volume": "4,184 kg",
+    "name": "Pierna 2",
+    "date": "2026-02-12",
+    "duration": "51 min",
+    "volume": "11,076 kg",
     "exercises": [
       {
-        "name": "Elevacion Laterales (Mancuerna)",
+        "name": "Peso Muerto Rumano (Barra)",
         "sets": [
           {
-            "reps": 10,
-            "weight": "10 kg"
-          },
-          {
-            "reps": 10,
-            "weight": "10 kg"
+            "reps": 8,
+            "weight": "104 kg"
           },
           {
             "reps": 8,
-            "weight": "10 kg"
-          }
-        ],
-        "muscle_group": "shoulders"
-      },
-      {
-        "name": "Pulldown Lateral con Agarre Inverso (Cable)",
-        "sets": [
-          {
-            "reps": 10,
-            "weight": "55 kg"
+            "weight": "104 kg"
           },
           {
-            "reps": 10,
-            "weight": "55 kg"
-          },
-          {
-            "reps": 9,
-            "weight": "55 kg"
+            "reps": 8,
+            "weight": "104 kg"
           }
         ],
-        "muscle_group": "lats",
+        "muscle_group": "hamstrings",
         "secondary_muscles": [
+          "glutes",
+          "lower_back",
           "upper_back",
-          "biceps"
+          "lats"
         ]
       },
       {
-        "name": "Press Francés (Barra)",
+        "name": "Curl de Piernas Acostado (Máquina)",
         "sets": [
           {
             "reps": 10,
             "weight": "31 kg"
-          },
-          {
-            "reps": 10,
-            "weight": "31 kg"
-          },
-          {
-            "reps": 7,
-            "weight": "31 kg"
-          }
-        ],
-        "muscle_group": "triceps"
-      },
-      {
-        "name": "Vuelos Posteriores (Máquina)",
-        "sets": [
-          {
-            "reps": 10,
-            "weight": "22.5 kg"
-          },
-          {
-            "reps": 9,
-            "weight": "22.5 kg"
           },
           {
             "reps": 8,
-            "weight": "22.5 kg"
+            "weight": "31 kg"
+          },
+          {
+            "reps": 6,
+            "weight": "31 kg"
           }
         ],
-        "muscle_group": "shoulders",
+        "muscle_group": "hamstrings",
         "secondary_muscles": [
-          "upper_back"
+          "calves"
         ]
       },
       {
-        "name": "Curl de Bíceps Inclinado (Mancuerna)",
+        "name": "Press de Piernas",
         "sets": [
           {
             "reps": 10,
-            "weight": "15.87 kg"
+            "weight": "163 kg"
           },
           {
             "reps": 10,
-            "weight": "15.87 kg"
+            "weight": "163 kg"
           },
           {
-            "reps": 8,
-            "weight": "15.87 kg"
+            "reps": 10,
+            "weight": "163 kg"
           }
         ],
-        "muscle_group": "biceps"
+        "muscle_group": "quadriceps",
+        "secondary_muscles": [
+          "glutes",
+          "hamstrings"
+        ]
       },
       {
-        "name": "Extensión de Tríceps (Cable)",
+        "name": "Extensión de Pierna",
         "sets": [
           {
-            "reps": 10,
-            "weight": "15 kg"
+            "reps": 14,
+            "weight": "38 kg"
           },
           {
-            "reps": 10,
-            "weight": "15 kg"
-          },
-          {
-            "reps": 8,
-            "weight": "15 kg"
+            "reps": 13,
+            "weight": "38 kg"
           }
         ],
-        "muscle_group": "triceps"
+        "muscle_group": "quadriceps"
+      },
+      {
+        "name": "Elevación de Gemelos a Una Pierna (Máquina)",
+        "sets": [
+          {
+            "reps": 12,
+            "weight": "50 kg"
+          },
+          {
+            "reps": 12,
+            "weight": "55 kg"
+          },
+          {
+            "reps": 12,
+            "weight": "55 kg"
+          }
+        ],
+        "muscle_group": "calves"
       }
     ]
   },
   "stats": {
-    "total_workouts": "17"
+    "total_workouts": "18"
   },
   "previous_workouts": [
+    {
+      "name": "Brazos 1",
+      "date": "2026-02-11",
+      "duration": "77 min",
+      "volume": "4,184 kg",
+      "exercises": [
+        {
+          "name": "Elevacion Laterales (Mancuerna)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "10 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "10 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "10 kg"
+            }
+          ],
+          "muscle_group": "shoulders"
+        },
+        {
+          "name": "Pulldown Lateral con Agarre Inverso (Cable)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "55 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "55 kg"
+            },
+            {
+              "reps": 9,
+              "weight": "55 kg"
+            }
+          ],
+          "muscle_group": "lats",
+          "secondary_muscles": [
+            "upper_back",
+            "biceps"
+          ]
+        },
+        {
+          "name": "Press Francés (Barra)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "31 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "31 kg"
+            },
+            {
+              "reps": 7,
+              "weight": "31 kg"
+            }
+          ],
+          "muscle_group": "triceps"
+        },
+        {
+          "name": "Vuelos Posteriores (Máquina)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "22.5 kg"
+            },
+            {
+              "reps": 9,
+              "weight": "22.5 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "22.5 kg"
+            }
+          ],
+          "muscle_group": "shoulders",
+          "secondary_muscles": [
+            "upper_back"
+          ]
+        },
+        {
+          "name": "Curl de Bíceps Inclinado (Mancuerna)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "15.87 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "15.87 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "15.87 kg"
+            }
+          ],
+          "muscle_group": "biceps"
+        },
+        {
+          "name": "Extensión de Tríceps (Cable)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "15 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "15 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "15 kg"
+            }
+          ],
+          "muscle_group": "triceps"
+        }
+      ]
+    },
     {
       "name": "Pierna 1",
       "date": "2026-02-10",
@@ -722,113 +829,6 @@
             }
           ],
           "muscle_group": "triceps"
-        }
-      ]
-    },
-    {
-      "name": "Pierna 1",
-      "date": "2026-02-03",
-      "duration": "56 min",
-      "volume": "9,549 kg",
-      "exercises": [
-        {
-          "name": "Sentadilla Hack (Máquina)",
-          "sets": [
-            {
-              "reps": 10,
-              "weight": "122.5 kg"
-            },
-            {
-              "reps": 10,
-              "weight": "122.5 kg"
-            },
-            {
-              "reps": 10,
-              "weight": "122.5 kg"
-            }
-          ],
-          "muscle_group": "quadriceps",
-          "secondary_muscles": [
-            "glutes",
-            "hamstrings"
-          ]
-        },
-        {
-          "name": "Extensión de Pierna",
-          "sets": [
-            {
-              "reps": 13,
-              "weight": "38 kg"
-            },
-            {
-              "reps": 12,
-              "weight": "38 kg"
-            },
-            {
-              "reps": 13,
-              "weight": "31.5 kg"
-            }
-          ],
-          "muscle_group": "quadriceps"
-        },
-        {
-          "name": "Peso Muerto Rumano (Barra)",
-          "sets": [
-            {
-              "reps": 10,
-              "weight": "104 kg"
-            },
-            {
-              "reps": 10,
-              "weight": "104 kg"
-            }
-          ],
-          "muscle_group": "hamstrings",
-          "secondary_muscles": [
-            "glutes",
-            "lower_back",
-            "upper_back",
-            "lats"
-          ]
-        },
-        {
-          "name": "Curl de Piernas Acostado (Máquina)",
-          "sets": [
-            {
-              "reps": 10,
-              "weight": "31 kg"
-            },
-            {
-              "reps": 9,
-              "weight": "31 kg"
-            },
-            {
-              "reps": 7,
-              "weight": "31 kg"
-            }
-          ],
-          "muscle_group": "hamstrings",
-          "secondary_muscles": [
-            "calves"
-          ]
-        },
-        {
-          "name": "Elevación de Gemelos a Una Pierna (Máquina)",
-          "sets": [
-            {
-              "reps": 12,
-              "weight": "45.24 kg"
-            },
-            {
-              "reps": 12,
-              "weight": "45.24 kg"
-            },
-            {
-              "reps": 12,
-              "weight": "45.24 kg"
-            }
-          ],
-          "muscle_group": "calves"
         }
       ]
     }
