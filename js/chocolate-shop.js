@@ -218,17 +218,19 @@ function renderChocolatesGrid() {
 }
 
 /**
- * Show chocolate detail (with 18+ gate)
+ * Show chocolate detail (SIN age gate - el age gate se muestra al hacer click en "Ver Perfil")
  */
 function showChocolateDetail(chocolateKey) {
   const choc = chocolates[chocolateKey];
   if (!choc) return;
 
-  showAgeGate('chocolate', () => {
-    _renderChocolateDetail(chocolateKey);
-  }, (key) => {
-    arrestChocolate(key);
-  }, chocolateKey);
+  // Si el chocolate está arrestado, no permitir verlo
+  if (arrestedChocolates.has(chocolateKey)) {
+    return; // No hacer nada
+  }
+
+  // Mostrar detalle directamente, sin age gate
+  _renderChocolateDetail(chocolateKey);
 }
 
 /**
@@ -273,12 +275,9 @@ function _renderChocolateDetail(chocolateKey) {
       <div class="detail-description">${choc.description}</div>
 
       <div class="detail-actions">
-        <a href="https://instagram.com/${choc.instagram.replace('@', '')}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="detail-btn">
+        <button onclick="handleViewProfile('${chocolateKey}')" class="detail-btn">
           Ver Perfil
-        </a>
+        </button>
         <button onclick="backToChocolatesGrid()" class="detail-btn secondary">
           Ver Otros Chocolates
         </button>
@@ -304,6 +303,23 @@ function backToChocolatesGrid() {
     detailView.style.display = 'none';
     gridView.style.display = 'block';
   }, 300);
+}
+
+/**
+ * Manejar click en "Ver Perfil" - muestra age gate primero
+ */
+function handleViewProfile(chocolateKey) {
+  const choc = chocolates[chocolateKey];
+  if (!choc) return;
+
+  showAgeGate('chocolate', () => {
+    // Si pasa el age gate, abrir Instagram
+    window.open(`https://instagram.com/${choc.instagram.replace('@', '')}`, '_blank', 'noopener,noreferrer');
+  }, (key) => {
+    // Si NO pasa el age gate, arrestar chocolate
+    // (age-gate.js se encarga de mostrar closet para Anthonny o cárcel para los demás)
+    arrestChocolate(key);
+  }, chocolateKey);
 }
 
 /**

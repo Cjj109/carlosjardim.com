@@ -226,3 +226,96 @@
     animation: none !important;
   }
 }
+
+/* ============================================
+   CLOSET OVERLAY - Para Anthonny
+   ============================================ */
+.closet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  cursor: pointer;
+}
+
+.closet-overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.closet-content {
+  text-align: center;
+  position: relative;
+  animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.closet-door {
+  position: relative;
+  width: 200px;
+  height: 300px;
+  background: linear-gradient(135deg, #6b4423 0%, #8b5a2b 50%, #6b4423 100%);
+  border: 4px solid #4a2c1a;
+  border-radius: 8px;
+  margin: 0 auto 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.closet-slats {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.closet-slats:nth-child(1) { top: 25%; }
+.closet-slats:nth-child(2) { top: 45%; }
+.closet-slats:nth-child(3) { top: 65%; }
+.closet-slats:nth-child(4) { top: 85%; }
+
+.closet-text {
+  font-size: 42px;
+  font-weight: 900;
+  color: #8b5a2b;
+  text-shadow: 0 4px 12px rgba(139, 90, 43, 0.6);
+  letter-spacing: 3px;
+  margin-bottom: 18px;
+  font-family: var(--mono);
+}
+
+.closet-subtext {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 400px;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+  font-family: var(--font-sans);
+}
+
+.closet-dismiss {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  font-family: var(--mono);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

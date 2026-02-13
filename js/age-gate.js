@@ -32,7 +32,13 @@ function handleAgeGateResponse(isAdult) {
     callback();
   } else {
     if (rejectCb) rejectCb(rejectData);
-    showPoliceArrest();
+
+    // Anthonny va al closet, los demás a la cárcel
+    if (rejectData === 'anthonny') {
+      showCloset();
+    } else {
+      showPoliceArrest();
+    }
   }
 }
 
@@ -41,6 +47,9 @@ let policeArrestTimer = null;
 function showPoliceArrest() {
   const overlay = document.getElementById('policeArrestOverlay');
   if (!overlay) return;
+
+  // Guard: si ya está activa, no mostrar de nuevo
+  if (overlay.classList.contains('active')) return;
 
   overlay.classList.add('active');
   overlay.classList.add('sirens-active');
@@ -61,6 +70,24 @@ function closePoliceArrest() {
   overlay.classList.remove('active');
 }
 
+/* Closet para Anthonny */
+function showCloset() {
+  const overlay = document.getElementById('closetOverlay');
+  if (!overlay) return;
+
+  // Guard: si ya está activa, no mostrar de nuevo
+  if (overlay.classList.contains('active')) return;
+
+  overlay.classList.add('active');
+}
+
+function closeCloset() {
+  const overlay = document.getElementById('closetOverlay');
+  if (!overlay) return;
+
+  overlay.classList.remove('active');
+}
+
 /* Side B: menor de edad (mensaje simple, no chocolate) */
 function showUnderageOverlay() {
   const overlay = document.getElementById('underageOverlay');
@@ -76,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ageGateModal = document.getElementById('ageGateModal');
   const underageOverlay = document.getElementById('underageOverlay');
   const policeOverlay = document.getElementById('policeArrestOverlay');
+  const closetOverlay = document.getElementById('closetOverlay');
   const closeButtons = document.querySelectorAll('.close-gate[role="button"]');
 
   closeButtons.forEach((button) => {
@@ -89,6 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
+
+    if (closetOverlay && closetOverlay.classList.contains('active')) {
+      closeCloset();
+      return;
+    }
 
     if (policeOverlay && policeOverlay.classList.contains('active')) {
       closePoliceArrest();

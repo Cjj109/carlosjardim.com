@@ -3,6 +3,8 @@
    ============================================ */
 
 let videoUrl = "";
+let userGender = null;
+let userHasBoyfriend = null;
 
 /**
  * Cerrar el gate y resetear bombón
@@ -16,6 +18,9 @@ function closeGate() {
     bonbon.style.clipPath = '';
     bonbon.classList.add('breathing');
   });
+  // Reset tracking variables
+  userGender = null;
+  userHasBoyfriend = null;
 }
 
 /**
@@ -43,6 +48,7 @@ function showStep(stepId) {
  * Manejar selección de género
  */
 function handleGender(gender) {
+  userGender = gender;
   if (gender === 'male') {
     showStep('gateStepPadel');
   } else {
@@ -54,6 +60,7 @@ function handleGender(gender) {
  * Manejar respuesta de "¿Tienes novio?"
  */
 function handleBoyfriend(hasBoyfriend) {
+  userHasBoyfriend = hasBoyfriend;
   if (!hasBoyfriend) {
     showStep('gateStepAge');
   } else {
@@ -70,7 +77,12 @@ function handleAgeStep(isAdult) {
     toggleMode(true);
   } else {
     closeGate();
-    showUnderageOverlay();
+    // Si es mujer + no tiene novio + menor de 18 → video
+    if (userGender === 'female' && userHasBoyfriend === false) {
+      openVideoModal('https://www.youtube.com/watch?v=9q3VM00xW1M');
+    } else {
+      showUnderageOverlay();
+    }
   }
 }
 

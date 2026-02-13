@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Chocolate Shop - Selecciona tu chocolate favorito">
+  <meta name="author" content="Carlos Jardim">
+  <meta name="theme-color" content="#ff3b30">
+  <meta name="robots" content="noindex, nofollow">
+
+  <title>Chocolate Shop</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/chocolate-shop.css">
+  <link rel="stylesheet" href="css/age-gate.css">
+
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a0a0a 0%, #2d1810 50%, #1a0a0a 100%);
+      padding: 20px;
+    }
+
+    .chocolate-direct-container {
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .chocolate-direct-title {
+      font-size: 48px;
+      font-weight: 900;
+      color: #ffd700;
+      margin-bottom: 20px;
+      font-family: var(--mono);
+      text-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    }
+
+    .chocolate-direct-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 40px;
+      font-family: var(--font-sans);
+    }
+
+    .chocolate-open-btn {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+      border: 3px solid #b8860b;
+      border-radius: var(--radius-md);
+      padding: 20px 40px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #8b4513;
+      cursor: pointer;
+      font-family: var(--mono);
+      letter-spacing: 2px;
+      transition: all var(--transition-fast);
+      box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
+    }
+
+    .chocolate-open-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 32px rgba(255, 215, 0, 0.6);
+    }
+
+    .back-link {
+      margin-top: 30px;
+      display: inline-block;
+      color: rgba(255, 255, 255, 0.5);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 14px;
+      transition: color var(--transition-fast);
+    }
+
+    .back-link:hover {
+      color: var(--accent-red);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chocolate-direct-container">
+    <div class="chocolate-direct-title">🍫 Chocolate Shop</div>
+    <div class="chocolate-direct-subtitle">
+      Acceso directo a la tienda de chocolates
+    </div>
+    <button class="chocolate-open-btn" onclick="openChocolateShop()">
+      Entrar al Shop
+    </button>
+    <br>
+    <a href="/" class="back-link">← Volver al sitio principal</a>
+  </div>
+
+  <!-- Chocolate Shop Modal -->
+  <div class="chocolate-shop-modal" id="chocolateShopModal" role="dialog" aria-modal="true" aria-label="Chocolate Shop">
+    <div class="chocolate-shop-container">
+      <button class="chocolate-shop-close" onclick="closeChocolateShop()" aria-label="Cerrar">✕</button>
+
+      <div class="chocolate-shop-header">
+        <div class="chocolate-shop-title">🍫 CHOCOLATE SHOP</div>
+        <div class="chocolate-shop-subtitle">
+          Selecciona tu chocolate o prueba suerte con la slot machine
+        </div>
+      </div>
+
+      <!-- Chocolates Grid View -->
+      <div id="chocolatesGridView">
+        <!-- Slot Machine Button -->
+        <div class="slot-machine-section">
+          <button class="slot-machine-btn" onclick="startSlotMachine()">
+            🎰 SLOT MACHINE
+          </button>
+          <div class="slot-machine-hint">Deja que la suerte decida</div>
+        </div>
+
+        <!-- Chocolates Grid -->
+        <div id="chocolatesGrid" class="chocolates-grid">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Compatibility Test CTA -->
+        <div class="chocolate-shop-footer">
+          <button class="compatibility-cta" onclick="openCompatibilityTestFromShop()">
+            💘 ¿No sabes cuál elegir? Haz el test de compatibilidad
+          </button>
+        </div>
+      </div>
+
+      <!-- Chocolate Detail View -->
+      <div id="chocolateDetailView" style="display: none;">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Slot Machine Container -->
+      <div id="slotMachineContainer" class="slot-machine-container" style="display: none;">
+        <div class="slot-viewport">
+          <div id="slotReel" class="slot-reel">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Age Gate Modal -->
+  <div class="age-gate-modal" id="ageGateModal" role="dialog" aria-modal="true" aria-label="Verificación de edad">
+    <div class="age-gate-card">
+      <div class="age-gate-title">Verificación de Edad</div>
+      <div class="age-gate-question">¿Eres mayor de 18 años?</div>
+      <div class="age-gate-buttons">
+        <button onclick="handleAgeGateResponse(true)" class="age-gate-btn yes">Sí</button>
+        <button onclick="handleAgeGateResponse(false)" class="age-gate-btn no">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Police Arrest Overlay -->
+  <div class="police-arrest-overlay" id="policeArrestOverlay" onclick="closePoliceArrest()">
+    <div class="police-arrest-content">
+      <div class="police-lights">
+        <div class="police-light red"></div>
+        <div class="police-light blue"></div>
+      </div>
+      <div class="arrest-text">¡Chocolate detenido! 🚔</div>
+      <div class="arrest-subtext">Este bombón es para mayores de 18</div>
+      <div class="arrest-dismiss">Toca para cerrar</div>
+    </div>
+  </div>
+
+  <!-- Closet Overlay (para Anthonny) -->
+  <div class="closet-overlay" id="closetOverlay" onclick="closeCloset()">
+    <div class="closet-content">
+      <div class="closet-door">
+        <div class="closet-slats"></div>
+        <div class="closet-slats"></div>
+        <div class="closet-slats"></div>
+        <div class="closet-slats"></div>
+      </div>
+      <div class="closet-text">¡Chocolate escondido! 🚪</div>
+      <div class="closet-subtext">Este bombón se refugió en el closet (no es para menores de 18)</div>
+      <div class="closet-dismiss">Toca para cerrar</div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/chocolate-shop.js"></script>
+  <script src="js/age-gate.js"></script>
+
+  <!-- Auto-open chocolate shop on load -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Abrir automáticamente al cargar la página
+      setTimeout(() => {
+        openChocolateShop();
+      }, 300);
+    });
+  </script>
+</body>
+</html>
