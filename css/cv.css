@@ -176,6 +176,8 @@
   border: 1px solid rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.25);
   background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.06);
   transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
 }
 
 .work-link-minimal:hover {
@@ -184,14 +186,41 @@
   box-shadow: 0 8px 18px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.18);
 }
 
+.work-link-minimal::before {
+  content: "";
+  position: absolute;
+  inset: -50% auto -50% -60%;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  transform: rotate(15deg);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+}
+
+.work-link-minimal:hover::before {
+  transform: translateX(260%) rotate(15deg);
+}
+
 .work-shrimp {
-  width: 26px;
-  height: 18px;
+  width: 30px;
+  height: 20px;
   flex-shrink: 0;
+  opacity: 0.95;
 }
 
 .work-link-text {
   letter-spacing: 0.5px;
+}
+
+.work-link-arrow {
+  font-size: 14px;
+  opacity: 0.6;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.work-link-minimal:hover .work-link-arrow {
+  opacity: 1;
+  transform: translateX(2px) translateY(-1px);
 }
 
 .cv-text-spaced {

@@ -107,6 +107,18 @@ function openValentineFlowers() {
   if (document.body.dataset.theme !== 'valentine') return;
   const modal = document.getElementById('valentineFlowersModal');
   if (!modal) return;
+
+  const bloom = modal.querySelector('.flower-bloom');
+  const stem = modal.querySelector('.flower-stem');
+  if (bloom && stem) {
+    bloom.classList.remove('replay');
+    stem.classList.remove('replay');
+    requestAnimationFrame(() => {
+      bloom.classList.add('replay');
+      stem.classList.add('replay');
+    });
+  }
+
   modal.classList.add('active');
   document.body.classList.add('valentine-flowers-open');
 }

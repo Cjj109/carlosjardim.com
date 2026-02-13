@@ -1230,13 +1230,15 @@ body.gym-widget-open {
 .valentine-flowers-container {
   position: relative;
   width: 100%;
-  max-width: 520px;
-  border: 1px solid rgba(255, 182, 193, 0.45);
+  max-width: 560px;
+  border: 1px solid rgba(255, 182, 193, 0.4);
   border-radius: var(--radius-lg);
-  background: linear-gradient(160deg, #2b1020 0%, #3d1630 60%, #2a0f22 100%);
-  padding: 52px 28px 30px;
+  background:
+    radial-gradient(560px 300px at 50% 22%, rgba(255, 199, 229, 0.22), transparent 60%),
+    linear-gradient(165deg, #2a0d1f 0%, #3f1732 55%, #271021 100%);
+  padding: 56px 28px 34px;
   text-align: center;
-  box-shadow: 0 0 45px rgba(255, 105, 180, 0.22);
+  box-shadow: 0 0 45px rgba(255, 105, 180, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
 
 .valentine-flowers-close {
@@ -1258,39 +1260,107 @@ body.gym-widget-open {
   transform: rotate(90deg);
 }
 
-.valentine-flowers-bouquet {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 0 auto 22px;
-  max-width: 220px;
+.valentine-flower-stage {
+  position: relative;
+  margin: 0 auto 26px;
+  width: min(100%, 330px);
+  aspect-ratio: 1 / 1.08;
 }
 
-.valentine-flowers-bouquet .flower {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  color: #ffd6e6;
-  background: rgba(255, 192, 203, 0.14);
-  border: 1px solid rgba(255, 192, 203, 0.35);
-  font-size: 25px;
-  animation: flowerFloat 2.8s ease-in-out infinite;
+.valentine-flower-art {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.28));
 }
 
-.valentine-flowers-bouquet .flower:nth-child(2n) {
+.flower-aura {
+  fill: rgba(255, 199, 229, 0.22);
+  animation: auraPulse 3s ease-in-out infinite;
+}
+
+.flower-bloom {
+  transform-origin: 150px 140px;
+  animation: bloomIn 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.flower-bloom.replay {
+  animation: bloomIn 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.flower-stem {
+  transform-origin: 150px 320px;
+  animation: stemGrow 0.9s ease-out;
+}
+
+.flower-stem.replay {
+  animation: stemGrow 0.9s ease-out;
+}
+
+.petal {
+  transform-origin: 150px 140px;
+  animation: petalBreath 3.4s ease-in-out infinite;
+}
+
+.petal.p2, .petal.p4, .petal.p6, .petal.p8, .petal.p10 {
   animation-delay: 0.2s;
 }
 
-.valentine-flowers-bouquet .flower:nth-child(3n) {
-  animation-delay: 0.4s;
+.flower-core {
+  animation: coreGlow 2.8s ease-in-out infinite;
 }
 
-@keyframes flowerFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+.flower-core-inner {
+  animation: coreSpark 2.8s ease-in-out infinite;
+}
+
+.sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 246, 199, 0.95);
+  box-shadow: 0 0 12px rgba(255, 246, 199, 0.8);
+  animation: sparkleFloat 2.6s ease-in-out infinite;
+}
+
+.sparkle.s1 { top: 22%; left: 18%; animation-delay: 0.1s; }
+.sparkle.s2 { top: 15%; right: 22%; animation-delay: 0.5s; }
+.sparkle.s3 { top: 42%; left: 12%; animation-delay: 0.9s; }
+.sparkle.s4 { top: 39%; right: 14%; animation-delay: 1.3s; }
+
+@keyframes bloomIn {
+  from { transform: scale(0.35); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes stemGrow {
+  from { transform: scaleY(0.2); opacity: 0.1; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes petalBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+@keyframes coreGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.16); }
+}
+
+@keyframes coreSpark {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@keyframes sparkleFloat {
+  0%, 100% { transform: translateY(0) scale(0.85); opacity: 0.45; }
+  50% { transform: translateY(-7px) scale(1.1); opacity: 1; }
+}
+
+@keyframes auraPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.95; }
 }
 
 .valentine-flowers-title {
@@ -1298,19 +1368,37 @@ body.gym-widget-open {
   font-family: var(--mono);
   letter-spacing: 2px;
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 12px;
+  opacity: 0.8;
 }
 
 .valentine-flowers-text {
   margin: 0;
-  color: #ffdbe8;
-  font-size: 18px;
+  color: #ffe7f1;
+  font-size: 19px;
+  max-width: 450px;
+  margin-inline: auto;
   line-height: 1.6;
+  text-wrap: balance;
 }
 
 body.valentine-flowers-open {
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .valentine-flowers-container {
+    padding: 50px 20px 26px;
+  }
+
+  .valentine-flowers-text {
+    font-size: 16px;
+  }
+
+  .valentine-flower-stage {
+    width: min(100%, 290px);
+  }
 }
 
 /* Mobile adjustments */

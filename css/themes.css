@@ -412,3 +412,126 @@ body[data-theme="navidad"] .bonbon-icon {
 .admin-panel-close:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* ============================================
+   THEME POLISH - Better visual cohesion
+   ============================================ */
+
+body[data-theme] .window {
+  backdrop-filter: blur(3px);
+}
+
+body[data-theme] .section-label {
+  letter-spacing: 2.4px;
+}
+
+body[data-theme] .interests-list li {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+body[data-theme] .skill-bar-container {
+  background: rgba(0, 0, 0, 0.34);
+}
+
+body[data-theme] .alt-card {
+  backdrop-filter: blur(4px);
+}
+
+body[data-theme] .main-cta-button,
+body[data-theme] .return-button {
+  border-width: 1.5px !important;
+}
+
+/* Valentine */
+body[data-theme="valentine"] {
+  --bg-cv: #190812;
+  --text-main: #ffeaf3;
+  --accent-red: #ff4f9f;
+  --accent-r: 255;
+  --accent-g: 79;
+  --accent-b: 159;
+}
+
+body[data-theme="valentine"] .window {
+  border-color: rgba(255, 120, 185, 0.45);
+  box-shadow: 0 12px 54px rgba(255, 45, 140, 0.22), 0 0 120px rgba(255, 120, 185, 0.08);
+}
+
+body[data-theme="valentine"] .interests-list li:hover {
+  background: rgba(255, 98, 170, 0.15);
+  border-color: rgba(255, 159, 209, 0.45);
+  box-shadow: 0 6px 16px rgba(255, 98, 170, 0.22);
+}
+
+body[data-theme="valentine"] .valentine-interest-item {
+  background: linear-gradient(135deg, rgba(255, 95, 170, 0.22), rgba(255, 155, 210, 0.14));
+  border-color: rgba(255, 173, 218, 0.4);
+  color: #ffeaf4 !important;
+}
+
+body[data-theme="valentine"] .valentine-interest-item::before {
+  content: "❤";
+}
+
+body[data-theme="valentine"] .main-cta-button {
+  background: rgba(255, 79, 159, 0.17) !important;
+  border-color: rgba(255, 138, 192, 0.7) !important;
+  color: #ffd9eb !important;
+}
+
+body[data-theme="valentine"] .main-cta-button:hover {
+  background: #ff4f9f !important;
+  color: #fff !important;
+}
+
+/* Carnaval */
+body[data-theme="carnaval"] {
+  --bg-cv: #121027;
+  --text-main: #fff3de;
+  --accent-red: #ff8a00;
+  --accent-r: 255;
+  --accent-g: 138;
+  --accent-b: 0;
+}
+
+body[data-theme="carnaval"] .window {
+  border-image: linear-gradient(135deg, #ff8a00, #ffd760, #ff4db4, #6b5bff) 1;
+  box-shadow: 0 14px 58px rgba(255, 138, 0, 0.24), 0 0 96px rgba(255, 77, 180, 0.12);
+}
+
+body[data-theme="carnaval"] .interests-list li:hover {
+  background: linear-gradient(135deg, rgba(255, 138, 0, 0.14), rgba(255, 77, 180, 0.1));
+  border-color: rgba(255, 207, 120, 0.55);
+}
+
+body[data-theme="carnaval"] .main-cta-button {
+  color: #ffe4ba !important;
+  background: linear-gradient(135deg, rgba(255, 138, 0, 0.23), rgba(255, 77, 180, 0.18)) !important;
+  border-color: rgba(255, 207, 120, 0.8) !important;
+}
+
+/* Navidad */
+body[data-theme="navidad"] {
+  --bg-cv: #0b1b12;
+  --text-main: #ecfff0;
+  --accent-red: #d33d3d;
+  --accent-r: 211;
+  --accent-g: 61;
+  --accent-b: 61;
+}
+
+body[data-theme="navidad"] .window {
+  border-color: rgba(211, 61, 61, 0.56);
+  box-shadow: 0 12px 52px rgba(211, 61, 61, 0.2), 0 0 120px rgba(44, 138, 84, 0.11);
+}
+
+body[data-theme="navidad"] .interests-list li:hover {
+  background: linear-gradient(135deg, rgba(211, 61, 61, 0.14), rgba(44, 138, 84, 0.11));
+  border-color: rgba(176, 243, 203, 0.4);
+}
+
+body[data-theme="navidad"] .main-cta-button {
+  background: rgba(211, 61, 61, 0.2) !important;
+  border-color: rgba(248, 170, 170, 0.75) !important;
+  color: #ffecec !important;
+}
