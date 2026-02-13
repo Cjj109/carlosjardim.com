@@ -1230,6 +1230,7 @@ body.gym-widget-open {
 .valentine-flowers-container {
   position: relative;
   width: 100%;
+  min-width: 0; /* previene truncado en flex children */
   max-width: 560px;
   border: 1px solid rgba(255, 182, 193, 0.4);
   border-radius: var(--radius-lg);
