@@ -34,7 +34,7 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet index.html; then
+          if git diff --quiet index.html chocolateria.html; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
@@ -43,7 +43,7 @@ jobs:
       - name: Commit and push if changed
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
-          git add index.html
+          git add index.html chocolateria.html
           VERSION=$(grep -o 'v=[0-9]\{14\}' index.html | head -1 | cut -d= -f2)
           git commit -m "Update cache busting version to $VERSION [skip ci]"
           git push

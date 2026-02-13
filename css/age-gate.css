@@ -118,7 +118,6 @@
   display: flex;
   gap: 50px;
   margin-bottom: 35px;
-  animation: lightsShake 0.08s ease-in-out infinite alternate;
 }
 
 .police-arrest-overlay.sirens-active .police-lights {
