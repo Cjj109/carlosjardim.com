@@ -1260,127 +1260,114 @@ body.gym-widget-open {
   transform: rotate(90deg);
 }
 
+/* ============================================
+   FLOR DE SAN VALENTÍN - Animación Premium
+   ============================================ */
+
 .valentine-flower-stage {
   position: relative;
-  margin: 0 auto 26px;
-  width: min(100%, 330px);
-  aspect-ratio: 1 / 1.08;
+  width: 140px;
+  height: 220px;
+  margin: 0 auto 30px;
+  filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.4));
 }
 
 .valentine-flower-art {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.28));
+  overflow: visible;
 }
 
-.flower-aura {
-  fill: rgba(255, 199, 229, 0.22);
-  animation: auraPulse 3s ease-in-out infinite;
+/* Animación de Tallo creciendo */
+.flower-stem-group {
+  transform-origin: 50% 100%;
+  animation: stemGrow 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
 }
 
-.flower-bloom {
-  transform-origin: 150px 140px;
-  animation: bloomIn 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+/* Hojas balanceándose */
+.flower-leaf {
+  transform-origin: 100px 220px; /* Punto de pivote aproximado en el tallo */
+  animation: leafSway 4s ease-in-out infinite alternate;
+}
+.flower-leaf.right {
+  animation-delay: 1s;
 }
 
-.flower-bloom.replay {
-  animation: bloomIn 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+/* Capullo abriéndose */
+.flower-head {
+  transform-origin: 100px 160px;
+  animation: bloomOpen 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.5s; /* Empieza después del tallo */
+  opacity: 0; /* Empieza invisible */
 }
 
-.flower-stem {
-  transform-origin: 150px 320px;
-  animation: stemGrow 0.9s ease-out;
-}
-
-.flower-stem.replay {
-  animation: stemGrow 0.9s ease-out;
-}
-
+/* Pétalos respirando */
 .petal {
-  transform-origin: 150px 140px;
-  animation: petalBreath 3.4s ease-in-out infinite;
+  transform-origin: 100px 120px;
+  transition: transform 0.5s ease;
 }
 
-.petal.p2, .petal.p4, .petal.p6, .petal.p8, .petal.p10 {
-  animation-delay: 0.2s;
-}
+.flower-head:hover .petal.mid-left { transform: translate(-2px, -2px) rotate(-5deg); }
+.flower-head:hover .petal.mid-right { transform: translate(2px, -2px) rotate(5deg); }
 
-.flower-core {
-  animation: coreGlow 2.8s ease-in-out infinite;
-}
-
-.flower-core-inner {
-  animation: coreSpark 2.8s ease-in-out infinite;
-}
-
+/* Partículas mágicas */
 .sparkle {
   position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 246, 199, 0.95);
-  box-shadow: 0 0 12px rgba(255, 246, 199, 0.8);
-  animation: sparkleFloat 2.6s ease-in-out infinite;
+  font-size: 16px;
+  color: #fff7d6;
+  opacity: 0;
+  text-shadow: 0 0 5px #fff;
+  animation: sparkleFloat 3s ease-in-out infinite;
 }
 
-.sparkle.s1 { top: 22%; left: 18%; animation-delay: 0.1s; }
-.sparkle.s2 { top: 15%; right: 22%; animation-delay: 0.5s; }
-.sparkle.s3 { top: 42%; left: 12%; animation-delay: 0.9s; }
-.sparkle.s4 { top: 39%; right: 14%; animation-delay: 1.3s; }
+.s1 { top: 20%; left: 10%; animation-delay: 1.8s; font-size: 12px; }
+.s2 { top: 10%; right: 15%; animation-delay: 2.2s; font-size: 18px; }
+.s3 { top: 50%; left: 5%; animation-delay: 2.6s; font-size: 10px; }
+.s4 { top: 40%; right: 5%; animation-delay: 3.0s; font-size: 14px; }
 
-@keyframes bloomIn {
-  from { transform: scale(0.35); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
+/* Keyframes */
 @keyframes stemGrow {
-  from { transform: scaleY(0.2); opacity: 0.1; }
-  to { transform: scaleY(1); opacity: 1; }
+  0% { transform: scaleY(0); opacity: 0; }
+  100% { transform: scaleY(1); opacity: 1; }
 }
 
-@keyframes petalBreath {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.045); }
+@keyframes bloomOpen {
+  0% { transform: scale(0); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes coreGlow {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.16); }
-}
-
-@keyframes coreSpark {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 1; }
+@keyframes leafSway {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(3deg); }
 }
 
 @keyframes sparkleFloat {
-  0%, 100% { transform: translateY(0) scale(0.85); opacity: 0.45; }
-  50% { transform: translateY(-7px) scale(1.1); opacity: 1; }
-}
-
-@keyframes auraPulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 0.95; }
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  50% { transform: translateY(-10px) scale(1); opacity: 1; }
+  100% { transform: translateY(-20px) scale(0); opacity: 0; }
 }
 
 .valentine-flowers-title {
-  color: #ffe4ec;
-  font-family: var(--mono);
-  letter-spacing: 2px;
+  color: #ffe6f2;
+  font-family: var(--font-sans); /* Más limpio que mono */
+  letter-spacing: 3px;
   text-transform: uppercase;
-  font-size: 13px;
-  margin-bottom: 12px;
-  opacity: 0.8;
+  font-size: 12px;
+  margin-bottom: 16px;
+  opacity: 0.7;
+  font-weight: 600;
 }
 
 .valentine-flowers-text {
   margin: 0;
-  color: #ffe7f1;
-  font-size: 19px;
+  color: #fff;
+  font-size: 20px;
   max-width: 450px;
   margin-inline: auto;
-  line-height: 1.6;
-  text-wrap: balance;
+  line-height: 1.5;
+  font-weight: 300; /* Light */
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 body.valentine-flowers-open {

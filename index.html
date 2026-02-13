@@ -222,15 +222,21 @@
 
       <div class="section-label">Trabajo</div>
       <a href="https://rpym.net" target="_blank" rel="noopener noreferrer" class="work-link-minimal">
-        <svg class="work-shrimp" viewBox="0 0 64 40" aria-hidden="true">
-          <g fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M52 22c0-8-7-14-16-14-9 0-17 6-19 14-1 5 2 10 8 12"/>
-            <path d="M25 34c3 3 8 5 13 5 9 0 16-6 16-14"/>
-            <path d="M16 20h8M12 15h6M12 25h6"/>
-            <path d="M58 21l-7 5 2-7-8 1"/>
-            <path d="M42 34l-2-5M49 33l-2-5M55 30l-2-5"/>
-          </g>
-          <circle cx="41.5" cy="13" r="1.7" fill="currentColor"/>
+        <svg class="work-shrimp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Cuerpo curvo elegante -->
+          <path d="M16.5 6.5C16.5 6.5 19 8.5 19 11C19 14.5 16 17 12 17C8 17 6.5 14 6.5 11C6.5 8.5 8 5.5 12 5.5"/>
+          <!-- Segmentos del cuerpo -->
+          <path d="M12 5.5C13.5 5.5 15 6 15 8"/>
+          <path d="M11 17C11 17 9 15.5 9 13.5"/>
+          <!-- Cola detallada -->
+          <path d="M6.5 11C5.5 11 4 11.5 3 10.5"/>
+          <path d="M6.5 11C5.5 11 4 10.5 3.5 9"/>
+          <!-- Antenas largas y estilizadas -->
+          <path d="M16.5 6.5C18 4 21 4 21 4"/>
+          <path d="M16.5 6.5C17.5 5 19.5 2 19.5 2"/>
+          <!-- Patas sutiles -->
+          <path d="M10 17L9.5 19"/>
+          <path d="M14 17L14.5 19"/>
         </svg>
         <span class="work-link-text">rpym.net</span>
         <span class="work-link-arrow">↗</span>
@@ -666,55 +672,63 @@
     <div class="valentine-flowers-container">
       <button class="valentine-flowers-close" onclick="closeValentineFlowers()" aria-label="Cerrar detalle">✕</button>
       <div class="valentine-flower-stage" aria-hidden="true">
-        <svg class="valentine-flower-art" viewBox="0 0 300 340">
+        <!-- Rosa 'Beauty' SVG: Diseño orgánico y capas de profundidad -->
+        <svg class="valentine-flower-art" viewBox="0 0 200 300">
           <defs>
-            <radialGradient id="petalMain" cx="50%" cy="35%">
-              <stop offset="0%" stop-color="#ffd8ef"/>
-              <stop offset="100%" stop-color="#ff6aa9"/>
+            <radialGradient id="rose-center" cx="50%" cy="20%" r="80%">
+              <stop offset="0%" stop-color="#ff9a9e" />
+              <stop offset="100%" stop-color="#fecfef" />
             </radialGradient>
-            <radialGradient id="petalSoft" cx="50%" cy="35%">
-              <stop offset="0%" stop-color="#ffe8f6"/>
-              <stop offset="100%" stop-color="#ff8fc2"/>
-            </radialGradient>
-            <radialGradient id="flowerCore" cx="50%" cy="50%">
-              <stop offset="0%" stop-color="#fff7c0"/>
-              <stop offset="100%" stop-color="#f3c44c"/>
-            </radialGradient>
-            <linearGradient id="stemTone" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#97d77c"/>
-              <stop offset="100%" stop-color="#2f8f58"/>
+            <linearGradient id="rose-petal-1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff758c" />
+              <stop offset="100%" stop-color="#ff7eb3" />
             </linearGradient>
-            <linearGradient id="leafTone" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#8de28e"/>
-              <stop offset="100%" stop-color="#348f5f"/>
+            <linearGradient id="rose-petal-2" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fa709a" />
+              <stop offset="100%" stop-color="#fee140" />
             </linearGradient>
+            <linearGradient id="stem-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#11998e" />
+              <stop offset="50%" stop-color="#38ef7d" />
+              <stop offset="100%" stop-color="#11998e" />
+            </linearGradient>
+            <filter id="glow-soft">
+              <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
           </defs>
 
-          <circle class="flower-aura" cx="150" cy="140" r="86"/>
-          <g class="flower-stem">
-            <path d="M150 320 C148 270,149 225,150 184" fill="none" stroke="url(#stemTone)" stroke-width="8" stroke-linecap="round"/>
-            <path d="M145 245 C120 230,112 215,126 205 C141 206,150 220,145 245 Z" fill="url(#leafTone)"/>
-            <path d="M155 265 C178 252,188 236,175 225 C160 228,151 242,155 265 Z" fill="url(#leafTone)"/>
+          <!-- Tallo -->
+          <g class="flower-stem-group">
+            <path d="M100 280 Q100 200 100 160" stroke="url(#stem-gradient)" stroke-width="4" fill="none" stroke-linecap="round" />
+            <!-- Hojas -->
+            <path class="flower-leaf left" d="M100 220 Q70 210 60 190 Q80 200 100 210" fill="#38ef7d" opacity="0.8"/>
+            <path class="flower-leaf right" d="M100 240 Q130 230 140 210 Q120 220 100 230" fill="#11998e" opacity="0.8"/>
           </g>
-          <g class="flower-bloom">
-            <ellipse class="petal p1" cx="150" cy="140" rx="20" ry="60" fill="url(#petalMain)" transform="rotate(0 150 140)"/>
-            <ellipse class="petal p2" cx="150" cy="140" rx="20" ry="60" fill="url(#petalSoft)" transform="rotate(36 150 140)"/>
-            <ellipse class="petal p3" cx="150" cy="140" rx="20" ry="60" fill="url(#petalMain)" transform="rotate(72 150 140)"/>
-            <ellipse class="petal p4" cx="150" cy="140" rx="20" ry="60" fill="url(#petalSoft)" transform="rotate(108 150 140)"/>
-            <ellipse class="petal p5" cx="150" cy="140" rx="20" ry="60" fill="url(#petalMain)" transform="rotate(144 150 140)"/>
-            <ellipse class="petal p6" cx="150" cy="140" rx="20" ry="60" fill="url(#petalSoft)" transform="rotate(180 150 140)"/>
-            <ellipse class="petal p7" cx="150" cy="140" rx="20" ry="60" fill="url(#petalMain)" transform="rotate(216 150 140)"/>
-            <ellipse class="petal p8" cx="150" cy="140" rx="20" ry="60" fill="url(#petalSoft)" transform="rotate(252 150 140)"/>
-            <ellipse class="petal p9" cx="150" cy="140" rx="20" ry="60" fill="url(#petalMain)" transform="rotate(288 150 140)"/>
-            <ellipse class="petal p10" cx="150" cy="140" rx="20" ry="60" fill="url(#petalSoft)" transform="rotate(324 150 140)"/>
-            <circle class="flower-core" cx="150" cy="140" r="27" fill="url(#flowerCore)"/>
-            <circle class="flower-core-inner" cx="150" cy="140" r="13" fill="#fff3bb"/>
+
+          <!-- Capullo de la Rosa -->
+          <g class="flower-head" filter="url(#glow-soft)">
+            <!-- Pétalos traseros -->
+            <path class="petal back-left" d="M100 160 C70 130 60 100 80 80 C100 100 100 160 100 160" fill="url(#rose-petal-1)" />
+            <path class="petal back-right" d="M100 160 C130 130 140 100 120 80 C100 100 100 160 100 160" fill="url(#rose-petal-2)" />
+            
+            <!-- Pétalos medios -->
+            <path class="petal mid-left" d="M100 160 C60 140 60 90 90 90 C100 120 100 160 100 160" fill="#ff758c" opacity="0.9"/>
+            <path class="petal mid-right" d="M100 160 C140 140 140 90 110 90 C100 120 100 160 100 160" fill="#fa709a" opacity="0.9"/>
+
+            <!-- Centro cerrado -->
+            <ellipse class="petal center-bud" cx="100" cy="100" rx="15" ry="25" fill="url(#rose-center)" />
           </g>
         </svg>
-        <span class="sparkle s1"></span>
-        <span class="sparkle s2"></span>
-        <span class="sparkle s3"></span>
-        <span class="sparkle s4"></span>
+        
+        <!-- Partículas de magia -->
+        <span class="sparkle s1">✦</span>
+        <span class="sparkle s2">✨</span>
+        <span class="sparkle s3">✦</span>
+        <span class="sparkle s4">✨</span>
       </div>
       <div class="valentine-flowers-title">Para ti</div>
       <p class="valentine-flowers-text">
