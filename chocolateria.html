@@ -18,10 +18,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 
-  <!-- Styles -->
+  <!-- Styles (NO base.css - interfiere con el layout standalone) -->
   <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/chocolate-shop.css">
   <link rel="stylesheet" href="css/age-gate.css">
 
   <style>
@@ -34,6 +32,64 @@
       font-family: var(--font-sans, 'Inter', sans-serif);
       overflow-x: hidden;
     }
+
+    /* ── Gate Card (inline - viene de pong.css en la pag principal) ── */
+    .gate-card {
+      text-align: center;
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      color: #fff;
+      width: 90%;
+      max-width: 380px;
+      position: relative;
+      border: 1px solid #333;
+      padding: 30px;
+      border-radius: 16px;
+      background: #050505;
+      box-shadow: 0 0 0 1px rgba(255, 59, 48, 0.08);
+    }
+
+    .gate-card button {
+      display: block;
+      width: 100%;
+      margin: 12px 0;
+      padding: 16px;
+      background: transparent;
+      border: 1px solid #333;
+      color: #fff;
+      cursor: pointer;
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      transition: 0.2s ease;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 12px;
+    }
+
+    .gate-card button:hover {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .gate-step-text {
+      letter-spacing: 2px;
+      font-size: 12px;
+      margin-bottom: 20px;
+      color: #888;
+    }
+
+    .close-gate {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      color: #555;
+      font-size: 20px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      background: none;
+      border: none;
+    }
+
+    .close-gate:hover { color: #fff; }
 
     /* ── Header ── */
     .choco-page-header {
@@ -70,9 +126,10 @@
 
     /* ── Grid directo (sin modal) ── */
     .choco-page-content {
-      max-width: 700px;
+      max-width: 750px;
       margin: 0 auto;
       padding: 20px;
+      width: 100%;
     }
 
     .choco-slot-section {
@@ -109,9 +166,10 @@
     /* ── Chocolates Grid ── */
     .choco-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-bottom: 30px;
+      width: 100%;
     }
 
     .choco-card {
@@ -433,15 +491,13 @@
     <div class="choco-detail-card" id="chocoDetailCard"></div>
   </div>
 
-  <!-- Age Gate Modal -->
-  <div class="age-gate-modal" id="ageGateModal" role="dialog" aria-modal="true" aria-label="Verificación de edad">
-    <div class="age-gate-card">
-      <div class="age-gate-title">Verificación de Edad</div>
-      <div class="age-gate-question">¿Eres mayor de 18 años?</div>
-      <div class="age-gate-buttons">
-        <button onclick="handleAgeGateResponse(true)" class="age-gate-btn yes">Sí</button>
-        <button onclick="handleAgeGateResponse(false)" class="age-gate-btn no">No</button>
-      </div>
+  <!-- Age Gate Modal (mismas clases que index.html) -->
+  <div class="age-gate-overlay gate-style" id="ageGateModal" role="dialog" aria-modal="true" aria-label="Verificación de edad">
+    <div class="gate-card">
+      <div class="close-gate" onclick="closeAgeGateModal()" role="button" tabindex="0" aria-label="Cerrar">✕</div>
+      <p class="gate-step-text">¿Eres mayor de 18?</p>
+      <button onclick="handleAgeGateResponse(true)">Sí</button>
+      <button onclick="handleAgeGateResponse(false)">No</button>
     </div>
   </div>
 
