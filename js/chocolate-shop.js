@@ -205,10 +205,13 @@ function renderChocolatesGrid() {
            ${choc.status === 'extremadamente apartado' ? '🚨 EXTREMADAMENTE APARTADO' : '⚠️ APARTADO'}
          </div>`
       : '';
-    const arrestedClass = arrestedChocolates.has(key) ? ' arrested' : '';
+    let blockedClass = '';
+    if (arrestedChocolates.has(key)) {
+      blockedClass = key === 'anthonny' ? ' in-closet' : ' arrested';
+    }
 
     return `
-      <div class="chocolate-card${arrestedClass}" onclick="showChocolateDetail('${key}')">
+      <div class="chocolate-card${blockedClass}" onclick="showChocolateDetail('${key}')">
         <img src="${choc.image}" alt="${choc.name}" class="chocolate-img" loading="lazy" decoding="async" width="120" height="120" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE_SVG}'">
         <div class="chocolate-name">${choc.name}</div>
         ${statusBadge}
@@ -316,9 +319,32 @@ function handleViewProfile(chocolateKey) {
     // Si pasa el age gate, abrir Instagram
     window.open(`https://instagram.com/${choc.instagram.replace('@', '')}`, '_blank', 'noopener,noreferrer');
   }, (key) => {
-    // Si NO pasa el age gate, arrestar chocolate
-    // (age-gate.js se encarga de mostrar closet para Anthonny o cárcel para los demás)
+    // Si NO pasa el age gate, arrestar y transformar la vista de detalle
     arrestChocolate(key);
+
+    // Transformar la imagen del detalle actual en rejas/closet
+    const detailView = document.getElementById('chocolateDetailView');
+    if (detailView && detailView.classList.contains('active')) {
+      const detailCard = detailView.querySelector('.chocolate-detail');
+      if (detailCard) {
+        if (key === 'anthonny') {
+          detailCard.classList.add('detail-in-closet');
+        } else {
+          detailCard.classList.add('detail-arrested');
+        }
+        // Reemplazar botones con solo "Volver"
+        const actions = detailCard.querySelector('.detail-actions');
+        if (actions) {
+          actions.innerHTML = `
+            <button onclick="backToChocolatesGrid()" class="detail-btn secondary">
+              Ver Otros Chocolates
+            </button>
+            <button onclick="closeChocolateShop()" class="detail-btn secondary">
+              Cerrar
+            </button>`;
+        }
+      }
+    }
   }, chocolateKey);
 }
 

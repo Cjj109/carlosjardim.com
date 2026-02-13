@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Chocolate Shop - Selecciona tu chocolate favorito">
   <meta name="author" content="Carlos Jardim">
-  <meta name="theme-color" content="#ff3b30">
+  <meta name="theme-color" content="#1a0a0a">
   <meta name="robots" content="noindex, nofollow">
 
   <title>Chocolate Shop</title>
@@ -25,134 +25,412 @@
   <link rel="stylesheet" href="css/age-gate.css">
 
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: linear-gradient(135deg, #1a0a0a 0%, #2d1810 50%, #1a0a0a 100%);
+      color: #fff;
+      font-family: var(--font-sans, 'Inter', sans-serif);
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .choco-page-header {
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+
+    .choco-page-title {
+      font-size: clamp(28px, 6vw, 48px);
+      font-weight: 900;
+      color: #ffd700;
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      text-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+      margin-bottom: 8px;
+    }
+
+    .choco-page-subtitle {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 8px;
+    }
+
+    .choco-back-link {
+      color: rgba(255, 255, 255, 0.4);
+      text-decoration: none;
+      font-size: 13px;
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      transition: color 0.2s;
+    }
+
+    .choco-back-link:hover {
+      color: #ffd700;
+    }
+
+    /* ── Grid directo (sin modal) ── */
+    .choco-page-content {
+      max-width: 700px;
+      margin: 0 auto;
       padding: 20px;
     }
 
-    .chocolate-direct-container {
+    .choco-slot-section {
       text-align: center;
-      max-width: 600px;
+      margin-bottom: 24px;
     }
 
-    .chocolate-direct-title {
-      font-size: 48px;
-      font-weight: 900;
-      color: #ffd700;
-      margin-bottom: 20px;
-      font-family: var(--mono);
-      text-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-    }
-
-    .chocolate-direct-subtitle {
-      font-size: 18px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 40px;
-      font-family: var(--font-sans);
-    }
-
-    .chocolate-open-btn {
+    .choco-slot-btn {
       background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
-      border: 3px solid #b8860b;
-      border-radius: var(--radius-md);
-      padding: 20px 40px;
-      font-size: 24px;
+      border: 2px solid #b8860b;
+      border-radius: 12px;
+      padding: 14px 32px;
+      font-size: 18px;
       font-weight: 700;
       color: #8b4513;
       cursor: pointer;
-      font-family: var(--mono);
-      letter-spacing: 2px;
-      transition: all var(--transition-fast);
-      box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
     }
 
-    .chocolate-open-btn:hover {
-      transform: translateY(-4px) scale(1.05);
-      box-shadow: 0 12px 32px rgba(255, 215, 0, 0.6);
+    .choco-slot-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(255, 215, 0, 0.5);
     }
 
-    .back-link {
-      margin-top: 30px;
+    .choco-slot-hint {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 8px;
+    }
+
+    /* ── Chocolates Grid ── */
+    .choco-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .choco-card {
+      background: rgba(139, 69, 19, 0.2);
+      border: 2px solid rgba(139, 69, 19, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .choco-card:hover {
+      background: rgba(139, 69, 19, 0.3);
+      border-color: rgba(255, 215, 0, 0.6);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .choco-card.arrested {
+      box-shadow: inset 0 0 0 3px rgba(100, 100, 100, 0.5);
+      cursor: not-allowed;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .choco-card.arrested::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0px, transparent 18px, rgba(60,60,60,0.8) 18px, rgba(60,60,60,0.8) 22px);
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 12px;
+    }
+
+    .choco-card.arrested .choco-card-name::after {
+      content: ' 🔒';
+      font-size: 0.85em;
+    }
+
+    .choco-card img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 12px;
+      border: 3px solid rgba(255, 215, 0, 0.3);
+      transition: all 0.2s;
+    }
+
+    .choco-card:hover img {
+      border-color: #ffd700;
+    }
+
+    .choco-card-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffd700;
+      margin-bottom: 6px;
+    }
+
+    .choco-card-status {
       display: inline-block;
-      color: rgba(255, 255, 255, 0.5);
-      text-decoration: none;
-      font-family: var(--mono);
-      font-size: 14px;
-      transition: color var(--transition-fast);
+      background: rgba(255, 200, 0, 0.2);
+      border: 1px solid rgba(255, 200, 0, 0.5);
+      color: #ffc800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
-    .back-link:hover {
-      color: var(--accent-red);
+    .choco-card-status.extreme {
+      background: rgba(255, 50, 0, 0.2);
+      border-color: rgba(255, 50, 0, 0.5);
+      color: #ff5533;
+    }
+
+    /* ── Detail View ── */
+    .choco-detail-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      overflow-y: auto;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .choco-detail-overlay.active {
+      display: flex;
+    }
+
+    .choco-detail-card {
+      background: linear-gradient(135deg, #2d1810 0%, #1a0a0a 100%);
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      border-radius: 16px;
+      padding: 40px 30px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .choco-detail-card img {
+      width: 160px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #ffd700;
+      margin-bottom: 20px;
+    }
+
+    .choco-detail-name {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffd700;
+      margin-bottom: 12px;
+    }
+
+    .choco-detail-status {
+      display: inline-block;
+      background: rgba(255, 200, 0, 0.2);
+      border: 1px solid rgba(255, 200, 0, 0.5);
+      color: #ffc800;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .choco-detail-status.extreme {
+      background: rgba(255, 50, 0, 0.2);
+      border-color: rgba(255, 50, 0, 0.5);
+      color: #ff5533;
+    }
+
+    .choco-detail-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 24px;
+    }
+
+    .choco-detail-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .choco-detail-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: var(--font-sans, 'Inter', sans-serif);
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .choco-detail-btn.primary {
+      background: linear-gradient(135deg, #ffd700, #ffed4e);
+      color: #8b4513;
+    }
+
+    .choco-detail-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    }
+
+    .choco-detail-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .choco-detail-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    /* ── Slot Machine ── */
+    .choco-slot-container {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .choco-slot-container.active {
+      display: block;
+    }
+
+    .choco-slot-viewport {
+      height: 300px;
+      overflow: hidden;
+      border: 3px solid rgba(255, 215, 0, 0.5);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .choco-slot-reel {
+      transition: transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .choco-slot-reel.spinning {
+      animation: slotSpin 0.2s linear infinite;
+    }
+
+    @keyframes slotSpin {
+      from { transform: translateY(0); }
+      to { transform: translateY(-700px); }
+    }
+
+    .choco-slot-item {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .choco-slot-item img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 215, 0, 0.4);
+    }
+
+    /* ── Footer ── */
+    .choco-page-footer {
+      text-align: center;
+      padding: 10px 20px 40px;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 12px;
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 500px) {
+      .choco-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .choco-card img {
+        width: 80px;
+        height: 80px;
+      }
+
+      .choco-card-name {
+        font-size: 15px;
+      }
+
+      .choco-detail-card {
+        padding: 30px 20px;
+      }
+
+      .choco-detail-card img {
+        width: 120px;
+        height: 120px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="chocolate-direct-container">
-    <div class="chocolate-direct-title">🍫 Chocolate Shop</div>
-    <div class="chocolate-direct-subtitle">
-      Acceso directo a la tienda de chocolates
+  <!-- Header -->
+  <header class="choco-page-header">
+    <div class="choco-page-title">🍫 Chocolate Shop</div>
+    <div class="choco-page-subtitle">Selecciona tu chocolate favorito</div>
+    <a href="/" class="choco-back-link">← carlosjardim.com</a>
+  </header>
+
+  <!-- Content -->
+  <main class="choco-page-content">
+    <!-- Slot Machine Button -->
+    <div class="choco-slot-section" id="slotSection">
+      <button class="choco-slot-btn" onclick="startDirectSlot()">
+        🎰 SLOT MACHINE
+      </button>
+      <div class="choco-slot-hint">Deja que la suerte decida</div>
     </div>
-    <button class="chocolate-open-btn" onclick="openChocolateShop()">
-      Entrar al Shop
-    </button>
-    <br>
-    <a href="/" class="back-link">← Volver al sitio principal</a>
-  </div>
 
-  <!-- Chocolate Shop Modal -->
-  <div class="chocolate-shop-modal" id="chocolateShopModal" role="dialog" aria-modal="true" aria-label="Chocolate Shop">
-    <div class="chocolate-shop-container">
-      <button class="chocolate-shop-close" onclick="closeChocolateShop()" aria-label="Cerrar">✕</button>
-
-      <div class="chocolate-shop-header">
-        <div class="chocolate-shop-title">🍫 CHOCOLATE SHOP</div>
-        <div class="chocolate-shop-subtitle">
-          Selecciona tu chocolate o prueba suerte con la slot machine
-        </div>
-      </div>
-
-      <!-- Chocolates Grid View -->
-      <div id="chocolatesGridView">
-        <!-- Slot Machine Button -->
-        <div class="slot-machine-section">
-          <button class="slot-machine-btn" onclick="startSlotMachine()">
-            🎰 SLOT MACHINE
-          </button>
-          <div class="slot-machine-hint">Deja que la suerte decida</div>
-        </div>
-
-        <!-- Chocolates Grid -->
-        <div id="chocolatesGrid" class="chocolates-grid">
-          <!-- Rendered by JS -->
-        </div>
-
-        <!-- Compatibility Test CTA -->
-        <div class="chocolate-shop-footer">
-          <button class="compatibility-cta" onclick="openCompatibilityTestFromShop()">
-            💘 ¿No sabes cuál elegir? Haz el test de compatibilidad
-          </button>
-        </div>
-      </div>
-
-      <!-- Chocolate Detail View -->
-      <div id="chocolateDetailView" style="display: none;">
-        <!-- Rendered by JS -->
-      </div>
-
-      <!-- Slot Machine Container -->
-      <div id="slotMachineContainer" class="slot-machine-container" style="display: none;">
-        <div class="slot-viewport">
-          <div id="slotReel" class="slot-reel">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
+    <!-- Slot Machine Animation -->
+    <div class="choco-slot-container" id="directSlotContainer">
+      <div class="choco-slot-viewport">
+        <div id="directSlotReel" class="choco-slot-reel"></div>
       </div>
     </div>
+
+    <!-- Chocolates Grid -->
+    <div class="choco-grid" id="directChocGrid"></div>
+  </main>
+
+  <footer class="choco-page-footer">
+    Un proyecto de carlosjardim.com
+  </footer>
+
+  <!-- Detail Overlay -->
+  <div class="choco-detail-overlay" id="chocoDetailOverlay">
+    <div class="choco-detail-card" id="chocoDetailCard"></div>
   </div>
 
   <!-- Age Gate Modal -->
@@ -190,23 +468,202 @@
         <div class="closet-slats"></div>
       </div>
       <div class="closet-text">¡Chocolate escondido! 🚪</div>
-      <div class="closet-subtext">Este bombón se refugió en el closet (no es para menores de 18)</div>
+      <div class="closet-subtext">Este bombón se metió en el closet y no quiere salir</div>
       <div class="closet-dismiss">Toca para cerrar</div>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="js/chocolate-shop.js"></script>
+  <!-- Load age-gate first (provides showAgeGate, etc.) -->
   <script src="js/age-gate.js"></script>
 
-  <!-- Auto-open chocolate shop on load -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Abrir automáticamente al cargar la página
+    // ── Chocolate data (inline, no dependency on chocolate-shop.js modal logic) ──
+    const chocolates = {
+      jesus: {
+        name: "Jesús", image: "images/Jesus.webp", instagram: "@elyizus",
+        status: "extremadamente apartado",
+        description: "Dulce en fase beta. En un día de Luz se derritió y dio como resultado otro dulce. Hoy vive una vida tranquila comiendo perros calientes y jugando LoL. No sale en el test de compatibilidad porque es incompatible con otra mujer (nadie fue amenazado para escribir esto)."
+      },
+      miguel: {
+        name: "Miguel Acosta", image: "images/Miguel.webp", instagram: "@miguex94",
+        status: "apartado",
+        description: "En su momento fue el terror de cierto sitio que a él no le gusta mencionar ¿hoy? Su vida gira alrededor de la iglesia y la fe. Un hombre totalmente cambiado y apartado ¿su sabor? Solo para una."
+      },
+      zachiro: {
+        name: "Zachiro", image: "images/Zachiro.webp", instagram: "@zachiroj",
+        status: null,
+        description: "El primer asiático nacido de dos padres venezolanos. Fanático de los videojuegos. Cuenta con una moto y un tatuaje de un número. Dispuesto a tatuarse tu nombre, pero solo si tienes el sabor correcto."
+      },
+      anthonny: {
+        name: "Anthonny", image: "images/Anthonny.webp", instagram: "@anthonny.123",
+        status: "apartado",
+        description: "El Benjamín Button del cabello. Ya a los 13 años tenía barba, lo que hacía que lo expulsaran de sitios para menores ¿el problema? Su cabello ya había vivido lo suficiente y decidió abandonarlo ¿hoy? Gracias a un viaje a Rusia volvió a encontrar el camino de Head & Shoulders. Este es un dulce tipo Di Caprio (no apto para mayores de 23)."
+      },
+      ricardo: {
+        name: "Ricardo", image: "images/Ricardo.webp", instagram: "@radsl",
+        status: null,
+        description: "Este caramelo es conocido por partir. Tiene prohibición de venta en Tanaguarenas. Con ligero sabor y olor a pollo a la brasa y con un trauma a los carros Chrysler (con este le pago la universidad al hijo de su mecánico)."
+      },
+      mike: {
+        name: "Miguel Angelo", image: "images/Mike.webp", instagram: "@miguel267",
+        status: null,
+        description: "De fabricación venezolana, pero actualmente se encuentra en el mercado estadounidense. Su mayor miedo en la actualidad es el hielo (ICE). Cuenta con un legendario movimiento de caderas que le ganó el apodo de Magic Mike (de ahí se inspiró la película)."
+      },
+      david: {
+        name: "David Pereira", image: "images/David.webp", instagram: "@davidapereiraf",
+        status: null,
+        description: "Este chocolate era un poco más blanco, pero se doró (de más) en sus viajes a Los Caracas. Su sueño es encontrar una alemana que disfrute su sabor ¿el problema? Hoy está más cerca del lado oscuro."
+      }
+    };
+
+    const FALLBACK_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
+      "<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'>" +
+      "<rect width='200' height='200' fill='#24150f'/>" +
+      "<circle cx='100' cy='80' r='40' fill='#6b3d1f'/>" +
+      "<text x='100' y='160' text-anchor='middle' fill='#ffd700' font-size='16'>🍫</text></svg>"
+    );
+
+    const arrestedChocolates = new Set();
+
+    // ── Render Grid ──
+    function renderGrid() {
+      const grid = document.getElementById('directChocGrid');
+      if (!grid) return;
+
+      grid.innerHTML = Object.keys(chocolates).map(key => {
+        const c = chocolates[key];
+        const arrested = arrestedChocolates.has(key) ? ' arrested' : '';
+        const statusHtml = c.status
+          ? `<div class="choco-card-status${c.status === 'extremadamente apartado' ? ' extreme' : ''}">${c.status === 'extremadamente apartado' ? '🚨 EXTREMADAMENTE APARTADO' : '⚠️ APARTADO'}</div>`
+          : '';
+
+        return `
+          <div class="choco-card${arrested}" onclick="showDetail('${key}')">
+            <img src="${c.image}" alt="${c.name}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+            <div class="choco-card-name">${c.name}</div>
+            ${statusHtml}
+          </div>`;
+      }).join('');
+    }
+
+    // ── Show Detail ──
+    function showDetail(key) {
+      if (arrestedChocolates.has(key)) return;
+
+      const c = chocolates[key];
+      if (!c) return;
+
+      const overlay = document.getElementById('chocoDetailOverlay');
+      const card = document.getElementById('chocoDetailCard');
+
+      const statusHtml = c.status
+        ? `<div class="choco-detail-status${c.status === 'extremadamente apartado' ? ' extreme' : ''}">${c.status === 'extremadamente apartado' ? '🚨 EXTREMADAMENTE APARTADO' : '⚠️ APARTADO'}</div>`
+        : '';
+
+      card.innerHTML = `
+        <img src="${c.image}" alt="${c.name}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+        <div class="choco-detail-name">${c.name}</div>
+        ${statusHtml}
+        <div class="choco-detail-desc">${c.description}</div>
+        <div class="choco-detail-actions">
+          <button class="choco-detail-btn primary" onclick="viewProfile('${key}')">Ver Perfil</button>
+          <button class="choco-detail-btn secondary" onclick="closeDetail()">Volver</button>
+        </div>`;
+
+      overlay.classList.add('active');
+    }
+
+    function closeDetail() {
+      document.getElementById('chocoDetailOverlay').classList.remove('active');
+    }
+
+    // ── View Profile (con age gate) ──
+    function viewProfile(key) {
+      const c = chocolates[key];
+      if (!c) return;
+
+      closeDetail();
+
+      showAgeGate('chocolate', () => {
+        window.open('https://instagram.com/' + c.instagram.replace('@', ''), '_blank', 'noopener,noreferrer');
+      }, (k) => {
+        arrestedChocolates.add(k);
+        renderGrid();
+      }, key);
+    }
+
+    // ── Slot Machine ──
+    function startDirectSlot() {
+      const container = document.getElementById('directSlotContainer');
+      const reel = document.getElementById('directSlotReel');
+      const gridEl = document.getElementById('directChocGrid');
+      const slotSection = document.getElementById('slotSection');
+
+      if (!container || !reel) return;
+
+      if (gridEl) gridEl.style.display = 'none';
+      if (slotSection) slotSection.style.display = 'none';
+      container.classList.add('active');
+
+      const keys = Object.keys(chocolates);
+      const items = [];
+      for (let i = 0; i < 20; i++) {
+        keys.forEach(k => items.push({ key: k, image: chocolates[k].image }));
+      }
+
+      reel.innerHTML = items.map(item =>
+        `<div class="choco-slot-item" data-key="${item.key}">
+          <img src="${item.image}" alt="${chocolates[item.key].name}">
+        </div>`
+      ).join('');
+
+      const winnerKey = keys[Math.floor(Math.random() * keys.length)];
+      const itemHeight = 100;
+      const middleItem = Math.floor(items.length / 2);
+      let winnerPos = middleItem;
+      for (let i = middleItem; i < items.length; i++) {
+        if (items[i].key === winnerKey) { winnerPos = i; break; }
+      }
+
+      const finalPos = -(winnerPos * itemHeight) + 150 - (itemHeight / 2);
+
+      reel.classList.add('spinning');
+
       setTimeout(() => {
-        openChocolateShop();
-      }, 300);
+        reel.classList.remove('spinning');
+        reel.style.transform = `translateY(${finalPos}px)`;
+
+        setTimeout(() => {
+          container.classList.remove('active');
+          if (gridEl) gridEl.style.display = '';
+          if (slotSection) slotSection.style.display = '';
+          showDetail(winnerKey);
+
+          setTimeout(() => {
+            reel.style.transition = 'none';
+            reel.style.transform = 'translateY(0)';
+            setTimeout(() => {
+              reel.style.transition = 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            }, 50);
+          }, 300);
+        }, 800);
+      }, 2000);
+    }
+
+    // ── Close detail on overlay click ──
+    document.getElementById('chocoDetailOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeDetail();
     });
+
+    // ── ESC key ──
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeDetail();
+      }
+    });
+
+    // ── Init ──
+    renderGrid();
   </script>
 </body>
 </html>

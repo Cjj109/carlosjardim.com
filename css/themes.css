@@ -22,9 +22,13 @@ body[data-theme] .skill-bar-container {
 
 body[data-theme] .window-content .cv-text,
 body[data-theme] .window-content .skill-name,
-body[data-theme] .window-content .skill-tooltip,
 body[data-theme] .window-content .interests-list li {
   color: var(--text-main);
+}
+
+/* Tooltip siempre blanco sobre fondo negro, independiente del tema */
+body[data-theme] .window-content .skill-tooltip {
+  color: #ffffff;
 }
 
 body[data-theme] .window-content h1 {

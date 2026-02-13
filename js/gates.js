@@ -72,13 +72,17 @@ function handleBoyfriend(hasBoyfriend) {
  * Manejar respuesta de "¿Eres mayor de 18?" (Lado B)
  */
 function handleAgeStep(isAdult) {
+  // Guardar valores ANTES de closeGate (que los resetea)
+  const gender = userGender;
+  const hasBoyfriend = userHasBoyfriend;
+
+  closeGate();
+
   if (isAdult) {
-    closeGate();
     toggleMode(true);
   } else {
-    closeGate();
     // Si es mujer + no tiene novio + menor de 18 → video
-    if (userGender === 'female' && userHasBoyfriend === false) {
+    if (gender === 'female' && hasBoyfriend === false) {
       openVideoModal('https://www.youtube.com/watch?v=9q3VM00xW1M');
     } else {
       showUnderageOverlay();

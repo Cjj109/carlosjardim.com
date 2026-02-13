@@ -287,6 +287,35 @@
   font-size: 0.85em;
 }
 
+/* Anthonny: closet en vez de rejas */
+.chocolate-card.in-closet {
+  box-shadow: inset 0 0 0 3px rgba(139, 90, 43, 0.5);
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.chocolate-card.in-closet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 20px,
+    rgba(107, 68, 35, 0.6) 20px,
+    rgba(107, 68, 35, 0.6) 24px
+  );
+  pointer-events: none;
+  z-index: 2;
+  border-radius: var(--radius-md);
+}
+
+.chocolate-card.in-closet .chocolate-name::after {
+  content: ' 🚪';
+  font-size: 0.85em;
+}
+
 .chocolate-card:hover {
   background: rgba(139, 69, 19, 0.3);
   border-color: rgba(255, 215, 0, 0.6);
@@ -456,6 +485,73 @@
 
 .detail-btn.secondary:hover {
   background: rgba(139, 69, 19, 0.5);
+}
+
+/* Detail view: arrested (rejas sobre la imagen) */
+.chocolate-detail.detail-arrested .detail-img {
+  border-color: #666;
+  filter: grayscale(0.7);
+  position: relative;
+}
+
+.chocolate-detail.detail-arrested::before {
+  content: '🔒 DETENIDO';
+  display: block;
+  background: rgba(229, 57, 53, 0.2);
+  border: 2px solid rgba(229, 57, 53, 0.6);
+  color: #ff5252;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 900;
+  font-family: var(--mono);
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+  animation: detailArrestPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes detailArrestPulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+.chocolate-detail.detail-arrested .detail-name::after {
+  content: ' 🔒';
+}
+
+.chocolate-detail.detail-arrested .detail-description {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+/* Detail view: in-closet (Anthonny) */
+.chocolate-detail.detail-in-closet .detail-img {
+  border-color: #6b4423;
+  filter: sepia(0.5);
+}
+
+.chocolate-detail.detail-in-closet::before {
+  content: '🚪 EN EL CLOSET';
+  display: block;
+  background: rgba(139, 90, 43, 0.2);
+  border: 2px solid rgba(139, 90, 43, 0.6);
+  color: #c8a06b;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 900;
+  font-family: var(--mono);
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+}
+
+.chocolate-detail.detail-in-closet .detail-name::after {
+  content: ' 🚪';
+}
+
+.chocolate-detail.detail-in-closet .detail-description {
+  opacity: 0.5;
+  font-style: italic;
 }
 
 /* Mobile Responsive */

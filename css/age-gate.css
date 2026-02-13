@@ -90,16 +90,10 @@
 
 .police-arrest-overlay.active {
   display: flex;
-  animation: arrestFadeIn 0.3s ease;
-}
-
-@keyframes arrestFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .police-arrest-overlay.sirens-active {
-  animation: screenFlash 0.4s ease-in-out 3, none 0s 1.2s forwards;
+  animation: screenFlash 0.4s ease-in-out 3;
 }
 
 @keyframes screenFlash {
