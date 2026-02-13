@@ -1,271 +1,220 @@
 /* ============================================
    THEMES - Temáticas estacionales
+   Diseño: paletas sofisticadas, sin !important
    ============================================ */
 
-/* Default - Sin tema */
-body[data-theme="default"] {
-  /* Usa variables por defecto */
+/* ── Genérico para todos los temas ── */
+body[data-theme] .window {
+  backdrop-filter: blur(3px);
 }
 
-/* Valentine / Magic Mike - 14 de Febrero */
+body[data-theme] .section-label {
+  letter-spacing: 2.4px;
+}
+
+body[data-theme] .interests-list li {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme] .skill-bar-container {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+body[data-theme] .window-content .cv-text,
+body[data-theme] .window-content .skill-name,
+body[data-theme] .window-content .skill-tooltip,
+body[data-theme] .window-content .interests-list li {
+  color: var(--text-main);
+}
+
+body[data-theme] .window-content h1 {
+  color: var(--text-main);
+}
+
+body[data-theme] .window-content .section-label {
+  color: color-mix(in srgb, var(--text-main) 60%, transparent);
+}
+
+body[data-theme] .window-header {
+  background: color-mix(in srgb, var(--bg-cv) 92%, transparent);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+body[data-theme] .micro-line {
+  color: color-mix(in srgb, var(--text-main) 80%, transparent);
+}
+
+body[data-theme] .work-link-minimal {
+  color: var(--accent-red);
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.08);
+}
+
+body[data-theme] .work-link-minimal:hover {
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6);
+  box-shadow: 0 8px 20px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
+}
+
+/* ============================================
+   VALENTINE - Borgoña & Rosa Empolvado
+   Elegante, cálido, íntimo
+   ============================================ */
 body[data-theme="valentine"] {
-  --bg-cv: #1a0a0f;
-  --text-main: #ffe4ec;
-  --accent-red: #ff1493;
-  --accent-r: 255;
-  --accent-g: 20;
-  --accent-b: 147;
+  --bg-cv: #16070e;
+  --text-main: #f5dce6;
+  --accent-red: #e8446c;
+  --accent-r: 232;
+  --accent-g: 68;
+  --accent-b: 108;
 }
 
 body[data-theme="valentine"]::before {
-  background: 
-    radial-gradient(700px 520px at 50% 62%, rgba(255, 20, 147, 0.25), transparent 60%),
-    radial-gradient(400px 400px at 20% 80%, rgba(255, 105, 180, 0.15), transparent 50%),
-    radial-gradient(400px 400px at 80% 20%, rgba(255, 20, 147, 0.12), transparent 50%);
+  background:
+    radial-gradient(600px 450px at 50% 55%, rgba(232, 68, 108, 0.14), transparent 55%),
+    radial-gradient(400px 400px at 25% 80%, rgba(180, 60, 100, 0.08), transparent 50%),
+    radial-gradient(350px 350px at 80% 25%, rgba(255, 180, 200, 0.06), transparent 50%);
 }
 
 body[data-theme="valentine"] .window {
-  background: linear-gradient(135deg, rgba(26, 10, 15, 0.98) 0%, rgba(50, 15, 30, 0.98) 100%) !important;
-  border: 2px solid rgba(255, 20, 147, 0.4);
-  box-shadow: 0 0 60px rgba(255, 20, 147, 0.2), 0 0 120px rgba(255, 105, 180, 0.1);
-}
-
-body[data-theme="valentine"] .window-content .cv-text,
-body[data-theme="valentine"] .window-content .section-label,
-body[data-theme="valentine"] .window-content .skill-name,
-body[data-theme="valentine"] .window-content .skill-tooltip,
-body[data-theme="valentine"] .window-content .interests-list li {
-  color: #ffe4ec !important;
-}
-
-body[data-theme="valentine"] .window-content .section-label {
-  color: rgba(255, 228, 236, 0.7) !important;
-}
-
-body[data-theme="valentine"] .window-content h1 {
-  color: #ffe4ec !important;
-}
-
-body[data-theme="valentine"] .work-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-body[data-theme="valentine"] .work-link-minimal {
-  color: #ff8fc8;
-  border-color: rgba(255, 143, 200, 0.45);
-  background: rgba(255, 143, 200, 0.12);
-}
-
-body[data-theme="valentine"] .work-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 20, 147, 0.4);
-}
-
-body[data-theme="valentine"] .work-link-minimal:hover {
-  border-color: rgba(255, 143, 200, 0.75);
-  box-shadow: 0 10px 22px rgba(255, 20, 147, 0.28);
-}
-
-body[data-theme="valentine"] .work-card-title {
-  color: #ff69b4 !important;
-}
-
-body[data-theme="valentine"] .work-card-desc {
-  color: rgba(255, 228, 236, 0.8);
-}
-
-body[data-theme="valentine"] .work-card-arrow {
-  color: rgba(255, 228, 236, 0.6);
-}
-
-body[data-theme="valentine"] .window-header {
-  background: rgba(26, 10, 15, 0.9);
-  border-bottom-color: rgba(255, 20, 147, 0.3);
-}
-
-body[data-theme="valentine"] .micro-line {
-  color: rgba(255, 228, 236, 0.85) !important;
+  background: linear-gradient(155deg, rgba(28, 10, 18, 0.97), rgba(38, 14, 24, 0.98));
+  border: 1px solid rgba(232, 68, 108, 0.25);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 200, 220, 0.05);
 }
 
 body[data-theme="valentine"] .bonbon-icon {
-  background: linear-gradient(135deg, #ff1493, #ff69b4) !important;
-  box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
+  background: linear-gradient(135deg, #e8446c, #c73860);
+  box-shadow: 0 6px 24px rgba(232, 68, 108, 0.4);
 }
 
 body[data-theme="valentine"] .bonbon-icon.breathing {
-  animation: valentinePulse 2.5s ease-in-out infinite;
+  animation: valentinePulse 3s ease-in-out infinite;
 }
 
 @keyframes valentinePulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 20, 147, 0.5); transform: scale(1); }
-  50% { box-shadow: 0 0 40px rgba(255, 20, 147, 0.8); transform: scale(1.05); }
+  0%, 100% { box-shadow: 0 6px 24px rgba(232, 68, 108, 0.35); transform: scale(1); }
+  50% { box-shadow: 0 8px 32px rgba(232, 68, 108, 0.55); transform: scale(1.03); }
 }
 
-/* Carnavales */
+body[data-theme="valentine"] .interests-list li:hover {
+  background: rgba(232, 68, 108, 0.1);
+  border-color: rgba(232, 68, 108, 0.3);
+}
+
+body[data-theme="valentine"] .valentine-interest-item {
+  background: rgba(232, 68, 108, 0.12);
+  border-color: rgba(232, 68, 108, 0.35);
+  color: var(--text-main);
+}
+
+body[data-theme="valentine"] .valentine-interest-item::before {
+  content: "♡";
+  color: #e8446c;
+}
+
+/* ============================================
+   CARNAVAL - Violeta Profundo & Oro
+   Festivo pero sofisticado
+   ============================================ */
 body[data-theme="carnaval"] {
-  --bg-cv: #0d0d1a;
-  --text-main: #fff5e6;
-  --accent-red: #ff6b00;
-  --accent-r: 255;
-  --accent-g: 107;
-  --accent-b: 0;
+  --bg-cv: #0e0b1e;
+  --text-main: #f0ecff;
+  --accent-red: #a855f7;
+  --accent-r: 168;
+  --accent-g: 85;
+  --accent-b: 247;
 }
 
 body[data-theme="carnaval"]::before {
-  background: 
-    radial-gradient(700px 520px at 30% 50%, rgba(255, 107, 0, 0.2), transparent 55%),
-    radial-gradient(500px 500px at 70% 50%, rgba(255, 215, 0, 0.15), transparent 55%),
-    radial-gradient(400px 400px at 50% 80%, rgba(255, 0, 128, 0.1), transparent 50%);
-  animation: carnavalShimmer 8s ease-in-out infinite alternate;
-}
-
-@keyframes carnavalShimmer {
-  0% { opacity: 1; }
-  100% { opacity: 0.85; }
+  background:
+    radial-gradient(500px 450px at 30% 40%, rgba(168, 85, 247, 0.12), transparent 50%),
+    radial-gradient(450px 400px at 70% 60%, rgba(255, 193, 7, 0.08), transparent 50%),
+    radial-gradient(350px 350px at 50% 85%, rgba(236, 72, 153, 0.06), transparent 50%);
 }
 
 body[data-theme="carnaval"] .window {
-  background: linear-gradient(135deg, rgba(13, 13, 26, 0.98) 0%, rgba(30, 20, 40, 0.98) 100%) !important;
-  border: 2px solid;
-  border-image: linear-gradient(135deg, #ff6b00, #ffd700, #ff0080, #ff6b00) 1;
-  box-shadow: 0 0 40px rgba(255, 107, 0, 0.3), 0 0 80px rgba(255, 215, 0, 0.1);
+  background: linear-gradient(155deg, rgba(14, 11, 30, 0.97), rgba(22, 16, 42, 0.98));
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(200, 160, 255, 0.05);
 }
 
-body[data-theme="carnaval"] .window-content .cv-text,
-body[data-theme="carnaval"] .window-content .skill-name,
-body[data-theme="carnaval"] .window-content .skill-tooltip {
-  color: #fff5e6 !important;
-}
-
-body[data-theme="carnaval"] .work-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-body[data-theme="carnaval"] .work-link-minimal {
-  color: #ffd56a;
-  border-color: rgba(255, 213, 106, 0.45);
-  background: rgba(255, 107, 0, 0.14);
-}
-
-body[data-theme="carnaval"] .work-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 107, 0, 0.5);
-}
-
-body[data-theme="carnaval"] .work-card-desc {
-  color: rgba(255, 245, 230, 0.8);
-}
-
-body[data-theme="carnaval"] .work-card-arrow {
-  color: rgba(255, 245, 230, 0.6);
-}
-
-body[data-theme="carnaval"] .window-content .section-label {
-  color: rgba(255, 245, 230, 0.7) !important;
-}
-
-body[data-theme="carnaval"] .window-header {
-  background: rgba(13, 13, 26, 0.9);
-  border-bottom-color: rgba(255, 107, 0, 0.4);
-}
-
-body[data-theme="carnaval"] .micro-line {
-  color: rgba(255, 245, 230, 0.85) !important;
+body[data-theme="carnaval"] .window-content h1 {
+  background: linear-gradient(135deg, #c084fc, #f59e0b, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 body[data-theme="carnaval"] .bonbon-icon {
-  background: linear-gradient(135deg, #ff6b00, #ffd700, #ff0080) !important;
+  background: linear-gradient(135deg, #a855f7, #ec4899, #f59e0b);
   background-size: 200% 200%;
-  animation: carnavalGradient 3s ease infinite;
+  animation: carnavalShift 4s ease infinite;
 }
 
-@keyframes carnavalGradient {
+@keyframes carnavalShift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
 
-/* Navidad */
+body[data-theme="carnaval"] .interests-list li:hover {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* ============================================
+   NAVIDAD - Verde Bosque & Rojo Cereza
+   ============================================ */
 body[data-theme="navidad"] {
-  --bg-cv: #0a1a0f;
-  --text-main: #e8f5e9;
-  --accent-red: #c62828;
-  --accent-r: 198;
-  --accent-g: 40;
-  --accent-b: 40;
+  --bg-cv: #0b1610;
+  --text-main: #e4f5e8;
+  --accent-red: #dc2626;
+  --accent-r: 220;
+  --accent-g: 38;
+  --accent-b: 38;
 }
 
 body[data-theme="navidad"]::before {
-  background: 
-    radial-gradient(700px 520px at 50% 30%, rgba(198, 40, 40, 0.15), transparent 55%),
-    radial-gradient(500px 500px at 20% 70%, rgba(46, 125, 50, 0.12), transparent 55%),
-    radial-gradient(400px 400px at 80% 70%, rgba(255, 215, 0, 0.08), transparent 50%);
+  background:
+    radial-gradient(600px 450px at 50% 35%, rgba(220, 38, 38, 0.1), transparent 50%),
+    radial-gradient(450px 400px at 25% 70%, rgba(34, 120, 60, 0.08), transparent 50%),
+    radial-gradient(350px 350px at 80% 70%, rgba(255, 215, 0, 0.05), transparent 50%);
 }
 
 body[data-theme="navidad"] .window {
-  background: linear-gradient(135deg, rgba(10, 26, 15, 0.98) 0%, rgba(20, 40, 25, 0.98) 100%) !important;
-  border-color: rgba(198, 40, 40, 0.5);
-  box-shadow: 0 0 50px rgba(198, 40, 40, 0.15), 0 0 100px rgba(46, 125, 50, 0.1);
-}
-
-body[data-theme="navidad"] .window-content .cv-text,
-body[data-theme="navidad"] .window-content .skill-name,
-body[data-theme="navidad"] .window-content .skill-tooltip {
-  color: #e8f5e9 !important;
-}
-
-body[data-theme="navidad"] .work-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-body[data-theme="navidad"] .work-link-minimal {
-  color: #a5f5c5;
-  border-color: rgba(165, 245, 197, 0.4);
-  background: rgba(46, 125, 50, 0.16);
-}
-
-body[data-theme="navidad"] .work-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(198, 40, 40, 0.5);
-}
-
-body[data-theme="navidad"] .work-card-desc {
-  color: rgba(232, 245, 233, 0.8);
-}
-
-body[data-theme="navidad"] .work-card-arrow {
-  color: rgba(232, 245, 233, 0.6);
-}
-
-body[data-theme="navidad"] .window-content .section-label {
-  color: rgba(232, 245, 233, 0.7) !important;
-}
-
-body[data-theme="navidad"] .window-header {
-  background: rgba(10, 26, 15, 0.9);
-  border-bottom-color: rgba(198, 40, 40, 0.4);
-}
-
-body[data-theme="navidad"] .micro-line {
-  color: rgba(232, 245, 233, 0.85) !important;
+  background: linear-gradient(155deg, rgba(11, 22, 16, 0.97), rgba(18, 32, 22, 0.98));
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(34, 120, 60, 0.08);
 }
 
 body[data-theme="navidad"] .bonbon-icon {
-  background: linear-gradient(135deg, #c62828, #2e7d32) !important;
-  box-shadow: 0 0 25px rgba(198, 40, 40, 0.5);
+  background: linear-gradient(135deg, #dc2626, #16a34a);
+  box-shadow: 0 6px 24px rgba(220, 38, 38, 0.35);
 }
 
-/* Admin panel */
+body[data-theme="navidad"] .interests-list li:hover {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.25);
+}
+
+/* ============================================
+   ADMIN PANEL
+   ============================================ */
 .admin-panel-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 99999;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 2147483647;
   display: none;
   align-items: center;
   justify-content: center;
@@ -278,35 +227,36 @@ body[data-theme="navidad"] .bonbon-icon {
 }
 
 .admin-panel {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(155deg, #141424, #1a1a32);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-lg);
-  padding: 30px;
-  max-width: 500px;
+  padding: 32px;
+  max-width: 480px;
   width: 100%;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
 }
 
 .admin-panel h2 {
   color: #fff;
   margin: 0 0 24px 0;
-  font-size: 24px;
+  font-size: 22px;
   font-family: var(--mono);
 }
 
 .admin-themes {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .admin-theme-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
-  padding: 16px 20px;
+  padding: 14px 18px;
   border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   text-align: left;
   transition: all 0.2s ease;
@@ -316,18 +266,18 @@ body[data-theme="navidad"] .bonbon-icon {
 }
 
 .admin-theme-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateX(3px);
 }
 
 .admin-theme-btn.active {
   border-color: var(--accent-red);
-  background: rgba(255, 59, 48, 0.2);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
 }
 
 .admin-theme-btn .theme-emoji {
-  font-size: 28px;
+  font-size: 26px;
 }
 
 /* Admin Login Form */
@@ -335,12 +285,12 @@ body[data-theme="navidad"] .bonbon-icon {
 .admin-themes-section h2 {
   color: #fff;
   margin: 0 0 24px 0;
-  font-size: 24px;
+  font-size: 22px;
   font-family: var(--mono);
 }
 
 .admin-login-hint {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 14px;
   margin: -16px 0 20px 0;
 }
@@ -352,17 +302,18 @@ body[data-theme="navidad"] .bonbon-icon {
 }
 
 .admin-login-form input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
   padding: 14px 18px;
   border-radius: var(--radius-md);
   font-size: 16px;
   font-family: var(--font-sans);
+  transition: border-color 0.2s;
 }
 
 .admin-login-form input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .admin-login-form input:focus {
@@ -371,7 +322,7 @@ body[data-theme="navidad"] .bonbon-icon {
 }
 
 .admin-login-error {
-  color: #ff6b6b;
+  color: #f87171;
   font-size: 14px;
   margin: 0;
 }
@@ -396,142 +347,22 @@ body[data-theme="navidad"] .bonbon-icon {
 
 .admin-panel-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s;
 }
 
 .admin-panel-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ============================================
-   THEME POLISH - Better visual cohesion
-   ============================================ */
-
-body[data-theme] .window {
-  backdrop-filter: blur(3px);
-}
-
-body[data-theme] .section-label {
-  letter-spacing: 2.4px;
-}
-
-body[data-theme] .interests-list li {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-body[data-theme] .skill-bar-container {
-  background: rgba(0, 0, 0, 0.34);
-}
-
-body[data-theme] .alt-card {
-  backdrop-filter: blur(4px);
-}
-
-body[data-theme] .main-cta-button,
-body[data-theme] .return-button {
-  border-width: 1.5px !important;
-}
-
-/* Valentine */
-body[data-theme="valentine"] {
-  --bg-cv: #190812;
-  --text-main: #ffeaf3;
-  --accent-red: #ff4f9f;
-  --accent-r: 255;
-  --accent-g: 79;
-  --accent-b: 159;
-}
-
-body[data-theme="valentine"] .window {
-  border-color: rgba(255, 120, 185, 0.45);
-  box-shadow: 0 12px 54px rgba(255, 45, 140, 0.22), 0 0 120px rgba(255, 120, 185, 0.08);
-}
-
-body[data-theme="valentine"] .interests-list li:hover {
-  background: rgba(255, 98, 170, 0.15);
-  border-color: rgba(255, 159, 209, 0.45);
-  box-shadow: 0 6px 16px rgba(255, 98, 170, 0.22);
-}
-
-body[data-theme="valentine"] .valentine-interest-item {
-  background: linear-gradient(135deg, rgba(255, 95, 170, 0.22), rgba(255, 155, 210, 0.14));
-  border-color: rgba(255, 173, 218, 0.4);
-  color: #ffeaf4 !important;
-}
-
-body[data-theme="valentine"] .valentine-interest-item::before {
-  content: "❤";
-}
-
-body[data-theme="valentine"] .main-cta-button {
-  background: rgba(255, 79, 159, 0.17) !important;
-  border-color: rgba(255, 138, 192, 0.7) !important;
-  color: #ffd9eb !important;
-}
-
-body[data-theme="valentine"] .main-cta-button:hover {
-  background: #ff4f9f !important;
-  color: #fff !important;
-}
-
-/* Carnaval */
-body[data-theme="carnaval"] {
-  --bg-cv: #121027;
-  --text-main: #fff3de;
-  --accent-red: #ff8a00;
-  --accent-r: 255;
-  --accent-g: 138;
-  --accent-b: 0;
-}
-
-body[data-theme="carnaval"] .window {
-  border-image: linear-gradient(135deg, #ff8a00, #ffd760, #ff4db4, #6b5bff) 1;
-  box-shadow: 0 14px 58px rgba(255, 138, 0, 0.24), 0 0 96px rgba(255, 77, 180, 0.12);
-}
-
-body[data-theme="carnaval"] .interests-list li:hover {
-  background: linear-gradient(135deg, rgba(255, 138, 0, 0.14), rgba(255, 77, 180, 0.1));
-  border-color: rgba(255, 207, 120, 0.55);
-}
-
-body[data-theme="carnaval"] .main-cta-button {
-  color: #ffe4ba !important;
-  background: linear-gradient(135deg, rgba(255, 138, 0, 0.23), rgba(255, 77, 180, 0.18)) !important;
-  border-color: rgba(255, 207, 120, 0.8) !important;
-}
-
-/* Navidad */
-body[data-theme="navidad"] {
-  --bg-cv: #0b1b12;
-  --text-main: #ecfff0;
-  --accent-red: #d33d3d;
-  --accent-r: 211;
-  --accent-g: 61;
-  --accent-b: 61;
-}
-
-body[data-theme="navidad"] .window {
-  border-color: rgba(211, 61, 61, 0.56);
-  box-shadow: 0 12px 52px rgba(211, 61, 61, 0.2), 0 0 120px rgba(44, 138, 84, 0.11);
-}
-
-body[data-theme="navidad"] .interests-list li:hover {
-  background: linear-gradient(135deg, rgba(211, 61, 61, 0.14), rgba(44, 138, 84, 0.11));
-  border-color: rgba(176, 243, 203, 0.4);
-}
-
-body[data-theme="navidad"] .main-cta-button {
-  background: rgba(211, 61, 61, 0.2) !important;
-  border-color: rgba(248, 170, 170, 0.75) !important;
-  color: #ffecec !important;
+  background: rgba(255, 255, 255, 0.15);
 }

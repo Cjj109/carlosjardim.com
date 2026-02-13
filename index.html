@@ -66,65 +66,64 @@
 
   <title>Carlos Jardim | Economista</title>
   
-  <!-- Critical CSS - loads immediately -->
-  <link rel="stylesheet" href="css/variables.css?v=20260213001833">
-  <link rel="stylesheet" href="css/base.css?v=20260213001833">
-  <link rel="stylesheet" href="css/cv.css?v=20260213001833">
-  <link rel="stylesheet" href="css/alt.css?v=20260213001833">
-  <link rel="stylesheet" href="css/side-a-enhancements.css?v=20260213001833">
+  <!-- Critical CSS - loads immediately (includes themes to prevent FOUC) -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/cv.css">
+  <link rel="stylesheet" href="css/alt.css">
+  <link rel="stylesheet" href="css/side-a-enhancements.css">
+  <link rel="stylesheet" href="css/themes.css">
 
   <!-- Non-critical CSS - deferred loading for modals/games -->
-  <link rel="stylesheet" href="css/pong.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/tetris.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/games-menu.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/video-modal.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/compatibility-test.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/chocolate-shop.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/matrix-mode.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/new-features.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/bcv-calculator.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/utilities.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/monetary-indicators.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/commodities.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/themes.css?v=20260213001833" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/age-gate.css?v=20260213001833" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/pong.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/tetris.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/games-menu.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/video-modal.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/compatibility-test.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/chocolate-shop.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/matrix-mode.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/new-features.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/bcv-calculator.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/utilities.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/monetary-indicators.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/commodities.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/age-gate.css" media="print" onload="this.media='all'">
   <!-- Fallback for browsers without JS -->
   <noscript>
-    <link rel="stylesheet" href="css/pong.css?v=20260213001833">
-    <link rel="stylesheet" href="css/tetris.css?v=20260213001833">
-    <link rel="stylesheet" href="css/games-menu.css?v=20260213001833">
-    <link rel="stylesheet" href="css/video-modal.css?v=20260213001833">
-    <link rel="stylesheet" href="css/compatibility-test.css?v=20260213001833">
-    <link rel="stylesheet" href="css/chocolate-shop.css?v=20260213001833">
-    <link rel="stylesheet" href="css/matrix-mode.css?v=20260213001833">
-    <link rel="stylesheet" href="css/new-features.css?v=20260213001833">
-    <link rel="stylesheet" href="css/bcv-calculator.css?v=20260213001833">
-    <link rel="stylesheet" href="css/utilities.css?v=20260213001833">
-    <link rel="stylesheet" href="css/monetary-indicators.css?v=20260213001833">
-    <link rel="stylesheet" href="css/commodities.css?v=20260213001833">
-    <link rel="stylesheet" href="css/themes.css?v=20260213001833">
-    <link rel="stylesheet" href="css/age-gate.css?v=20260213001833">
+    <link rel="stylesheet" href="css/pong.css">
+    <link rel="stylesheet" href="css/tetris.css">
+    <link rel="stylesheet" href="css/games-menu.css">
+    <link rel="stylesheet" href="css/video-modal.css">
+    <link rel="stylesheet" href="css/compatibility-test.css">
+    <link rel="stylesheet" href="css/chocolate-shop.css">
+    <link rel="stylesheet" href="css/matrix-mode.css">
+    <link rel="stylesheet" href="css/new-features.css">
+    <link rel="stylesheet" href="css/bcv-calculator.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/monetary-indicators.css">
+    <link rel="stylesheet" href="css/commodities.css">
+    <link rel="stylesheet" href="css/age-gate.css">
   </noscript>
 
   <!-- Scripts optimizados con defer para carga paralela -->
-  <script src="js/main.js?v=20260213001833" defer></script>
-  <script src="js/video-modal.js?v=20260213001833" defer></script>
-  <script src="js/compatibility-test.js?v=20260213001833" defer></script>
-  <script src="js/chocolate-shop.js?v=20260213001833" defer></script>
-  <script src="js/side-a-enhancements.js?v=20260213001833" defer></script>
-  <script src="js/gym-widget.js?v=20260213001833" defer></script>
-  <script src="js/bcv-calculator.js?v=20260213001833" defer></script>
-  <script src="js/utilities.js?v=20260213001833" defer></script>
-  <script src="js/monetary-indicators.js?v=20260213001833" defer></script>
-  <script src="js/commodities.js?v=20260213001833" defer></script>
-  <script src="js/gates.js?v=20260213001833" defer></script>
-  <script src="js/games-menu.js?v=20260213001833" defer></script>
-  <script src="js/pong.js?v=20260213001833" defer></script>
-  <script src="js/tetris.js?v=20260213001833" defer></script>
-  <script src="js/snake.js?v=20260213001833" defer></script>
-  <script src="js/new-features.js?v=20260213001833" defer></script>
-  <script src="js/admin-themes.js?v=20260213001833" defer></script>
-  <script src="js/age-gate.js?v=20260213001833" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/video-modal.js" defer></script>
+  <script src="js/compatibility-test.js" defer></script>
+  <script src="js/chocolate-shop.js" defer></script>
+  <script src="js/side-a-enhancements.js" defer></script>
+  <script src="js/gym-widget.js" defer></script>
+  <script src="js/bcv-calculator.js" defer></script>
+  <script src="js/utilities.js" defer></script>
+  <script src="js/monetary-indicators.js" defer></script>
+  <script src="js/commodities.js" defer></script>
+  <script src="js/gates.js" defer></script>
+  <script src="js/games-menu.js" defer></script>
+  <script src="js/pong.js" defer></script>
+  <script src="js/tetris.js" defer></script>
+  <script src="js/snake.js" defer></script>
+  <script src="js/new-features.js" defer></script>
+  <script src="js/admin-themes.js" defer></script>
+  <script src="js/age-gate.js" defer></script>
 </head>
 
 <body>
@@ -138,7 +137,7 @@
   <main>
   <div class="window">
     <div class="window-header">
-      <div class="traffic-lights">
+      <div class="traffic-lights" style="cursor: pointer;" title="Admin (3 clicks)">
         <div class="light red"></div>
         <div class="light orange"></div>
         <div class="light green"></div>
@@ -222,21 +221,23 @@
 
       <div class="section-label">Trabajo</div>
       <a href="https://rpym.net" target="_blank" rel="noopener noreferrer" class="work-link-minimal">
-        <svg class="work-shrimp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Cuerpo curvo elegante -->
-          <path d="M16.5 6.5C16.5 6.5 19 8.5 19 11C19 14.5 16 17 12 17C8 17 6.5 14 6.5 11C6.5 8.5 8 5.5 12 5.5"/>
-          <!-- Segmentos del cuerpo -->
-          <path d="M12 5.5C13.5 5.5 15 6 15 8"/>
-          <path d="M11 17C11 17 9 15.5 9 13.5"/>
-          <!-- Cola detallada -->
-          <path d="M6.5 11C5.5 11 4 11.5 3 10.5"/>
-          <path d="M6.5 11C5.5 11 4 10.5 3.5 9"/>
-          <!-- Antenas largas y estilizadas -->
-          <path d="M16.5 6.5C18 4 21 4 21 4"/>
-          <path d="M16.5 6.5C17.5 5 19.5 2 19.5 2"/>
-          <!-- Patas sutiles -->
-          <path d="M10 17L9.5 19"/>
-          <path d="M14 17L14.5 19"/>
+        <!-- Nuevo Camarón Sólido: Diseño de silueta icónica y legible -->
+        <svg class="work-shrimp" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+          <path d="M346.7,64C333.3,64,320,74.7,320,85.3c0,10.7,10.7,21.3,21.3,21.3c21.3,0,42.7,10.7,53.3,32
+            c10.7,21.3,0,42.7-21.3,53.3c-10.7,5.3-10.7,21.3,0,26.7c5.3,5.3,16,5.3,21.3,0c42.7-21.3,53.3-64,42.7-96
+            C416,85.3,389.3,64,346.7,64z"/>
+          <path d="M293.3,85.3c-10.7,0-21.3,10.7-21.3,21.3c0,10.7,10.7,21.3,21.3,21.3c32,0,53.3,21.3,53.3,53.3
+            c0,10.7,10.7,21.3,21.3,21.3c10.7,0,21.3-10.7,21.3-21.3C389.3,128,346.7,85.3,293.3,85.3z"/>
+          <path d="M149.3,192c-21.3,0-42.7,10.7-53.3,32c-21.3,32-10.7,74.7,21.3,106.7c32,32,74.7,42.7,106.7,21.3
+            c21.3-10.7,32-32,32-53.3c0-21.3-10.7-42.7-32-53.3C202.7,234.7,181.3,202.7,149.3,192z M170.7,266.7
+            c-5.3,5.3-16,5.3-21.3,0c-5.3-5.3-5.3-16,0-21.3c5.3-5.3,16-5.3,21.3,0C176,250.7,176,261.3,170.7,266.7z"/>
+          <path d="M256,128c-42.7,0-85.3,21.3-106.7,64c-5.3,10.7,0,21.3,10.7,26.7c10.7,5.3,21.3,0,26.7-10.7
+            c10.7-21.3,42.7-42.7,69.3-42.7c32,0,58.7,16,74.7,42.7c5.3,10.7,16,10.7,26.7,5.3c10.7-5.3,10.7-16,5.3-26.7
+            C330.7,149.3,298.7,128,256,128z"/>
+          <path d="M405.3,362.7c-32-32-85.3-32-117.3,0c-10.7,10.7-10.7,26.7,0,37.3c10.7,10.7,26.7,10.7,37.3,0
+            c10.7-10.7,32-10.7,42.7,0c5.3,5.3,16,5.3,21.3,0C400,389.3,405.3,373.3,405.3,362.7z"/>
+          <path d="M85.3,362.7c-32,32-32,85.3,0,117.3c32,32,85.3,32,117.3,0c5.3-5.3,5.3-16,0-21.3c-5.3-5.3-16-5.3-21.3,0
+            c-10.7,10.7-32,10.7-42.7,0c-10.7-10.7-10.7-32,0-42.7c5.3-5.3,5.3-16,0-21.3C128,384,117.3,384,85.3,362.7z"/>
         </svg>
         <span class="work-link-text">rpym.net</span>
         <span class="work-link-arrow">↗</span>
@@ -671,70 +672,27 @@
   <div class="valentine-flowers-modal" id="valentineFlowersModal" role="dialog" aria-modal="true" aria-label="Detalle de flores eternas">
     <div class="valentine-flowers-container">
       <button class="valentine-flowers-close" onclick="closeValentineFlowers()" aria-label="Cerrar detalle">✕</button>
-      <div class="valentine-flower-stage" aria-hidden="true">
-        <!-- Rosa 'Beauty' SVG: Diseño orgánico y capas de profundidad -->
-        <svg class="valentine-flower-art" viewBox="0 0 200 300">
-          <defs>
-            <radialGradient id="rose-center" cx="50%" cy="20%" r="80%">
-              <stop offset="0%" stop-color="#ff9a9e" />
-              <stop offset="100%" stop-color="#fecfef" />
-            </radialGradient>
-            <linearGradient id="rose-petal-1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ff758c" />
-              <stop offset="100%" stop-color="#ff7eb3" />
-            </linearGradient>
-            <linearGradient id="rose-petal-2" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#fa709a" />
-              <stop offset="100%" stop-color="#fee140" />
-            </linearGradient>
-            <linearGradient id="stem-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#11998e" />
-              <stop offset="50%" stop-color="#38ef7d" />
-              <stop offset="100%" stop-color="#11998e" />
-            </linearGradient>
-            <filter id="glow-soft">
-              <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-
-          <!-- Tallo -->
-          <g class="flower-stem-group">
-            <path d="M100 280 Q100 200 100 160" stroke="url(#stem-gradient)" stroke-width="4" fill="none" stroke-linecap="round" />
-            <!-- Hojas -->
-            <path class="flower-leaf left" d="M100 220 Q70 210 60 190 Q80 200 100 210" fill="#38ef7d" opacity="0.8"/>
-            <path class="flower-leaf right" d="M100 240 Q130 230 140 210 Q120 220 100 230" fill="#11998e" opacity="0.8"/>
-          </g>
-
-          <!-- Capullo de la Rosa -->
-          <g class="flower-head" filter="url(#glow-soft)">
-            <!-- Pétalos traseros -->
-            <path class="petal back-left" d="M100 160 C70 130 60 100 80 80 C100 100 100 160 100 160" fill="url(#rose-petal-1)" />
-            <path class="petal back-right" d="M100 160 C130 130 140 100 120 80 C100 100 100 160 100 160" fill="url(#rose-petal-2)" />
-            
-            <!-- Pétalos medios -->
-            <path class="petal mid-left" d="M100 160 C60 140 60 90 90 90 C100 120 100 160 100 160" fill="#ff758c" opacity="0.9"/>
-            <path class="petal mid-right" d="M100 160 C140 140 140 90 110 90 C100 120 100 160 100 160" fill="#fa709a" opacity="0.9"/>
-
-            <!-- Centro cerrado -->
-            <ellipse class="petal center-bud" cx="100" cy="100" rx="15" ry="25" fill="url(#rose-center)" />
-          </g>
-        </svg>
-        
-        <!-- Partículas de magia -->
-        <span class="sparkle s1">✦</span>
-        <span class="sparkle s2">✨</span>
-        <span class="sparkle s3">✦</span>
-        <span class="sparkle s4">✨</span>
+      <!-- Rosa animada con CSS puro -->
+      <div class="rose-scene" aria-hidden="true">
+        <div class="rose-stem"></div>
+        <div class="rose-leaf rose-leaf-l"></div>
+        <div class="rose-leaf rose-leaf-r"></div>
+        <div class="rose-bloom">
+          <div class="rose-petal rp rp-1"></div>
+          <div class="rose-petal rp rp-2"></div>
+          <div class="rose-petal rp rp-3"></div>
+          <div class="rose-petal rp rp-4"></div>
+          <div class="rose-petal rp rp-5"></div>
+          <div class="rose-petal rp rp-6"></div>
+          <div class="rose-petal rp rp-7"></div>
+          <div class="rose-core"></div>
+        </div>
+        <div class="rose-glow"></div>
       </div>
-      <div class="valentine-flowers-title">Para ti</div>
+      <p class="valentine-flowers-msg">Para ti</p>
       <p class="valentine-flowers-text">
-        Las flores verdaderas duran solo unos dias.
-        <br>
-        Este detalle durara para toda la vida.
+        Las flores verdaderas duran solo unos días.<br>
+        Este detalle durará para toda la vida.
       </p>
     </div>
   </div>
@@ -1228,7 +1186,7 @@
   </div>
 
   <!-- Chocolate detenido (solo Chocolatería) -->
-  <div class="police-arrest-overlay" id="policeArrestOverlay">
+  <div class="police-arrest-overlay" id="policeArrestOverlay" onclick="closePoliceArrest()">
     <div class="police-arrest-content">
       <div class="police-lights">
         <div class="police-light red"></div>
@@ -1236,6 +1194,7 @@
       </div>
       <div class="arrest-text">¡Chocolate detenido! 🚔</div>
       <div class="arrest-subtext">Este bombón es para mayores de 18</div>
+      <div class="arrest-dismiss">Toca para cerrar</div>
     </div>
   </div>
 
@@ -1243,10 +1202,9 @@
   <div class="underage-overlay" id="underageOverlay" role="dialog" aria-modal="true" aria-label="Aviso de edad">
     <div class="gate-card">
       <p class="gate-step-text gate-step-text-underage">
-        Este bombón es para mayores de 18.
+        No puedes acceder a este bombón.
       </p>
       <button onclick="closeUnderageOverlay()" class="underage-btn-spaced">Entendido</button>
-      <button onclick="enterWebAnyway()" class="underage-secondary-btn">Entrar igual a la web</button>
     </div>
   </div>
 </body>

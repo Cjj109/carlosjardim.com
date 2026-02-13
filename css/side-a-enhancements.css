@@ -1261,113 +1261,215 @@ body.gym-widget-open {
 }
 
 /* ============================================
-   FLOR DE SAN VALENTÍN - Animación Premium
+   ROSA DE SAN VALENTÍN - CSS puro
+   7 pétalos en capas + tallo + hojas + glow
    ============================================ */
 
-.valentine-flower-stage {
+.rose-scene {
   position: relative;
-  width: 140px;
-  height: 220px;
-  margin: 0 auto 30px;
-  filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.4));
+  width: 160px;
+  height: 240px;
+  margin: 0 auto 28px;
 }
 
-.valentine-flower-art {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* Animación de Tallo creciendo */
-.flower-stem-group {
-  transform-origin: 50% 100%;
-  animation: stemGrow 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
-}
-
-/* Hojas balanceándose */
-.flower-leaf {
-  transform-origin: 100px 220px; /* Punto de pivote aproximado en el tallo */
-  animation: leafSway 4s ease-in-out infinite alternate;
-}
-.flower-leaf.right {
-  animation-delay: 1s;
-}
-
-/* Capullo abriéndose */
-.flower-head {
-  transform-origin: 100px 160px;
-  animation: bloomOpen 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  animation-delay: 0.5s; /* Empieza después del tallo */
-  opacity: 0; /* Empieza invisible */
-}
-
-/* Pétalos respirando */
-.petal {
-  transform-origin: 100px 120px;
-  transition: transform 0.5s ease;
-}
-
-.flower-head:hover .petal.mid-left { transform: translate(-2px, -2px) rotate(-5deg); }
-.flower-head:hover .petal.mid-right { transform: translate(2px, -2px) rotate(5deg); }
-
-/* Partículas mágicas */
-.sparkle {
+/* ── Tallo ── */
+.rose-stem {
   position: absolute;
-  font-size: 16px;
-  color: #fff7d6;
+  bottom: 0;
+  left: 50%;
+  width: 5px;
+  height: 120px;
+  margin-left: -2.5px;
+  background: linear-gradient(180deg, #3a7d44, #2d6a37);
+  border-radius: 3px;
+  transform-origin: bottom center;
+  animation: roseStemGrow 1s ease-out forwards;
+}
+
+/* ── Hojas ── */
+.rose-leaf {
+  position: absolute;
+  width: 36px;
+  height: 18px;
+  border-radius: 0 50% 50% 0;
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
   opacity: 0;
-  text-shadow: 0 0 5px #fff;
-  animation: sparkleFloat 3s ease-in-out infinite;
+  animation: roseLeafIn 0.5s ease forwards;
 }
 
-.s1 { top: 20%; left: 10%; animation-delay: 1.8s; font-size: 12px; }
-.s2 { top: 10%; right: 15%; animation-delay: 2.2s; font-size: 18px; }
-.s3 { top: 50%; left: 5%; animation-delay: 2.6s; font-size: 10px; }
-.s4 { top: 40%; right: 5%; animation-delay: 3.0s; font-size: 14px; }
-
-/* Keyframes */
-@keyframes stemGrow {
-  0% { transform: scaleY(0); opacity: 0; }
-  100% { transform: scaleY(1); opacity: 1; }
+.rose-leaf-l {
+  bottom: 58px;
+  left: 50%;
+  margin-left: -38px;
+  transform: rotate(-30deg);
+  border-radius: 50% 0 0 50%;
+  animation-delay: 0.7s;
 }
 
-@keyframes bloomOpen {
-  0% { transform: scale(0); opacity: 0; }
-  60% { opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+.rose-leaf-r {
+  bottom: 38px;
+  left: 50%;
+  margin-left: 4px;
+  transform: rotate(25deg);
+  animation-delay: 0.9s;
 }
 
-@keyframes leafSway {
-  0% { transform: rotate(-3deg); }
-  100% { transform: rotate(3deg); }
+/* ── Capullo (contenedor de pétalos) ── */
+.rose-bloom {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: 10px;
+  opacity: 0;
+  transform: scale(0.3);
+  animation: roseBloomIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.6s;
 }
 
-@keyframes sparkleFloat {
-  0% { transform: translateY(0) scale(0); opacity: 0; }
-  50% { transform: translateY(-10px) scale(1); opacity: 1; }
-  100% { transform: translateY(-20px) scale(0); opacity: 0; }
+/* ── Pétalos individuales ── */
+.rp {
+  position: absolute;
+  border-radius: 50% 50% 50% 0;
+  background: linear-gradient(145deg, #e8446c, #d63a5e);
 }
 
-.valentine-flowers-title {
-  color: #ffe6f2;
-  font-family: var(--font-sans); /* Más limpio que mono */
-  letter-spacing: 3px;
+/* Capa exterior — pétalos más grandes, abiertos */
+.rp-1 {
+  width: 52px; height: 52px;
+  top: 2px; left: 0;
+  transform: rotate(-40deg);
+  background: linear-gradient(135deg, #e8446c, #c03058);
+  opacity: 0.85;
+}
+.rp-2 {
+  width: 50px; height: 50px;
+  top: -2px; right: 4px;
+  transform: rotate(50deg);
+  background: linear-gradient(135deg, #f06292, #d63a5e);
+  opacity: 0.9;
+}
+.rp-3 {
+  width: 48px; height: 48px;
+  bottom: 4px; left: -2px;
+  transform: rotate(-80deg);
+  background: linear-gradient(135deg, #d63a5e, #ad2a4a);
+  opacity: 0.8;
+}
+.rp-4 {
+  width: 46px; height: 46px;
+  bottom: 0; right: 0;
+  transform: rotate(90deg);
+  background: linear-gradient(135deg, #ec407a, #c73860);
+  opacity: 0.85;
+}
+
+/* Capa interior — pétalos medianos, más cerrados */
+.rp-5 {
+  width: 38px; height: 38px;
+  top: 14px; left: 12px;
+  transform: rotate(-20deg);
+  background: linear-gradient(145deg, #f48fb1, #e8446c);
+  opacity: 0.95;
+}
+.rp-6 {
+  width: 36px; height: 36px;
+  top: 12px; right: 14px;
+  transform: rotate(30deg);
+  background: linear-gradient(145deg, #f06292, #ec407a);
+}
+
+/* Centro — pétalo más interno */
+.rp-7 {
+  width: 26px; height: 26px;
+  top: 22px; left: 50%;
+  margin-left: -13px;
+  transform: rotate(10deg);
+  background: linear-gradient(160deg, #f8bbd0, #f48fb1);
+  border-radius: 50%;
+}
+
+/* Centro dorado */
+.rose-core {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  top: 30px;
+  left: 50%;
+  margin-left: -7px;
+  background: radial-gradient(circle, #fff3e0, #ffcc80, #ffab40);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 171, 64, 0.5);
+  z-index: 2;
+}
+
+/* Glow ambiental detrás de la flor */
+.rose-glow {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  margin-left: -70px;
+  background: radial-gradient(circle, rgba(232, 68, 108, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: roseGlowPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Animaciones */
+@keyframes roseStemGrow {
+  from { height: 0; opacity: 0; }
+  to { height: 120px; opacity: 1; }
+}
+
+@keyframes roseLeafIn {
+  from { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  to { opacity: 1; }
+}
+
+@keyframes roseBloomIn {
+  from { opacity: 0; transform: scale(0.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes roseGlowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.08); }
+}
+
+/* Mensaje */
+.valentine-flowers-msg {
+  color: rgba(245, 220, 230, 0.6);
+  font-family: var(--font-sans);
+  letter-spacing: 4px;
   text-transform: uppercase;
-  font-size: 12px;
-  margin-bottom: 16px;
-  opacity: 0.7;
+  font-size: 11px;
+  margin: 0 0 14px;
   font-weight: 600;
 }
 
 .valentine-flowers-text {
   margin: 0;
-  color: #fff;
-  font-size: 20px;
-  max-width: 450px;
+  color: #f5dce6;
+  font-size: 18px;
+  max-width: 400px;
   margin-inline: auto;
-  line-height: 1.5;
-  font-weight: 300; /* Light */
-  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+@media (max-width: 768px) {
+  .rose-scene {
+    width: 130px;
+    height: 200px;
+  }
+
+  .valentine-flowers-text {
+    font-size: 16px;
+  }
 }
 
 body.valentine-flowers-open {

@@ -145,11 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lights) {
     let clickCount = 0;
     let clickTimer = null;
-    lights.addEventListener('click', () => {
+    
+    // Mejor manejo del área de click
+    lights.addEventListener('click', (e) => {
+      e.stopPropagation(); // Evitar burbujeo
       clickCount++;
+      
+      console.log('Traffic light click:', clickCount); // Debug
+      
       clearTimeout(clickTimer);
       clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+      
       if (clickCount >= 3) {
+        console.log('Opening admin panel...');
         openAdminPanel();
         clickCount = 0;
       }

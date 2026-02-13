@@ -108,17 +108,12 @@ function openValentineFlowers() {
   const modal = document.getElementById('valentineFlowersModal');
   if (!modal) return;
 
-  const head = modal.querySelector('.flower-head');
-  const stem = modal.querySelector('.flower-stem-group');
-  
-  // Reiniciar animaciones
-  if (head && stem) {
-    head.style.animation = 'none';
-    stem.style.animation = 'none';
-    head.offsetHeight; /* trigger reflow */
-    stem.offsetHeight; 
-    head.style.animation = 'bloomOpen 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.5s';
-    stem.style.animation = 'stemGrow 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards';
+  // Reiniciar animaciones de la rosa CSS
+  const scene = modal.querySelector('.rose-scene');
+  if (scene) {
+    scene.style.display = 'none';
+    scene.offsetHeight;
+    scene.style.display = '';
   }
 
   modal.classList.add('active');

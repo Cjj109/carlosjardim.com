@@ -22,14 +22,14 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=3600
   Content-Type: text/html; charset=utf-8
 
-# CSS - Cache agresivo (1 año) con revalidación
+# CSS - Cache con revalidación automática (ETag de Cloudflare invalida al hacer deploy)
 /css/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=600, stale-while-revalidate=86400
   Content-Type: text/css; charset=utf-8
 
-# JavaScript - Cache agresivo (1 año) con revalidación
+# JavaScript - Cache con revalidación automática
 /js/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=600, stale-while-revalidate=86400
   Content-Type: application/javascript; charset=utf-8
 
 # Fonts (si se agregan en el futuro)

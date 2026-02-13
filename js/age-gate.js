@@ -36,6 +36,8 @@ function handleAgeGateResponse(isAdult) {
   }
 }
 
+let policeArrestTimer = null;
+
 function showPoliceArrest() {
   const overlay = document.getElementById('policeArrestOverlay');
   if (!overlay) return;
@@ -43,10 +45,20 @@ function showPoliceArrest() {
   overlay.classList.add('active');
   overlay.classList.add('sirens-active');
 
-  setTimeout(() => {
+  // Sirenas se apagan después de 1.5s, pero el overlay queda visible
+  clearTimeout(policeArrestTimer);
+  policeArrestTimer = setTimeout(() => {
     overlay.classList.remove('sirens-active');
-    overlay.classList.remove('active');
-  }, 4000);
+  }, 1500);
+}
+
+function closePoliceArrest() {
+  const overlay = document.getElementById('policeArrestOverlay');
+  if (!overlay) return;
+
+  clearTimeout(policeArrestTimer);
+  overlay.classList.remove('sirens-active');
+  overlay.classList.remove('active');
 }
 
 /* Side B: menor de edad (mensaje simple, no chocolate) */
@@ -60,16 +72,10 @@ function closeUnderageOverlay() {
   if (overlay) overlay.classList.remove('active');
 }
 
-function enterWebAnyway() {
-  closeUnderageOverlay();
-  if (typeof toggleMode === 'function') {
-    toggleMode(true);
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   const ageGateModal = document.getElementById('ageGateModal');
   const underageOverlay = document.getElementById('underageOverlay');
+  const policeOverlay = document.getElementById('policeArrestOverlay');
   const closeButtons = document.querySelectorAll('.close-gate[role="button"]');
 
   closeButtons.forEach((button) => {
@@ -83,6 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
+
+    if (policeOverlay && policeOverlay.classList.contains('active')) {
+      closePoliceArrest();
+      return;
+    }
 
     if (ageGateModal && ageGateModal.classList.contains('active')) {
       closeAgeGateModal();
