@@ -37,7 +37,7 @@ function closeMonetaryIndicators() {
  */
 async function loadLiquidityData() {
   try {
-    const response = await fetch('data/bcv-liquidity.json?' + new Date().getTime());
+    const response = await fetch('data/bcv-liquidity.json');
 
     if (!response.ok) {
       throw new Error('Failed to fetch liquidity data');
@@ -274,13 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close with click outside
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
-        closeMonetaryIndicators();
-      }
-    });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('active')) {
         closeMonetaryIndicators();
       }
     });

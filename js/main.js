@@ -147,6 +147,45 @@ function startBiteSequence() {
 }
 
 /**
+ * Global ESC key handler - single listener for all modals
+ * Replaces individual keydown listeners across all JS files
+ */
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+
+  // Modal/overlay ID -> close function name (resolved at call time via window[fn])
+  // Order matters: overlays first (higher z-index), then modals
+  const modalCloseMap = [
+    ['closetOverlay', 'closeCloset'],
+    ['policeArrestOverlay', 'closePoliceArrest'],
+    ['underageOverlay', 'closeUnderageOverlay'],
+    ['ageGateModal', 'closeAgeGateModal'],
+    ['videoModal', 'closeVideoModal'],
+    ['bcvCalculatorModal', 'closeBCVCalculator'],
+    ['monetaryModal', 'closeMonetaryIndicators'],
+    ['commoditiesModal', 'closeCommodities'],
+    ['gymWidgetModal', 'closeGymWidget'],
+    ['chocolateShopModal', 'closeChocolateShop'],
+    ['timelineModal', 'closeAcademicTimeline'],
+    ['heightScaleModal', 'closeHeightScale'],
+    ['valentineFlowersModal', 'closeValentineFlowers'],
+    ['instagramChoiceModal', 'closeInstagramChoice'],
+    ['zodiacModal', 'closeZodiacCompatibility'],
+    ['fingerChooserModal', 'closeFingerChooser'],
+    ['utilitiesModal', 'closeUtilitiesMenu'],
+    ['compatTestModal', 'closeCompatibilityTest'],
+  ];
+
+  for (const [modalId, closeFn] of modalCloseMap) {
+    const modal = document.getElementById(modalId);
+    if (modal && modal.classList.contains('active') && typeof window[closeFn] === 'function') {
+      window[closeFn]();
+      return;
+    }
+  }
+});
+
+/**
  * Inicialización al cargar el DOM
  */
 document.addEventListener('DOMContentLoaded', () => {

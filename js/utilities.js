@@ -432,19 +432,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Close finger chooser with ESC
-  document.addEventListener('keydown', (e) => {
-    const fingerModal = document.getElementById('fingerChooserModal');
-    if (e.key === 'Escape' && fingerModal && fingerModal.classList.contains('active')) {
-      closeFingerChooser();
-    }
-  });
-
-  // Close utilities menu with ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && utilitiesModal && utilitiesModal.classList.contains('active')) {
-      closeUtilitiesMenu();
-    }
-  });
 });

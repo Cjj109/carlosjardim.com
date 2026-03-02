@@ -374,13 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeChocolateShop();
       }
     });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('active')) {
-        closeChocolateShop();
-      }
-    });
   }
 
 });

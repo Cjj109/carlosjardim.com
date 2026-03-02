@@ -43,7 +43,7 @@ async function loadGymData() {
 
   try {
     // Fetch data
-    const response = await fetch('data/gym-data.json?' + new Date().getTime());
+    const response = await fetch('data/gym-data.json');
 
     if (!response.ok) {
       throw new Error('Failed to fetch gym data');
@@ -273,13 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close with click outside
     gymModal.addEventListener('click', (e) => {
       if (e.target === gymModal) {
-        closeGymWidget();
-      }
-    });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && gymModal.classList.contains('active')) {
         closeGymWidget();
       }
     });

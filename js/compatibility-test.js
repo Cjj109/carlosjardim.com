@@ -349,12 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeCompatibilityTest();
       }
     });
-
-    // Cerrar con ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('active')) {
-        closeCompatibilityTest();
-      }
-    });
   }
+  // ESC handling is in the global handler (main.js)
 });

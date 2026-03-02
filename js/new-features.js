@@ -177,13 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeInstagramChoice();
       }
     });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && instagramModal.classList.contains('active')) {
-        closeInstagramChoice();
-      }
-    });
   }
 
   // Zodiac modal
@@ -192,13 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close with click outside
     zodiacModal.addEventListener('click', (e) => {
       if (e.target === zodiacModal) {
-        closeZodiacCompatibility();
-      }
-    });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && zodiacModal.classList.contains('active')) {
         closeZodiacCompatibility();
       }
     });

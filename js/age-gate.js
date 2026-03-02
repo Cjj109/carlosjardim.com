@@ -100,12 +100,8 @@ function closeUnderageOverlay() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const ageGateModal = document.getElementById('ageGateModal');
-  const underageOverlay = document.getElementById('underageOverlay');
-  const policeOverlay = document.getElementById('policeArrestOverlay');
-  const closetOverlay = document.getElementById('closetOverlay');
+  // Accessibility: Enter/Space on close buttons
   const closeButtons = document.querySelectorAll('.close-gate[role="button"]');
-
   closeButtons.forEach((button) => {
     button.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
@@ -114,27 +110,5 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') return;
-
-    if (closetOverlay && closetOverlay.classList.contains('active')) {
-      closeCloset();
-      return;
-    }
-
-    if (policeOverlay && policeOverlay.classList.contains('active')) {
-      closePoliceArrest();
-      return;
-    }
-
-    if (ageGateModal && ageGateModal.classList.contains('active')) {
-      closeAgeGateModal();
-      return;
-    }
-
-    if (underageOverlay && underageOverlay.classList.contains('active')) {
-      closeUnderageOverlay();
-    }
-  });
+  // ESC handling is in the global handler (main.js)
 });

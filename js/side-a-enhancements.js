@@ -108,12 +108,15 @@ function openValentineFlowers() {
   const modal = document.getElementById('valentineFlowersModal');
   if (!modal) return;
 
-  // Reiniciar animaciones de la rosa CSS
+  // Reiniciar animaciones de la rosa CSS (double rAF to avoid forced reflow)
   const scene = modal.querySelector('.rose-scene');
   if (scene) {
     scene.style.display = 'none';
-    scene.offsetHeight;
-    scene.style.display = '';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scene.style.display = '';
+      });
+    });
   }
 
   modal.classList.add('active');
@@ -140,13 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeAcademicTimeline();
       }
     });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && timelineModal.classList.contains('active')) {
-        closeAcademicTimeline();
-      }
-    });
   }
 
   // Animate skill bars on page load
@@ -160,24 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
         closeHeightScale();
       }
     });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && heightScaleModal.classList.contains('active')) {
-        closeHeightScale();
-      }
-    });
   }
 
   const valentineFlowersModal = document.getElementById('valentineFlowersModal');
   if (valentineFlowersModal) {
     valentineFlowersModal.addEventListener('click', (e) => {
       if (e.target === valentineFlowersModal) {
-        closeValentineFlowers();
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && valentineFlowersModal.classList.contains('active')) {
         closeValentineFlowers();
       }
     });

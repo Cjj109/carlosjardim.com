@@ -87,11 +87,5 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Cerrar con tecla ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('active')) {
-      closeVideoModal();
-    }
-  });
+  // ESC handling is in the global handler (main.js)
 });

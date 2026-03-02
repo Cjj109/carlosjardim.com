@@ -63,17 +63,18 @@ async function fetchUsdtRate() {
  */
 async function loadBCVRates() {
   try {
-    const cacheBuster = new Date().getTime();
+    // Fetch rates and history in parallel to avoid waterfall
+    const historyPromise = fetch('data/bcv-rates-history.json');
 
     // Primary: edge API (SSR). Fallback: static JSON + live USDT
-    let ratesResponse = await fetch('/api/bcv?' + cacheBuster);
+    let ratesResponse = await fetch('/api/bcv');
     let data;
 
     if (ratesResponse.ok) {
       data = await ratesResponse.json();
     } else {
       const [staticRates, usdtData] = await Promise.all([
-        fetch('data/bcv-rates.json?' + cacheBuster),
+        fetch('data/bcv-rates.json'),
         fetchUsdtRate()
       ]);
       if (!staticRates.ok) throw new Error('Failed to fetch BCV rates');
@@ -83,8 +84,8 @@ async function loadBCVRates() {
 
     bcvRates = data;
 
-    // History from static file (updated by GitHub Action)
-    const historyResponse = await fetch('data/bcv-rates-history.json?' + cacheBuster);
+    // Await history (already started in parallel)
+    const historyResponse = await historyPromise;
     if (historyResponse.ok) {
       bcvHistory = await historyResponse.json();
     }
@@ -490,13 +491,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close with click outside
     bcvModal.addEventListener('click', (e) => {
       if (e.target === bcvModal) {
-        closeBCVCalculator();
-      }
-    });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && bcvModal.classList.contains('active')) {
         closeBCVCalculator();
       }
     });

@@ -204,44 +204,33 @@ async function fetchGoldPrice() {
  */
 async function fetchEurUsdRate() {
   // Try Frankfurter API (free, no API key required)
+  // Fetch current and historical rates in parallel to avoid waterfall
   try {
-    const response = await fetch(
-      'https://api.frankfurter.app/latest?from=EUR&to=USD',
-      { cache: 'no-store' }
-    );
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const dateStr = yesterday.toISOString().split('T')[0];
 
-    if (response.ok) {
-      const data = await response.json();
+    const [currentRes, histRes] = await Promise.all([
+      fetch('https://api.frankfurter.app/latest?from=EUR&to=USD', { cache: 'no-store' }),
+      fetch(`https://api.frankfurter.app/${dateStr}?from=EUR&to=USD`, { cache: 'no-store' })
+    ]);
+
+    if (currentRes.ok) {
+      const data = await currentRes.json();
       if (data.rates && data.rates.USD) {
-        // Get yesterday's rate for change calculation
-        const yesterdayResponse = await fetch(
-          'https://api.frankfurter.app/latest?from=EUR&to=USD&amount=1',
-          { cache: 'no-store' }
-        );
-
         let change = null;
 
-        // Try to get historical rate for change
-        try {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          const dateStr = yesterday.toISOString().split('T')[0];
-
-          const histResponse = await fetch(
-            `https://api.frankfurter.app/${dateStr}?from=EUR&to=USD`,
-            { cache: 'no-store' }
-          );
-
-          if (histResponse.ok) {
-            const histData = await histResponse.json();
+        if (histRes.ok) {
+          try {
+            const histData = await histRes.json();
             if (histData.rates && histData.rates.USD) {
               const currentRate = data.rates.USD;
               const previousRate = histData.rates.USD;
               change = ((currentRate - previousRate) / previousRate) * 100;
             }
+          } catch (e) {
+            console.warn('Could not parse EUR/USD historical rate:', e);
           }
-        } catch (e) {
-          console.warn('Could not fetch EUR/USD historical rate:', e);
         }
 
         return {
@@ -440,13 +429,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close with click outside
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
-        closeCommodities();
-      }
-    });
-
-    // Close with ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('active')) {
         closeCommodities();
       }
     });
