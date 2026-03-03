@@ -162,6 +162,7 @@
   transform: translateX(4px);
 }
 
+/* rpym.net button — shrimp swim + water wave */
 .work-link-minimal {
   display: flex;
   align-items: center;
@@ -175,41 +176,99 @@
   border-radius: var(--radius-md);
   border: 1px solid rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
   background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.04);
-  transition: all var(--transition-fast);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   width: 100%;
   box-sizing: border-box;
 }
 
-.work-link-minimal:hover {
-  transform: translateY(-2px);
-  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5);
-  box-shadow: 0 8px 24px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.08);
+.work-link-minimal:hover,
+.work-link-minimal:active {
+  transform: translateY(-3px);
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6);
+  box-shadow:
+    0 8px 24px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2),
+    inset 0 -2px 8px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.08);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12);
 }
 
+/* Water wave rising from bottom on hover */
 .work-link-minimal::before {
   content: "";
   position: absolute;
-  inset: -50% auto -50% -60%;
-  width: 45%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transform: rotate(15deg);
-  transition: transform 0.5s ease;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0%;
+  background: linear-gradient(
+    0deg,
+    rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.18),
+    rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.06) 50%,
+    transparent
+  );
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
+  z-index: 0;
 }
 
-.work-link-minimal:hover::before {
-  transform: translateX(260%) rotate(15deg);
+.work-link-minimal:hover::before,
+.work-link-minimal:active::before {
+  height: 100%;
 }
 
+/* Floating bubbles on hover */
+.work-link-minimal::after {
+  content: "○ ○ ○";
+  position: absolute;
+  right: 55px;
+  bottom: -25px;
+  font-size: 8px;
+  letter-spacing: 6px;
+  color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0);
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  writing-mode: vertical-lr;
+  z-index: 1;
+}
+
+.work-link-minimal:hover::after,
+.work-link-minimal:active::after {
+  bottom: 6px;
+  color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
+}
+
+/* Shrimp icon — idle swim animation */
 .work-shrimp {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
-  opacity: 0.9;
   color: var(--accent-red);
+  animation: shrimpSwim 3s ease-in-out infinite;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4));
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes shrimpSwim {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  25% { transform: translateX(3px) translateY(-2px) rotate(2deg); }
+  75% { transform: translateX(-3px) translateY(1px) rotate(-2deg); }
+}
+
+/* Shrimp dash on hover */
+.work-link-minimal:hover .work-shrimp,
+.work-link-minimal:active .work-shrimp {
+  animation: shrimpDash 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  filter: drop-shadow(0 3px 10px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6));
+}
+
+@keyframes shrimpDash {
+  0% { transform: translateX(0) rotate(0deg) scale(1); }
+  30% { transform: translateX(-4px) rotate(5deg) scale(0.95); }
+  60% { transform: translateX(10px) rotate(-12deg) scale(1.15); }
+  100% { transform: translateX(4px) rotate(-4deg) scale(1.08); }
 }
 
 .work-link-text {
@@ -219,18 +278,30 @@
   font-weight: 700;
   color: var(--accent-red);
   flex: 1;
+  transition: letter-spacing 0.4s ease, text-shadow 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.work-link-minimal:hover .work-link-text,
+.work-link-minimal:active .work-link-text {
+  letter-spacing: 2.5px;
+  text-shadow: 0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
 }
 
 .work-link-arrow {
-  font-size: 16px;
-  opacity: 0.5;
-  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  font-size: 18px;
+  opacity: 0.4;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
   color: var(--accent-red);
+  position: relative;
+  z-index: 1;
 }
 
-.work-link-minimal:hover .work-link-arrow {
+.work-link-minimal:hover .work-link-arrow,
+.work-link-minimal:active .work-link-arrow {
   opacity: 1;
-  transform: translateX(3px);
+  transform: translate(6px, -3px);
 }
 
 .cv-text-spaced {
