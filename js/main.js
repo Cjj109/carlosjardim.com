@@ -174,6 +174,7 @@ document.addEventListener('keydown', (e) => {
     ['fingerChooserModal', 'closeFingerChooser'],
     ['utilitiesModal', 'closeUtilitiesMenu'],
     ['compatTestModal', 'closeCompatibilityTest'],
+    ['skillTreeModal', 'closeSkillTree'],
   ];
 
   for (const [modalId, closeFn] of modalCloseMap) {
@@ -186,52 +187,90 @@ document.addEventListener('keydown', (e) => {
 });
 
 /**
- * Skill Tree — Portafolio
- * Nodos se desbloquean al hacer click, estado guardado en localStorage
+ * Skill Tree — Portafolio (modal)
  */
-function setupSkillTree() {
-  const STORAGE_KEY = 'portfolio-unlocked';
-  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  const nodes = document.querySelectorAll('.skill-node');
-  const lines = document.querySelectorAll('.skill-tree-line');
+const SKILL_STORAGE = 'portfolio-unlocked';
 
-  // Restore previously unlocked nodes (without animation)
-  saved.forEach(skill => {
-    const node = document.querySelector(`.skill-node[data-skill="${skill}"]`);
-    if (node) {
+function updateSkillBadge() {
+  const badge = document.getElementById('skillTreeBadge');
+  if (!badge) return;
+  const saved = JSON.parse(localStorage.getItem(SKILL_STORAGE) || '[]');
+  badge.textContent = saved.length + '/3';
+}
+
+function openSkillTree() {
+  const overlay = document.getElementById('skillTreeModal');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // Restore previously unlocked nodes instantly
+  const saved = JSON.parse(localStorage.getItem(SKILL_STORAGE) || '[]');
+  overlay.querySelectorAll('.skill-node').forEach(node => {
+    if (saved.includes(node.dataset.skill)) {
       node.classList.add('unlocked');
-      // Light up the line that comes BEFORE this node (data-after = previous node's skill)
-      const line = document.querySelector(`.skill-tree-line[data-after="${skill}"]`);
-      if (line) line.classList.add('lit');
+      const branch = node.closest('.skill-branch');
+      if (branch) {
+        const line = branch.querySelector('.skill-branch-line');
+        if (line) line.classList.add('lit');
+      }
     }
   });
 
-  nodes.forEach(node => {
+  // Staggered branch entrance
+  const branches = overlay.querySelectorAll('.skill-branch');
+  branches.forEach((branch, i) => {
+    branch.classList.remove('visible');
+    setTimeout(() => branch.classList.add('visible'), 150 + i * 120);
+  });
+}
+window.openSkillTree = openSkillTree;
+
+function closeSkillTree() {
+  const overlay = document.getElementById('skillTreeModal');
+  if (!overlay) return;
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+window.closeSkillTree = closeSkillTree;
+
+function setupSkillTree() {
+  updateSkillBadge();
+
+  // Click overlay background to close
+  const overlay = document.getElementById('skillTreeModal');
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeSkillTree();
+    });
+  }
+
+  // Node click to unlock
+  document.querySelectorAll('#skillTreeModal .skill-node').forEach(node => {
     node.addEventListener('click', (e) => {
-      const skill = node.dataset.skill;
-
-      // Already unlocked — don't re-animate
       if (node.classList.contains('unlocked')) return;
-
-      // Prevent clicking the visit link from re-triggering
       if (e.target.closest('.skill-visit')) return;
 
-      // Unlock animation
       node.classList.add('unlocking');
       setTimeout(() => {
         node.classList.remove('unlocking');
         node.classList.add('unlocked');
 
-        // Light the connector line
-        const line = document.querySelector(`.skill-tree-line[data-after="${skill}"]`);
-        if (line) line.classList.add('lit');
+        // Light the branch line
+        const branch = node.closest('.skill-branch');
+        if (branch) {
+          const line = branch.querySelector('.skill-branch-line');
+          if (line) line.classList.add('lit');
+        }
 
-        // Save to localStorage
-        const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        // Save
+        const current = JSON.parse(localStorage.getItem(SKILL_STORAGE) || '[]');
+        const skill = node.dataset.skill;
         if (!current.includes(skill)) {
           current.push(skill);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+          localStorage.setItem(SKILL_STORAGE, JSON.stringify(current));
         }
+        updateSkillBadge();
       }, 600);
     });
   });
