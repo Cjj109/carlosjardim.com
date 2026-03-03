@@ -198,30 +198,86 @@ function updateSkillBadge() {
   badge.textContent = saved.length + '/3';
 }
 
+function unlockRoot() {
+  const root = document.getElementById('skillRoot');
+  if (root && !root.classList.contains('unlocked')) {
+    root.classList.add('unlocked');
+  }
+}
+
+function restoreBranch(col) {
+  const branch = col.dataset.branch;
+  col.classList.add('unlocked');
+
+  // Light root line for this column
+  const colIndex = Array.from(col.parentElement.children).indexOf(col);
+  const rootLine = document.querySelector('.skill-root-line[data-col="' + colIndex + '"]');
+  if (rootLine) rootLine.classList.add('lit');
+
+  // Unlock all prereqs and final instantly
+  col.querySelectorAll('.skill-prereq, .skill-final').forEach(node => {
+    node.classList.add('unlocked');
+  });
+}
+
+function cascadeUnlock(col) {
+  if (col.classList.contains('unlocked')) return;
+
+  const branch = col.dataset.branch;
+  const nodes = col.querySelectorAll('.skill-prereq, .skill-final');
+  const colIndex = Array.from(col.parentElement.children).indexOf(col);
+
+  // Light root line
+  const rootLine = document.querySelector('.skill-root-line[data-col="' + colIndex + '"]');
+  if (rootLine) rootLine.classList.add('lit');
+
+  // Cascade: unlock each node with staggered delay
+  nodes.forEach((node, i) => {
+    setTimeout(() => {
+      node.classList.add('unlocking');
+      setTimeout(() => {
+        node.classList.remove('unlocking');
+        node.classList.add('unlocked');
+      }, 500);
+    }, i * 250);
+  });
+
+  // Mark column as unlocked after all nodes finish
+  setTimeout(() => {
+    col.classList.add('unlocked');
+
+    // Save
+    const current = JSON.parse(localStorage.getItem(SKILL_STORAGE) || '[]');
+    if (!current.includes(branch)) {
+      current.push(branch);
+      localStorage.setItem(SKILL_STORAGE, JSON.stringify(current));
+    }
+    updateSkillBadge();
+    unlockRoot();
+  }, nodes.length * 250 + 500);
+}
+
 function openSkillTree() {
   const overlay = document.getElementById('skillTreeModal');
   if (!overlay) return;
   overlay.classList.add('active');
   document.body.style.overflow = 'hidden';
 
-  // Restore previously unlocked nodes instantly
+  // Restore previously unlocked branches instantly
   const saved = JSON.parse(localStorage.getItem(SKILL_STORAGE) || '[]');
-  overlay.querySelectorAll('.skill-node').forEach(node => {
-    if (saved.includes(node.dataset.skill)) {
-      node.classList.add('unlocked');
-      const branch = node.closest('.skill-branch');
-      if (branch) {
-        const line = branch.querySelector('.skill-branch-line');
-        if (line) line.classList.add('lit');
-      }
+  overlay.querySelectorAll('.skill-column').forEach(col => {
+    if (saved.includes(col.dataset.branch)) {
+      restoreBranch(col);
     }
   });
 
-  // Staggered branch entrance
-  const branches = overlay.querySelectorAll('.skill-branch');
-  branches.forEach((branch, i) => {
-    branch.classList.remove('visible');
-    setTimeout(() => branch.classList.add('visible'), 150 + i * 120);
+  if (saved.length > 0) unlockRoot();
+
+  // Staggered column entrance
+  const columns = overlay.querySelectorAll('.skill-column');
+  columns.forEach((col, i) => {
+    col.classList.remove('visible');
+    setTimeout(() => col.classList.add('visible'), 150 + i * 120);
   });
 }
 window.openSkillTree = openSkillTree;
@@ -245,33 +301,12 @@ function setupSkillTree() {
     });
   }
 
-  // Node click to unlock
-  document.querySelectorAll('#skillTreeModal .skill-node').forEach(node => {
-    node.addEventListener('click', (e) => {
-      if (node.classList.contains('unlocked')) return;
+  // Column click to cascade unlock
+  document.querySelectorAll('#skillTreeModal .skill-column').forEach(col => {
+    col.addEventListener('click', (e) => {
+      if (col.classList.contains('unlocked')) return;
       if (e.target.closest('.skill-visit')) return;
-
-      node.classList.add('unlocking');
-      setTimeout(() => {
-        node.classList.remove('unlocking');
-        node.classList.add('unlocked');
-
-        // Light the branch line
-        const branch = node.closest('.skill-branch');
-        if (branch) {
-          const line = branch.querySelector('.skill-branch-line');
-          if (line) line.classList.add('lit');
-        }
-
-        // Save
-        const current = JSON.parse(localStorage.getItem(SKILL_STORAGE) || '[]');
-        const skill = node.dataset.skill;
-        if (!current.includes(skill)) {
-          current.push(skill);
-          localStorage.setItem(SKILL_STORAGE, JSON.stringify(current));
-        }
-        updateSkillBadge();
-      }, 600);
+      cascadeUnlock(col);
     });
   });
 }

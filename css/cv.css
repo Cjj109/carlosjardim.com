@@ -184,11 +184,11 @@
   background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
-  width: 92%;
-  max-width: 400px;
-  max-height: 85vh;
+  width: 94%;
+  max-width: 520px;
+  max-height: 90vh;
   overflow-y: auto;
-  padding: 28px 24px;
+  padding: 24px 16px 28px;
   position: relative;
   transform: scale(0.95) translateY(10px);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -214,6 +214,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  z-index: 2;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -226,7 +227,7 @@
 /* Header */
 .skill-tree-header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .skill-tree-title {
@@ -245,183 +246,397 @@
   letter-spacing: 1px;
 }
 
-/* Branches container */
-.skill-tree-branches {
+/* ============================================
+   ROOT NODE — Creatividad
+   ============================================ */
+.skill-root-node {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
-}
-
-/* Root dot */
-.skill-tree-root {
   margin-bottom: 4px;
 }
 
-.skill-root-dot {
-  width: 12px;
-  height: 12px;
+.skill-root-circle {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: var(--accent-red);
-  box-shadow: 0 0 10px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5);
-  animation: rootPulse 2s ease-in-out infinite;
-}
-
-@keyframes rootPulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5); }
-  50% { box-shadow: 0 0 20px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.8); }
-}
-
-/* Branch (line + node) */
-.skill-branch {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  opacity: 0;
-  transform: translateY(15px);
-}
-
-.skill-branch.visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.skill-branch-line {
-  width: 2px;
-  height: 0;
-  background: rgba(255, 255, 255, 0.08);
-  transition: height 0.4s ease, background 0.6s ease, box-shadow 0.6s ease;
-}
-
-.skill-branch.visible .skill-branch-line {
-  height: 24px;
-}
-
-.skill-branch-line.lit {
-  background: var(--accent-red);
-  box-shadow: 0 0 8px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
-}
-
-/* Skill node (inside modal) */
-.skill-node {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1.5px dashed rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.03);
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  animation: nodePulse 3s ease-in-out infinite;
-}
-
-@keyframes nodePulse {
-  0%, 100% { border-color: rgba(255, 255, 255, 0.12); }
-  50% { border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.35); }
-}
-
-.skill-node:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-/* Circle icon container */
-.skill-node-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2.5px dashed rgba(255, 255, 255, 0.15);
   background: rgba(255, 255, 255, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   position: relative;
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: rootNodePulse 3s ease-in-out infinite;
 }
 
-.skill-lock {
+@keyframes rootNodePulse {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.15); }
+  50% { border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4); }
+}
+
+.skill-root-lock {
+  font-size: 22px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.skill-root-icon {
+  font-size: 26px;
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skill-root-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 6px;
+  transition: color 0.4s ease;
+}
+
+/* Root unlocked */
+.skill-root-node.unlocked .skill-root-circle {
+  border-style: solid;
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12);
+  box-shadow: 0 0 20px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+  animation: none;
+}
+
+.skill-root-node.unlocked .skill-root-lock {
+  opacity: 0;
+  transform: scale(0) rotate(90deg);
+}
+
+.skill-root-node.unlocked .skill-root-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.skill-root-node.unlocked .skill-root-label {
+  color: var(--accent-red);
+}
+
+/* ============================================
+   ROOT LINES — connecting root to columns
+   ============================================ */
+.skill-root-lines {
+  display: flex;
+  justify-content: space-around;
+  width: 70%;
+  margin: 0 auto 4px;
+  padding: 0 10px;
+}
+
+.skill-root-line {
+  width: 2px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.6s ease, box-shadow 0.6s ease;
+}
+
+.skill-root-line.lit {
+  background: var(--accent-red);
+  box-shadow: 0 0 8px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
+}
+
+/* ============================================
+   COLUMNS — 3-branch layout
+   ============================================ */
+.skill-tree-columns {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.skill-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  padding: 8px 4px;
+  border-radius: var(--radius-md);
+  border: 1.5px dashed rgba(255, 255, 255, 0.06);
+  transition: all 0.3s ease;
+}
+
+.skill-column:hover {
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.skill-column.unlocked {
+  cursor: default;
+  border-style: solid;
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.03);
+}
+
+.skill-column.unlocked:hover {
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.03);
+}
+
+/* ============================================
+   COLUMN LINES — vertical connectors
+   ============================================ */
+.skill-column-line {
+  width: 2px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.6s ease, box-shadow 0.6s ease;
+}
+
+.skill-column.unlocked .skill-column-line {
+  background: var(--accent-red);
+  box-shadow: 0 0 6px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+}
+
+/* ============================================
+   PREREQUISITE NODES — small skill circles
+   ============================================ */
+.skill-prereq {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skill-column.visible .skill-prereq {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.skill-prereq-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skill-prereq-lock {
+  font-size: 14px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.skill-prereq-icon {
+  font-size: 18px;
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skill-prereq-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 4px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  transition: color 0.4s ease;
+}
+
+/* Prereq unlocked */
+.skill-prereq.unlocked .skill-prereq-circle {
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.1);
+  box-shadow: 0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.25);
+}
+
+.skill-prereq.unlocked .skill-prereq-lock {
+  opacity: 0;
+  transform: scale(0) rotate(90deg);
+}
+
+.skill-prereq.unlocked .skill-prereq-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.skill-prereq.unlocked .skill-prereq-label {
+  color: var(--accent-red);
+}
+
+/* Prereq unlock animation */
+.skill-prereq.unlocking .skill-prereq-circle {
+  animation: prereqPop 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes prereqPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.9); }
+  70% { transform: scale(1.15); box-shadow: 0 0 20px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5); }
+  100% { transform: scale(1); }
+}
+
+/* ============================================
+   FINAL PROJECT NODE — bigger, with info
+   ============================================ */
+.skill-final {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skill-column.visible .skill-final {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.skill-final-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2.5px dashed rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: finalNodePulse 3s ease-in-out infinite;
+}
+
+@keyframes finalNodePulse {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.12); }
+  50% { border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3); }
+}
+
+.skill-final-lock {
   font-size: 18px;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.skill-icon-svg,
-.skill-icon-emoji {
+.skill-final-svg,
+.skill-final-emoji {
   position: absolute;
   opacity: 0;
-  transform: scale(0.4);
-  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(0.3);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.skill-icon-svg {
+.skill-final-svg {
   width: 28px;
   height: 28px;
   color: var(--accent-red);
 }
 
-.skill-icon-emoji {
+.skill-final-emoji {
   font-size: 22px;
 }
 
-/* Node body (text side) */
-.skill-node-body {
-  flex: 1;
-  text-align: left;
-  min-width: 0;
-}
-
-.skill-category {
+.skill-final-label {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2.5px;
-  color: rgba(255, 255, 255, 0.3);
-  margin-bottom: 3px;
-  transition: color 0.4s ease;
-}
-
-.skill-name {
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 5px;
+  text-align: center;
   letter-spacing: 0.3px;
   transition: color 0.4s ease;
 }
 
-/* Hidden info panel */
-.skill-info {
+.skill-final-info {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
+  text-align: center;
   transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.4s ease 0.1s,
+              opacity 0.4s ease 0.15s,
               margin-top 0.4s ease;
   margin-top: 0;
 }
 
-.skill-info p {
-  font-size: 12px;
+.skill-final-info p {
+  font-size: 10px;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 10px;
+  margin: 0 0 8px;
 }
 
+/* Final node unlocked */
+.skill-final.unlocked .skill-final-circle {
+  border-style: solid;
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12);
+  box-shadow: 0 0 16px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.35);
+  animation: none;
+}
+
+.skill-final.unlocked .skill-final-lock {
+  opacity: 0;
+  transform: scale(0) rotate(90deg);
+}
+
+.skill-final.unlocked .skill-final-svg,
+.skill-final.unlocked .skill-final-emoji {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.skill-final.unlocked .skill-final-label {
+  color: #fff;
+  font-size: 11px;
+}
+
+.skill-final.unlocked .skill-final-info {
+  max-height: 120px;
+  opacity: 1;
+  margin-top: 6px;
+}
+
+/* Final node unlock animation */
+.skill-final.unlocking .skill-final-circle {
+  animation: finalPop 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes finalPop {
+  0% { transform: scale(1); box-shadow: none; }
+  30% { transform: scale(0.92); }
+  60% { transform: scale(1.12); box-shadow: 0 0 30px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6); }
+  100% { transform: scale(1); }
+}
+
+/* Shrimp swim in skill tree */
+.skill-final.unlocked .skill-shrimp {
+  animation: shrimpSwim 3s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4));
+}
+
+@keyframes shrimpSwim {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  25% { transform: translateX(2px) translateY(-1px) rotate(2deg); }
+  75% { transform: translateX(-2px) translateY(1px) rotate(-2deg); }
+}
+
+/* Reuse existing visit button */
 .skill-visit {
   display: inline-block;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--accent-red);
   text-decoration: none;
-  padding: 5px 14px;
+  padding: 4px 12px;
   border: 1px solid rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
   border-radius: var(--radius-sm);
   transition: all 0.3s ease;
@@ -431,73 +646,6 @@
 .skill-visit:hover {
   background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
   border-color: var(--accent-red);
-  transform: translateX(3px);
-}
-
-/* ============================================
-   SKILL NODE — Unlocked state
-   ============================================ */
-.skill-node.unlocked {
-  border-style: solid;
-  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.06);
-  animation: none;
-  cursor: default;
-}
-
-.skill-node.unlocked .skill-node-circle {
-  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.1);
-}
-
-.skill-node.unlocked .skill-category {
-  color: var(--accent-red);
-}
-
-.skill-node.unlocked .skill-lock {
-  opacity: 0;
-  transform: scale(0) rotate(90deg);
-  position: absolute;
-}
-
-.skill-node.unlocked .skill-icon-svg,
-.skill-node.unlocked .skill-icon-emoji {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.skill-node.unlocked .skill-name {
-  color: #fff;
-}
-
-.skill-node.unlocked .skill-info {
-  max-height: 100px;
-  opacity: 1;
-  margin-top: 8px;
-}
-
-/* Unlock flash animation */
-@keyframes skillUnlock {
-  0% { transform: scale(1); box-shadow: none; }
-  30% { transform: scale(0.97); }
-  60% { transform: scale(1.03); box-shadow: 0 0 24px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5); }
-  100% { transform: scale(1); box-shadow: none; }
-}
-
-.skill-node.unlocking {
-  animation: skillUnlock 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* Shrimp swim in skill tree */
-.skill-node.unlocked .skill-shrimp {
-  animation: shrimpSwim 3s ease-in-out infinite;
-  filter: drop-shadow(0 2px 4px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4));
-}
-
-@keyframes shrimpSwim {
-  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
-  25% { transform: translateX(2px) translateY(-1px) rotate(2deg); }
-  75% { transform: translateX(-2px) translateY(1px) rotate(-2deg); }
 }
 
 .cv-text-spaced {
