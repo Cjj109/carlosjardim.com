@@ -48,15 +48,56 @@ body[data-theme] .micro-line {
   color: color-mix(in srgb, var(--text-main) 80%, transparent);
 }
 
-body[data-theme] .work-link-minimal {
-  color: var(--accent-red);
-  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+/* Skill tree — dark theme overrides */
+body[data-theme] .skill-node {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+@keyframes nodePulseDark {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.1); }
+  50% { border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.35); }
+}
+
+body[data-theme] .skill-node {
+  animation-name: nodePulseDark;
+}
+
+body[data-theme] .skill-node:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body[data-theme] .skill-node.unlocked {
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
   background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.08);
 }
 
-body[data-theme] .work-link-minimal:hover {
-  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6);
-  box-shadow: 0 8px 20px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
+body[data-theme] .skill-category {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+body[data-theme] .skill-name {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+body[data-theme] .skill-node.unlocked .skill-name {
+  color: var(--accent-red);
+}
+
+body[data-theme] .skill-tree-line {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body[data-theme] .skill-info p {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body[data-theme] .skill-visit {
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+}
+
+body[data-theme] .skill-visit:hover {
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
 }
 
 /* ============================================

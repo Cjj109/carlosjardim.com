@@ -186,10 +186,63 @@ document.addEventListener('keydown', (e) => {
 });
 
 /**
+ * Skill Tree — Portafolio
+ * Nodos se desbloquean al hacer click, estado guardado en localStorage
+ */
+function setupSkillTree() {
+  const STORAGE_KEY = 'portfolio-unlocked';
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const nodes = document.querySelectorAll('.skill-node');
+  const lines = document.querySelectorAll('.skill-tree-line');
+
+  // Restore previously unlocked nodes (without animation)
+  saved.forEach(skill => {
+    const node = document.querySelector(`.skill-node[data-skill="${skill}"]`);
+    if (node) {
+      node.classList.add('unlocked');
+      // Light up the line that comes BEFORE this node (data-after = previous node's skill)
+      const line = document.querySelector(`.skill-tree-line[data-after="${skill}"]`);
+      if (line) line.classList.add('lit');
+    }
+  });
+
+  nodes.forEach(node => {
+    node.addEventListener('click', (e) => {
+      const skill = node.dataset.skill;
+
+      // Already unlocked — don't re-animate
+      if (node.classList.contains('unlocked')) return;
+
+      // Prevent clicking the visit link from re-triggering
+      if (e.target.closest('.skill-visit')) return;
+
+      // Unlock animation
+      node.classList.add('unlocking');
+      setTimeout(() => {
+        node.classList.remove('unlocking');
+        node.classList.add('unlocked');
+
+        // Light the connector line
+        const line = document.querySelector(`.skill-tree-line[data-after="${skill}"]`);
+        if (line) line.classList.add('lit');
+
+        // Save to localStorage
+        const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        if (!current.includes(skill)) {
+          current.push(skill);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+        }
+      }, 600);
+    });
+  });
+}
+
+/**
  * Inicialización al cargar el DOM
  */
 document.addEventListener('DOMContentLoaded', () => {
   applyRandomness();
   setupHintBehavior();
   setupParallax();
+  setupSkillTree();
 });

@@ -106,202 +106,212 @@
   color: #333;
 }
 
-/* Work card */
-.work-card {
+/* ============================================
+   SKILL TREE — Portafolio
+   ============================================ */
+.skill-tree {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 18px 20px;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  color: inherit;
-  transition: all var(--transition-fast);
-  margin-bottom: 4px;
+  gap: 0;
+  padding: 8px 0;
 }
 
-.work-card:hover {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.25);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+/* Connecting line between nodes */
+.skill-tree-line {
+  width: 2px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.1);
+  transition: background 0.6s ease;
 }
 
-.work-card-icon {
-  font-size: 28px;
-  flex-shrink: 0;
+.skill-tree-line.lit {
+  background: var(--accent-red);
+  box-shadow: 0 0 8px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
 }
 
-.work-card-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.work-card-title {
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--accent-red);
-  margin-bottom: 4px;
-}
-
-.work-card-desc {
-  font-size: 14px;
-  line-height: 1.5;
-  color: #555;
-}
-
-.work-card-arrow {
-  font-size: 18px;
-  color: #999;
-  flex-shrink: 0;
-  transition: transform var(--transition-fast);
-}
-
-.work-card:hover .work-card-arrow {
-  color: var(--accent-red);
-  transform: translateX(4px);
-}
-
-/* rpym.net button — shrimp swim + water wave */
-.work-link-minimal {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  text-decoration: none;
-  color: var(--text-main);
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 500;
-  padding: 16px 20px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.04);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+/* Skill node — locked state (default) */
+.skill-node {
   width: 100%;
   box-sizing: border-box;
-}
-
-.work-link-minimal:hover,
-.work-link-minimal:active {
-  transform: translateY(-3px);
-  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6);
-  box-shadow:
-    0 8px 24px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2),
-    inset 0 -2px 8px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.08);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12);
-}
-
-/* Water wave rising from bottom on hover */
-.work-link-minimal::before {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 0%;
-  background: linear-gradient(
-    0deg,
-    rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.18),
-    rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.06) 50%,
-    transparent
-  );
-  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.work-link-minimal:hover::before,
-.work-link-minimal:active::before {
-  height: 100%;
-}
-
-/* Floating bubbles on hover */
-.work-link-minimal::after {
-  content: "○ ○ ○";
-  position: absolute;
-  right: 55px;
-  bottom: -25px;
-  font-size: 8px;
-  letter-spacing: 6px;
-  color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0);
-  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  writing-mode: vertical-lr;
-  z-index: 1;
-}
-
-.work-link-minimal:hover::after,
-.work-link-minimal:active::after {
-  bottom: 6px;
-  color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
-}
-
-/* Shrimp icon — idle swim animation */
-.work-shrimp {
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
-  color: var(--accent-red);
-  animation: shrimpSwim 3s ease-in-out infinite;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;
-  filter: drop-shadow(0 2px 4px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4));
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  border: 1.5px dashed rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.02);
+  cursor: pointer;
   position: relative;
-  z-index: 1;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  animation: nodePulse 3s ease-in-out infinite;
+}
+
+@keyframes nodePulse {
+  0%, 100% { border-color: rgba(0, 0, 0, 0.15); }
+  50% { border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3); }
+}
+
+.skill-node:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Category label */
+.skill-category {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #aaa;
+  margin-bottom: 10px;
+  transition: color 0.4s ease;
+}
+
+/* Icon wrapper */
+.skill-icon-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skill-lock {
+  font-size: 24px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.skill-icon-svg,
+.skill-icon-emoji {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skill-icon-svg {
+  width: 40px;
+  height: 40px;
+  color: var(--accent-red);
+}
+
+.skill-icon-emoji {
+  font-size: 32px;
+}
+
+/* Project name */
+.skill-name {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: #999;
+  letter-spacing: 0.5px;
+  transition: color 0.4s ease, letter-spacing 0.4s ease;
+}
+
+/* Hidden info panel */
+.skill-info {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.4s ease 0.1s,
+              margin-top 0.4s ease;
+  margin-top: 0;
+}
+
+.skill-info p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0 0 12px;
+}
+
+.skill-visit {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-red);
+  text-decoration: none;
+  padding: 6px 16px;
+  border: 1px solid rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.skill-visit:hover {
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.1);
+  border-color: var(--accent-red);
+  transform: translateX(3px);
+}
+
+/* ============================================
+   SKILL NODE — Unlocked state
+   ============================================ */
+.skill-node.unlocked {
+  border-style: solid;
+  border-color: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.05);
+  animation: none;
+  cursor: default;
+}
+
+.skill-node.unlocked .skill-category {
+  color: var(--accent-red);
+}
+
+.skill-node.unlocked .skill-lock {
+  opacity: 0;
+  transform: scale(0) rotate(90deg);
+  position: absolute;
+}
+
+.skill-node.unlocked .skill-icon-svg,
+.skill-node.unlocked .skill-icon-emoji {
+  opacity: 1;
+  transform: scale(1);
+  position: relative;
+}
+
+.skill-node.unlocked .skill-name {
+  color: var(--accent-red);
+  letter-spacing: 1.5px;
+}
+
+.skill-node.unlocked .skill-info {
+  max-height: 120px;
+  opacity: 1;
+  margin-top: 12px;
+}
+
+/* Unlock flash animation */
+@keyframes skillUnlock {
+  0% { transform: scale(1); box-shadow: none; }
+  30% { transform: scale(0.97); }
+  60% { transform: scale(1.03); box-shadow: 0 0 20px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4); }
+  100% { transform: scale(1); box-shadow: 0 4px 16px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12); }
+}
+
+.skill-node.unlocking {
+  animation: skillUnlock 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Shrimp swim in skill tree (reuse) */
+.skill-node.unlocked .skill-shrimp {
+  animation: shrimpSwim 3s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4));
 }
 
 @keyframes shrimpSwim {
   0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
   25% { transform: translateX(3px) translateY(-2px) rotate(2deg); }
   75% { transform: translateX(-3px) translateY(1px) rotate(-2deg); }
-}
-
-/* Shrimp dash on hover */
-.work-link-minimal:hover .work-shrimp,
-.work-link-minimal:active .work-shrimp {
-  animation: shrimpDash 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  filter: drop-shadow(0 3px 10px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6));
-}
-
-@keyframes shrimpDash {
-  0% { transform: translateX(0) rotate(0deg) scale(1); }
-  30% { transform: translateX(-4px) rotate(5deg) scale(0.95); }
-  60% { transform: translateX(10px) rotate(-12deg) scale(1.15); }
-  100% { transform: translateX(4px) rotate(-4deg) scale(1.08); }
-}
-
-.work-link-text {
-  letter-spacing: 0.3px;
-  font-family: var(--mono);
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--accent-red);
-  flex: 1;
-  transition: letter-spacing 0.4s ease, text-shadow 0.4s ease;
-  position: relative;
-  z-index: 1;
-}
-
-.work-link-minimal:hover .work-link-text,
-.work-link-minimal:active .work-link-text {
-  letter-spacing: 2.5px;
-  text-shadow: 0 0 12px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
-}
-
-.work-link-arrow {
-  font-size: 18px;
-  opacity: 0.4;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-  color: var(--accent-red);
-  position: relative;
-  z-index: 1;
-}
-
-.work-link-minimal:hover .work-link-arrow,
-.work-link-minimal:active .work-link-arrow {
-  opacity: 1;
-  transform: translate(6px, -3px);
 }
 
 .cv-text-spaced {
