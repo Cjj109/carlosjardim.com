@@ -266,6 +266,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   animation: rootNodePulse 3s ease-in-out infinite;
 }
@@ -425,6 +426,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -512,6 +514,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   animation: finalNodePulse 3s ease-in-out infinite;
 }
