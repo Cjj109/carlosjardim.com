@@ -9,11 +9,11 @@ function initChat(containerId, persona) {
 
   const history = [];
   const placeholder = persona === 'abuela'
-    ? 'Háblale a la Avó...'
-    : 'Pregunta sobre mis proyectos...';
+    ? 'Convence a la Avó...'
+    : 'Pregúntale a Clippy...';
   const welcomeMsg = persona === 'abuela'
-    ? 'Ai, meu filhinho! Já comeste hoje? Fala com a tua avó, então...'
-    : 'Hola, soy el asistente de Carlos. ¿En qué te puedo ayudar?';
+    ? 'Então... tú quieres ser la novia de mi Carlos? Meu Deus, a ver, cuéntame de ti, filha. ¿Sabes cocinar?'
+    : '¡Parece que estás intentando conocer a Carlos! ¿Necesitas ayuda con eso? Soy Clippy, su asistente.';
 
   container.innerHTML =
     '<div class="chat-messages" id="' + containerId + 'Msgs">' +
@@ -82,8 +82,8 @@ function initChat(containerId, persona) {
 
       if (data.error) {
         addBubble(persona === 'abuela'
-          ? 'Ai meu Deus... não consigo falar agora, filhinho.'
-          : 'Lo siento, hubo un error. Intenta de nuevo.',
+          ? 'Ai meu Deus... não consigo falar agora, filha.'
+          : '¡Parece que estás intentando hablar conmigo pero algo falló! Intenta de nuevo.',
           'ai');
       } else {
         const reply = data.reply || '';
@@ -94,7 +94,7 @@ function initChat(containerId, persona) {
       typingEl.remove();
       addBubble(persona === 'abuela'
         ? 'Nossa senhora, esta coisa não funciona...'
-        : 'Error de conexión. Intenta de nuevo.',
+        : '¡Parece que perdí la conexión! Como en Windows 98. Intenta de nuevo.',
         'ai');
     }
 
