@@ -1,0 +1,186 @@
+/* ============================================
+   CHAT WIDGET — Side A (assistant) & Side B (abuela)
+   ============================================ */
+
+.chat-section {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #fafafa;
+  margin-top: 10px;
+}
+
+.chat-messages {
+  height: 260px;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scroll-behavior: smooth;
+}
+
+/* Bubbles */
+.chat-bubble {
+  max-width: 85%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+  animation: bubbleIn 0.25s ease;
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-bubble-ai {
+  align-self: flex-start;
+  background: #e9e9eb;
+  color: #1a1a1a;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-bubble-user {
+  align-self: flex-end;
+  background: var(--accent-red);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+/* Typing indicator */
+.chat-typing {
+  display: flex;
+  gap: 4px;
+  padding: 10px 16px;
+}
+
+.chat-typing .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #999;
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+
+.chat-typing .dot:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing .dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* Input row */
+.chat-input-row {
+  display: flex;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: var(--mono);
+  background: transparent;
+  color: #1a1a1a;
+}
+
+.chat-input::placeholder {
+  color: #aaa;
+}
+
+.chat-send {
+  border: none;
+  background: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: var(--accent-red);
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.chat-send:hover {
+  transform: scale(1.15);
+}
+
+.chat-send:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   SIDE B — Abuela variant (dark theme)
+   ============================================ */
+
+.alt-chat-section {
+  padding: 0 20px;
+  margin: 24px 0;
+}
+
+.alt-chat-section .chat-section {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.alt-chat-section .chat-bubble-ai {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.alt-chat-section .chat-bubble-user {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+.alt-chat-section .chat-input-row {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.alt-chat-section .chat-input {
+  color: #fff;
+}
+
+.alt-chat-section .chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.alt-chat-section .chat-typing .dot {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Abuela label */
+.alt-chat-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Scrollbar styling */
+.chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.alt-chat-section .chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
