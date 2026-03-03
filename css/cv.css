@@ -281,11 +281,11 @@
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.skill-root-icon {
-  font-size: 26px;
+.skill-root-svg {
   position: absolute;
   opacity: 0;
   transform: scale(0.3);
+  color: var(--accent-red);
   transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -314,7 +314,7 @@
   transform: scale(0) rotate(90deg);
 }
 
-.skill-root-node.unlocked .skill-root-icon {
+.skill-root-node.unlocked .skill-root-svg {
   opacity: 1;
   transform: scale(1);
 }
@@ -435,11 +435,11 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.skill-prereq-icon {
-  font-size: 18px;
+.skill-prereq-svg {
   position: absolute;
   opacity: 0;
   transform: scale(0.3);
+  color: var(--accent-red);
   transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -466,7 +466,7 @@
   transform: scale(0) rotate(90deg);
 }
 
-.skill-prereq.unlocked .skill-prereq-icon {
+.skill-prereq.unlocked .skill-prereq-svg {
   opacity: 1;
   transform: scale(1);
 }
@@ -529,22 +529,12 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.skill-final-svg,
-.skill-final-emoji {
+.skill-final-svg {
   position: absolute;
   opacity: 0;
   transform: scale(0.3);
-  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.skill-final-svg {
-  width: 28px;
-  height: 28px;
   color: var(--accent-red);
-}
-
-.skill-final-emoji {
-  font-size: 22px;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .skill-final-label {
@@ -590,8 +580,7 @@
   transform: scale(0) rotate(90deg);
 }
 
-.skill-final.unlocked .skill-final-svg,
-.skill-final.unlocked .skill-final-emoji {
+.skill-final.unlocked .skill-final-svg {
   opacity: 1;
   transform: scale(1);
 }
