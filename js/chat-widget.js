@@ -185,6 +185,27 @@ function initClippyWidget() {
     openChat();
   });
 
+  // Hide/show Clippy based on Side A vs Side B / gates
+  const widget = document.getElementById('clippyWidget');
+
+  function updateClippyVisibility() {
+    const isAltActive = document.body.classList.contains('alt-active');
+    const gateActive = document.querySelector('.gender-gate.active');
+    if (isAltActive || gateActive) {
+      widget.style.display = 'none';
+      if (chatOpen) closeChat();
+    } else {
+      widget.style.display = '';
+    }
+  }
+
+  // Watch for class changes on body and gate
+  new MutationObserver(updateClippyVisibility).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  const gate = document.getElementById('genderGate');
+  if (gate) new MutationObserver(updateClippyVisibility).observe(gate, { attributes: true, attributeFilter: ['class'] });
+
+  updateClippyVisibility();
+
   // Start the annoyance cycle
   startTipCycle();
 }
