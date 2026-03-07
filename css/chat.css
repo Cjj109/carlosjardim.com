@@ -332,22 +332,70 @@
 /* ---- Mobile adjustments ---- */
 @media (max-width: 600px) {
   .clippy-widget {
-    bottom: 14px;
-    right: 14px;
+    bottom: 12px;
+    right: 12px;
   }
 
   .clippy-trigger {
-    width: 56px;
-    height: 56px;
-  }
-
-  .clippy-chat-panel {
-    width: calc(100vw - 28px);
-    max-height: 370px;
+    width: 68px;
+    height: 68px;
   }
 
   .clippy-tip {
-    max-width: 180px;
+    max-width: 190px;
     font-size: 10px;
+  }
+
+  /* Full-screen chat on mobile */
+  .clippy-chat-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    z-index: 9999;
+  }
+
+  .clippy-chat-panel .chat-messages {
+    height: auto;
+    flex: 1;
+  }
+
+  .clippy-chat-panel .chat-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .clippy-chat-header {
+    padding: 12px 16px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    font-size: 13px;
+  }
+
+  .clippy-chat-close {
+    font-size: 22px;
+    padding: 4px 8px;
+  }
+
+  .clippy-chat-panel .chat-input {
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+
+  .clippy-chat-panel .chat-send {
+    padding: 12px 16px;
+  }
+
+  .clippy-chat-panel .chat-bubble {
+    font-size: 14px;
+  }
+
+  .clippy-chat-panel .chat-input-row {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
