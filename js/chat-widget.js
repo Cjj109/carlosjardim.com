@@ -12,8 +12,8 @@ function initChat(containerId, persona) {
     ? 'Convence a la Avó...'
     : 'Pregúntale a Clippy...';
   const welcomeMsg = persona === 'abuela'
-    ? 'Então... tú quieres ser la novia de mi Carlos? Meu Deus, a ver, cuéntame de ti, filha. ¿Sabes cocinar?'
-    : '¡Parece que estás intentando conocer a Carlos! ¿Necesitas ayuda con eso? Soy Clippy, su asistente.';
+    ? 'Entonces... ¿tú quieres ser la novia de mi Carlos? Meu Deus, a ver, cuéntame de ti, filha. ¿Sabes cocinar?'
+    : '¡Parece que estás intentando conocer a Carlos! Según mi contrato, debo informarte de que es el mejor profesional del mundo. ¿Necesitas ayuda?';
 
   container.innerHTML =
     '<div class="chat-messages" id="' + containerId + 'Msgs">' +
