@@ -240,11 +240,7 @@
         🎫 Chocolatería
       </div>
 
-      <div class="clippy-header">
-        <img src="images/clippy.png" alt="Clippy" class="clippy-avatar">
-        <div class="section-label">Clippy</div>
-      </div>
-      <div class="chat-section chat-clippy" id="chatAssistant"></div>
+      <!-- Clippy widget moved to floating container at end of body -->
 
       <div class="trigger-wrapper">
         <div class="hint-arrow" id="hintArrow">Muerde el dulce ↓</div>
@@ -1399,6 +1395,22 @@
 
       </div>
     </div>
+  </div>
+  <!-- ============================================
+       CLIPPY FLOATING WIDGET
+       ============================================ -->
+  <div class="clippy-widget" id="clippyWidget">
+    <div class="clippy-chat-panel" id="clippyChatPanel">
+      <div class="clippy-chat-header">
+        <span>Clippy</span>
+        <button class="clippy-chat-close" id="clippyChatClose" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="chat-section" id="chatAssistant"></div>
+    </div>
+    <div class="clippy-tip" id="clippyTip"></div>
+    <button class="clippy-trigger" id="clippyTrigger" aria-label="Hablar con Clippy">
+      <img src="images/clippy.png" alt="Clippy" class="clippy-avatar">
+    </button>
   </div>
 </body>
 </html>

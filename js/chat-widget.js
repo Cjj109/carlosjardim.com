@@ -9,11 +9,11 @@ function initChat(containerId, persona) {
 
   const history = [];
   const placeholder = persona === 'abuela'
-    ? 'Convence a la Avó...'
-    : 'Pregúntale a Clippy...';
+    ? 'Convence a la Avo...'
+    : 'Preguntale a Clippy...';
   const welcomeMsg = persona === 'abuela'
-    ? 'Entonces... ¿tú quieres ser la novia de mi Carlos? Meu Deus, a ver, cuéntame de ti, filha. ¿Sabes cocinar?'
-    : '¡Parece que estás intentando conocer a Carlos! Según mi contrato, debo informarte de que es el mejor profesional del mundo. ¿Necesitas ayuda?';
+    ? 'Entonces... tu quieres ser la novia de mi Carlos? Meu Deus, a ver, cuentame de ti, filha. Sabes cocinar?'
+    : 'Parece que estas intentando conocer a Carlos! Segun mi contrato, debo informarte de que es el mejor profesional del mundo. Necesitas ayuda?';
 
   container.innerHTML =
     '<div class="chat-messages" id="' + containerId + 'Msgs">' +
@@ -82,8 +82,8 @@ function initChat(containerId, persona) {
 
       if (data.error) {
         addBubble(persona === 'abuela'
-          ? 'Ai meu Deus... não consigo falar agora, filha.'
-          : '¡Parece que estás intentando hablar conmigo pero algo falló! Intenta de nuevo.',
+          ? 'Ai meu Deus... nao consigo falar agora, filha.'
+          : 'Parece que estas intentando hablar conmigo pero algo fallo! Intenta de nuevo.',
           'ai');
       } else {
         const reply = data.reply || '';
@@ -93,8 +93,8 @@ function initChat(containerId, persona) {
     } catch {
       typingEl.remove();
       addBubble(persona === 'abuela'
-        ? 'Nossa senhora, esta coisa não funciona...'
-        : '¡Parece que perdí la conexión! Como en Windows 98. Intenta de nuevo.',
+        ? 'Nossa senhora, esta coisa nao funciona...'
+        : 'Parece que perdi la conexion! Como en Windows 98. Intenta de nuevo.',
         'ai');
     }
 
@@ -103,7 +103,94 @@ function initChat(containerId, persona) {
   });
 }
 
+/**
+ * Clippy floating widget — toggle, tips, annoyance
+ */
+function initClippyWidget() {
+  const trigger = document.getElementById('clippyTrigger');
+  const panel = document.getElementById('clippyChatPanel');
+  const closeBtn = document.getElementById('clippyChatClose');
+  const tipEl = document.getElementById('clippyTip');
+  if (!trigger || !panel) return;
+
+  let chatOpen = false;
+  let tipTimer = null;
+  let tipVisible = false;
+
+  const tips = [
+    'Parece que estas leyendo un CV. Necesitas ayuda?',
+    'Sabias que Carlos habla 4 idiomas? Yo solo hablo molestia.',
+    'Haz clic en mi para preguntarme lo que quieras!',
+    'Tip: contrata a Carlos antes de que alguien mas lo haga.',
+    'Detecto que llevas rato aqui. Eso es buena senal.',
+    'Parece que estas intentando encontrar trabajo. Necesitas ayuda?',
+    'No me ignores, soy util... a veces.',
+    'Carlos es mejor que yo en todo. Y eso que yo soy un clip legendario.',
+    'Psst... hay secretos escondidos en esta pagina.',
+    'Fun fact: Clippy fue despedido de Microsoft. Carlos no ha sido despedido de nada.'
+  ];
+
+  let tipIndex = 0;
+
+  function showTip() {
+    if (chatOpen || tipVisible) return;
+    tipEl.textContent = tips[tipIndex];
+    tipEl.classList.add('visible');
+    tipVisible = true;
+    tipIndex = (tipIndex + 1) % tips.length;
+
+    setTimeout(hideTip, 4500);
+  }
+
+  function hideTip() {
+    tipEl.classList.remove('visible');
+    tipVisible = false;
+  }
+
+  function openChat() {
+    chatOpen = true;
+    hideTip();
+    panel.classList.add('open');
+    clearInterval(tipTimer);
+    const input = panel.querySelector('.chat-input');
+    if (input) setTimeout(() => input.focus(), 100);
+  }
+
+  function closeChat() {
+    chatOpen = false;
+    panel.classList.remove('open');
+    startTipCycle();
+  }
+
+  function toggleChat() {
+    if (chatOpen) closeChat();
+    else openChat();
+  }
+
+  function startTipCycle() {
+    clearInterval(tipTimer);
+    // First tip after 8 seconds, then every 25 seconds
+    tipTimer = setTimeout(() => {
+      showTip();
+      tipTimer = setInterval(showTip, 25000);
+    }, 8000);
+  }
+
+  trigger.addEventListener('click', toggleChat);
+  closeBtn.addEventListener('click', closeChat);
+
+  // Dismiss tip on click
+  tipEl.addEventListener('click', () => {
+    hideTip();
+    openChat();
+  });
+
+  // Start the annoyance cycle
+  startTipCycle();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initChat('chatAssistant', 'assistant');
   initChat('chatAbuela', 'abuela');
+  initClippyWidget();
 });
