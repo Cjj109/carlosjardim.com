@@ -145,7 +145,7 @@ function initChat(containerId, persona) {
 
       // Show Instagram access button
       const igBtn = document.getElementById('instagramAccessBtn');
-      if (igBtn) igBtn.style.display = '';
+      if (igBtn) igBtn.classList.remove('instagram-access-hidden');
     } else {
       banner.innerHTML =
         '<div class="verdict-icon">&#x1F64F;</div>' +

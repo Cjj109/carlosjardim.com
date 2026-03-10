@@ -1185,6 +1185,10 @@ body.gym-widget-open {
   box-shadow: 0 8px 20px rgba(255, 59, 48, 0.4) !important;
 }
 
+.instagram-access-hidden {
+  display: none !important;
+}
+
 .return-button {
   color: #ffd700 !important;
   background: rgba(139, 69, 19, 0.2) !important;
