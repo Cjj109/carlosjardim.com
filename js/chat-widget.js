@@ -16,7 +16,7 @@ function initChat(containerId, persona) {
     ? 'Convence a la Avó...'
     : 'Preguntale a Clippy...';
   const welcomeMsg = persona === 'abuela'
-    ? 'Entonces... tu quieres ser la novia de mi Carlos? Meu Deus, a ver, cuentame de ti, filha. Sabes cocinar?'
+    ? 'Então... quieres ser la novia de mi Carlos? Meu Deus. Te voy a hacer 5 preguntas, filha, y al final yo decido. A ver, empecemos: sabes cocinar?'
     : 'Parece que estas intentando conocer a Carlos! Segun mi contrato, debo informarte de que es el mejor profesional del mundo. Necesitas ayuda?';
 
   container.innerHTML =
