@@ -22,7 +22,7 @@ function initChat(containerId, persona) {
   container.innerHTML =
     '<div class="chat-messages" id="' + containerId + 'Msgs">' +
       (persona === 'abuela'
-        ? '<div class="chat-bubble-row chat-bubble-row-ai"><img class="avo-avatar" src="img/avo.png" alt="Avó María"><div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div></div>'
+        ? '<div class="chat-bubble-row chat-bubble-row-ai"><img class="avo-avatar" src="images/avo.png" alt="Avó María"><div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div></div>'
         : '<div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div>') +
     '</div>' +
     '<form class="chat-input-row" id="' + containerId + 'Form">' +
@@ -52,7 +52,7 @@ function initChat(containerId, persona) {
       row.className = 'chat-bubble-row chat-bubble-row-ai';
       const avatar = document.createElement('img');
       avatar.className = 'avo-avatar';
-      avatar.src = 'img/avo.png';
+      avatar.src = 'images/avo.png';
       avatar.alt = 'Avó María';
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble chat-bubble-ai';
@@ -100,7 +100,7 @@ function initChat(containerId, persona) {
       row.className = 'chat-bubble-row chat-bubble-row-ai';
       const avatar = document.createElement('img');
       avatar.className = 'avo-avatar';
-      avatar.src = 'img/avo.png';
+      avatar.src = 'images/avo.png';
       avatar.alt = 'Avó María';
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble chat-bubble-ai chat-typing';
