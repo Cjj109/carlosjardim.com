@@ -169,7 +169,6 @@ document.addEventListener('keydown', (e) => {
     ['timelineModal', 'closeAcademicTimeline'],
     ['heightScaleModal', 'closeHeightScale'],
     ['valentineFlowersModal', 'closeValentineFlowers'],
-    ['instagramChoiceModal', 'closeInstagramChoice'],
     ['zodiacModal', 'closeZodiacCompatibility'],
     ['fingerChooserModal', 'closeFingerChooser'],
     ['utilitiesModal', 'closeUtilitiesMenu'],

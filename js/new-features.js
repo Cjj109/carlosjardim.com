@@ -6,28 +6,6 @@
 const MY_SIGN = 'tauro'; // ♉ Tauro
 
 /**
- * Open Instagram choice modal
- */
-function openInstagramChoice() {
-  const modal = document.getElementById('instagramChoiceModal');
-  if (!modal) return;
-
-  modal.classList.add('active');
-  document.body.classList.add('instagram-choice-open');
-}
-
-/**
- * Close Instagram choice modal
- */
-function closeInstagramChoice() {
-  const modal = document.getElementById('instagramChoiceModal');
-  if (!modal) return;
-
-  modal.classList.remove('active');
-  document.body.classList.remove('instagram-choice-open');
-}
-
-/**
  * Open zodiac compatibility modal
  */
 function openZodiacCompatibility() {
@@ -168,17 +146,6 @@ function renderZodiacResult(selectedSign, isCompatible) {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  // Instagram choice modal
-  const instagramModal = document.getElementById('instagramChoiceModal');
-  if (instagramModal) {
-    // Close with click outside
-    instagramModal.addEventListener('click', (e) => {
-      if (e.target === instagramModal) {
-        closeInstagramChoice();
-      }
-    });
-  }
-
   // Zodiac modal
   const zodiacModal = document.getElementById('zodiacModal');
   if (zodiacModal) {

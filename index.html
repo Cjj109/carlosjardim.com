@@ -293,15 +293,17 @@
 
     <!-- Chat Abuela -->
     <div class="alt-chat-section">
-      <div class="alt-chat-label">Convence a la Avó</div>
+      <div class="alt-chat-label">Convence a la Avó María</div>
+      <div class="alt-chat-sublabel">La avó evalúa si eres digna de su nieto</div>
       <div class="chat-section" id="chatAbuela"></div>
     </div>
 
     <!-- Call to Action -->
     <div class="alt-cta-section">
-      <button onclick="openInstagramChoice()" class="main-cta-button">
+      <a href="https://instagram.com/cjj109" target="_blank" rel="noopener noreferrer"
+         class="main-cta-button instagram-access-btn instagram-access-hidden" id="instagramAccessBtn">
         SOLICITAR ACCESO
-      </button>
+      </a>
 
       <button onclick="toggleMode(false)" class="return-button">
         ¿No estás convencida? 🎫
@@ -803,41 +805,6 @@
     </div>
   </div>
 
-  <!-- ============================================
-       INSTAGRAM CHOICE MODAL
-       ============================================ -->
-  <div class="instagram-choice-overlay" id="instagramChoiceModal" role="dialog" aria-modal="true" aria-label="Elige tu opción">
-    <div class="instagram-choice-container">
-      <button class="instagram-choice-close" onclick="closeInstagramChoice()" aria-label="Cerrar">✕</button>
-
-      <div class="instagram-choice-header">
-        <div class="instagram-choice-title">📸 ¿Cuál eres?</div>
-        <div class="instagram-choice-subtitle">Escoge sabiamente...</div>
-      </div>
-
-      <div class="instagram-choice-buttons">
-        <a href="https://www.instagram.com/901jjc?igsh=cXh4b3g1enp2azJy&utm_source=qr"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="instagram-btn instagram-bad"
-           onclick="closeInstagramChoice()">
-          <div class="instagram-btn-icon">😈</div>
-          <div class="instagram-btn-label">Para las malas</div>
-          <div class="instagram-btn-subtitle">El lado oscuro</div>
-        </a>
-
-        <a href="https://instagram.com/cjj109"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="instagram-btn instagram-good"
-           onclick="closeInstagramChoice()">
-          <div class="instagram-btn-icon">😇</div>
-          <div class="instagram-btn-label">Para las buenas</div>
-          <div class="instagram-btn-subtitle">El lado oficial</div>
-        </a>
-      </div>
-    </div>
-  </div>
 
   <!-- ============================================
        BCV CALCULATOR MODAL

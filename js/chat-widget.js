@@ -8,8 +8,12 @@ function initChat(containerId, persona) {
   if (!container) return;
 
   const history = [];
+  let userMsgCount = 0;
+  let verdictGiven = false;
+  let verdictResult = null; // 'aprobada' or 'rechazada'
+
   const placeholder = persona === 'abuela'
-    ? 'Convence a la Avo...'
+    ? 'Convence a la Avó...'
     : 'Preguntale a Clippy...';
   const welcomeMsg = persona === 'abuela'
     ? 'Entonces... tu quieres ser la novia de mi Carlos? Meu Deus, a ver, cuentame de ti, filha. Sabes cocinar?'
@@ -17,7 +21,9 @@ function initChat(containerId, persona) {
 
   container.innerHTML =
     '<div class="chat-messages" id="' + containerId + 'Msgs">' +
-      '<div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div>' +
+      (persona === 'abuela'
+        ? '<div class="chat-bubble-row chat-bubble-row-ai"><img class="avo-avatar" src="images/avo.png" alt="Avó María"><div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div></div>'
+        : '<div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div>') +
     '</div>' +
     '<form class="chat-input-row" id="' + containerId + 'Form">' +
       '<input type="text" class="chat-input" placeholder="' + placeholder + '" autocomplete="off" maxlength="500">' +
@@ -41,6 +47,21 @@ function initChat(containerId, persona) {
   }
 
   function addBubble(text, type) {
+    if (persona === 'abuela' && type === 'ai') {
+      const row = document.createElement('div');
+      row.className = 'chat-bubble-row chat-bubble-row-ai';
+      const avatar = document.createElement('img');
+      avatar.className = 'avo-avatar';
+      avatar.src = 'images/avo.png';
+      avatar.alt = 'Avó María';
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble chat-bubble-ai';
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      msgsEl.appendChild(row);
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+      return bubble;
+    }
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble chat-bubble-' + type;
     bubble.textContent = text;
@@ -49,24 +70,207 @@ function initChat(containerId, persona) {
     return bubble;
   }
 
+  function typeWriter(element, text, speed) {
+    return new Promise((resolve) => {
+      if (persona !== 'abuela') {
+        element.textContent = text;
+        resolve();
+        return;
+      }
+      let i = 0;
+      element.textContent = '';
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          msgsEl.scrollTop = msgsEl.scrollHeight;
+          setTimeout(type, speed || 25);
+        } else {
+          resolve();
+        }
+      }
+      type();
+    });
+  }
+
   function addTyping() {
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble chat-bubble-ai chat-typing';
-    bubble.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
-    msgsEl.appendChild(bubble);
+    let row;
+    if (persona === 'abuela') {
+      row = document.createElement('div');
+      row.className = 'chat-bubble-row chat-bubble-row-ai';
+      const avatar = document.createElement('img');
+      avatar.className = 'avo-avatar';
+      avatar.src = 'images/avo.png';
+      avatar.alt = 'Avó María';
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble chat-bubble-ai chat-typing';
+      bubble.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      msgsEl.appendChild(row);
+    } else {
+      row = document.createElement('div');
+      row.className = 'chat-bubble chat-bubble-ai chat-typing';
+      row.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+      msgsEl.appendChild(row);
+    }
     msgsEl.scrollTop = msgsEl.scrollHeight;
-    return bubble;
+    return row;
+  }
+
+  function parseVerdict(reply) {
+    if (reply.startsWith('VEREDICTO:APROBADA:')) {
+      return { result: 'aprobada', message: reply.replace('VEREDICTO:APROBADA:', '').trim() };
+    }
+    if (reply.startsWith('VEREDICTO:RECHAZADA:')) {
+      return { result: 'rechazada', message: reply.replace('VEREDICTO:RECHAZADA:', '').trim() };
+    }
+    return null;
+  }
+
+  function showVerdictEffects(result) {
+    const section = container.closest('.alt-chat-section');
+    if (!section) return;
+
+    // Add verdict banner
+    const banner = document.createElement('div');
+    banner.className = 'avo-verdict avo-verdict-' + result;
+
+    if (result === 'aprobada') {
+      banner.innerHTML =
+        '<div class="verdict-icon">&#x2764;&#xFE0F;</div>' +
+        '<div class="verdict-title">La Avó te ha aprobado!</div>' +
+        '<div class="verdict-sub">Tienes un puesto en la mesa del domingo</div>';
+      launchConfetti(section);
+
+      // Show Instagram access button
+      const igBtn = document.getElementById('instagramAccessBtn');
+      if (igBtn) igBtn.classList.remove('instagram-access-hidden');
+    } else {
+      banner.innerHTML =
+        '<div class="verdict-icon">&#x1F64F;</div>' +
+        '<div class="verdict-title">La Avó no está convencida...</div>' +
+        '<div class="verdict-sub">Vuelve cuando sepas hacer bacalhau</div>';
+    }
+
+    section.appendChild(banner);
+
+    // Add share button
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'avo-share-btn';
+    shareBtn.innerHTML = 'Compartir resultado &#x1F4F1;';
+    shareBtn.addEventListener('click', () => shareVerdict(result));
+    section.appendChild(shareBtn);
+
+    // Disable input
+    inputEl.disabled = true;
+    inputEl.placeholder = 'La Avó ya dio su veredicto';
+    formEl.querySelector('.chat-send').disabled = true;
+  }
+
+  function launchConfetti(container) {
+    const colors = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6bcb'];
+    for (let i = 0; i < 40; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti-piece';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      confetti.style.animationDuration = (1.5 + Math.random()) + 's';
+      container.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 3000);
+    }
+  }
+
+  function shareVerdict(result) {
+    // Create a canvas for the shareable image
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext('2d');
+
+    // Background gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 1920);
+    gradient.addColorStop(0, '#1a0a2e');
+    gradient.addColorStop(0.5, '#2d1b4e');
+    gradient.addColorStop(1, '#1a0a2e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    // Decorative border
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, 40, 1000, 1840);
+
+    // Title
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 52px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('La Avó María', 540, 300);
+    ctx.font = '36px Georgia, serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText('ha dado su veredicto...', 540, 370);
+
+    // Verdict
+    ctx.font = 'bold 72px Georgia, serif';
+    if (result === 'aprobada') {
+      ctx.fillStyle = '#6bcb77';
+      ctx.fillText('APROBADA', 540, 900);
+      ctx.font = '120px serif';
+      ctx.fillText('\u2764\uFE0F', 540, 750);
+      ctx.font = '32px Georgia, serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fillText('"Ven a cenar el domingo, filha"', 540, 1000);
+    } else {
+      ctx.fillStyle = '#ff6b6b';
+      ctx.fillText('RECHAZADA', 540, 900);
+      ctx.font = '120px serif';
+      ctx.fillText('\uD83D\uDE4F', 540, 750);
+      ctx.font = '32px Georgia, serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fillText('"Vuelve cuando sepas cocinar, filha"', 540, 1000);
+    }
+
+    // Footer
+    ctx.font = '28px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('carlosjardim.com', 540, 1700);
+    ctx.font = '24px monospace';
+    ctx.fillText('Convence a la Avó', 540, 1750);
+
+    // Convert to blob and share/download
+    canvas.toBlob((blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], 'veredicto-avo.png', { type: 'image/png' });
+        const shareData = { files: [file], title: 'Veredicto de la Avó María' };
+        if (navigator.canShare(shareData)) {
+          navigator.share(shareData).catch(() => downloadBlob(blob));
+          return;
+        }
+      }
+      downloadBlob(blob);
+    }, 'image/png');
+  }
+
+  function downloadBlob(blob) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'veredicto-avo.png';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = inputEl.value.trim();
-    if (!text || sending) return;
+    if (!text || sending || verdictGiven) return;
 
     sending = true;
     inputEl.value = '';
     addBubble(text, 'user');
     history.push({ role: 'user', content: text });
+    userMsgCount++;
 
     const typingEl = addTyping();
 
@@ -86,9 +290,26 @@ function initChat(containerId, persona) {
           : 'Parece que estas intentando hablar conmigo pero algo fallo! Intenta de nuevo.',
           'ai');
       } else {
-        const reply = data.reply || '';
+        let reply = data.reply || '';
         history.push({ role: 'assistant', content: reply });
-        addBubble(reply, 'ai');
+
+        // Check for verdict in abuela persona
+        if (persona === 'abuela') {
+          const verdict = parseVerdict(reply);
+          if (verdict) {
+            verdictGiven = true;
+            verdictResult = verdict.result;
+            reply = verdict.message;
+            const bubble = addBubble('', 'ai');
+            await typeWriter(bubble, reply, 25);
+            showVerdictEffects(verdict.result);
+          } else {
+            const bubble = addBubble('', 'ai');
+            await typeWriter(bubble, reply, 25);
+          }
+        } else {
+          addBubble(reply, 'ai');
+        }
       }
     } catch {
       typingEl.remove();
@@ -99,7 +320,7 @@ function initChat(containerId, persona) {
     }
 
     sending = false;
-    inputEl.focus();
+    if (!verdictGiven) inputEl.focus();
   });
 }
 
