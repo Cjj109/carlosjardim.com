@@ -22,7 +22,7 @@ function initChat(containerId, persona) {
   container.innerHTML =
     '<div class="chat-messages" id="' + containerId + 'Msgs">' +
       (persona === 'abuela'
-        ? '<div class="chat-bubble-row chat-bubble-row-ai"><img class="avo-avatar" src="img/avo.png" alt="Avó Conceição"><div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div></div>'
+        ? '<div class="chat-bubble-row chat-bubble-row-ai"><img class="avo-avatar" src="img/avo.png" alt="Avó María"><div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div></div>'
         : '<div class="chat-bubble chat-bubble-ai">' + escapeHtml(welcomeMsg) + '</div>') +
     '</div>' +
     '<form class="chat-input-row" id="' + containerId + 'Form">' +
@@ -53,7 +53,7 @@ function initChat(containerId, persona) {
       const avatar = document.createElement('img');
       avatar.className = 'avo-avatar';
       avatar.src = 'img/avo.png';
-      avatar.alt = 'Avó Conceição';
+      avatar.alt = 'Avó María';
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble chat-bubble-ai';
       row.appendChild(avatar);
@@ -101,7 +101,7 @@ function initChat(containerId, persona) {
       const avatar = document.createElement('img');
       avatar.className = 'avo-avatar';
       avatar.src = 'img/avo.png';
-      avatar.alt = 'Avó Conceição';
+      avatar.alt = 'Avó María';
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble chat-bubble-ai chat-typing';
       bubble.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
@@ -202,7 +202,7 @@ function initChat(containerId, persona) {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 52px Georgia, serif';
     ctx.textAlign = 'center';
-    ctx.fillText('La Avó Conceição', 540, 300);
+    ctx.fillText('La Avó María', 540, 300);
     ctx.font = '36px Georgia, serif';
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.fillText('ha dado su veredicto...', 540, 370);
@@ -238,7 +238,7 @@ function initChat(containerId, persona) {
     canvas.toBlob((blob) => {
       if (navigator.share && navigator.canShare) {
         const file = new File([blob], 'veredicto-avo.png', { type: 'image/png' });
-        const shareData = { files: [file], title: 'Veredicto de la Avó Conceição' };
+        const shareData = { files: [file], title: 'Veredicto de la Avó María' };
         if (navigator.canShare(shareData)) {
           navigator.share(shareData).catch(() => downloadBlob(blob));
           return;
