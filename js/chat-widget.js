@@ -142,6 +142,10 @@ function initChat(containerId, persona) {
         '<div class="verdict-title">La Avó te ha aprobado!</div>' +
         '<div class="verdict-sub">Tienes un puesto en la mesa del domingo</div>';
       launchConfetti(section);
+
+      // Show Instagram access button
+      const igBtn = document.getElementById('instagramAccessBtn');
+      if (igBtn) igBtn.style.display = '';
     } else {
       banner.innerHTML =
         '<div class="verdict-icon">&#x1F64F;</div>' +
