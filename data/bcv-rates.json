@@ -1,17 +1,17 @@
 {
-  "last_updated": "2026-04-21T18:56:27.049386",
+  "last_updated": "2026-04-21T21:36:42.672640",
   "eur": {
-    "rate": 567.58099688,
-    "date": "Martes, 21 Abril 2026",
+    "rate": 567.70963084,
+    "date": "Miércoles, 22 Abril 2026",
     "symbol": "€"
   },
   "usd": {
-    "rate": 481.6989,
-    "date": "Martes, 21 Abril 2026",
+    "rate": 482.7586,
+    "date": "Miércoles, 22 Abril 2026",
     "symbol": "$"
   },
   "usdt": {
-    "rate": 628.43,
+    "rate": 628.47,
     "date": "2026-04-21",
     "symbol": "₮"
   }
