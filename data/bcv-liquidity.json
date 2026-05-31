@@ -1,13 +1,18 @@
 {
-  "last_updated": "2026-05-28T13:54:18.886378",
+  "last_updated": "2026-05-31T11:41:50.698591",
   "latest": {
-    "date": "15/05/2026",
-    "m1_billions": 1948.14,
-    "m2_billions": 1949.65,
-    "variation_pct": 10.6,
+    "date": "22/05/2026",
+    "m1_billions": 1962.27,
+    "m2_billions": 1963.86,
+    "variation_pct": 0.73,
     "variation_direction": "up"
   },
   "history": [
+    {
+      "date": "22/05/2026",
+      "m2_billions": 1963.86,
+      "variation_pct": 0.73
+    },
     {
       "date": "15/05/2026",
       "m2_billions": 1949.65,
@@ -42,21 +47,21 @@
       "date": "03/04/2026",
       "m2_billions": 1498.43,
       "variation_pct": -1.41
-    },
-    {
-      "date": "27/03/2026",
-      "m2_billions": 1519.81,
-      "variation_pct": 0.7
     }
   ],
   "base_monetaria": {
     "latest": {
-      "date": "15/05/2026",
-      "value_billions": 1411.64,
-      "variation_pct": 11.3,
+      "date": "22/05/2026",
+      "value_billions": 1440.97,
+      "variation_pct": 2.08,
       "variation_direction": "up"
     },
     "history": [
+      {
+        "date": "22/05/2026",
+        "value_billions": 1440.97,
+        "variation_pct": 2.08
+      },
       {
         "date": "15/05/2026",
         "value_billions": 1411.64,
@@ -91,11 +96,6 @@
         "date": "03/04/2026",
         "value_billions": 1042.96,
         "variation_pct": -6.17
-      },
-      {
-        "date": "27/03/2026",
-        "value_billions": 1111.57,
-        "variation_pct": -2.19
       }
     ]
   }
