@@ -1,159 +1,270 @@
 {
-  "last_updated": "2026-07-21T18:59:24.282212",
+  "last_updated": "2026-07-22T01:17:52.068708",
   "profile_url": "https://hevy.com/user/cjj109",
   "last_workout": {
-    "name": "Torso 1",
-    "date": "2026-07-20",
-    "duration": "75 min",
-    "volume": "11,443 kg",
+    "name": "Pierna 1",
+    "date": "2026-07-21",
+    "duration": "69 min",
+    "volume": "14,280 kg",
     "exercises": [
       {
-        "name": "Press de Banca Inclinado (Mancuerna)",
+        "name": "Sentadilla Péndulo (Máquina)",
         "sets": [
           {
-            "reps": 10,
-            "weight": "27.215574566138386 kg"
+            "reps": 8,
+            "weight": "70 kg"
           },
           {
             "reps": 8,
-            "weight": "29.483539113316585 kg"
+            "weight": "70 kg"
           },
           {
-            "reps": 6,
-            "weight": "29.483539113316585 kg"
+            "reps": 8,
+            "weight": "70 kg"
           }
         ],
-        "muscle_group": "chest",
+        "muscle_group": "quadriceps",
         "secondary_muscles": [
-          "triceps",
-          "shoulders"
+          "glutes",
+          "hamstrings"
         ]
       },
       {
-        "name": "Mariposa (Pec Deck)",
+        "name": "Extensión de Pierna",
         "sets": [
           {
-            "reps": 9,
-            "weight": "60 kg"
+            "reps": 15,
+            "weight": "80 kg"
           },
           {
-            "reps": 9,
-            "weight": "60 kg"
+            "reps": 15,
+            "weight": "80 kg"
+          },
+          {
+            "reps": 15,
+            "weight": "80 kg"
+          },
+          {
+            "reps": 15,
+            "weight": "80 kg"
           }
         ],
-        "muscle_group": "chest"
+        "muscle_group": "quadriceps"
       },
       {
-        "name": "Remo Sentado con Agarre en V (Cable)",
-        "sets": [
-          {
-            "reps": 8,
-            "weight": "90 kg"
-          },
-          {
-            "reps": 8,
-            "weight": "90 kg"
-          },
-          {
-            "reps": 8,
-            "weight": "90 kg"
-          }
-        ],
-        "muscle_group": "upper_back",
-        "secondary_muscles": [
-          "lats",
-          "biceps",
-          "forearms"
-        ]
-      },
-      {
-        "name": "Remo Sentado con Cable",
+        "name": "Peso Muerto Rumano (Barra)",
         "sets": [
           {
             "reps": 10,
-            "weight": "85 kg"
+            "weight": "84 kg"
           },
           {
             "reps": 10,
-            "weight": "85 kg"
-          },
-          {
-            "reps": 10,
-            "weight": "85 kg"
+            "weight": "84 kg"
           }
         ],
-        "muscle_group": "upper_back",
+        "muscle_group": "hamstrings",
         "secondary_muscles": [
-          "lats",
-          "biceps",
-          "forearms"
-        ]
-      },
-      {
-        "name": "Jalón al Pecho (Cable)",
-        "sets": [
-          {
-            "reps": 10,
-            "weight": "60 kg"
-          },
-          {
-            "reps": 9,
-            "weight": "60 kg"
-          },
-          {
-            "reps": 7,
-            "weight": "60 kg"
-          }
-        ],
-        "muscle_group": "lats",
-        "secondary_muscles": [
+          "glutes",
+          "lower_back",
           "upper_back",
-          "biceps",
-          "forearms"
+          "lats"
         ]
       },
       {
-        "name": "Elevacion Laterales (Mancuerna)",
+        "name": "Curl de Pierna Sentado",
         "sets": [
           {
-            "reps": 10,
-            "weight": "13.607787283069193 kg"
+            "reps": 12,
+            "weight": "82 kg"
           },
           {
-            "reps": 10,
-            "weight": "13.607787283069193 kg"
+            "reps": 12,
+            "weight": "88 kg"
           },
           {
-            "reps": 10,
-            "weight": "13.607787283069193 kg"
+            "reps": 12,
+            "weight": "88 kg"
           }
         ],
-        "muscle_group": "shoulders"
+        "muscle_group": "hamstrings",
+        "secondary_muscles": [
+          "calves"
+        ]
       },
       {
-        "name": "Abdominal Corto con Cable",
+        "name": "Elevación de Gemelos a Una Pierna (Máquina)",
         "sets": [
           {
-            "reps": 10,
-            "weight": "100 kg"
+            "reps": 12,
+            "weight": "82 kg"
           },
           {
-            "reps": 10,
-            "weight": "100 kg"
+            "reps": 12,
+            "weight": "82 kg"
           },
           {
-            "reps": 10,
-            "weight": "100 kg"
+            "reps": 12,
+            "weight": "88 kg"
           }
         ],
-        "muscle_group": "abdominals"
+        "muscle_group": "calves"
       }
     ]
   },
   "stats": {
-    "total_workouts": "112"
+    "total_workouts": "113"
   },
   "previous_workouts": [
+    {
+      "name": "Torso 1",
+      "date": "2026-07-20",
+      "duration": "75 min",
+      "volume": "11,443 kg",
+      "exercises": [
+        {
+          "name": "Press de Banca Inclinado (Mancuerna)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "27.215574566138386 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "29.483539113316585 kg"
+            },
+            {
+              "reps": 6,
+              "weight": "29.483539113316585 kg"
+            }
+          ],
+          "muscle_group": "chest",
+          "secondary_muscles": [
+            "triceps",
+            "shoulders"
+          ]
+        },
+        {
+          "name": "Mariposa (Pec Deck)",
+          "sets": [
+            {
+              "reps": 9,
+              "weight": "60 kg"
+            },
+            {
+              "reps": 9,
+              "weight": "60 kg"
+            }
+          ],
+          "muscle_group": "chest"
+        },
+        {
+          "name": "Remo Sentado con Agarre en V (Cable)",
+          "sets": [
+            {
+              "reps": 8,
+              "weight": "90 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "90 kg"
+            },
+            {
+              "reps": 8,
+              "weight": "90 kg"
+            }
+          ],
+          "muscle_group": "upper_back",
+          "secondary_muscles": [
+            "lats",
+            "biceps",
+            "forearms"
+          ]
+        },
+        {
+          "name": "Remo Sentado con Cable",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "85 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "85 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "85 kg"
+            }
+          ],
+          "muscle_group": "upper_back",
+          "secondary_muscles": [
+            "lats",
+            "biceps",
+            "forearms"
+          ]
+        },
+        {
+          "name": "Jalón al Pecho (Cable)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "60 kg"
+            },
+            {
+              "reps": 9,
+              "weight": "60 kg"
+            },
+            {
+              "reps": 7,
+              "weight": "60 kg"
+            }
+          ],
+          "muscle_group": "lats",
+          "secondary_muscles": [
+            "upper_back",
+            "biceps",
+            "forearms"
+          ]
+        },
+        {
+          "name": "Elevacion Laterales (Mancuerna)",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "13.607787283069193 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "13.607787283069193 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "13.607787283069193 kg"
+            }
+          ],
+          "muscle_group": "shoulders"
+        },
+        {
+          "name": "Abdominal Corto con Cable",
+          "sets": [
+            {
+              "reps": 10,
+              "weight": "100 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "100 kg"
+            },
+            {
+              "reps": 10,
+              "weight": "100 kg"
+            }
+          ],
+          "muscle_group": "abdominals"
+        }
+      ]
+    },
     {
       "name": "Pierna 1",
       "date": "2026-06-23",
@@ -785,117 +896,6 @@
             }
           ],
           "muscle_group": "triceps"
-        }
-      ]
-    },
-    {
-      "name": "Pierna 1",
-      "date": "2026-06-16",
-      "duration": "88 min",
-      "volume": "12,917 kg",
-      "exercises": [
-        {
-          "name": "Sentadilla Hack (Máquina)",
-          "sets": [
-            {
-              "reps": 8,
-              "weight": "154.22 kg"
-            },
-            {
-              "reps": 8,
-              "weight": "154.22 kg"
-            },
-            {
-              "reps": 7,
-              "weight": "154.22 kg"
-            }
-          ],
-          "muscle_group": "quadriceps",
-          "secondary_muscles": [
-            "glutes",
-            "hamstrings"
-          ]
-        },
-        {
-          "name": "Extensión de Pierna",
-          "sets": [
-            {
-              "reps": 12,
-              "weight": "70 kg"
-            },
-            {
-              "reps": 11,
-              "weight": "70 kg"
-            },
-            {
-              "reps": 10,
-              "weight": "70 kg"
-            },
-            {
-              "reps": 10,
-              "weight": "70 kg"
-            }
-          ],
-          "muscle_group": "quadriceps"
-        },
-        {
-          "name": "Peso Muerto Rumano (Barra)",
-          "sets": [
-            {
-              "reps": 10,
-              "weight": "120 kg"
-            },
-            {
-              "reps": 10,
-              "weight": "120 kg"
-            }
-          ],
-          "muscle_group": "hamstrings",
-          "secondary_muscles": [
-            "glutes",
-            "lower_back",
-            "upper_back",
-            "lats"
-          ]
-        },
-        {
-          "name": "Curl de Piernas Acostado (Máquina)",
-          "sets": [
-            {
-              "reps": 10,
-              "weight": "36 kg"
-            },
-            {
-              "reps": 9,
-              "weight": "36 kg"
-            },
-            {
-              "reps": 6,
-              "weight": "36 kg"
-            }
-          ],
-          "muscle_group": "hamstrings",
-          "secondary_muscles": [
-            "calves"
-          ]
-        },
-        {
-          "name": "Elevación de Gemelos a Una Pierna (Máquina)",
-          "sets": [
-            {
-              "reps": 12,
-              "weight": "85 kg"
-            },
-            {
-              "reps": 12,
-              "weight": "85 kg"
-            },
-            {
-              "reps": 12,
-              "weight": "85 kg"
-            }
-          ],
-          "muscle_group": "calves"
         }
       ]
     }
