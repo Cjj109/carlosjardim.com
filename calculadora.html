@@ -40,8 +40,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/variables.css?r=16">
-  <link rel="stylesheet" href="/css/calculadora.css?r=16">
+  <link rel="stylesheet" href="/css/variables.css?r=17">
+  <link rel="stylesheet" href="/css/calculadora.css?r=17">
 </head>
 <body>
 
@@ -80,22 +80,18 @@
   <!-- Tasas del momento -->
   <section class="calc-tasas" aria-label="Tasas actuales">
     <article class="tasa">
-      <span class="tasa-simbolo">$</span>
       <span class="tasa-nombre">Dólar BCV</span>
       <span class="tasa-valor" id="tasaUsd">—</span>
     </article>
     <article class="tasa">
-      <span class="tasa-simbolo">€</span>
       <span class="tasa-nombre">Euro BCV</span>
       <span class="tasa-valor" id="tasaEur">—</span>
     </article>
     <article class="tasa tasa-viva">
-      <span class="tasa-simbolo">₮</span>
       <span class="tasa-nombre">USDT p2p</span>
       <span class="tasa-valor" id="tasaUsdt">—</span>
     </article>
     <article class="tasa tasa-zelle">
-      <span class="tasa-simbolo">Z</span>
       <span class="tasa-nombre">Zelle</span>
       <span class="tasa-valor" id="tasaZelle">—</span>
     </article>
@@ -139,7 +135,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v16</span>
+    <span class="calc-version" title="Versión de la app instalada">v17</span>
     <div class="calc-pie-botones">
       <button type="button" id="calcTema" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelTema">
         Tema
@@ -210,7 +206,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=16" defer></script>
+<script src="/js/calculadora.js?r=17" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
