@@ -19,7 +19,12 @@
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
-const BINANCE_P2P = 'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search';
+// Dos hosts sirven el mismo libro. p2p.binance.com rechaza a Cloudflare, asi
+// que se prueba tambien www.binance.com, que tiene otras reglas de filtrado.
+const BINANCE_HOSTS = [
+  'https://www.binance.com/bapi/c2c/v2/friendly/c2c/adv/search',
+  'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search',
+];
 const COTIZAVE_API = 'https://api.cotizave.com/v1/fx/rates';
 const USDT_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
 
@@ -129,17 +134,23 @@ async function leerPaginaBinance(tradeType, page) {
  * Si Binance no responde queda Cotizave, y detras el paralelo de DolarAPI.
  */
 async function leerUsdtBinance() {
-  const peticiones = [];
-  for (const tradeType of ['SELL', 'BUY']) {
-    for (const page of [1, 2]) {
-      peticiones.push(leerPaginaBinance(tradeType, page));
-    }
-  }
+  let precios = [];
 
-  const respuestas = await Promise.allSettled(peticiones);
-  const precios = respuestas
-    .filter((r) => r.status === 'fulfilled')
-    .flatMap((r) => r.value);
+  for (const url of BINANCE_HOSTS) {
+    const peticiones = [];
+    for (const tradeType of ['SELL', 'BUY']) {
+      for (const page of [1, 2]) {
+        peticiones.push(leerPaginaBinance(tradeType, page, url));
+      }
+    }
+
+    const respuestas = await Promise.allSettled(peticiones);
+    precios = respuestas
+      .filter((r) => r.status === 'fulfilled')
+      .flatMap((r) => r.value);
+
+    if (precios.length >= 10) break;
+  }
 
   // Con menos de diez anuncios el promedio no es representativo
   if (precios.length < 10) return null;
@@ -221,6 +232,7 @@ async function leerBCV() {
 
 export async function onRequestGet(context) {
   const hoy = new Date().toISOString().split('T')[0];
+  const conDiagnostico = new URL(context.request.url).searchParams.has('debug');
 
   try {
     const [bcvRes, binanceRes, usdtRes, usdtRespaldoRes, respaldoRes] = await Promise.allSettled([
@@ -265,6 +277,18 @@ export async function onRequestGet(context) {
             }
           : null,
     };
+
+    if (conDiagnostico) {
+      output.diagnostico = {
+        binanceDirecto: binanceRes.status === 'fulfilled' && binanceRes.value
+          ? `ok (${binanceRes.value.anuncios} anuncios)`
+          : `falla: ${binanceRes.reason?.message || 'sin datos'}`,
+        cotizave: usdtRes.status === 'fulfilled' && usdtRes.value
+          ? `ok (${usdtRes.value.mercados} mercados)`
+          : `falla: ${usdtRes.reason?.message || 'sin datos'}`,
+        bcv: bcvRes.status === 'fulfilled' ? 'ok' : `falla: ${bcvRes.reason?.message}`,
+      };
+    }
 
     return new Response(JSON.stringify(output), {
       headers: {
