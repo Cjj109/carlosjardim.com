@@ -25,6 +25,16 @@ const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
 // alli 82 anuncios.
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 
+async function fetchJson(url) {
+  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function fetchConCabeceras(url, opciones = {}) {
+  return fetch(url, opciones);
+}
+
 /**
  * Tasa p2p leida del libro de Binance a traves del puente.
  *
@@ -91,6 +101,30 @@ async function leerUsdtP2P(clave) {
     market: origen,
     mercados: mercados.length,
   };
+}
+
+/** "945,65085917" -> 945.65085917 */
+function aNumero(texto) {
+  return parseFloat(String(texto).trim().replace(/\./g, '').replace(',', '.'));
+}
+
+/** Extrae el valor de una moneda del bloque que le corresponde en el HTML */
+function leerMoneda(html, id) {
+  const inicio = html.indexOf(`id="${id}"`);
+  if (inicio === -1) return null;
+
+  const encontrado = html.slice(inicio, inicio + 600).match(/<strong[^>]*>\s*([\d.,]+)\s*<\/strong>/);
+  if (!encontrado) return null;
+
+  const valor = aNumero(encontrado[1]);
+  // Si el HTML cambia y se lee cualquier cosa, mejor null que un disparate
+  return Number.isFinite(valor) && valor > 0 && valor < 1_000_000 ? valor : null;
+}
+
+/** Fecha de vigencia; el BCV la trae exacta en un atributo */
+function leerFecha(html) {
+  const iso = html.match(/date-display-single[^>]*content="(\d{4}-\d{2}-\d{2})/);
+  return iso ? iso[1] : new Date().toISOString().split('T')[0];
 }
 
 async function leerBCV() {
