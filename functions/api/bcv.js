@@ -1,15 +1,24 @@
 /**
- * Cloudflare Pages Function: BCV Exchange Rates (SSR/Edge)
- * Fetches USD, EUR from bcvapi.tech and USDT from DolarAPI
- * Replaces GitHub Action for rates - runs at edge on each request
- * Cache: 5 minutes (Cloudflare CDN)
+ * Cloudflare Pages Function: tasas BCV (USD, EUR) y USDT paralelo.
+ *
+ * El USD y el EUR se leen de la página del BCV, que es la fuente oficial.
+ * Antes venían de bcvapi.tech, que dejó de responder (el dominio resuelve
+ * pero el servidor no contesta) y por eso la web estaba devolviendo
+ * "usd": null y "eur": null sin que nada avisara.
+ *
+ * Nota: bcv.org.ve entrega la cadena de certificados incompleta y ni Node ni
+ * workerd local la aceptan, pero la red de Cloudflare en producción sí — que
+ * es donde corre esto. Si algún día fallara, queda DolarAPI de respaldo para
+ * el dólar.
+ *
+ * Cache: 5 minutos en el CDN.
  */
 
-const EUR_API = 'https://bcvapi.tech/api/v1/euro/public';
-const USD_API = 'https://bcvapi.tech/api/v1/dolar/public';
+const BCV_URL = 'https://www.bcv.org.ve/';
+const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
 const USDT_API = 'https://ve.dolarapi.com/v1/dolares/paralelo';
 
-const CACHE_MAX_AGE = 300; // 5 minutes
+const CACHE_MAX_AGE = 300;
 
 async function fetchJson(url) {
   const res = await fetch(url);
@@ -17,45 +26,85 @@ async function fetchJson(url) {
   return res.json();
 }
 
+/** "945,65085917" -> 945.65085917 */
+function aNumero(texto) {
+  return parseFloat(String(texto).trim().replace(/\./g, '').replace(',', '.'));
+}
+
+/** Extrae el valor de una moneda del bloque que le corresponde en el HTML */
+function leerMoneda(html, id) {
+  const inicio = html.indexOf(`id="${id}"`);
+  if (inicio === -1) return null;
+
+  const encontrado = html.slice(inicio, inicio + 600).match(/<strong[^>]*>\s*([\d.,]+)\s*<\/strong>/);
+  if (!encontrado) return null;
+
+  const valor = aNumero(encontrado[1]);
+  // Si el HTML cambia y se lee cualquier cosa, mejor null que un disparate
+  return Number.isFinite(valor) && valor > 0 && valor < 1_000_000 ? valor : null;
+}
+
+/** Fecha de vigencia; el BCV la trae exacta en un atributo */
+function leerFecha(html) {
+  const iso = html.match(/date-display-single[^>]*content="(\d{4}-\d{2}-\d{2})/);
+  return iso ? iso[1] : new Date().toISOString().split('T')[0];
+}
+
+async function leerBCV() {
+  const res = await fetch(BCV_URL, {
+    headers: {
+      Accept: 'text/html',
+      'User-Agent': 'Mozilla/5.0 (compatible; carlosjardim.com/1.0)',
+    },
+    cf: { cacheTtl: CACHE_MAX_AGE, cacheEverything: true },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const html = await res.text();
+  return {
+    usd: leerMoneda(html, 'dolar'),
+    eur: leerMoneda(html, 'euro'),
+    fecha: leerFecha(html),
+  };
+}
+
 export async function onRequestGet(context) {
+  const hoy = new Date().toISOString().split('T')[0];
+
   try {
-    const [eurRes, usdRes, usdtRes] = await Promise.allSettled([
-      fetchJson(EUR_API),
-      fetchJson(USD_API),
-      fetchJson(USDT_API)
+    const [bcvRes, usdtRes, respaldoRes] = await Promise.allSettled([
+      leerBCV(),
+      fetchJson(USDT_API),
+      fetchJson(USD_RESPALDO),
     ]);
 
-    const eur = eurRes.status === 'fulfilled' ? eurRes.value : null;
-    const usd = usdRes.status === 'fulfilled' ? usdRes.value : null;
+    const bcv = bcvRes.status === 'fulfilled' ? bcvRes.value : null;
     const usdt = usdtRes.status === 'fulfilled' ? usdtRes.value : null;
+    const respaldo = respaldoRes.status === 'fulfilled' ? respaldoRes.value : null;
 
-    const now = new Date().toISOString();
+    // El respaldo solo entra si el BCV no dio dólar
+    const usdRate = bcv?.usd ?? (respaldo?.promedio ? parseFloat(respaldo.promedio) : null);
+    const usdFecha = bcv?.usd
+      ? bcv.fecha
+      : respaldo?.fechaActualizacion?.split('T')[0] ?? hoy;
 
     const output = {
-      last_updated: now,
-      eur: eur ? {
-        rate: parseFloat(eur.tasa) || 0,
-        date: eur.fecha || now.split('T')[0],
-        symbol: '€'
-      } : null,
-      usd: usd ? {
-        rate: parseFloat(usd.tasa) || 0,
-        date: usd.fecha || now.split('T')[0],
-        symbol: '$'
-      } : null,
+      last_updated: new Date().toISOString(),
+      eur: bcv?.eur ? { rate: bcv.eur, date: bcv.fecha, symbol: '€' } : null,
+      usd: usdRate ? { rate: usdRate, date: usdFecha, symbol: '$' } : null,
       usdt: usdt ? {
         rate: parseFloat(usdt.promedio) || 0,
-        date: usdt.fechaActualizacion ? usdt.fechaActualizacion.split('T')[0] : now.split('T')[0],
+        date: usdt.fechaActualizacion ? usdt.fechaActualizacion.split('T')[0] : hoy,
         symbol: '₮',
-        live: true
-      } : null
+        live: true,
+      } : null,
     };
 
     return new Response(JSON.stringify(output), {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}, stale-while-revalidate=60`
-      }
+        'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}, stale-while-revalidate=60`,
+      },
     });
   } catch (err) {
     return new Response(
