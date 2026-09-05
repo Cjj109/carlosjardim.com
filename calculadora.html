@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://carlosjardim.com/calculadora">
   <meta property="og:site_name" content="Carlos Jardim">
   <meta property="og:locale" content="es_VE">
-  <meta property="og:image" content="https://carlosjardim.com/calculadora/og.png">
+  <meta property="og:image" content="https://carlosjardim.com/calculadora-app/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/png">
@@ -23,13 +23,13 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Calculadora de Tasas | Carlos Jardim">
   <meta name="twitter:description" content="Dólar BCV, euro BCV y USDT paralelo. Compara tasas y calcula cuánto vender.">
-  <meta name="twitter:image" content="https://carlosjardim.com/calculadora/og.png">
+  <meta name="twitter:image" content="https://carlosjardim.com/calculadora-app/og.png">
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
   <!-- App instalable -->
-  <link rel="manifest" href="/calculadora/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/calculadora/icon-192.png">
+  <link rel="manifest" href="/calculadora-app/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/calculadora-app/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Tasas">
@@ -120,7 +120,10 @@
   // memoria seria peor que no tenerla.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/calculadora/sw.js', { scope: '/calculadora/' })
+      // El service worker vive en la raíz para poder cubrir /calculadora, que ya
+      // no es carpeta: la redirección que eso creaba impedía que WhatsApp leyera
+      // la vista previa.
+      navigator.serviceWorker.register('/sw-calculadora.js', { scope: '/calculadora' })
         .catch((error) => console.warn('No se pudo registrar el service worker:', error));
     });
   }

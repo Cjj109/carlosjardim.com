@@ -13,13 +13,12 @@
 
 const VERSION = 'tasas-v2';
 const APP = [
-  '/calculadora/',
-  '/calculadora/index.html',
+  '/calculadora',
   '/css/variables.css',
   '/css/calculadora.css?r=6',
   '/js/calculadora.js?r=6',
-  '/calculadora/icon-192.png',
-  '/calculadora/icon-512.png',
+  '/calculadora-app/icon-192.png',
+  '/calculadora-app/icon-512.png',
 ];
 
 self.addEventListener('install', (evento) => {

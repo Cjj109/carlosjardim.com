@@ -84,10 +84,10 @@
 # La app instalable de la calculadora
 # El service worker nunca se cachea: es quien decide qué se guarda y qué no,
 # y una copia vieja dejaría la app congelada en una versión anterior.
-/calculadora/sw.js
+/sw-calculadora.js
   Cache-Control: no-cache, must-revalidate
   Content-Type: application/javascript; charset=utf-8
 
-/calculadora/manifest.webmanifest
+/calculadora-app/manifest.webmanifest
   Cache-Control: public, max-age=3600
   Content-Type: application/manifest+json; charset=utf-8
