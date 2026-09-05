@@ -11,6 +11,44 @@ let fuentes = null;
 // La eleccion se guarda en el navegador de cada quien: es una preferencia
 // personal, no hay cuentas ni servidor donde ponerla.
 const MEMORIA = 'calc-fuentes';
+const TEMA = 'calc-tema';
+
+// El color de la barra de estado del teléfono va con el tema: es el detalle
+// que hace que deje de parecer una web abierta y parezca una app.
+const TEMAS = {
+  oscuro: '#0a0b0f',
+  claro: '#f4f6fa',
+  navidad: '#0b1410',
+};
+
+function aplicarTema(tema) {
+  const elegido = TEMAS[tema] ? tema : 'oscuro';
+
+  document.documentElement.dataset.tema = elegido;
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', TEMAS[elegido]);
+
+  document.querySelectorAll('#listaTemas .tema').forEach((boton) => {
+    const activo = boton.dataset.tema === elegido;
+    boton.classList.toggle('is-elegido', activo);
+    boton.setAttribute('aria-checked', String(activo));
+  });
+
+  try {
+    localStorage.setItem(TEMA, elegido);
+  } catch {
+    // Sin almacenamiento el tema dura lo que la visita
+  }
+}
+
+function temaGuardado() {
+  try {
+    return localStorage.getItem(TEMA) || 'oscuro';
+  } catch {
+    return 'oscuro';
+  }
+}
 
 function fuentesElegidas() {
   try {
@@ -431,6 +469,7 @@ function elegirModo(nuevo) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  aplicarTema(temaGuardado());
   cargarTasas();
 
   const monto = document.getElementById('calcMonto');
@@ -518,6 +557,26 @@ document.addEventListener('DOMContentLoaded', () => {
     pintarFuentes();
     aplicarEleccion();
     cerrarFuentes();
+  });
+
+  // Tema
+  const botonTema = document.getElementById('calcTema');
+  const panelTema = document.getElementById('calcPanelTema');
+
+  botonTema?.addEventListener('click', () => {
+    const abierto = !panelTema.hidden;
+    panelTema.hidden = abierto;
+    botonTema.setAttribute('aria-expanded', String(!abierto));
+    if (!abierto) panelTema.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  panelTema?.addEventListener('click', (e) => {
+    const boton = e.target.closest('.tema');
+    if (!boton) return;
+
+    aplicarTema(boton.dataset.tema);
+    panelTema.hidden = true;
+    botonTema.setAttribute('aria-expanded', 'false');
   });
 
   // Historial

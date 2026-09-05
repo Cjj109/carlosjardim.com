@@ -14,16 +14,19 @@
   <meta property="og:url" content="https://carlosjardim.com/calculadora">
   <meta property="og:site_name" content="Carlos Jardim">
   <meta property="og:locale" content="es_VE">
-  <meta property="og:image" content="https://carlosjardim.com/calculadora-app/og.png">
+  <!-- JPEG y no PNG: el PNG llevaba canal alfa, y hay clientes de WhatsApp
+       que descartan las imágenes con transparencia sin decir nada. -->
+  <meta property="og:image" content="https://carlosjardim.com/calculadora-app/og.jpg">
+  <meta property="og:image:secure_url" content="https://carlosjardim.com/calculadora-app/og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:alt" content="Calculadora de tasas: dólar BCV, euro BCV y USDT paralelo">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Calculadora de Tasas | Carlos Jardim">
   <meta name="twitter:description" content="Dólar BCV, euro BCV y USDT paralelo. Compara tasas y calcula cuánto vender.">
-  <meta name="twitter:image" content="https://carlosjardim.com/calculadora-app/og.png">
+  <meta name="twitter:image" content="https://carlosjardim.com/calculadora-app/og.jpg">
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
@@ -37,8 +40,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/variables.css?r=11">
-  <link rel="stylesheet" href="/css/calculadora.css?r=11">
+  <link rel="stylesheet" href="/css/variables.css?r=12">
+  <link rel="stylesheet" href="/css/calculadora.css?r=12">
 </head>
 <body>
 
@@ -109,8 +112,11 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v11</span>
+    <span class="calc-version" title="Versión de la app instalada">v12</span>
     <div class="calc-pie-botones">
+      <button type="button" id="calcTema" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelTema">
+        Tema
+      </button>
       <button type="button" id="calcHistorial" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelHistorial">
         Historial
       </button>
@@ -120,6 +126,29 @@
       <button type="button" id="calcRefrescar" class="calc-refrescar">Actualizar</button>
     </div>
   </footer>
+
+  <!-- Temas -->
+  <section class="calc-ajustes" id="calcPanelTema" hidden>
+    <div class="calc-ajustes-cabecera">
+      <h2>Tema</h2>
+      <p>Se queda guardado en este dispositivo.</p>
+    </div>
+
+    <div class="calc-temas" id="listaTemas" role="radiogroup" aria-label="Tema">
+      <button type="button" class="tema" data-tema="oscuro" role="radio" aria-checked="true">
+        <span class="tema-muestra muestra-oscuro" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Oscuro
+      </button>
+      <button type="button" class="tema" data-tema="claro" role="radio" aria-checked="false">
+        <span class="tema-muestra muestra-claro" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Claro
+      </button>
+      <button type="button" class="tema" data-tema="navidad" role="radio" aria-checked="false">
+        <span class="tema-muestra muestra-navidad" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Navidad
+      </button>
+    </div>
+  </section>
 
   <!-- Lo calculado, guardado solo en este navegador -->
   <section class="calc-ajustes" id="calcPanelHistorial" hidden>
@@ -154,7 +183,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=11" defer></script>
+<script src="/js/calculadora.js?r=12" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

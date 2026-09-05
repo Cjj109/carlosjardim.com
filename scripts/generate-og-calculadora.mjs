@@ -60,5 +60,10 @@ const svg = `
         font-size="25" fill="#2ecc71">carlosjardim.com/calculadora</text>
 </svg>`;
 
-await sharp(Buffer.from(svg)).png().toFile(join(raiz, 'calculadora', 'og.png'));
-console.log('calculadora/og.png generado (1200x630)');
+// JPEG sin transparencia: WhatsApp descarta algunas imagenes con canal alfa
+await sharp(Buffer.from(svg))
+  .flatten({ background: '#0a0b0f' })
+  .jpeg({ quality: 88 })
+  .toFile(join(raiz, 'calculadora-app', 'og.jpg'));
+
+console.log('calculadora-app/og.jpg generado (1200x630)');
