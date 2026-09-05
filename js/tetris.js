@@ -73,6 +73,7 @@ function openTetris() {
   document.body.style.overflow = 'hidden';
 
   initTetris();
+  reengancharTetrisListeners(); // al cerrar se quitaron
   restartTetris();
   startTetrisLoop();
 }
@@ -90,6 +91,18 @@ function closeTetris() {
     tetris.modal.setAttribute('aria-hidden', 'true');
   }
   document.body.style.overflow = '';
+}
+
+/**
+ * Reponer los listeners de ventana al reabrir (ver nota en snake.js).
+ */
+function reengancharTetrisListeners() {
+  if (tetris.listeners.keydown) {
+    window.addEventListener('keydown', tetris.listeners.keydown);
+  }
+  if (tetris.listeners.resize) {
+    window.addEventListener('resize', tetris.listeners.resize, { passive: true });
+  }
 }
 
 /**
@@ -285,9 +298,18 @@ function rotateTetrisPiece() {
   const rotated = tetris.currentPiece.shape[0].map((_, i) =>
     tetris.currentPiece.shape.map(row => row[i]).reverse()
   );
-  
-  if (!checkTetrisCollision(rotated, tetris.currentX, tetris.currentY)) {
-    tetris.currentPiece.shape = rotated;
+
+  // Wall kick: si la pieza girada no cabe donde esta, se prueba a correrla
+  // un poco a los lados antes de rendirse. Sin esto, una pieza pegada a la
+  // pared o a otra simplemente no giraba, que es lo que mas molesta al jugar.
+  const desplazamientos = [0, -1, 1, -2, 2];
+
+  for (const dx of desplazamientos) {
+    if (!checkTetrisCollision(rotated, tetris.currentX + dx, tetris.currentY)) {
+      tetris.currentPiece.shape = rotated;
+      tetris.currentX += dx;
+      return;
+    }
   }
 }
 
@@ -356,7 +378,10 @@ function clearTetrisLines() {
   }
   
   if (linesCleared > 0) {
-    tetris.score += linesCleared * 100;
+    // Escala clasica: cuatro lineas de golpe valen el doble que cuatro
+    // sueltas. Antes todas valian 100 y no habia razon para arriesgarse.
+    const PUNTOS = { 1: 100, 2: 300, 3: 500, 4: 800 };
+    tetris.score += PUNTOS[linesCleared] || linesCleared * 200;
     document.getElementById('tetrisScore').textContent = tetris.score;
   }
 }

@@ -51,6 +51,7 @@ function openPong() {
   document.body.style.overflow = 'hidden';
 
   initPong();
+  reengancharPongListeners(); // al cerrar se quitaron
   restartPong();
   startLoop();
 }
@@ -70,6 +71,20 @@ function closePong() {
   document.body.style.overflow = '';
   pong.touchY = null;
   pong.targetPaddleY = null;
+}
+
+/**
+ * Reponer los listeners de ventana al reabrir (ver nota en snake.js).
+ * Sin esto, al cerrar y volver a abrir Pong se perdian el teclado y el
+ * arrastre con el raton, porque mousemove y mouseup viven en window.
+ */
+function reengancharPongListeners() {
+  const l = pong.listeners;
+  if (l.keydown) window.addEventListener('keydown', l.keydown);
+  if (l.keyup) window.addEventListener('keyup', l.keyup);
+  if (l.mousemove) window.addEventListener('mousemove', l.mousemove, { passive: true });
+  if (l.mouseup) window.addEventListener('mouseup', l.mouseup, { passive: true });
+  if (l.resize) window.addEventListener('resize', l.resize, { passive: true });
 }
 
 /**
@@ -266,7 +281,6 @@ function update() {
   
   // IA sigue la pelota
   const target = pong.ballY - pong.paddleH / 2;
-  const aiSpeed = speed * 0.82;
   pong.aY += (target - pong.aY) * 0.08;
   pong.aY = Math.max(0, Math.min(pong.h - pong.paddleH, pong.aY));
   
@@ -319,9 +333,18 @@ function update() {
     resetBall(true);
   }
   
-  // Limitar velocidad
+  // Limitar velocidad.
+  //
+  // El choque se detecta comparando posiciones fotograma a fotograma, asi que
+  // la pelota no puede avanzar mas que la ventana en la que se la detecta
+  // (ancho de paleta + dos radios = 26px) o la atraviesa sin tocarla. Con la
+  // formula anterior eso pasaba de verdad en pantallas grandes: un canvas de
+  // 1800px daba hasta 27,7px por fotograma. El limite vertical si puede ser
+  // mayor, porque ahi el rebote es contra las paredes.
   const maxV = Math.max(8.5, pong.w / 65);
-  pong.vx = Math.max(-maxV, Math.min(maxV, pong.vx));
+  const maxVX = Math.min(maxV, pong.paddleW + pong.ballR);
+
+  pong.vx = Math.max(-maxVX, Math.min(maxVX, pong.vx));
   pong.vy = Math.max(-maxV, Math.min(maxV, pong.vy));
 }
 

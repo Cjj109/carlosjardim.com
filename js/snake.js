@@ -52,6 +52,7 @@ function openSnake() {
   document.body.style.overflow = 'hidden';
 
   initSnake();
+  reengancharSnakeListeners(); // al cerrar se quitaron; hay que reponerlos
   restartSnake();
   startSnakeLoop();
 }
@@ -69,6 +70,23 @@ function closeSnake() {
     snake.modal.setAttribute('aria-hidden', 'true');
   }
   document.body.style.overflow = '';
+}
+
+/**
+ * Reponer los listeners de ventana al reabrir.
+ *
+ * Al cerrar se quitan para no dejarlos colgando, pero setupSnakeControls solo
+ * corre una vez (lo guarda dataset.bound), asi que al reabrir el juego se
+ * quedaba sin teclado. addEventListener con la misma referencia no duplica,
+ * asi que llamar a esto siempre es seguro.
+ */
+function reengancharSnakeListeners() {
+  if (snake.listeners.keydown) {
+    window.addEventListener('keydown', snake.listeners.keydown);
+  }
+  if (snake.listeners.resize) {
+    window.addEventListener('resize', snake.listeners.resize, { passive: true });
+  }
 }
 
 /**
@@ -322,8 +340,12 @@ function updateSnake() {
     return;
   }
   
-  // Verificar colisión consigo misma
-  if (snake.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+  // Verificar colisión consigo misma. Se excluye el ultimo segmento salvo que
+  // vaya a comer: esa casilla queda libre en este mismo turno, y contarla
+  // provocaba muertes injustas al ir pegado a la propia cola.
+  const vaAComer = head.x === snake.food.x && head.y === snake.food.y;
+  const cuerpo = vaAComer ? snake.snake : snake.snake.slice(0, -1);
+  if (cuerpo.some(segment => segment.x === head.x && segment.y === head.y)) {
     gameOver();
     return;
   }
