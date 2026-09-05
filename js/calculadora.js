@@ -153,10 +153,10 @@ function calcular() {
     ];
   } else if (modo === 'bcv') {
     const enBs = monto * usd;
+    // Sin euros: quien paga un precio fijado a BCV vende USDT, no euros
     filas = [
       { nombre: 'Son en bolívares', nota: `a ${num(usd)} Bs.`, valor: enBs, unidad: 'Bs.', color: COLORES.bs },
       usdt && { nombre: 'USDT a vender', nota: `a ${num(usdt)} Bs.`, valor: enBs / usdt, unidad: '₮', color: COLORES.usdt },
-      eur && { nombre: 'Euros a vender', nota: `a ${num(eur)} Bs.`, valor: enBs / eur, unidad: '€', color: COLORES.eur },
     ];
   } else if (modo === 'usdt') {
     if (!usdt) {
@@ -167,7 +167,6 @@ function calcular() {
     filas = [
       { nombre: 'Son en bolívares', nota: `a ${num(usdt)} Bs.`, valor: enBs, unidad: 'Bs.', color: COLORES.usdt },
       { nombre: 'Equivalen a BCV', nota: `a ${num(usd)} Bs.`, valor: enBs / usd, unidad: '$', color: COLORES.usd },
-      eur && { nombre: 'Equivalen en euros', nota: `a ${num(eur)} Bs.`, valor: enBs / eur, unidad: '€', color: COLORES.eur },
     ];
   }
 
