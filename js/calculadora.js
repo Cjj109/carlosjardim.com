@@ -110,9 +110,14 @@ function pintarTasas() {
   const aviso = document.getElementById('calcActualizado');
   if (!aviso) return;
 
-  const origen = tasas?.usdt?.market === 'binance-p2p'
-    ? `p2p de ${tasas.usdt.anuncios || 0} anuncios de Binance`
-    : 'p2p de respaldo';
+  // Se nombra la fuente elegida. Antes se comparaba con una etiqueta interna
+  // y, al elegir cualquier fuente en el panel, dejaba de coincidir y decia
+  // "de respaldo" aunque estuviera usando la buena.
+  const origen = tasas?.usdt?.fuente
+    ? tasas.usdt.fuente
+    : tasas?.usdt?.market === 'binance-p2p'
+      ? `Binance, ${tasas.usdt.anuncios || 0} anuncios`
+      : 'p2p de respaldo';
 
   const hora = new Date().toLocaleTimeString('es-VE', {
     timeZone: 'America/Caracas',
@@ -275,8 +280,12 @@ function aplicarEleccion() {
   const oficial = buscar('bcv');
   const paralelo = buscar('paralelo');
 
-  if (oficial) tasas.usd = { rate: oficial.rate, date: oficial.date, symbol: '$' };
-  if (paralelo) tasas.usdt = { rate: paralelo.rate, date: paralelo.date, symbol: '₮', market: paralelo.id };
+  if (oficial) {
+    tasas.usd = { rate: oficial.rate, date: oficial.date, symbol: '$', fuente: oficial.nombre };
+  }
+  if (paralelo) {
+    tasas.usdt = { rate: paralelo.rate, date: paralelo.date, symbol: '₮', market: paralelo.id, fuente: paralelo.nombre };
+  }
 
   pintarTasas();
   calcular();

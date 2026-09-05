@@ -623,3 +623,16 @@ body {
   font-size: 0.8rem;
   color: var(--calc-texto-tenue);
 }
+
+/* Sello de versión: para saber qué está corriendo una app ya instalada,
+   que es imposible de adivinar desde fuera */
+.calc-version {
+  font-family: var(--mono, monospace);
+  font-size: 0.6rem;
+  color: var(--calc-texto-tenue);
+  opacity: 0.5;
+}
+
+.calc-pie {
+  flex-wrap: wrap;
+}
