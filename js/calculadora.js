@@ -6,6 +6,29 @@
 const API = '/api/bcv';
 
 let tasas = null;
+let fuentes = null;
+
+// La eleccion se guarda en el navegador de cada quien: es una preferencia
+// personal, no hay cuentas ni servidor donde ponerla.
+const MEMORIA = 'calc-fuentes';
+
+function fuentesElegidas() {
+  try {
+    return JSON.parse(localStorage.getItem(MEMORIA)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function guardarEleccion(grupo, id) {
+  const actual = fuentesElegidas();
+  actual[grupo] = id;
+  try {
+    localStorage.setItem(MEMORIA, JSON.stringify(actual));
+  } catch {
+    // Modo privado o almacenamiento lleno: se sigue sin guardar
+  }
+}
 let modo = 'divisa';
 let refresco = null;
 
@@ -47,8 +70,13 @@ async function cargarTasas({ forzar = false } = {}) {
     if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
 
     tasas = await respuesta.json();
-    pintarTasas();
-    calcular();
+
+    if (fuentes) {
+      aplicarEleccion();
+    } else {
+      pintarTasas();
+      calcular();
+    }
   } catch (error) {
     console.error('No se pudieron cargar las tasas:', error);
     if (aviso) aviso.textContent = 'No se pudieron cargar las tasas';
@@ -93,6 +121,86 @@ function pintarTasas() {
   });
 
   aviso.textContent = `${hora} · ${origen}`;
+}
+
+/* ---------- Fuentes ---------- */
+
+async function cargarFuentes() {
+  try {
+    const respuesta = await fetch(`/api/fuentes?t=${Date.now()}`, { cache: 'no-store' });
+    if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+
+    const datos = await respuesta.json();
+    fuentes = datos.fuentes || [];
+    pintarFuentes();
+    aplicarEleccion();
+  } catch (error) {
+    console.error('No se pudieron consultar las fuentes:', error);
+  }
+}
+
+function fichaFuente(f, elegida) {
+  const caida = f.rate === null || f.rate === undefined;
+  const valor = caida
+    ? '<span class="fuente-tasa">sin respuesta</span>'
+    : `<span class="fuente-tasa">${num(f.rate)}</span>${f.date ? `<span class="fuente-fecha">${fecha(f.date)}</span>` : ''}`;
+
+  return `
+    <button type="button" role="radio" aria-checked="${elegida}"
+      class="fuente${elegida ? ' is-elegida' : ''}${caida ? ' fuente-caida' : ''}"
+      data-grupo="${f.grupo}" data-id="${f.id}" ${caida ? 'disabled' : ''}>
+      <span class="fuente-info">
+        <span class="fuente-nombre">
+          ${f.nombre}${elegida ? '<span class="fuente-marca">en uso</span>' : ''}
+        </span>
+        <span class="fuente-detalle">${f.detalle}</span>
+      </span>
+      <span class="fuente-valor">${valor}</span>
+    </button>`;
+}
+
+function pintarFuentes() {
+  if (!fuentes) return;
+
+  const elegidas = fuentesElegidas();
+  const porDefecto = { bcv: 'bcv', paralelo: 'binance' };
+
+  for (const grupo of ['bcv', 'paralelo']) {
+    const caja = document.getElementById(grupo === 'bcv' ? 'fuentesBcv' : 'fuentesParalelo');
+    if (!caja) continue;
+
+    const delGrupo = fuentes.filter((f) => f.grupo === grupo);
+    const elegida = elegidas[grupo] || porDefecto[grupo];
+
+    // Si la elegida no responde, manda la primera que si lo haga
+    const activa = delGrupo.some((f) => f.id === elegida && f.rate != null)
+      ? elegida
+      : (delGrupo.find((f) => f.rate != null) || {}).id;
+
+    caja.innerHTML = delGrupo.map((f) => fichaFuente(f, f.id === activa)).join('');
+  }
+}
+
+/** Sustituye las tasas por las de las fuentes elegidas */
+function aplicarEleccion() {
+  if (!fuentes || !tasas) return;
+
+  const elegidas = fuentesElegidas();
+  const porDefecto = { bcv: 'bcv', paralelo: 'binance' };
+
+  const buscar = (grupo) => {
+    const delGrupo = fuentes.filter((f) => f.grupo === grupo && f.rate != null);
+    return delGrupo.find((f) => f.id === (elegidas[grupo] || porDefecto[grupo])) || delGrupo[0] || null;
+  };
+
+  const oficial = buscar('bcv');
+  const paralelo = buscar('paralelo');
+
+  if (oficial) tasas.usd = { rate: oficial.rate, date: oficial.date, symbol: '$' };
+  if (paralelo) tasas.usdt = { rate: paralelo.rate, date: paralelo.date, symbol: '₮', market: paralelo.id };
+
+  pintarTasas();
+  calcular();
 }
 
 /* ---------- Cálculo ---------- */
@@ -228,7 +336,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('calcRefrescar')?.addEventListener('click', () => cargarTasas({ forzar: true }));
+  document.getElementById('calcRefrescar')?.addEventListener('click', () => {
+    cargarTasas({ forzar: true });
+    if (fuentes) cargarFuentes();
+  });
+
+  // Panel de fuentes: se consultan la primera vez que se abre, no antes,
+  // porque preguntarle a las siete fuentes cuesta y casi nadie lo abre.
+  const boton = document.getElementById('calcAjustes');
+  const panel = document.getElementById('calcPanelAjustes');
+
+  boton?.addEventListener('click', () => {
+    const abierto = !panel.hidden;
+    panel.hidden = abierto;
+    boton.setAttribute('aria-expanded', String(!abierto));
+
+    if (!abierto && !fuentes) cargarFuentes();
+    if (!abierto) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  panel?.addEventListener('click', (e) => {
+    const ficha = e.target.closest('.fuente');
+    if (!ficha || ficha.disabled) return;
+
+    guardarEleccion(ficha.dataset.grupo, ficha.dataset.id);
+    pintarFuentes();
+    aplicarEleccion();
+  });
+
+  document.getElementById('calcRestablecer')?.addEventListener('click', () => {
+    try {
+      localStorage.removeItem(MEMORIA);
+    } catch {
+      // sin almacenamiento no hay nada que borrar
+    }
+    pintarFuentes();
+    aplicarEleccion();
+  });
 
   // El p2p se mueve durante el dia; el BCV no. Se refresca solo cada minuto.
   refresco = setInterval(() => cargarTasas({ forzar: true }), 60000);

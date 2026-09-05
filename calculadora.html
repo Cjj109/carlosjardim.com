@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/variables.css?r=6">
-  <link rel="stylesheet" href="/css/calculadora.css?r=6">
+  <link rel="stylesheet" href="/css/variables.css?r=7">
+  <link rel="stylesheet" href="/css/calculadora.css?r=7">
 </head>
 <body>
 
@@ -109,11 +109,36 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <button type="button" id="calcRefrescar" class="calc-refrescar">Actualizar</button>
+    <div class="calc-pie-botones">
+      <button type="button" id="calcAjustes" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelAjustes">
+        Fuentes
+      </button>
+      <button type="button" id="calcRefrescar" class="calc-refrescar">Actualizar</button>
+    </div>
   </footer>
+
+  <!-- Elegir de dónde sale cada tasa -->
+  <section class="calc-ajustes" id="calcPanelAjustes" hidden>
+    <div class="calc-ajustes-cabecera">
+      <h2>De dónde sale cada tasa</h2>
+      <p>Así están ahora mismo. Toca una para usarla.</p>
+    </div>
+
+    <div class="calc-grupo">
+      <h3>Tasa oficial</h3>
+      <div class="calc-fuentes" id="fuentesBcv" role="radiogroup" aria-label="Fuente de la tasa oficial"></div>
+    </div>
+
+    <div class="calc-grupo">
+      <h3>Tasa paralela</h3>
+      <div class="calc-fuentes" id="fuentesParalelo" role="radiogroup" aria-label="Fuente de la tasa paralela"></div>
+    </div>
+
+    <button type="button" id="calcRestablecer" class="calc-restablecer">Volver a las de siempre</button>
+  </section>
 </main>
 
-<script src="/js/calculadora.js?r=6" defer></script>
+<script src="/js/calculadora.js?r=7" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
