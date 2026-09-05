@@ -350,7 +350,7 @@ function elegirModo(modo) {
   if (modo !== 'divisa' && modo !== 'bs') return;
   bcvModo = modo;
 
-  document.querySelectorAll('#bcvFromChips .bcv-chip').forEach((chip) => {
+  document.querySelectorAll('#bcvFromChips .bcv-modo-btn').forEach((chip) => {
     const activo = chip.dataset.modo === modo;
     chip.classList.toggle('is-active', activo);
     chip.setAttribute('aria-pressed', activo ? 'true' : 'false');
@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const chips = document.getElementById('bcvFromChips');
   if (chips) {
     chips.addEventListener('click', (e) => {
-      const chip = e.target.closest('.bcv-chip');
+      const chip = e.target.closest('.bcv-modo-btn');
       if (chip) elegirModo(chip.dataset.modo);
     });
   }

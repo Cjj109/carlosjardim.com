@@ -715,3 +715,47 @@ body.bcv-open {
 }
 
 .bcv-chips-2 { grid-template-columns: repeat(2, 1fr); }
+
+
+/* Selector de modo: un interruptor de dos posiciones, en su propia linea.
+   Antes eran cuatro botones apretados al lado del monto y en pantalla ancha
+   quedaban estrujados. */
+.bcv-modo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  margin-bottom: 0.9rem;
+  border-radius: var(--radius-md, 10px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.bcv-modo-btn {
+  padding: 0.65rem 0.5rem;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.bcv-modo-btn:hover { color: rgba(255, 255, 255, 0.8); }
+
+.bcv-modo-btn.is-active {
+  background: rgba(46, 204, 113, 0.16);
+  color: #2ecc71;
+  box-shadow: inset 0 0 0 1px rgba(46, 204, 113, 0.35);
+}
+
+.bcv-input-grande {
+  width: 100%;
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0.9rem;
+}
