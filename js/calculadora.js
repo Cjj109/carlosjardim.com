@@ -74,6 +74,7 @@ const COLORES = {
   usd: 'var(--calc-usd)',
   eur: 'var(--calc-eur)',
   usdt: 'var(--calc-usdt)',
+  zelle: 'var(--calc-zelle)',
   bs: 'var(--calc-texto)',
 };
 
@@ -134,6 +135,7 @@ function pintarTasas() {
     ['tasaUsd', 'fechaUsd', 'usd'],
     ['tasaEur', 'fechaEur', 'eur'],
     ['tasaUsdt', 'fechaUsdt', 'usdt'],
+    ['tasaZelle', 'fechaZelle', 'zelle'],
   ];
 
   for (const [idValor, idFecha, id] of campos) {
@@ -404,6 +406,7 @@ function calcular() {
   const usd = tasaDe('usd');
   const eur = tasaDe('eur');
   const usdt = tasaDe('usdt');
+  const zelle = tasaDe('zelle');
 
   if (!usd) {
     salida.innerHTML = '<p class="calc-vacio">Sin tasa del BCV</p>';
@@ -417,12 +420,14 @@ function calcular() {
     filas = [
       { nombre: 'Dólar BCV', nota: `a ${num(usd)} Bs.`, valor: monto * usd, unidad: 'Bs.', color: COLORES.usd },
       usdt && { nombre: 'USDT p2p', nota: `a ${num(usdt)} Bs.`, valor: monto * usdt, unidad: 'Bs.', color: COLORES.usdt },
+      zelle && { nombre: 'Zelle', nota: `a ${num(zelle)} Bs.`, valor: monto * zelle, unidad: 'Bs.', color: COLORES.zelle },
       eur && { nombre: 'Euro BCV', nota: `a ${num(eur)} Bs.`, valor: monto * eur, unidad: 'Bs.', color: COLORES.eur },
     ];
   } else if (modo === 'bs') {
     filas = [
       { nombre: 'En dólares BCV', nota: `a ${num(usd)} Bs.`, valor: monto / usd, unidad: '$', color: COLORES.usd },
       usdt && { nombre: 'En USDT', nota: `a ${num(usdt)} Bs.`, valor: monto / usdt, unidad: '₮', color: COLORES.usdt },
+      zelle && { nombre: 'En Zelle', nota: `a ${num(zelle)} Bs.`, valor: monto / zelle, unidad: '$', color: COLORES.zelle },
       eur && { nombre: 'En euros BCV', nota: `a ${num(eur)} Bs.`, valor: monto / eur, unidad: '€', color: COLORES.eur },
     ];
   } else if (modo === 'bcv') {
@@ -431,6 +436,7 @@ function calcular() {
     filas = [
       { nombre: 'Son en bolívares', nota: `a ${num(usd)} Bs.`, valor: enBs, unidad: 'Bs.', color: COLORES.bs },
       usdt && { nombre: 'USDT a vender', nota: `a ${num(usdt)} Bs.`, valor: enBs / usdt, unidad: '₮', color: COLORES.usdt },
+      zelle && { nombre: 'Zelle a vender', nota: `a ${num(zelle)} Bs.`, valor: enBs / zelle, unidad: '$', color: COLORES.zelle },
     ];
   } else if (modo === 'usdt') {
     if (!usdt) {
@@ -535,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   boton?.addEventListener('click', () => {
     const abierto = !panel.hidden;
+    cerrarPaneles(abierto ? null : panel.id);
     panel.hidden = abierto;
     boton.setAttribute('aria-expanded', String(!abierto));
 
@@ -559,12 +566,31 @@ document.addEventListener('DOMContentLoaded', () => {
     cerrarFuentes();
   });
 
+  // Los tres paneles se turnan: abrir uno cierra los otros, que si no se
+  // apilan y en el telefono acabas desplazandote entre menus abiertos.
+  const paneles = [
+    ['calcTema', 'calcPanelTema'],
+    ['calcHistorial', 'calcPanelHistorial'],
+    ['calcAjustes', 'calcPanelAjustes'],
+  ];
+
+  function cerrarPaneles(excepto) {
+    for (const [idBoton, idPanel] of paneles) {
+      if (idPanel === excepto) continue;
+      const panel = document.getElementById(idPanel);
+      const boton = document.getElementById(idBoton);
+      if (panel) panel.hidden = true;
+      if (boton) boton.setAttribute('aria-expanded', 'false');
+    }
+  }
+
   // Tema
   const botonTema = document.getElementById('calcTema');
   const panelTema = document.getElementById('calcPanelTema');
 
   botonTema?.addEventListener('click', () => {
     const abierto = !panelTema.hidden;
+    cerrarPaneles(abierto ? null : panelTema.id);
     panelTema.hidden = abierto;
     botonTema.setAttribute('aria-expanded', String(!abierto));
     if (!abierto) panelTema.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -585,6 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   botonHist?.addEventListener('click', () => {
     const abierto = !panelHist.hidden;
+    cerrarPaneles(abierto ? null : panelHist.id);
     panelHist.hidden = abierto;
     botonHist.setAttribute('aria-expanded', String(!abierto));
 

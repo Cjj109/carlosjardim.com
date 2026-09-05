@@ -57,6 +57,9 @@ async function leerUsdtBinance() {
     rate: datos.rate,
     date: (datos.updated_at || '').split('T')[0] || new Date().toISOString().split('T')[0],
     anuncios: datos.ads,
+    // Cuantos dolares Zelle cuesta un USDT: de ahi sale la tasa del Zelle
+    zellePorUsdt: datos.zelle_por_usdt || null,
+    zelleAnuncios: datos.zelle_ads || 0,
   };
 }
 
@@ -182,6 +185,18 @@ export async function onRequestGet(context) {
       last_updated: new Date().toISOString(),
       eur: bcv?.eur ? { rate: bcv.eur, date: bcv.fecha, symbol: '€' } : null,
       usd: usdRate ? { rate: usdRate, date: usdFecha, symbol: '$' } : null,
+      // El Zelle vale menos que el USDT porque quien lo recibe asume mas
+      // riesgo. El sobreprecio se lee del libro de Binance, no se inventa.
+      zelle: binanceValido && binance.zellePorUsdt
+        ? {
+            rate: Math.round((binance.rate / binance.zellePorUsdt) * 100) / 100,
+            date: binance.date,
+            symbol: 'Z',
+            live: true,
+            por_usdt: binance.zellePorUsdt,
+            anuncios: binance.zelleAnuncios,
+          }
+        : null,
       usdt: binanceValido
         ? { rate: binance.rate, date: binance.date, symbol: '₮', live: true, market: 'binance-p2p', anuncios: binance.anuncios }
         : usdt

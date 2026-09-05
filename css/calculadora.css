@@ -886,3 +886,21 @@ body {
   }
   .nieve span { opacity: 0.5; }
 }
+
+/* ---------- Zelle ---------- */
+
+/* Cuatro tasas: en dos filas de dos, que en una sola no caben legibles */
+.calc-tasas {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 560px) {
+  .calc-tasas { grid-template-columns: repeat(4, 1fr); }
+}
+
+.calc-tasas .tasa:nth-child(4)::before { background: var(--calc-zelle); }
+.calc-tasas .tasa:nth-child(4) .tasa-simbolo { color: var(--calc-zelle); }
+
+:root { --calc-zelle: #a855f7; }
+:root[data-tema="claro"] { --calc-zelle: #7e22ce; }
+:root[data-tema="navidad"] { --calc-zelle: #d98cff; }

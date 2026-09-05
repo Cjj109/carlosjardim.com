@@ -138,6 +138,18 @@ export async function onRequestGet(context) {
       date: soloFecha(cotizave?.binance?.updated_at),
     },
     {
+      id: 'zelle',
+      grupo: 'paralelo',
+      nombre: 'Zelle',
+      detalle: puente?.zelle_por_usdt
+        ? `Un USDT cuesta ${puente.zelle_por_usdt} en Zelle, de ${puente.zelle_ads} anuncios.`
+        : 'Calculado desde el libro de Binance.',
+      rate: puente?.rate && puente?.zelle_por_usdt
+        ? Math.round((puente.rate / puente.zelle_por_usdt) * 100) / 100
+        : null,
+      date: soloFecha(puente?.updated_at),
+    },
+    {
       id: 'dolarapi-paralelo',
       grupo: 'paralelo',
       nombre: 'Paralelo DolarAPI',
