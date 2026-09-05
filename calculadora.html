@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/variables.css?r=8">
-  <link rel="stylesheet" href="/css/calculadora.css?r=8">
+  <link rel="stylesheet" href="/css/variables.css?r=9">
+  <link rel="stylesheet" href="/css/calculadora.css?r=9">
 </head>
 <body>
 
@@ -110,12 +110,27 @@
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
     <div class="calc-pie-botones">
+      <button type="button" id="calcHistorial" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelHistorial">
+        Historial
+      </button>
       <button type="button" id="calcAjustes" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelAjustes">
         Fuentes
       </button>
       <button type="button" id="calcRefrescar" class="calc-refrescar">Actualizar</button>
     </div>
   </footer>
+
+  <!-- Lo calculado, guardado solo en este navegador -->
+  <section class="calc-ajustes" id="calcPanelHistorial" hidden>
+    <div class="calc-ajustes-cabecera">
+      <h2>Lo que has calculado</h2>
+      <p>Se guarda solo en este teléfono. Toca una línea para repetirla.</p>
+    </div>
+
+    <div class="calc-historial" id="listaHistorial"></div>
+
+    <button type="button" id="calcBorrarHistorial" class="calc-restablecer">Borrar el historial</button>
+  </section>
 
   <!-- Elegir de dónde sale cada tasa -->
   <section class="calc-ajustes" id="calcPanelAjustes" hidden>
@@ -138,7 +153,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=8" defer></script>
+<script src="/js/calculadora.js?r=9" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

@@ -551,3 +551,75 @@ body {
   border-color: var(--calc-borde-fuerte);
   color: var(--calc-texto);
 }
+
+/* ---------- Historial ---------- */
+
+.calc-historial {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.hist {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--calc-radio-sm);
+  border: 1px solid var(--calc-borde);
+  background: var(--calc-superficie-alta);
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease;
+}
+
+.hist:hover { border-color: var(--calc-borde-fuerte); }
+
+.hist-izq {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.hist-operacion {
+  font-family: var(--mono, monospace);
+  font-size: 0.82rem;
+}
+
+.hist-cuando {
+  font-size: 0.62rem;
+  color: var(--calc-texto-tenue);
+}
+
+.hist-der {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.hist-valor {
+  display: block;
+  font-family: var(--mono, monospace);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-res, var(--calc-texto));
+}
+
+.hist-tasa {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--calc-texto-tenue);
+}
+
+.calc-historial-vacio {
+  padding: 1.25rem 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--calc-texto-tenue);
+}

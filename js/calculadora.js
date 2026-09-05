@@ -123,6 +123,85 @@ function pintarTasas() {
   aviso.textContent = `${hora} · ${origen}`;
 }
 
+/* ---------- Historial ---------- */
+
+const HISTORIAL = 'calc-historial';
+const HISTORIAL_MAX = 30;
+
+function leerHistorial() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(HISTORIAL));
+    return Array.isArray(guardado) ? guardado : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Se apunta una linea cuando copias un resultado, no en cada tecla.
+ *
+ * Copiar es el momento en que un calculo importa de verdad: es el numero que
+ * te vas a llevar. Guardar cada pulsacion llenaria la lista de cifras a
+ * medio escribir.
+ */
+function apuntarEnHistorial(entrada) {
+  const lista = leerHistorial();
+
+  // Si repites el mismo calculo seguido, se actualiza en vez de duplicarse
+  const ultima = lista[0];
+  const mismo = ultima
+    && ultima.monto === entrada.monto
+    && ultima.modo === entrada.modo
+    && ultima.resultado === entrada.resultado;
+
+  if (mismo) return;
+
+  lista.unshift(entrada);
+
+  try {
+    localStorage.setItem(HISTORIAL, JSON.stringify(lista.slice(0, HISTORIAL_MAX)));
+  } catch {
+    // Sin almacenamiento el historial simplemente no se guarda
+  }
+
+  pintarHistorial();
+}
+
+function cuando(iso) {
+  const d = new Date(iso);
+  const hoy = new Date();
+  const mismoDia = d.toDateString() === hoy.toDateString();
+
+  const hora = d.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+  if (mismoDia) return hora;
+
+  return `${d.toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit' })} · ${hora}`;
+}
+
+function pintarHistorial() {
+  const caja = document.getElementById('listaHistorial');
+  if (!caja) return;
+
+  const lista = leerHistorial();
+
+  if (!lista.length) {
+    caja.innerHTML = '<p class="calc-historial-vacio">Todavía no has copiado ningún resultado</p>';
+    return;
+  }
+
+  caja.innerHTML = lista.map((h) => `
+    <button type="button" class="hist" data-monto="${h.monto}" data-modo="${h.modo}">
+      <span class="hist-izq">
+        <span class="hist-operacion">${num(h.monto)} ${h.origen} → ${h.destino}</span>
+        <span class="hist-cuando">${cuando(h.fecha)}</span>
+      </span>
+      <span class="hist-der" style="--color-res:${h.color || 'var(--calc-texto)'}">
+        <span class="hist-valor">${h.resultado}</span>
+        <span class="hist-tasa">a ${num(h.tasa)} Bs.</span>
+      </span>
+    </button>`).join('');
+}
+
 /* ---------- Fuentes ---------- */
 
 async function cargarFuentes() {
@@ -331,6 +410,20 @@ document.addEventListener('DOMContentLoaded', () => {
       await navigator.clipboard.writeText(fila.dataset.copiar);
       fila.classList.add('is-copiado');
       setTimeout(() => fila.classList.remove('is-copiado'), 1400);
+
+      const crudo = (document.getElementById('calcMonto').value || '').replace(/\./g, '').replace(',', '.');
+      const notaTasa = (fila.querySelector('.res-nota')?.textContent || '').replace(/[^\d,.]/g, '');
+
+      apuntarEnHistorial({
+        fecha: new Date().toISOString(),
+        modo,
+        monto: parseFloat(crudo),
+        origen: MODOS[modo].signo,
+        destino: fila.querySelector('.res-nombre')?.textContent.trim() || '',
+        resultado: fila.dataset.copiar,
+        tasa: parseFloat(notaTasa.replace(/\./g, '').replace(',', '.')) || 0,
+        color: fila.style.getPropertyValue('--color-res'),
+      });
     } catch (error) {
       console.warn('No se pudo copiar:', error);
     }
@@ -362,6 +455,43 @@ document.addEventListener('DOMContentLoaded', () => {
     guardarEleccion(ficha.dataset.grupo, ficha.dataset.id);
     pintarFuentes();
     aplicarEleccion();
+  });
+
+  // Historial
+  const botonHist = document.getElementById('calcHistorial');
+  const panelHist = document.getElementById('calcPanelHistorial');
+
+  botonHist?.addEventListener('click', () => {
+    const abierto = !panelHist.hidden;
+    panelHist.hidden = abierto;
+    botonHist.setAttribute('aria-expanded', String(!abierto));
+
+    if (!abierto) {
+      pintarHistorial();
+      panelHist.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+
+  // Tocar una línea repite ese cálculo
+  panelHist?.addEventListener('click', (e) => {
+    const linea = e.target.closest('.hist');
+    if (!linea) return;
+
+    const campo = document.getElementById('calcMonto');
+    if (campo) campo.value = linea.dataset.monto;
+    elegirModo(linea.dataset.modo);
+
+    panelHist.hidden = true;
+    botonHist.setAttribute('aria-expanded', 'false');
+  });
+
+  document.getElementById('calcBorrarHistorial')?.addEventListener('click', () => {
+    try {
+      localStorage.removeItem(HISTORIAL);
+    } catch {
+      // nada que borrar
+    }
+    pintarHistorial();
   });
 
   document.getElementById('calcRestablecer')?.addEventListener('click', () => {
