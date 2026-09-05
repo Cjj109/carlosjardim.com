@@ -3,6 +3,26 @@
    ============================================ */
 
 /**
+ * Redondea el peso a un decimal al pintarlo.
+ *
+ * Hevy guarda todo en kilos, asi que un ejercicio registrado en libras llega
+ * convertido con una ristra de decimales ("13.607787283069193 kg"). El script
+ * que genera los datos ya lo redondea, pero esto lo deja a prueba de que
+ * llegue un valor crudo por cualquier via.
+ */
+function formatearPeso(peso) {
+  if (typeof peso !== 'string') return peso;
+
+  const encontrado = peso.match(/^([\d.]+)\s*kg$/);
+  if (!encontrado) return peso;
+
+  const redondeado = Math.round(parseFloat(encontrado[1]) * 10) / 10;
+  if (!isFinite(redondeado)) return peso;
+
+  return (Number.isInteger(redondeado) ? redondeado : redondeado.toFixed(1)) + ' kg';
+}
+
+/**
  * Open gym widget modal
  */
 async function openGymWidget() {
@@ -102,7 +122,7 @@ function renderWorkoutData() {
         ${exercise.sets.map((set, index) => `
           <div class="gym-set">
             <div class="gym-set-number">Serie ${index + 1}</div>
-            <div class="gym-set-value">${set.reps} reps × ${set.weight}</div>
+            <div class="gym-set-value">${set.reps} reps × ${formatearPeso(set.weight)}</div>
           </div>
         `).join('')}
       </div>
