@@ -140,16 +140,17 @@ function calcular() {
   let filas = [];
 
   if (modo === 'divisa') {
+    // El euro va último en los dos modos: es el que menos se usa
     filas = [
       { nombre: 'Dólar BCV', nota: `a ${num(usd)} Bs.`, valor: monto * usd, unidad: 'Bs.', color: COLORES.usd },
-      eur && { nombre: 'Euro BCV', nota: `a ${num(eur)} Bs.`, valor: monto * eur, unidad: 'Bs.', color: COLORES.eur },
       usdt && { nombre: 'USDT p2p', nota: `a ${num(usdt)} Bs.`, valor: monto * usdt, unidad: 'Bs.', color: COLORES.usdt },
+      eur && { nombre: 'Euro BCV', nota: `a ${num(eur)} Bs.`, valor: monto * eur, unidad: 'Bs.', color: COLORES.eur },
     ];
   } else if (modo === 'bs') {
     filas = [
       { nombre: 'En dólares BCV', nota: `a ${num(usd)} Bs.`, valor: monto / usd, unidad: '$', color: COLORES.usd },
-      eur && { nombre: 'En euros BCV', nota: `a ${num(eur)} Bs.`, valor: monto / eur, unidad: '€', color: COLORES.eur },
       usdt && { nombre: 'En USDT', nota: `a ${num(usdt)} Bs.`, valor: monto / usdt, unidad: '₮', color: COLORES.usdt },
+      eur && { nombre: 'En euros BCV', nota: `a ${num(eur)} Bs.`, valor: monto / eur, unidad: '€', color: COLORES.eur },
     ];
   } else if (modo === 'bcv') {
     const enBs = monto * usd;
