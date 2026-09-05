@@ -1,0 +1,51 @@
+name: Update BCV Rates History
+
+# El historial de tasas de la calculadora se quedó congelado en mayo cuando se
+# borró el workflow anterior: las tasas del momento pasaron a leerse en el
+# borde con /api/bcv, pero nadie siguió alimentando el archivo del historial.
+# Esto lo rellena una vez al día leyendo ese mismo endpoint.
+
+on:
+  schedule:
+    # 13:00 UTC = 9:00 en Caracas, con la tasa del día ya publicada
+    - cron: '0 13 * * *'
+
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/fetch_bcv_rates.py'
+      - '.github/workflows/update-bcv-rates.yml'
+
+jobs:
+  update-rates:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install requests
+
+      - name: Leer las tasas y actualizar el historial
+        run: python scripts/fetch_bcv_rates.py
+
+      - name: Publicar si hubo cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/bcv-rates.json data/bcv-rates-history.json
+          if git diff --staged --quiet; then
+            echo "Sin cambios en las tasas"
+          else
+            git commit -m "Update BCV exchange rates [skip ci]"
+            git push
+          fi

@@ -13,67 +13,58 @@ from datetime import datetime
 # Output files
 OUTPUT_FILE = 'data/bcv-rates.json'
 HISTORY_FILE = 'data/bcv-rates-history.json'
-MAX_HISTORY_ENTRIES = 90  # Keep ~3 months of data (updates every 3 hours = 8/day)
+# Con una toma al dia, esto es algo mas de un anio de historial. Antes se
+# tomaba cada tres horas y los mismos 90 registros eran solo once dias.
+MAX_HISTORY_ENTRIES = 400
 
 # API endpoints
-EUR_API = 'https://bcvapi.tech/api/v1/euro/public'
-USD_API = 'https://bcvapi.tech/api/v1/dolar/public'
-USDT_API = 'https://ve.dolarapi.com/v1/dolares/paralelo'  # P2P reference rate
+# Se leen del propio endpoint del sitio, que ya resuelve de donde sacar cada
+# tasa: el dolar y el euro de la pagina del BCV y el USDT del p2p de Binance.
+# Antes cada una se pedia por separado a bcvapi.tech, que dejo de responder, y
+# por eso este historial llevaba congelado desde mayo.
+API_TASAS = 'https://carlosjardim.com/api/bcv'
+
+
+_tasas_cache = {}
+
+
+def _tasas_del_sitio():
+    """Una sola llamada al endpoint; las tres tasas salen de ahi."""
+    if not _tasas_cache:
+        response = requests.get(API_TASAS, timeout=20)
+        response.raise_for_status()
+        _tasas_cache.update(response.json())
+    return _tasas_cache
+
+
+def _leer(moneda):
+    try:
+        datos = _tasas_del_sitio().get(moneda)
+        if not datos or not datos.get('rate'):
+            print(f"\u2717 Sin tasa para {moneda}")
+            return None
+        return {
+            'rate': float(datos['rate']),
+            'date': datos.get('date') or datetime.now().strftime('%Y-%m-%d'),
+        }
+    except Exception as e:
+        print(f"\u2717 Error leyendo {moneda}: {e}")
+        return None
 
 
 def fetch_eur_rate():
-    """Fetch EUR rate from bcvapi.tech"""
-    try:
-        response = requests.get(EUR_API, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-
-        return {
-            'rate': float(data.get('tasa', 0)),
-            'date': data.get('fecha', datetime.now().strftime('%Y-%m-%d'))
-        }
-    except Exception as e:
-        print(f"✗ Error fetching EUR rate: {e}")
-        return None
+    """Tasa del euro publicada por el BCV"""
+    return _leer('eur')
 
 
 def fetch_usd_rate():
-    """Fetch USD rate from bcvapi.tech (official BCV rate)"""
-    try:
-        response = requests.get(USD_API, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-
-        return {
-            'rate': float(data.get('tasa', 0)),
-            'date': data.get('fecha', datetime.now().strftime('%Y-%m-%d'))
-        }
-    except Exception as e:
-        print(f"✗ Error fetching USD rate: {e}")
-        return None
+    """Tasa del dolar publicada por el BCV"""
+    return _leer('usd')
 
 
 def fetch_usdt_rate():
-    """Fetch USDT rate from DolarApi.com (P2P reference)"""
-    try:
-        response = requests.get(USDT_API, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-
-        # Parse date from ISO format
-        fecha_str = data.get('fechaActualizacion', '')
-        if fecha_str:
-            date = fecha_str.split('T')[0]
-        else:
-            date = datetime.now().strftime('%Y-%m-%d')
-
-        return {
-            'rate': float(data.get('promedio', 0)),
-            'date': date
-        }
-    except Exception as e:
-        print(f"✗ Error fetching USDT rate: {e}")
-        return None
+    """USDT p2p (Binance via Cotizave)"""
+    return _leer('usdt')
 
 
 def load_history():
@@ -213,15 +204,15 @@ def main():
     print("=" * 50)
 
     # Fetch EUR rate
-    print("\n→ Fetching EUR rate from bcvapi.tech...")
+    print("\n→ Leyendo la tasa del euro...")
     eur_data = fetch_eur_rate()
 
     # Fetch USD rate
-    print("→ Fetching USD rate from DolarApi.com...")
+    print("→ Leyendo la tasa del dolar...")
     usd_data = fetch_usd_rate()
 
     # Fetch USDT rate (P2P)
-    print("→ Fetching USDT rate from DolarApi.com...")
+    print("→ Leyendo el USDT p2p...")
     usdt_data = fetch_usdt_rate()
 
     # Save rates
