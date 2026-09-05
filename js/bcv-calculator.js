@@ -300,11 +300,14 @@ function tasasDisponibles() {
 }
 
 /**
- * Compara cuanto vale la cantidad segun cada tasa.
+ * Tres preguntas distintas, segun el modo:
  *
- * No es un conversor entre monedas: la pregunta util aqui es "estos 10 a
- * cuanto salen segun el BCV, segun el euro y segun el paralelo", para poder
- * comparar las tres de un vistazo.
+ *  divisa: cuantos bolivares son, a cada una de las tres tasas.
+ *  bs:     cuantas divisas salen de esos bolivares, a cada tasa.
+ *  bcv:    un precio fijado a tasa BCV, cuanto hay que vender de otra cosa
+ *          para pagarlo. Es el caso de "esto cuesta 350 a BCV, cuantos USDT
+ *          tengo que vender", donde el USDT vale mas bolivares y por eso
+ *          hacen falta menos.
  */
 function calculateConversion() {
   const contenedor = document.getElementById('bcvResults');
@@ -328,6 +331,39 @@ function calculateConversion() {
     return;
   }
 
+  // Precio fijado a tasa BCV: cuanto hay que pagar o vender en cada moneda
+  if (bcvModo === 'bcv') {
+    const tasaBcv = bcvRates.usd && bcvRates.usd.rate;
+    if (!tasaBcv) {
+      contenedor.innerHTML = '<div class="bcv-result-empty">Sin tasa del BCV</div>';
+      return;
+    }
+
+    const enBolivares = cantidad * tasaBcv;
+
+    const equivalencias = [
+      { etiqueta: 'Bs. Bolívares', valor: enBolivares, nota: `a ${formatRate(tasaBcv)} Bs.`, unidad: 'Bs.' },
+      ...tasas
+        .filter((t) => t.id !== 'usd')
+        .map((t) => ({
+          etiqueta: t.id === 'usdt' ? '₮ USDT a vender' : '€ Euros a vender',
+          valor: enBolivares / t.tasa,
+          nota: `a ${formatRate(t.tasa)} Bs.`,
+          unidad: ''
+        }))
+    ];
+
+    contenedor.innerHTML = equivalencias.map(({ etiqueta, valor, nota, unidad }) => `
+      <button type="button" class="bcv-result-row" data-copiar="${formatRate(valor)}">
+        <span class="bcv-result-info">
+          <span class="bcv-result-moneda">${etiqueta}</span>
+          <span class="bcv-result-tasa">${nota}</span>
+        </span>
+        <span class="bcv-result-valor">${formatRate(valor)}${unidad ? ' ' + unidad : ''}<span class="bcv-copiar-pista">copiar</span></span>
+      </button>`).join('');
+    return;
+  }
+
   const filas = tasas.map(({ etiqueta, tasa }) => {
     const valor = bcvModo === 'divisa' ? cantidad * tasa : cantidad / tasa;
     const unidad = bcvModo === 'divisa' ? 'Bs.' : '';
@@ -347,7 +383,7 @@ function calculateConversion() {
 
 /** Cambia entre "tengo divisas" y "tengo bolivares" */
 function elegirModo(modo) {
-  if (modo !== 'divisa' && modo !== 'bs') return;
+  if (!['divisa', 'bs', 'bcv'].includes(modo)) return;
   bcvModo = modo;
 
   document.querySelectorAll('#bcvFromChips .bcv-modo-btn').forEach((chip) => {

@@ -772,3 +772,6 @@ body.bcv-open {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+.bcv-modo { grid-template-columns: repeat(3, 1fr); }
+.bcv-modo-btn { font-size: 0.78rem; }
