@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Tasas | Carlos Jardim</title>
+  <meta name="description" content="Calculadora de tasas de cambio en Venezuela: dólar BCV, euro BCV y USDT paralelo. Compara cuánto vale un monto según cada tasa y cuánto vender para pagar un precio fijado a BCV.">
+  <meta name="theme-color" content="#050505">
+  <link rel="canonical" href="https://carlosjardim.com/calculadora">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Calculadora de Tasas | Carlos Jardim">
+  <meta property="og:description" content="Dólar BCV, euro BCV y USDT paralelo. Compara tasas y calcula cuánto vender.">
+  <meta property="og:url" content="https://carlosjardim.com/calculadora">
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/calculadora.css">
+</head>
+<body>
+
+<main class="calc">
+  <header class="calc-head">
+    <a class="calc-volver" href="/">← carlosjardim.com</a>
+    <h1>Calculadora de tasas</h1>
+    <p class="calc-sub">Dólar BCV, euro BCV y USDT paralelo</p>
+  </header>
+
+  <!-- Tasas del momento -->
+  <section class="calc-tasas" aria-label="Tasas actuales">
+    <article class="tasa">
+      <span class="tasa-simbolo">$</span>
+      <span class="tasa-nombre">Dólar BCV</span>
+      <span class="tasa-valor" id="tasaUsd">—</span>
+      <span class="tasa-fecha" id="fechaUsd"></span>
+    </article>
+    <article class="tasa">
+      <span class="tasa-simbolo">€</span>
+      <span class="tasa-nombre">Euro BCV</span>
+      <span class="tasa-valor" id="tasaEur">—</span>
+      <span class="tasa-fecha" id="fechaEur"></span>
+    </article>
+    <article class="tasa tasa-viva">
+      <span class="tasa-simbolo">₮</span>
+      <span class="tasa-nombre">USDT p2p</span>
+      <span class="tasa-valor" id="tasaUsdt">—</span>
+      <span class="tasa-fecha" id="fechaUsdt"></span>
+    </article>
+  </section>
+
+  <!-- Qué se quiere calcular -->
+  <section class="calc-panel">
+    <div class="calc-modos" id="calcModos" role="tablist" aria-label="Qué quieres calcular">
+      <button type="button" class="calc-modo is-active" data-modo="divisa" role="tab" aria-selected="true">Divisas</button>
+      <button type="button" class="calc-modo" data-modo="bs" role="tab" aria-selected="false">Bolívares</button>
+      <button type="button" class="calc-modo" data-modo="bcv" role="tab" aria-selected="false">Precio BCV</button>
+      <button type="button" class="calc-modo" data-modo="usdt" role="tab" aria-selected="false">USDT</button>
+    </div>
+
+    <p class="calc-pregunta" id="calcPregunta">¿Cuántos bolívares son, según cada tasa?</p>
+
+    <div class="calc-monto">
+      <span class="calc-monto-signo" id="calcSigno">$</span>
+      <input
+        type="text"
+        id="calcMonto"
+        inputmode="decimal"
+        autocomplete="off"
+        placeholder="0"
+        aria-label="Cantidad"
+      >
+    </div>
+
+    <div class="calc-rapidos" id="calcRapidos" role="group" aria-label="Montos rápidos">
+      <button type="button" data-monto="10">10</button>
+      <button type="button" data-monto="50">50</button>
+      <button type="button" data-monto="100">100</button>
+      <button type="button" data-monto="350">350</button>
+      <button type="button" data-monto="1000">1.000</button>
+    </div>
+
+    <div class="calc-resultados" id="calcResultados" aria-live="polite">
+      <p class="calc-vacio">Escribe una cantidad</p>
+    </div>
+  </section>
+
+  <footer class="calc-pie">
+    <span id="calcActualizado">Cargando tasas…</span>
+    <button type="button" id="calcRefrescar" class="calc-refrescar">Actualizar</button>
+  </footer>
+</main>
+
+<script src="js/calculadora.js" defer></script>
+</body>
+</html>

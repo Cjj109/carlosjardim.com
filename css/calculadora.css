@@ -1,0 +1,404 @@
+/* ============================================================
+   CALCULADORA DE TASAS — página propia
+   Cada tasa tiene su color, para poder distinguirlas de un
+   vistazo sin leer las etiquetas.
+   ============================================================ */
+
+:root {
+  --calc-fondo: #0a0b0f;
+  --calc-superficie: #14161d;
+  --calc-superficie-alta: #1b1e27;
+  --calc-borde: rgba(255, 255, 255, 0.07);
+  --calc-borde-fuerte: rgba(255, 255, 255, 0.14);
+  --calc-texto: #e8e9ee;
+  --calc-texto-suave: #9aa0ae;
+  --calc-texto-tenue: #626878;
+
+  --calc-usd: #5b93ff;
+  --calc-eur: #f5b544;
+  --calc-usdt: #2ecc71;
+
+  --calc-radio: 18px;
+  --calc-radio-sm: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(91, 147, 255, 0.10), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(46, 204, 113, 0.07), transparent 70%),
+    var(--calc-fondo);
+  color: var(--calc-texto);
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+.calc {
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+/* ---------- Cabecera ---------- */
+.calc-volver {
+  display: inline-block;
+  margin-bottom: 1.75rem;
+  color: var(--calc-texto-tenue);
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.calc-volver:hover { color: var(--calc-texto-suave); }
+
+.calc-head h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.calc-sub {
+  margin: 0.35rem 0 1.75rem;
+  color: var(--calc-texto-tenue);
+  font-size: 0.9rem;
+}
+
+/* ---------- Las tres tasas ---------- */
+.calc-tasas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.tasa {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 0.7rem;
+  border-radius: var(--calc-radio-sm);
+  background: var(--calc-superficie);
+  border: 1px solid var(--calc-borde);
+  overflow: hidden;
+}
+
+/* La franja de color identifica cada tasa */
+.tasa::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--calc-usd);
+}
+
+.calc-tasas .tasa:nth-child(2)::before { background: var(--calc-eur); }
+.calc-tasas .tasa:nth-child(3)::before { background: var(--calc-usdt); }
+
+.tasa-simbolo {
+  font-family: var(--mono, monospace);
+  font-size: 0.95rem;
+  color: var(--calc-usd);
+}
+
+.calc-tasas .tasa:nth-child(2) .tasa-simbolo { color: var(--calc-eur); }
+.calc-tasas .tasa:nth-child(3) .tasa-simbolo { color: var(--calc-usdt); }
+
+.tasa-nombre {
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--calc-texto-tenue);
+}
+
+.tasa-valor {
+  font-family: var(--mono, monospace);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.tasa-fecha {
+  font-size: 0.62rem;
+  color: var(--calc-texto-tenue);
+}
+
+/* El p2p late, porque se mueve durante el dia */
+.tasa-viva .tasa-simbolo::after {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 0.35rem;
+  border-radius: 50%;
+  background: var(--calc-usdt);
+  animation: latido 2.4s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+@keyframes latido {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+/* ---------- Panel principal ---------- */
+.calc-panel {
+  padding: 1.1rem;
+  border-radius: var(--calc-radio);
+  background: var(--calc-superficie);
+  border: 1px solid var(--calc-borde);
+}
+
+/* Pestañas */
+.calc-modos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.2rem;
+  padding: 0.25rem;
+  border-radius: var(--calc-radio-sm);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.calc-modo {
+  padding: 0.6rem 0.25rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--calc-texto-tenue);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.calc-modo:hover { color: var(--calc-texto-suave); }
+
+.calc-modo.is-active {
+  background: var(--calc-superficie-alta);
+  color: var(--calc-texto);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.calc-pregunta {
+  margin: 1rem 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--calc-texto-suave);
+  text-align: center;
+}
+
+/* Monto */
+.calc-monto {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--calc-radio-sm);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--calc-borde);
+  transition: border-color 0.2s;
+}
+
+.calc-monto:focus-within { border-color: var(--calc-borde-fuerte); }
+
+.calc-monto-signo {
+  font-family: var(--mono, monospace);
+  font-size: 1.5rem;
+  color: var(--calc-texto-tenue);
+}
+
+.calc-monto input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--calc-texto);
+  font-family: var(--mono, monospace);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  outline: none;
+}
+
+.calc-monto input::placeholder { color: var(--calc-texto-tenue); }
+
+/* Montos rapidos */
+.calc-rapidos {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0.7rem 0 1.1rem;
+}
+
+.calc-rapidos button {
+  flex: 1;
+  padding: 0.45rem 0;
+  border-radius: 8px;
+  border: 1px solid var(--calc-borde);
+  background: transparent;
+  color: var(--calc-texto-tenue);
+  font-family: var(--mono, monospace);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.calc-rapidos button:hover {
+  border-color: var(--calc-borde-fuerte);
+  color: var(--calc-texto);
+}
+
+/* ---------- Resultados ---------- */
+.calc-resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 3rem;
+}
+
+.calc-vacio {
+  margin: 0;
+  padding: 1.25rem 0;
+  text-align: center;
+  color: var(--calc-texto-tenue);
+  font-size: 0.85rem;
+}
+
+.res {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 1.15rem;
+  border-radius: var(--calc-radio-sm);
+  border: 1px solid var(--calc-borde);
+  background: var(--calc-superficie-alta);
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.2s ease;
+}
+
+.res::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-res, var(--calc-texto-tenue));
+}
+
+.res:hover {
+  transform: translateY(-1px);
+  border-color: var(--calc-borde-fuerte);
+}
+
+.res:active { transform: translateY(0); }
+
+.res-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.res-nombre {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.res-nota {
+  font-family: var(--mono, monospace);
+  font-size: 0.66rem;
+  color: var(--calc-texto-tenue);
+}
+
+.res-valor {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-family: var(--mono, monospace);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-res, var(--calc-texto));
+  white-space: nowrap;
+}
+
+.res-unidad {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--calc-texto-tenue);
+}
+
+.res-copiar {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--calc-texto-tenue);
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+@media (hover: none) {
+  .res-copiar { opacity: 0.55; }
+}
+
+.res:hover .res-copiar { opacity: 0.8; }
+
+.res.is-copiado {
+  border-color: var(--color-res, var(--calc-usdt));
+}
+
+.res.is-copiado .res-copiar {
+  opacity: 1;
+  color: var(--color-res, var(--calc-usdt));
+  font-size: 0;
+}
+
+.res.is-copiado .res-copiar::after {
+  content: 'copiado';
+  font-size: 0.58rem;
+}
+
+/* ---------- Pie ---------- */
+.calc-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.1rem;
+  padding: 0 0.25rem;
+  font-size: 0.72rem;
+  color: var(--calc-texto-tenue);
+}
+
+.calc-refrescar {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--calc-borde);
+  background: transparent;
+  color: var(--calc-texto-suave);
+  font-family: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.calc-refrescar:hover {
+  border-color: var(--calc-borde-fuerte);
+  color: var(--calc-texto);
+}
+
+.calc-refrescar:disabled { opacity: 0.5; cursor: default; }
+
+@media (max-width: 380px) {
+  .calc-modo { font-size: 0.65rem; }
+  .calc-monto input { font-size: 1.7rem; }
+}
