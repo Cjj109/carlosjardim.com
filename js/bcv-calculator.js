@@ -272,97 +272,95 @@ function formatDateTime(date) {
 /**
  * Calculate currency conversion
  */
+let bcvMonedaOrigen = 'USD';
+
+const BCV_MONEDAS = ['USD', 'EUR', 'USDT', 'BS'];
+
+const BCV_NOMBRES = {
+  USD: 'Dólar BCV',
+  EUR: 'Euro BCV',
+  USDT: 'USDT p2p',
+  BS: 'Bolívares'
+};
+
+/** Cuántos bolívares vale una unidad de cada moneda */
+function tasaEnBs(moneda) {
+  if (!bcvRates) return null;
+  if (moneda === 'BS') return 1;
+  if (moneda === 'USD') return bcvRates.usd && bcvRates.usd.rate;
+  if (moneda === 'EUR') return bcvRates.eur && bcvRates.eur.rate;
+  if (moneda === 'USDT') return (bcvRates.usdt && bcvRates.usdt.rate) || (bcvRates.usd && bcvRates.usd.rate);
+  return null;
+}
+
+/**
+ * Convierte la cantidad escrita a las otras tres monedas de una vez.
+ *
+ * Antes había que elegir origen y destino en dos desplegables y salía un solo
+ * resultado, así que ver "cuánto es esto en bolívares y en USDT" pedía dos
+ * pasadas. El icono de intercambio, además, no hacía nada: era un div sin
+ * ningún evento.
+ */
 function calculateConversion() {
+  const contenedor = document.getElementById('bcvResults');
+  if (!contenedor) return;
+
   if (!bcvRates) {
-    document.getElementById('bcvResult').innerHTML =
-      '<div class="bcv-result-empty">Cargando tasas...</div>';
+    contenedor.innerHTML = '<div class="bcv-result-empty">Cargando tasas...</div>';
     return;
   }
 
-  const amount = parseFloat(document.getElementById('bcvAmount').value);
-  const fromCurrency = document.getElementById('bcvFromCurrency').value;
-  const toCurrency = document.getElementById('bcvToCurrency').value;
+  const cantidad = parseFloat(document.getElementById('bcvAmount').value);
 
-  // Validate input
-  if (!amount || amount <= 0 || isNaN(amount)) {
-    document.getElementById('bcvResult').innerHTML =
-      '<div class="bcv-result-empty">Ingresa un monto válido</div>';
+  if (!cantidad || cantidad <= 0 || isNaN(cantidad)) {
+    contenedor.innerHTML = '<div class="bcv-result-empty">Escribe una cantidad</div>';
     return;
   }
 
-  // Prevent same currency conversion
-  if (fromCurrency === toCurrency) {
-    document.getElementById('bcvResult').innerHTML =
-      '<div class="bcv-result-text">' + formatRate(amount) + ' ' + getCurrencySymbol(fromCurrency) + '</div>';
+  const tasaOrigen = tasaEnBs(bcvMonedaOrigen);
+  if (!tasaOrigen) {
+    contenedor.innerHTML = '<div class="bcv-result-empty">Sin tasa disponible</div>';
     return;
   }
 
-  // Get rates (with USDT fallback)
-  const usdRate = bcvRates.usd.rate;
-  const eurRate = bcvRates.eur.rate;
-  const usdtRate = bcvRates.usdt ? bcvRates.usdt.rate : usdRate;
+  const enBolivares = cantidad * tasaOrigen;
 
-  // Perform conversion
-  let result = 0;
+  const filas = BCV_MONEDAS
+    .filter((moneda) => moneda !== bcvMonedaOrigen)
+    .map((moneda) => {
+      const tasa = tasaEnBs(moneda);
+      if (!tasa) return '';
 
-  if (fromCurrency === 'BS') {
-    // From Bs to other currency
-    if (toCurrency === 'USD') {
-      result = amount / usdRate;
-    } else if (toCurrency === 'EUR') {
-      result = amount / eurRate;
-    } else if (toCurrency === 'USDT') {
-      result = amount / usdtRate;
-    }
-  } else if (fromCurrency === 'USD') {
-    // From USD
-    if (toCurrency === 'BS') {
-      result = amount * usdRate;
-    } else if (toCurrency === 'EUR') {
-      const bsAmount = amount * usdRate;
-      result = bsAmount / eurRate;
-    } else if (toCurrency === 'USDT') {
-      const bsAmount = amount * usdRate;
-      result = bsAmount / usdtRate;
-    }
-  } else if (fromCurrency === 'EUR') {
-    // From EUR
-    if (toCurrency === 'BS') {
-      result = amount * eurRate;
-    } else if (toCurrency === 'USD') {
-      const bsAmount = amount * eurRate;
-      result = bsAmount / usdRate;
-    } else if (toCurrency === 'USDT') {
-      const bsAmount = amount * eurRate;
-      result = bsAmount / usdtRate;
-    }
-  } else if (fromCurrency === 'USDT') {
-    // From USDT
-    if (toCurrency === 'BS') {
-      result = amount * usdtRate;
-    } else if (toCurrency === 'USD') {
-      const bsAmount = amount * usdtRate;
-      result = bsAmount / usdRate;
-    } else if (toCurrency === 'EUR') {
-      const bsAmount = amount * usdtRate;
-      result = bsAmount / eurRate;
-    }
-  }
+      const valor = enBolivares / tasa;
+      const referencia = moneda === 'BS'
+        ? `1 ${bcvMonedaOrigen === 'BS' ? 'Bs.' : bcvMonedaOrigen} = ${formatRate(tasaOrigen)} Bs.`
+        : `1 ${moneda} = ${formatRate(tasa)} Bs.`;
 
-  // Display result
-  const symbol = getCurrencySymbol(toCurrency);
-  const formattedResult = formatRate(result);
+      return `
+        <button type="button" class="bcv-result-row" data-copiar="${formatRate(valor)}">
+          <span class="bcv-result-info">
+            <span class="bcv-result-moneda">${getCurrencySymbol(moneda)} ${BCV_NOMBRES[moneda]}</span>
+            <span class="bcv-result-tasa">${referencia}</span>
+          </span>
+          <span class="bcv-result-valor">${formatRate(valor)}</span>
+        </button>`;
+    })
+    .join('');
 
-  document.getElementById('bcvResult').innerHTML = `
-    <div class="bcv-result-text">${formattedResult} ${symbol}</div>
-    <button class="bcv-copy-btn" onclick="copyResult('${formattedResult}', '${symbol}')" title="Copiar resultado">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-      </svg>
-      Copiar
-    </button>
-  `;
+  contenedor.innerHTML = filas;
+}
+
+/** Marca la moneda elegida y recalcula */
+function elegirMonedaOrigen(moneda) {
+  if (!BCV_MONEDAS.includes(moneda)) return;
+  bcvMonedaOrigen = moneda;
+
+  document.querySelectorAll('#bcvFromChips .bcv-chip').forEach((chip) => {
+    chip.classList.toggle('is-active', chip.dataset.currency === moneda);
+    chip.setAttribute('aria-pressed', chip.dataset.currency === moneda ? 'true' : 'false');
+  });
+
+  calculateConversion();
 }
 
 /**
@@ -478,9 +476,13 @@ function copyResult(amount, symbol) {
  * Clear calculator
  */
 function clearBCVCalculator() {
-  document.getElementById('bcvAmount').value = '';
-  document.getElementById('bcvResult').innerHTML =
-    '<div class="bcv-result-empty">Resultado aparecerá aquí</div>';
+  const cantidad = document.getElementById('bcvAmount');
+  if (cantidad) cantidad.value = '';
+
+  const resultados = document.getElementById('bcvResults');
+  if (resultados) {
+    resultados.innerHTML = '<div class="bcv-result-empty">Escribe una cantidad</div>';
+  }
 }
 
 // Event listeners
@@ -496,21 +498,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Real-time calculation on input
+  // Calculo en vivo mientras se escribe
   const amountInput = document.getElementById('bcvAmount');
-  const fromSelect = document.getElementById('bcvFromCurrency');
-  const toSelect = document.getElementById('bcvToCurrency');
-
   if (amountInput) {
     amountInput.addEventListener('input', calculateConversion);
   }
 
-  if (fromSelect) {
-    fromSelect.addEventListener('change', calculateConversion);
+  // Moneda de origen
+  const chips = document.getElementById('bcvFromChips');
+  if (chips) {
+    chips.addEventListener('click', (e) => {
+      const chip = e.target.closest('.bcv-chip');
+      if (chip) elegirMonedaOrigen(chip.dataset.currency);
+    });
   }
 
-  if (toSelect) {
-    toSelect.addEventListener('change', calculateConversion);
+  // Montos rapidos
+  const rapidos = document.getElementById('bcvQuick');
+  if (rapidos) {
+    rapidos.addEventListener('click', (e) => {
+      const boton = e.target.closest('.bcv-quick-btn');
+      if (!boton || !amountInput) return;
+      amountInput.value = boton.dataset.amount;
+      calculateConversion();
+    });
+  }
+
+  // Tocar un resultado lo copia
+  const resultados = document.getElementById('bcvResults');
+  if (resultados) {
+    resultados.addEventListener('click', async (e) => {
+      const fila = e.target.closest('.bcv-result-row');
+      if (!fila || !navigator.clipboard) return;
+
+      try {
+        await navigator.clipboard.writeText(fila.dataset.copiar);
+        fila.classList.add('is-copiado');
+        setTimeout(() => fila.classList.remove('is-copiado'), 1200);
+      } catch (err) {
+        console.warn('No se pudo copiar:', err);
+      }
+    });
   }
 
   // Add click-to-refresh on USDT rate

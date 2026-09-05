@@ -522,3 +522,164 @@ body.bcv-open {
     margin-bottom: 10px;
   }
 }
+
+
+/* ============================================
+   CALCULADORA — una cantidad, todas las monedas
+   ============================================ */
+
+.bcv-amount-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.bcv-amount-row .bcv-input {
+  width: 100%;
+  font-size: 1.75rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+/* Selector de moneda: botones a la vista en vez de un desplegable */
+.bcv-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+
+.bcv-chip {
+  padding: 0.6rem 0.3rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.65);
+  font-family: var(--mono, monospace);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.bcv-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.bcv-chip.is-active {
+  background: rgba(46, 204, 113, 0.15);
+  border-color: rgba(46, 204, 113, 0.5);
+  color: #2ecc71;
+}
+
+/* Montos frecuentes */
+.bcv-quick {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.bcv-quick-btn {
+  flex: 1;
+  padding: 0.45rem 0;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--mono, monospace);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.bcv-quick-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Resultados: los tres a la vez */
+.bcv-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 3rem;
+}
+
+.bcv-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.bcv-result-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(46, 204, 113, 0.3);
+}
+
+.bcv-result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.bcv-result-moneda {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.bcv-result-tasa {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: var(--mono, monospace);
+}
+
+.bcv-result-valor {
+  font-family: var(--mono, monospace);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #2ecc71;
+  white-space: nowrap;
+}
+
+/* Aviso de copiado */
+.bcv-result-row.is-copiado {
+  border-color: rgba(46, 204, 113, 0.6);
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.bcv-result-row.is-copiado .bcv-result-valor::after {
+  content: ' copiado';
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: rgba(46, 204, 113, 0.75);
+  letter-spacing: 0.04em;
+}
+
+@media (min-width: 520px) {
+  .bcv-amount-row {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .bcv-amount-row .bcv-input {
+    flex: 1;
+    text-align: left;
+  }
+
+  .bcv-chips {
+    flex-shrink: 0;
+    grid-template-columns: repeat(4, minmax(3.2rem, 1fr));
+  }
+}
