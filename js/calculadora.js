@@ -183,6 +183,45 @@ function cuando(iso) {
   return `${d.toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit' })} · ${hora}`;
 }
 
+let apunteEnCurso = null;
+
+/**
+ * Apunta el calculo que hay en pantalla.
+ *
+ * Antes solo se guardaba al copiar un resultado, y en el telefono eso no se
+ * adivina: no hay Enter ni boton de "calcular", asi que la gente escribia,
+ * miraba el numero y se iba sin que quedara rastro. Ahora se apunta solo
+ * cuando dejas de escribir.
+ */
+function apuntarCalculoActual() {
+  const primera = document.querySelector('.res');
+  if (!primera) return;
+
+  const campo = document.getElementById('calcMonto');
+  const crudo = (campo?.value || '').replace(/\./g, '').replace(',', '.');
+  const cantidad = parseFloat(crudo);
+  if (!cantidad || cantidad <= 0) return;
+
+  const nota = (primera.querySelector('.res-nota')?.textContent || '').replace(/[^\d,.]/g, '');
+
+  apuntarEnHistorial({
+    fecha: new Date().toISOString(),
+    modo,
+    monto: cantidad,
+    origen: MODOS[modo].signo,
+    destino: primera.querySelector('.res-nombre')?.textContent.trim() || '',
+    resultado: primera.dataset.copiar,
+    tasa: parseFloat(nota.replace(/\./g, '').replace(',', '.')) || 0,
+    color: primera.style.getPropertyValue('--color-res'),
+  });
+}
+
+/** Espera a que se deje de escribir antes de apuntar nada */
+function programarApunte() {
+  clearTimeout(apunteEnCurso);
+  apunteEnCurso = setTimeout(apuntarCalculoActual, 1800);
+}
+
 function pintarHistorial() {
   const caja = document.getElementById('listaHistorial');
   if (!caja) return;
@@ -396,7 +435,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const monto = document.getElementById('calcMonto');
   if (monto) {
-    monto.addEventListener('input', calcular);
+    monto.addEventListener('input', () => {
+      calcular();
+      programarApunte();
+    });
+
+    // En el teléfono no hay Enter, así que no se puede esperar a que se
+    // confirme nada: se apunta cuando dejas de escribir.
+    monto.addEventListener('blur', apuntarCalculoActual);
     monto.focus();
   }
 
@@ -457,6 +503,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!abierto) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 
+  // En el teléfono el panel tapa la calculadora, así que al elegir se cierra
+  // y se ve enseguida el efecto del cambio.
+  const cerrarFuentes = () => {
+    panel.hidden = true;
+    boton.setAttribute('aria-expanded', 'false');
+  };
+
   panel?.addEventListener('click', (e) => {
     const ficha = e.target.closest('.fuente');
     if (!ficha || ficha.disabled) return;
@@ -464,6 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
     guardarEleccion(ficha.dataset.grupo, ficha.dataset.id);
     pintarFuentes();
     aplicarEleccion();
+    cerrarFuentes();
   });
 
   // Historial
@@ -511,6 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     pintarFuentes();
     aplicarEleccion();
+    cerrarFuentes();
   });
 
   // El p2p se mueve durante el dia; el BCV no. Se refresca solo cada minuto.
