@@ -132,19 +132,16 @@ function tasaDe(id) {
 
 function pintarTasas() {
   const campos = [
-    ['tasaUsd', 'fechaUsd', 'usd'],
-    ['tasaEur', 'fechaEur', 'eur'],
-    ['tasaUsdt', 'fechaUsdt', 'usdt'],
-    ['tasaZelle', 'fechaZelle', 'zelle'],
+    ['tasaUsd', 'usd'],
+    ['tasaEur', 'eur'],
+    ['tasaUsdt', 'usdt'],
+    ['tasaZelle', 'zelle'],
   ];
 
-  for (const [idValor, idFecha, id] of campos) {
+  for (const [idValor, id] of campos) {
     const valor = document.getElementById(idValor);
-    const cuando = document.getElementById(idFecha);
     const tasa = tasaDe(id);
-
     if (valor) valor.textContent = tasa ? num(tasa) : '—';
-    if (cuando) cuando.textContent = tasas?.[id]?.date ? fecha(tasas[id].date) : '';
   }
 
   const aviso = document.getElementById('calcActualizado');
@@ -165,7 +162,11 @@ function pintarTasas() {
     minute: '2-digit',
   });
 
-  aviso.textContent = `${hora} · ${origen}`;
+  // La fecha sale de las tarjetas —las hacia mas altas— pero la del BCV
+  // importa: dice que esa tasa rige el proximo dia habil, no hoy.
+  const vigencia = tasas?.usd?.date ? ` · BCV rige ${fecha(tasas.usd.date)}` : '';
+
+  aviso.textContent = `${hora} · ${origen}${vigencia}`;
 }
 
 /* ---------- Historial ---------- */
