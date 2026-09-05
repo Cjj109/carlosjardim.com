@@ -37,8 +37,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/variables.css?r=7">
-  <link rel="stylesheet" href="/css/calculadora.css?r=7">
+  <link rel="stylesheet" href="/css/variables.css?r=8">
+  <link rel="stylesheet" href="/css/calculadora.css?r=8">
 </head>
 <body>
 
@@ -138,7 +138,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=7" defer></script>
+<script src="/js/calculadora.js?r=8" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
@@ -149,6 +149,23 @@
       // no es carpeta: la redirección que eso creaba impedía que WhatsApp leyera
       // la vista previa.
       navigator.serviceWorker.register('/sw-calculadora.js', { scope: '/calculadora' })
+        .then((registro) => {
+          // Si hay una version nueva esperando, se pone al mando y se recarga
+          // una vez. Sin esto, en la app instalada un cambio tardaba dos
+          // aperturas en aparecer.
+          registro.addEventListener('updatefound', () => {
+            const nuevo = registro.installing;
+            if (!nuevo) return;
+
+            nuevo.addEventListener('statechange', () => {
+              if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
+                window.location.reload();
+              }
+            });
+          });
+
+          registro.update();
+        })
         .catch((error) => console.warn('No se pudo registrar el service worker:', error));
     });
   }
