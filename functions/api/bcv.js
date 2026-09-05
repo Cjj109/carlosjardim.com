@@ -6,17 +6,21 @@
  * pero el servidor no contesta) y por eso la web estaba devolviendo
  * "usd": null y "eur": null sin que nada avisara.
  *
+ * El USDT sale del p2p de Binance vía Cotizave: el "paralelo" de DolarAPI
+ * venía de otra medición que se actualiza una vez de madrugada, así que a
+ * media mañana ya iba 13 bolívares por detrás del p2p real.
+ *
  * Nota: bcv.org.ve entrega la cadena de certificados incompleta y ni Node ni
  * workerd local la aceptan, pero la red de Cloudflare en producción sí — que
- * es donde corre esto. Si algún día fallara, queda DolarAPI de respaldo para
- * el dólar.
+ * es donde corre esto. Si algún día fallara, queda DolarAPI de respaldo.
  *
  * Cache: 5 minutos en el CDN.
  */
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
-const USDT_API = 'https://ve.dolarapi.com/v1/dolares/paralelo';
+const COTIZAVE_API = 'https://api.cotizave.com/v1/fx/rates';
+const USDT_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
 
 const CACHE_MAX_AGE = 300;
 
@@ -50,6 +54,25 @@ function leerFecha(html) {
   return iso ? iso[1] : new Date().toISOString().split('T')[0];
 }
 
+/** USDT p2p de Binance. Necesita clave; sin ella se usa el respaldo. */
+async function leerUsdtCotizave(clave) {
+  if (!clave) return null;
+
+  const res = await fetch(COTIZAVE_API, {
+    headers: { 'X-API-Key': clave, Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const datos = await res.json();
+  const binance = datos.rates?.find((r) => r.market === 'binance');
+  if (!binance?.mid || binance.mid <= 0) return null;
+
+  return {
+    rate: binance.mid,
+    date: (binance.updated_at || '').split('T')[0] || new Date().toISOString().split('T')[0],
+  };
+}
+
 async function leerBCV() {
   const res = await fetch(BCV_URL, {
     headers: {
@@ -72,14 +95,16 @@ export async function onRequestGet(context) {
   const hoy = new Date().toISOString().split('T')[0];
 
   try {
-    const [bcvRes, usdtRes, respaldoRes] = await Promise.allSettled([
+    const [bcvRes, usdtRes, usdtRespaldoRes, respaldoRes] = await Promise.allSettled([
       leerBCV(),
-      fetchJson(USDT_API),
+      leerUsdtCotizave(context.env?.COTIZAVE_API_KEY),
+      fetchJson(USDT_RESPALDO),
       fetchJson(USD_RESPALDO),
     ]);
 
     const bcv = bcvRes.status === 'fulfilled' ? bcvRes.value : null;
     const usdt = usdtRes.status === 'fulfilled' ? usdtRes.value : null;
+    const usdtRespaldo = usdtRespaldoRes.status === 'fulfilled' ? usdtRespaldoRes.value : null;
     const respaldo = respaldoRes.status === 'fulfilled' ? respaldoRes.value : null;
 
     // El respaldo solo entra si el BCV no dio dólar
@@ -92,12 +117,17 @@ export async function onRequestGet(context) {
       last_updated: new Date().toISOString(),
       eur: bcv?.eur ? { rate: bcv.eur, date: bcv.fecha, symbol: '€' } : null,
       usd: usdRate ? { rate: usdRate, date: usdFecha, symbol: '$' } : null,
-      usdt: usdt ? {
-        rate: parseFloat(usdt.promedio) || 0,
-        date: usdt.fechaActualizacion ? usdt.fechaActualizacion.split('T')[0] : hoy,
-        symbol: '₮',
-        live: true,
-      } : null,
+      usdt: usdt
+        ? { rate: usdt.rate, date: usdt.date, symbol: '₮', live: true, market: 'binance' }
+        : usdtRespaldo
+          ? {
+              rate: parseFloat(usdtRespaldo.promedio) || 0,
+              date: usdtRespaldo.fechaActualizacion ? usdtRespaldo.fechaActualizacion.split('T')[0] : hoy,
+              symbol: '₮',
+              live: true,
+              market: 'paralelo',
+            }
+          : null,
     };
 
     return new Response(JSON.stringify(output), {
