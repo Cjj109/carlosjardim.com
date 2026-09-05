@@ -203,7 +203,9 @@ async function fetchGoldPrice() {
  * Using free forex APIs
  */
 async function fetchEurUsdRate() {
-  // Try Frankfurter API (free, no API key required)
+  // Frankfurter cambio de dominio: api.frankfurter.app responde 301 y ese
+  // redirect NO trae cabeceras CORS, asi que el navegador lo bloquea antes de
+  // seguirlo (con curl funciona, en la web no). El dominio .dev si las trae.
   // Fetch current and historical rates in parallel to avoid waterfall
   try {
     const yesterday = new Date();
@@ -211,8 +213,8 @@ async function fetchEurUsdRate() {
     const dateStr = yesterday.toISOString().split('T')[0];
 
     const [currentRes, histRes] = await Promise.all([
-      fetch('https://api.frankfurter.app/latest?from=EUR&to=USD', { cache: 'no-store' }),
-      fetch(`https://api.frankfurter.app/${dateStr}?from=EUR&to=USD`, { cache: 'no-store' })
+      fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD', { cache: 'no-store' }),
+      fetch(`https://api.frankfurter.dev/v1/${dateStr}?base=EUR&symbols=USD`, { cache: 'no-store' })
     ]);
 
     if (currentRes.ok) {
@@ -243,10 +245,11 @@ async function fetchEurUsdRate() {
     console.warn('Frankfurter API failed:', e);
   }
 
-  // Fallback: Try exchangerate.host
+  // Respaldo. Antes era exchangerate.host, que pasó a exigir clave de API y
+  // devolvia un error en vez de la tasa.
   try {
     const response = await fetch(
-      'https://api.exchangerate.host/latest?base=EUR&symbols=USD',
+      'https://open.er-api.com/v6/latest/EUR',
       { cache: 'no-store' }
     );
 

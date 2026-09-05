@@ -2,12 +2,17 @@
  * Cloudflare Pages Function: Chat Proxy for OpenRouter
  * Proxies chat requests to OpenRouter API, keeping the API key server-side.
  * Supports two personas: "assistant" (Side A) and "abuela" (Side B).
- * Primary model: Gemini 2.0 Flash (free). Fallback: DeepSeek V3 (cheap).
+ * Modelo principal: Gemini 3.5 Flash Lite, el flash-lite más nuevo que
+ * OpenRouter tiene estable hoy. Respaldo: DeepSeek V3.
+ *
+ * El principal era google/gemini-2.0-flash-001, que OpenRouter ya retiró: el
+ * catalogo no lo lista y todas las peticiones caian al respaldo sin avisar,
+ * pagando 0,32/0,89 por millon en vez de 0,10/0,40.
  * Set OPENROUTER_API_KEY in Cloudflare Dashboard > Pages > Settings > Environment variables
  */
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const PRIMARY_MODEL = 'google/gemini-2.0-flash-001';
+const PRIMARY_MODEL = 'google/gemini-3.5-flash-lite';
 const FALLBACK_MODEL = 'deepseek/deepseek-chat';
 const MAX_TOKENS = 300;
 

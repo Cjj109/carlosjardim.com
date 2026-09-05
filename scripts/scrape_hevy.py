@@ -104,6 +104,14 @@ def parse_workout(workout, templates):
     except (KeyError, ValueError):
         pass
 
+    # Hevy guarda todo en kilos: si el ejercicio se registro en libras, el
+    # valor convertido llega con una ristra de decimales (61.23499999...).
+    def formato_peso(kg):
+        redondeado = round(kg, 1)
+        if redondeado == int(redondeado):
+            return f"{int(redondeado)} kg"
+        return f"{redondeado} kg"
+
     # Calculate total volume (sum of weight_kg * reps for all sets)
     total_volume = 0
     exercises = []
@@ -118,7 +126,7 @@ def parse_workout(workout, templates):
                 total_volume += weight_kg * reps
                 sets.append({
                     "reps": reps,
-                    "weight": f"{weight_kg} kg"
+                    "weight": formato_peso(weight_kg)
                 })
             elif reps is not None:
                 sets.append({

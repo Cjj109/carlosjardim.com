@@ -28,6 +28,11 @@ HEADERS = {
 }
 
 
+# Semanas de historial que se guardan. Antes estaba recortado en tres sitios
+# distintos (10 filas leidas, 10 columnas leidas y 8 registros guardados), asi
+# que la web mostraba apenas mes y medio aunque el BCV publique mucho mas.
+SEMANAS_HISTORIAL = 104  # dos anios de datos semanales
+
 def download_excel(url, name):
     """Download an Excel file"""
     try:
@@ -82,9 +87,10 @@ def parse_liquidity_excel(file_path):
             print("✗ Could not find data rows in liquidity file")
             return None
 
-        # Get the most recent weeks (first 10 data rows)
+        # Se leen bastantes mas filas de las que se guardan: algunas se
+        # descartan por venir vacias o con texto en vez de numeros.
         weeks = []
-        for row_idx in range(data_start, min(data_start + 10, sheet.nrows)):
+        for row_idx in range(data_start, min(data_start + SEMANAS_HISTORIAL * 2, sheet.nrows)):
             try:
                 date_str = sheet.cell_value(row_idx, 0)
                 if not date_str or not isinstance(date_str, str):
@@ -196,7 +202,7 @@ def parse_base_monetaria_excel(file_path):
                 date_cols.append(col_idx)
 
         # Get data in reverse order (most recent first)
-        for col_idx in reversed(date_cols[-10:]):  # Get last 10 dates
+        for col_idx in reversed(date_cols[-(SEMANAS_HISTORIAL * 2):]):
             try:
                 date_str = str(sheet.cell_value(dates_row, col_idx)).strip()
                 # Clean date string (remove asterisks, parentheses)
@@ -269,7 +275,7 @@ def save_data(liquidity_weeks, base_weeks):
             'date': w['date'],
             'm2_billions': format_number(w['m2']),
             'variation_pct': w['variation']
-        } for w in liquidity_weeks[:8]]
+        } for w in liquidity_weeks[:SEMANAS_HISTORIAL]]
     }
 
     # Add base monetaria if available
@@ -286,7 +292,7 @@ def save_data(liquidity_weeks, base_weeks):
                 'date': w['date'],
                 'value_billions': format_number(w['base']),
                 'variation_pct': w['variation']
-            } for w in base_weeks[:8]]
+            } for w in base_weeks[:SEMANAS_HISTORIAL]]
         }
 
     try:
