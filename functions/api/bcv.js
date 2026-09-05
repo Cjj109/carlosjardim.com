@@ -19,149 +19,30 @@
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
-// Dos hosts sirven el mismo libro. p2p.binance.com rechaza a Cloudflare, asi
-// que se prueba tambien www.binance.com, que tiene otras reglas de filtrado.
-const BINANCE_HOSTS = [
-  'https://www.binance.com/bapi/c2c/v2/friendly/c2c/adv/search',
-  'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search',
-];
-const COTIZAVE_API = 'https://api.cotizave.com/v1/fx/rates';
-const USDT_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
-
-const CACHE_MAX_AGE = 300;
-
-async function fetchConCabeceras(url, opciones = {}) {
-  return fetch(url, opciones);
-}
-
-async function fetchJson(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-/** "945,65085917" -> 945.65085917 */
-function aNumero(texto) {
-  return parseFloat(String(texto).trim().replace(/\./g, '').replace(',', '.'));
-}
-
-/** Extrae el valor de una moneda del bloque que le corresponde en el HTML */
-function leerMoneda(html, id) {
-  const inicio = html.indexOf(`id="${id}"`);
-  if (inicio === -1) return null;
-
-  const encontrado = html.slice(inicio, inicio + 600).match(/<strong[^>]*>\s*([\d.,]+)\s*<\/strong>/);
-  if (!encontrado) return null;
-
-  const valor = aNumero(encontrado[1]);
-  // Si el HTML cambia y se lee cualquier cosa, mejor null que un disparate
-  return Number.isFinite(valor) && valor > 0 && valor < 1_000_000 ? valor : null;
-}
-
-/** Fecha de vigencia; el BCV la trae exacta en un atributo */
-function leerFecha(html) {
-  const iso = html.match(/date-display-single[^>]*content="(\d{4}-\d{2}-\d{2})/);
-  return iso ? iso[1] : new Date().toISOString().split('T')[0];
-}
+// Binance rechaza las peticiones que salen de la red de Cloudflare, asi que
+// la lectura del libro se hace desde una funcion propia en Vercel, cuyas IP
+// si acepta. Comprobado: mismo codigo, desde aqui devuelve vacio y desde
+// alli 82 anuncios.
+const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 
 /**
- * Promedio recortado: se descarta el 20% de los extremos a cada lado y se
- * promedia el resto. En el p2p siempre hay anuncios disparatados arriba y
- * abajo, y esto los deja fuera sin tener que juzgarlos uno a uno.
+ * Tasa p2p leida del libro de Binance a traves del puente.
+ *
+ * Devuelve el promedio recortado de hasta 80 anuncios de los dos lados del
+ * mercado. El puente cachea un minuto, asi que preguntar seguido no castiga
+ * a Binance.
  */
-function promedioRecortado(valores, recorte = 0.2) {
-  if (!valores.length) return null;
-
-  const ordenados = [...valores].sort((a, b) => a - b);
-  const fuera = Math.floor(ordenados.length * recorte);
-  const centro = ordenados.slice(fuera, ordenados.length - fuera);
-  const muestra = centro.length ? centro : ordenados;
-
-  return muestra.reduce((a, b) => a + b, 0) / muestra.length;
-}
-
-/** Una pagina del libro p2p de Binance (20 anuncios) */
-async function leerPaginaBinance(tradeType, page) {
-  // Binance rechaza lo que no parece venir de su web, asi que se mandan las
-  // cabeceras y el cuerpo que envia su propia pagina.
-  const res = await fetch(BINANCE_P2P, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'Accept-Language': 'es,en;q=0.9',
-      Origin: 'https://p2p.binance.com',
-      Referer: 'https://p2p.binance.com/es/trade/all-payments/USDT?fiat=VES',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
-      'clienttype': 'web',
-    },
-    body: JSON.stringify({
-      asset: 'USDT',
-      fiat: 'VES',
-      tradeType,
-      page,
-      rows: 20,
-      payTypes: [],
-      countries: [],
-      publisherType: null,
-      proMerchantAds: false,
-      shieldMerchantAds: false,
-      filterType: 'all',
-      periods: [],
-      additionalKycVerifyFilter: 0,
-      classifies: ['mass', 'profession', 'fiat_trade'],
-    }),
-    // Sin opciones de cache: Cloudflare solo cachea GET, y ponerselas a un
-    // POST hacia fallar la peticion entera.
-  });
+async function leerUsdtBinance() {
+  const res = await fetch(PUENTE_P2P, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const datos = await res.json();
-  return (datos.data || [])
-    .map((x) => parseFloat(x?.adv?.price))
-    .filter((n) => Number.isFinite(n) && n > 0);
-}
-
-/**
- * USDT p2p leido directamente del libro de Binance.
- *
- * Es la fuente de la que beben los demas, asi que se pregunta ahi primero. Se
- * toman las dos primeras paginas de los dos lados del libro —hasta 80
- * anuncios— y se calcula el promedio recortado. Los dos lados juntos dan el
- * precio medio de mercado: la punta de venta y la de compra se separan un
- * poco y quedarse con una sola sesgaria el dato.
- *
- * Si Binance no responde queda Cotizave, y detras el paralelo de DolarAPI.
- */
-async function leerUsdtBinance() {
-  let precios = [];
-
-  for (const url of BINANCE_HOSTS) {
-    const peticiones = [];
-    for (const tradeType of ['SELL', 'BUY']) {
-      for (const page of [1, 2]) {
-        peticiones.push(leerPaginaBinance(tradeType, page, url));
-      }
-    }
-
-    const respuestas = await Promise.allSettled(peticiones);
-    precios = respuestas
-      .filter((r) => r.status === 'fulfilled')
-      .flatMap((r) => r.value);
-
-    if (precios.length >= 10) break;
-  }
-
-  // Con menos de diez anuncios el promedio no es representativo
-  if (precios.length < 10) return null;
-
-  const precio = promedioRecortado(precios);
-  if (!Number.isFinite(precio) || precio <= 0) return null;
+  if (!datos.rate || datos.rate <= 0) return null;
 
   return {
-    rate: Math.round(precio * 100) / 100,
-    date: new Date().toISOString().split('T')[0],
-    anuncios: precios.length,
+    rate: datos.rate,
+    date: (datos.updated_at || '').split('T')[0] || new Date().toISOString().split('T')[0],
+    anuncios: datos.ads,
   };
 }
 
