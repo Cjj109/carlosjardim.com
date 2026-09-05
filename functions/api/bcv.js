@@ -19,6 +19,10 @@
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
+const USDT_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
+const COTIZAVE_API = 'https://api.cotizave.com/v1/fx/rates';
+
+const CACHE_MAX_AGE = 300;
 // Binance rechaza las peticiones que salen de la red de Cloudflare, asi que
 // la lectura del libro se hace desde una funcion propia en Vercel, cuyas IP
 // si acepta. Comprobado: mismo codigo, desde aqui devuelve vacio y desde
