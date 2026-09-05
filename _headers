@@ -30,11 +30,15 @@
   # cambio llegara, y cada uno forzaba a redescargar los 400 KB de golpe.
   # Cloudflare ya manda ETag en estos archivos, así que la revalidación
   # cuesta un 304 de ~150 bytes y solo se baja lo que cambió.
-  Cache-Control: public, max-age=600, stale-while-revalidate=86400
+  #
+  # El margen de "servir viejo mientras actualizo" es de 10 minutos y no de un
+  # día: con un día, alguien podía seguir viendo la versión anterior mucho
+  # después de un cambio, que es justo lo que pasó con la calculadora.
+  Cache-Control: public, max-age=600, stale-while-revalidate=600
   Content-Type: text/css; charset=utf-8
 
 /js/*
-  Cache-Control: public, max-age=600, stale-while-revalidate=86400
+  Cache-Control: public, max-age=600, stale-while-revalidate=600
   Content-Type: application/javascript; charset=utf-8
 
 # Fonts (si se agregan en el futuro)
