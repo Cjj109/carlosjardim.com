@@ -73,10 +73,35 @@ function promedioRecortado(valores, recorte = 0.2) {
 
 /** Una pagina del libro p2p de Binance (20 anuncios) */
 async function leerPaginaBinance(tradeType, page) {
+  // Binance rechaza lo que no parece venir de su web, asi que se mandan las
+  // cabeceras y el cuerpo que envia su propia pagina.
   const res = await fetch(BINANCE_P2P, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ asset: 'USDT', fiat: 'VES', tradeType, page, rows: 20 }),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'Accept-Language': 'es,en;q=0.9',
+      Origin: 'https://p2p.binance.com',
+      Referer: 'https://p2p.binance.com/es/trade/all-payments/USDT?fiat=VES',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+      'clienttype': 'web',
+    },
+    body: JSON.stringify({
+      asset: 'USDT',
+      fiat: 'VES',
+      tradeType,
+      page,
+      rows: 20,
+      payTypes: [],
+      countries: [],
+      publisherType: null,
+      proMerchantAds: false,
+      shieldMerchantAds: false,
+      filterType: 'all',
+      periods: [],
+      additionalKycVerifyFilter: 0,
+      classifies: ['mass', 'profession', 'fiat_trade'],
+    }),
     cf: { cacheTtl: CACHE_MAX_AGE, cacheEverything: true },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
