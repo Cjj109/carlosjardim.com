@@ -286,34 +286,25 @@ function formatDateTime(date) {
 /**
  * Calculate currency conversion
  */
-let bcvMonedaOrigen = 'USD';
+let bcvModo = 'divisa'; // 'divisa' = tengo dolares/euros/usdt · 'bs' = tengo bolivares
 
-const BCV_MONEDAS = ['USD', 'EUR', 'USDT', 'BS'];
+/** Las tres tasas del BCV y el paralelo, en bolivares por unidad */
+function tasasDisponibles() {
+  if (!bcvRates) return [];
 
-const BCV_NOMBRES = {
-  USD: 'Dólar BCV',
-  EUR: 'Euro BCV',
-  USDT: 'USDT p2p',
-  BS: 'Bolívares'
-};
-
-/** Cuántos bolívares vale una unidad de cada moneda */
-function tasaEnBs(moneda) {
-  if (!bcvRates) return null;
-  if (moneda === 'BS') return 1;
-  if (moneda === 'USD') return bcvRates.usd && bcvRates.usd.rate;
-  if (moneda === 'EUR') return bcvRates.eur && bcvRates.eur.rate;
-  if (moneda === 'USDT') return (bcvRates.usdt && bcvRates.usdt.rate) || (bcvRates.usd && bcvRates.usd.rate);
-  return null;
+  return [
+    { id: 'usd', etiqueta: '$ Dólar BCV', tasa: bcvRates.usd && bcvRates.usd.rate },
+    { id: 'eur', etiqueta: '€ Euro BCV', tasa: bcvRates.eur && bcvRates.eur.rate },
+    { id: 'usdt', etiqueta: '₮ USDT paralelo', tasa: bcvRates.usdt && bcvRates.usdt.rate }
+  ].filter((t) => t.tasa > 0);
 }
 
 /**
- * Convierte la cantidad escrita a las otras tres monedas de una vez.
+ * Compara cuanto vale la cantidad segun cada tasa.
  *
- * Antes había que elegir origen y destino en dos desplegables y salía un solo
- * resultado, así que ver "cuánto es esto en bolívares y en USDT" pedía dos
- * pasadas. El icono de intercambio, además, no hacía nada: era un div sin
- * ningún evento.
+ * No es un conversor entre monedas: la pregunta util aqui es "estos 10 a
+ * cuanto salen segun el BCV, segun el euro y segun el paralelo", para poder
+ * comparar las tres de un vistazo.
  */
 function calculateConversion() {
   const contenedor = document.getElementById('bcvResults');
@@ -331,47 +322,38 @@ function calculateConversion() {
     return;
   }
 
-  const tasaOrigen = tasaEnBs(bcvMonedaOrigen);
-  if (!tasaOrigen) {
-    contenedor.innerHTML = '<div class="bcv-result-empty">Sin tasa disponible</div>';
+  const tasas = tasasDisponibles();
+  if (!tasas.length) {
+    contenedor.innerHTML = '<div class="bcv-result-empty">Sin tasas disponibles</div>';
     return;
   }
 
-  const enBolivares = cantidad * tasaOrigen;
+  const filas = tasas.map(({ etiqueta, tasa }) => {
+    const valor = bcvModo === 'divisa' ? cantidad * tasa : cantidad / tasa;
+    const unidad = bcvModo === 'divisa' ? 'Bs.' : '';
 
-  const filas = BCV_MONEDAS
-    .filter((moneda) => moneda !== bcvMonedaOrigen)
-    .map((moneda) => {
-      const tasa = tasaEnBs(moneda);
-      if (!tasa) return '';
-
-      const valor = enBolivares / tasa;
-      const referencia = moneda === 'BS'
-        ? `1 ${bcvMonedaOrigen === 'BS' ? 'Bs.' : bcvMonedaOrigen} = ${formatRate(tasaOrigen)} Bs.`
-        : `1 ${moneda} = ${formatRate(tasa)} Bs.`;
-
-      return `
-        <button type="button" class="bcv-result-row" data-copiar="${formatRate(valor)}">
-          <span class="bcv-result-info">
-            <span class="bcv-result-moneda">${getCurrencySymbol(moneda)} ${BCV_NOMBRES[moneda]}</span>
-            <span class="bcv-result-tasa">${referencia}</span>
-          </span>
-          <span class="bcv-result-valor">${formatRate(valor)}<span class="bcv-copiar-pista">copiar</span></span>
-        </button>`;
-    })
-    .join('');
+    return `
+      <button type="button" class="bcv-result-row" data-copiar="${formatRate(valor)}">
+        <span class="bcv-result-info">
+          <span class="bcv-result-moneda">${etiqueta}</span>
+          <span class="bcv-result-tasa">a ${formatRate(tasa)} Bs.</span>
+        </span>
+        <span class="bcv-result-valor">${formatRate(valor)}${unidad ? ' ' + unidad : ''}<span class="bcv-copiar-pista">copiar</span></span>
+      </button>`;
+  }).join('');
 
   contenedor.innerHTML = filas;
 }
 
-/** Marca la moneda elegida y recalcula */
-function elegirMonedaOrigen(moneda) {
-  if (!BCV_MONEDAS.includes(moneda)) return;
-  bcvMonedaOrigen = moneda;
+/** Cambia entre "tengo divisas" y "tengo bolivares" */
+function elegirModo(modo) {
+  if (modo !== 'divisa' && modo !== 'bs') return;
+  bcvModo = modo;
 
   document.querySelectorAll('#bcvFromChips .bcv-chip').forEach((chip) => {
-    chip.classList.toggle('is-active', chip.dataset.currency === moneda);
-    chip.setAttribute('aria-pressed', chip.dataset.currency === moneda ? 'true' : 'false');
+    const activo = chip.dataset.modo === modo;
+    chip.classList.toggle('is-active', activo);
+    chip.setAttribute('aria-pressed', activo ? 'true' : 'false');
   });
 
   calculateConversion();
@@ -523,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (chips) {
     chips.addEventListener('click', (e) => {
       const chip = e.target.closest('.bcv-chip');
-      if (chip) elegirMonedaOrigen(chip.dataset.currency);
+      if (chip) elegirModo(chip.dataset.modo);
     });
   }
 

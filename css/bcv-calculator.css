@@ -713,3 +713,5 @@ body.bcv-open {
   font-size: 0.6rem;
   color: #2ecc71;
 }
+
+.bcv-chips-2 { grid-template-columns: repeat(2, 1fr); }

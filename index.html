@@ -861,11 +861,9 @@
             inputmode="decimal"
             aria-label="Cantidad a convertir"
           />
-          <div class="bcv-chips" id="bcvFromChips" role="group" aria-label="Moneda de origen">
-            <button type="button" class="bcv-chip is-active" data-currency="USD">USD</button>
-            <button type="button" class="bcv-chip" data-currency="EUR">EUR</button>
-            <button type="button" class="bcv-chip" data-currency="USDT">USDT</button>
-            <button type="button" class="bcv-chip" data-currency="BS">Bs.</button>
+          <div class="bcv-chips bcv-chips-2" id="bcvFromChips" role="group" aria-label="Qué tengo">
+            <button type="button" class="bcv-chip is-active" data-modo="divisa" aria-pressed="true">Tengo divisas</button>
+            <button type="button" class="bcv-chip" data-modo="bs" aria-pressed="false">Tengo bolívares</button>
           </div>
         </div>
 
