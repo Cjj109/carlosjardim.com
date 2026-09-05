@@ -659,14 +659,6 @@ body.bcv-open {
   background: rgba(46, 204, 113, 0.1);
 }
 
-.bcv-result-row.is-copiado .bcv-result-valor::after {
-  content: ' copiado';
-  font-size: 0.62rem;
-  font-weight: 500;
-  color: rgba(46, 204, 113, 0.75);
-  letter-spacing: 0.04em;
-}
-
 @media (min-width: 520px) {
   .bcv-amount-row {
     flex-direction: row;
@@ -682,4 +674,42 @@ body.bcv-open {
     flex-shrink: 0;
     grid-template-columns: repeat(4, minmax(3.2rem, 1fr));
   }
+}
+
+
+/* Pista de "copiar": se ve siempre en tactil, al pasar por encima en escritorio */
+.bcv-result-valor {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.bcv-copiar-pista {
+  font-family: var(--mono, monospace);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(46, 204, 113, 0.45);
+  opacity: 0.75;
+  transition: opacity var(--transition-fast, 0.15s ease);
+}
+
+@media (hover: hover) {
+  .bcv-copiar-pista { opacity: 0; }
+  .bcv-result-row:hover .bcv-copiar-pista { opacity: 1; }
+}
+
+/* Al copiar, la pista pasa a confirmarlo. Se anula el texto original con
+   font-size:0 y se escribe el nuevo, porque content no puede reemplazar el
+   contenido de un elemento, solo anadirle algo. */
+.bcv-result-row.is-copiado .bcv-copiar-pista {
+  opacity: 1;
+  font-size: 0;
+}
+
+.bcv-result-row.is-copiado .bcv-copiar-pista::after {
+  content: 'copiado';
+  font-size: 0.6rem;
+  color: #2ecc71;
 }

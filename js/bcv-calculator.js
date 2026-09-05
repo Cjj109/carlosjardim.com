@@ -8,11 +8,17 @@ let bcvHistory = null;
 let isRefreshingUsdt = false;
 
 // DolarAPI URL for live USDT/parallel dollar rate
-const USDT_API_URL = 'https://ve.dolarapi.com/v1/dolares/paralelo';
+// El p2p sale del propio endpoint del sitio, que lo lee del mercado de
+// Binance via Cotizave. Antes se pedia el "paralelo" de DolarAPI, que es otra
+// medicion y se actualiza una vez de madrugada: al refrescar se sustituia el
+// dato bueno por uno peor.
+const USDT_API_URL = '/api/bcv';
 
 /**
  * Open BCV calculator modal
  */
+let refrescoUsdt = null;
+
 function openBCVCalculator() {
   const modal = document.getElementById('bcvCalculatorModal');
   if (!modal) return;
@@ -24,6 +30,12 @@ function openBCVCalculator() {
   if (!bcvRates) {
     loadBCVRates();
   }
+
+  // El p2p se mueve durante el dia, asi que mientras la calculadora este
+  // abierta se refresca solo cada minuto. El dolar y el euro del BCV no hacen
+  // falta: cambian una vez al dia.
+  clearInterval(refrescoUsdt);
+  refrescoUsdt = setInterval(refreshUsdtRate, 60000);
 }
 
 /**
@@ -35,6 +47,9 @@ function closeBCVCalculator() {
 
   modal.classList.remove('active');
   document.body.classList.remove('bcv-open');
+
+  clearInterval(refrescoUsdt);
+  refrescoUsdt = null;
 }
 
 /**
@@ -42,18 +57,14 @@ function closeBCVCalculator() {
  */
 async function fetchUsdtRate() {
   try {
-    const response = await fetch(USDT_API_URL, { cache: 'no-store' });
+    // El parametro suelta la cache del borde para traer la ultima referencia
+    const response = await fetch(`${USDT_API_URL}?t=${Date.now()}`, { cache: 'no-store' });
     if (response.ok) {
       const data = await response.json();
-      return {
-        rate: data.promedio,
-        date: data.fechaActualizacion ? data.fechaActualizacion.split('T')[0] : new Date().toISOString().split('T')[0],
-        symbol: '₮',
-        live: true
-      };
+      if (data.usdt && data.usdt.rate) return data.usdt;
     }
   } catch (e) {
-    console.warn('DolarAPI request failed:', e.message);
+    console.warn('No se pudo refrescar el USDT:', e.message);
   }
   return null;
 }
@@ -92,6 +103,9 @@ async function loadBCVRates() {
 
     displayRates();
     displayHistory();
+    // Si ya habia algo escrito mientras cargaban las tasas, el resultado se
+    // quedaba en "Cargando tasas..." hasta volver a teclear.
+    calculateConversion();
 
   } catch (error) {
     console.error('Error loading BCV rates:', error);
@@ -342,7 +356,7 @@ function calculateConversion() {
             <span class="bcv-result-moneda">${getCurrencySymbol(moneda)} ${BCV_NOMBRES[moneda]}</span>
             <span class="bcv-result-tasa">${referencia}</span>
           </span>
-          <span class="bcv-result-valor">${formatRate(valor)}</span>
+          <span class="bcv-result-valor">${formatRate(valor)}<span class="bcv-copiar-pista">copiar</span></span>
         </button>`;
     })
     .join('');
