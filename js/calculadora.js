@@ -446,6 +446,9 @@ function calcular() {
     const enBs = monto * usdt;
     filas = [
       { nombre: 'Son en bolívares', nota: `a ${num(usdt)} Bs.`, valor: enBs, unidad: 'Bs.', color: COLORES.usdt },
+      // Vendiendo el USDT y cobrando por Zelle salen mas dolares, porque el
+      // Zelle vale menos: es el mismo dinero contado en otra moneda.
+      zelle && { nombre: 'Equivalen en Zelle', nota: `a ${num(zelle)} Bs.`, valor: enBs / zelle, unidad: '$', color: COLORES.zelle },
       { nombre: 'Equivalen a BCV', nota: `a ${num(usd)} Bs.`, valor: enBs / usd, unidad: '$', color: COLORES.usd },
     ];
   }
