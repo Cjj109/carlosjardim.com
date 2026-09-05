@@ -13,12 +13,20 @@
   <meta property="og:description" content="Dólar BCV, euro BCV y USDT paralelo. Compara tasas y calcula cuánto vender.">
   <meta property="og:url" content="https://carlosjardim.com/calculadora">
 
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- App instalable -->
+  <link rel="manifest" href="/calculadora/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/calculadora/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tasas">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/variables.css?r=5">
-  <link rel="stylesheet" href="css/calculadora.css?r=5">
+  <link rel="stylesheet" href="/css/variables.css?r=5">
+  <link rel="stylesheet" href="/css/calculadora.css?r=5">
 </head>
 <body>
 
@@ -93,6 +101,17 @@
   </footer>
 </main>
 
-<script src="js/calculadora.js?r=5" defer></script>
+<script src="/js/calculadora.js?r=5" defer></script>
+<script>
+  // El service worker guarda la app para que abra al instante y funcione sin
+  // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
+  // memoria seria peor que no tenerla.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/calculadora/sw.js', { scope: '/calculadora/' })
+        .catch((error) => console.warn('No se pudo registrar el service worker:', error));
+    });
+  }
+</script>
 </body>
 </html>

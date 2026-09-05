@@ -1,0 +1,18 @@
+{
+  "name": "Calculadora de Tasas · Venezuela",
+  "short_name": "Tasas",
+  "description": "Dólar BCV, euro BCV y USDT paralelo. Compara cuánto vale un monto según cada tasa.",
+  "start_url": "/calculadora/",
+  "scope": "/calculadora/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0b0f",
+  "theme_color": "#0a0b0f",
+  "lang": "es-VE",
+  "categories": ["finance", "utilities"],
+  "icons": [
+    { "src": "/calculadora/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/calculadora/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/calculadora/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
