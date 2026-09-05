@@ -323,34 +323,20 @@ body {
   color: var(--calc-texto-tenue);
 }
 
-.res-copiar {
-  font-size: 0.58rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--calc-texto-tenue);
-  opacity: 0;
-  transition: opacity 0.18s;
-}
-
-@media (hover: none) {
-  .res-copiar { opacity: 0.55; }
-}
-
-.res:hover .res-copiar { opacity: 0.8; }
-
+/* Al copiar, el aviso ocupa el renglon de la nota: asi el numero no se mueve */
 .res.is-copiado {
   border-color: var(--color-res, var(--calc-usdt));
 }
 
-.res.is-copiado .res-copiar {
-  opacity: 1;
-  color: var(--color-res, var(--calc-usdt));
+.res.is-copiado .res-nota {
   font-size: 0;
 }
 
-.res.is-copiado .res-copiar::after {
+.res.is-copiado .res-nota::after {
   content: 'copiado';
-  font-size: 0.58rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--color-res, var(--calc-usdt));
 }
 
 /* ---------- Pie ---------- */

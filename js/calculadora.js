@@ -382,7 +382,6 @@ function filaHTML({ nombre, nota, valor, unidad, color }) {
       </span>
       <span class="res-valor">
         ${num(valor)}${unidad ? `<span class="res-unidad">${unidad}</span>` : ''}
-        <span class="res-copiar">copiar</span>
       </span>
     </button>`;
 }
