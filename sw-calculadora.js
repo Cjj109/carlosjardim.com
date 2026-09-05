@@ -11,12 +11,12 @@
  *   falla se recurre a la ultima respuesta, y la app avisa de cuando es.
  */
 
-const VERSION = 'tasas-v8';
+const VERSION = 'tasas-v9';
 const APP = [
   '/calculadora',
   '/css/variables.css',
-  '/css/calculadora.css?r=12',
-  '/js/calculadora.js?r=12',
+  '/css/calculadora.css?r=13',
+  '/js/calculadora.js?r=13',
   '/calculadora-app/icon-192.png',
   '/calculadora-app/icon-512.png',
 ];

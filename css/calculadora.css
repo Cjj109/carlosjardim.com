@@ -782,3 +782,107 @@ body {
 .muestra-navidad span:nth-child(2) { background: #e5484d; }
 .muestra-navidad span:nth-child(3) { background: #e8b93a; }
 .muestra-navidad span:nth-child(4) { background: #3fbf71; }
+
+/* ---------- Detalles del tema navideño ---------- */
+
+/* Nieve: solo existe en navidad y solo si el sistema no pide quietud */
+.nieve { display: none; }
+
+:root[data-tema="navidad"] .nieve {
+  display: block;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.nieve span {
+  position: absolute;
+  top: -12px;
+  width: var(--tam);
+  height: var(--tam);
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0;
+  filter: blur(0.4px);
+  animation: caer var(--dur) linear var(--espera) infinite;
+}
+
+@keyframes caer {
+  0% { transform: translate(0, -12px); opacity: 0; }
+  8% { opacity: 0.75; }
+  92% { opacity: 0.4; }
+  100% { transform: translate(var(--giro), 105vh); opacity: 0; }
+}
+
+/* Guirnalda de luces sobre el panel */
+:root[data-tema="navidad"] .calc-panel { position: relative; }
+
+:root[data-tema="navidad"] .calc-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 14px;
+
+  /* Un cable y, colgando, bombillas de 7px cada 14px. En pixeles y no en
+     porcentaje: el radio porcentual se calcula sobre la baldosa y las dejaba
+     pegadas, con aspecto de cinta en vez de guirnalda. */
+  background-image:
+    linear-gradient(rgba(232, 185, 58, 0.3), rgba(232, 185, 58, 0.3)),
+    radial-gradient(circle 3.5px at 7px 9px, #e5484d 97%, transparent 100%),
+    radial-gradient(circle 3.5px at 7px 9px, #e8b93a 97%, transparent 100%),
+    radial-gradient(circle 3.5px at 7px 9px, #3fbf71 97%, transparent 100%);
+  background-size:
+    100% 1px,
+    42px 14px,
+    42px 14px,
+    42px 14px;
+  background-position:
+    0 0,
+    0 0,
+    14px 0,
+    28px 0;
+  background-repeat: repeat-x;
+  animation: guirnalda 3.5s ease-in-out infinite;
+}
+
+@keyframes guirnalda {
+  0%, 100% { opacity: 0.6; filter: none; }
+  50% { opacity: 1; filter: drop-shadow(0 0 5px rgba(232, 185, 58, 0.75)); }
+}
+
+/* Un poco de aire para que las bombillas no toquen las pestañas */
+:root[data-tema="navidad"] .calc-panel { padding-top: 1.6rem; }
+
+/* El título respira, como una vela */
+:root[data-tema="navidad"] .calc-head h1 {
+  background-size: 200% auto;
+  animation: brilloNavideno 7s ease-in-out infinite;
+}
+
+@keyframes brilloNavideno {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* Las tasas, con un halo cálido */
+:root[data-tema="navidad"] .tasa {
+  box-shadow: 0 0 24px -14px rgba(232, 185, 58, 0.9);
+}
+
+/* El punto del p2p late como una lucecita */
+:root[data-tema="navidad"] .tasa-viva .tasa-simbolo::after {
+  box-shadow: 0 0 6px 1px rgba(63, 191, 113, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nieve span,
+  :root[data-tema="navidad"] .calc-panel::before,
+  :root[data-tema="navidad"] .calc-head h1 {
+    animation: none;
+  }
+  .nieve span { opacity: 0.5; }
+}
