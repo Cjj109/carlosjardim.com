@@ -18,6 +18,14 @@
   Cache-Control: no-cache, must-revalidate
   Content-Type: text/html; charset=utf-8
 
+# La calculadora se sirve sin extensión, así que la regla de arriba no la
+# cubría: le tocaba el valor por defecto de Cloudflare y Safari lo trataba
+# como cacheable. Por eso en iPhone seguía saliendo la versión anterior
+# mientras en Chrome ya salía la nueva.
+/calculadora
+  Cache-Control: no-cache, must-revalidate
+  Content-Type: text/html; charset=utf-8
+
 /
   Cache-Control: no-cache, must-revalidate
   Content-Type: text/html; charset=utf-8
