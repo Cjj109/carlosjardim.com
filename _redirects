@@ -1,0 +1,5 @@
+# El lector de enlaces de WhatsApp no sigue redirecciones: al pedir
+# /calculadora recibia un 308 vacio y no encontraba las etiquetas, asi que
+# mostraba el enlace pelado. Con un 200 se le sirve la pagina directamente,
+# sin redirigir, y la vista previa aparece.
+/calculadora  /calculadora/index.html  200
