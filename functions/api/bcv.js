@@ -25,6 +25,10 @@ const USDT_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
 
 const CACHE_MAX_AGE = 300;
 
+async function fetchConCabeceras(url, opciones = {}) {
+  return fetch(url, opciones);
+}
+
 async function fetchJson(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -102,7 +106,8 @@ async function leerPaginaBinance(tradeType, page) {
       additionalKycVerifyFilter: 0,
       classifies: ['mass', 'profession', 'fiat_trade'],
     }),
-    cf: { cacheTtl: CACHE_MAX_AGE, cacheEverything: true },
+    // Sin opciones de cache: Cloudflare solo cachea GET, y ponerselas a un
+    // POST hacia fallar la peticion entera.
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -149,22 +154,50 @@ async function leerUsdtBinance() {
   };
 }
 
-/** USDT p2p de Binance. Necesita clave; sin ella se usa el respaldo. */
-async function leerUsdtCotizave(clave) {
+/**
+ * USDT p2p con verificacion cruzada.
+ *
+ * Binance bloquea las IP de Cloudflare, asi que desde aqui no se puede leer
+ * su libro directamente (comprobado: funciona desde una maquina normal y
+ * falla en produccion, con cabeceras de navegador incluidas). Cotizave si lo
+ * lee y publica ocho mercados p2p distintos, asi que en vez de fiarnos de una
+ * sola cifra se contrasta la de Binance con la mediana de todas.
+ *
+ * Si Binance se aparta mas de un 2% del consenso, manda el consenso: un
+ * mercado puede tener un anuncio raro o quedarse colgado, ocho a la vez no.
+ *
+ * Para una medicion propia del libro de Binance esta scripts/fetch_p2p.py,
+ * que se ejecuta a mano desde cualquier maquina que Binance no bloquee.
+ */
+async function leerUsdtP2P(clave) {
   if (!clave) return null;
 
-  const res = await fetch(COTIZAVE_API, {
+  const res = await fetchConCabeceras(COTIZAVE_API, {
     headers: { 'X-API-Key': clave, Accept: 'application/json' },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const datos = await res.json();
-  const binance = datos.rates?.find((r) => r.market === 'binance');
-  if (!binance?.mid || binance.mid <= 0) return null;
+  const mercados = (datos.rates || []).filter((r) => r.type === 'p2p' && r.mid > 0);
+  if (!mercados.length) return null;
+
+  const precios = mercados.map((m) => m.mid).sort((a, b) => a - b);
+  const medio = Math.floor(precios.length / 2);
+  const consenso = precios.length % 2
+    ? precios[medio]
+    : (precios[medio - 1] + precios[medio]) / 2;
+
+  const binance = mercados.find((m) => m.market === 'binance');
+  const seDesvia = binance && Math.abs(binance.mid - consenso) / consenso > 0.02;
+
+  const elegido = binance && !seDesvia ? binance.mid : consenso;
+  const origen = binance && !seDesvia ? 'binance' : 'consenso-p2p';
 
   return {
-    rate: binance.mid,
-    date: (binance.updated_at || '').split('T')[0] || new Date().toISOString().split('T')[0],
+    rate: Math.round(elegido * 100) / 100,
+    date: new Date((binance || mercados[0]).updated_at || Date.now()).toISOString().split('T')[0],
+    market: origen,
+    mercados: mercados.length,
   };
 }
 
@@ -193,7 +226,7 @@ export async function onRequestGet(context) {
     const [bcvRes, binanceRes, usdtRes, usdtRespaldoRes, respaldoRes] = await Promise.allSettled([
       leerBCV(),
       leerUsdtBinance(),
-      leerUsdtCotizave(context.env?.COTIZAVE_API_KEY),
+      leerUsdtP2P(context.env?.COTIZAVE_API_KEY),
       fetchJson(USDT_RESPALDO),
       fetchJson(USD_RESPALDO),
     ]);
@@ -221,7 +254,7 @@ export async function onRequestGet(context) {
       usdt: binanceValido
         ? { rate: binance.rate, date: binance.date, symbol: '₮', live: true, market: 'binance-p2p', anuncios: binance.anuncios }
         : usdt
-        ? { rate: usdt.rate, date: usdt.date, symbol: '₮', live: true, market: 'cotizave' }
+        ? { rate: usdt.rate, date: usdt.date, symbol: '₮', live: true, market: usdt.market, mercados: usdt.mercados }
         : usdtRespaldo
           ? {
               rate: parseFloat(usdtRespaldo.promedio) || 0,
