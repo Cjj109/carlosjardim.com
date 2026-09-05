@@ -22,13 +22,19 @@
   Cache-Control: no-cache, must-revalidate
   Content-Type: text/html; charset=utf-8
 
-# CSS/JS - Cache largo porque el ?v= en el HTML fuerza la descarga de versiones nuevas
+# CSS/JS - Caché corta con revalidación: ya no se versionan las URLs
 /css/*
-  Cache-Control: public, max-age=31536000, immutable
+  # 10 minutos de caché y revalidación en segundo plano. Antes iba con
+  # max-age de un año e "immutable", lo que obligaba a cambiar la URL con
+  # ?v=<fecha> en cada despliegue: hacían falta dos despliegues para que un
+  # cambio llegara, y cada uno forzaba a redescargar los 400 KB de golpe.
+  # Cloudflare ya manda ETag en estos archivos, así que la revalidación
+  # cuesta un 304 de ~150 bytes y solo se baja lo que cambió.
+  Cache-Control: public, max-age=600, stale-while-revalidate=86400
   Content-Type: text/css; charset=utf-8
 
 /js/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=600, stale-while-revalidate=86400
   Content-Type: application/javascript; charset=utf-8
 
 # Fonts (si se agregan en el futuro)
