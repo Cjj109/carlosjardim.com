@@ -759,3 +759,16 @@ body.bcv-open {
   text-align: center;
   margin-bottom: 0.9rem;
 }
+
+
+/* Sin flechas de subir y bajar: el monto se escribe, no se pulsa */
+.bcv-input-grande::-webkit-outer-spin-button,
+.bcv-input-grande::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bcv-input-grande {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

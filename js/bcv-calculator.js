@@ -498,6 +498,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const amountInput = document.getElementById('bcvAmount');
   if (amountInput) {
     amountInput.addEventListener('input', calculateConversion);
+
+    // La rueda del raton cambia el valor de un campo numerico cuando tiene el
+    // foco, asi que bajando por la pagina se alteraba el monto sin querer. Se
+    // le quita el foco: la pagina sigue bajando y la cifra no se toca.
+    amountInput.addEventListener('wheel', () => {
+      if (document.activeElement === amountInput) amountInput.blur();
+    }, { passive: true });
   }
 
   // Moneda de origen
