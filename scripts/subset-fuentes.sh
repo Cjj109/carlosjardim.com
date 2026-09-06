@@ -18,7 +18,7 @@
 # se ve distinto, no desaparece. Pero conviene correrlo antes de desplegar
 # cambios grandes de copy.
 #
-# Los originales completos se guardan en fonts/originales/ para poder volver
+# Los originales completos se guardan en fuentes-originales/ para poder volver
 # a recortar sin bajarlos otra vez de Google.
 #
 # Uso:  bash scripts/subset-fuentes.sh
@@ -35,7 +35,7 @@ if [ ! -x "$venv/bin/pyftsubset" ]; then
   "$venv/bin/pip" install --quiet fonttools brotli
 fi
 
-mkdir -p fonts/originales
+mkdir -p fuentes-originales
 
 # Los caracteres que el sitio escribe, sacados del propio código y no de una
 # suposición, más el alfabeto latino completo por si entra texto nuevo.
@@ -63,15 +63,15 @@ PY
 # archivo se queda en nada y el unicode-range del CSS sigue igual.
 for f in inter-latin inter-latin-ext jetbrains-mono-latin jetbrains-mono-latin-ext; do
   # La primera vez se guarda el original; después se recorta siempre desde él
-  [ -f "fonts/originales/$f.woff2" ] || cp "fonts/$f.woff2" "fonts/originales/$f.woff2"
+  [ -f "fuentes-originales/$f.woff2" ] || cp "fonts/$f.woff2" "fuentes-originales/$f.woff2"
 
-  antes=$(wc -c < "fonts/originales/$f.woff2")
+  antes=$(wc -c < "fuentes-originales/$f.woff2")
   # kern y tnum, no ''. Vaciar las características OpenType quitaba también
   # `tnum`, los dígitos tabulares, y entonces font-variant-numeric:tabular-nums
   # en el CSS no hacía absolutamente nada: pedía algo que ya no existía en el
   # archivo. Se nota en cuanto los números van en columna —las cuatro tarjetas
   # de tasas—, porque el 1 es mucho más estrecho que el 8 y no cuadran.
-  "$venv/bin/pyftsubset" "fonts/originales/$f.woff2" \
+  "$venv/bin/pyftsubset" "fuentes-originales/$f.woff2" \
     --text-file=fonts/.subset.txt \
     --flavor=woff2 \
     --layout-features='kern,tnum' \

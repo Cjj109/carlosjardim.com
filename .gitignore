@@ -26,3 +26,8 @@ npm-debug.log*
 .env.*
 # Estado local de wrangler (caché de miniflare, trazas). Se regenera solo.
 .wrangler/
+
+# Los .woff2 sin recortar. Se guardan para poder volver a subsetear sin
+# bajarlos de Google, pero no se despliegan: estuvieron en fonts/ y _headers
+# los servía en público con immutable a un año.
+fuentes-originales/

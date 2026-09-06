@@ -247,6 +247,18 @@ function fuentesElegidas() {
   }
 }
 
+/**
+ * ¿Hay alguna fuente elegida que se aparte de la que ya trae /api/bcv?
+ *
+ * Si no la hay —y es el caso de casi todo el mundo— no hace falta sustituir
+ * nada: el endpoint ya devuelve las de siempre, y pisarlas con la foto de
+ * /api/fuentes solo servía para congelarlas.
+ */
+function hayEleccionPropia() {
+  const elegidas = fuentesElegidas();
+  return GRUPOS.some(([grupo]) => elegidas[grupo] && elegidas[grupo] !== POR_DEFECTO[grupo]);
+}
+
 function guardarEleccion(grupo, id) {
   const actual = fuentesElegidas();
   actual[grupo] = id;
@@ -477,8 +489,20 @@ async function cargarTasas({ forzar = false, primera = false } = {}) {
     tasas = datos;
     ultimaBuena = Date.now();
 
-    if (fuentes) aplicarEleccion();
-    else {
+    /* Aquí estaba el fallo más grave de todos.
+       Antes: `if (fuentes) aplicarEleccion()`. Bastaba abrir el panel de
+       fuentes UNA vez para que `fuentes` quedara cargado, y a partir de ahí
+       cada refresco pisaba las tasas recién traídas con la foto vieja de ese
+       momento. El pie seguía estampando la hora actual, así que la tasa se
+       congelaba sin que nada lo dijera: justo lo que esta app existe para
+       evitar.
+
+       Ahora solo se sustituye si de verdad hay algo que sustituir —una
+       elección que se aparta de lo que /api/bcv ya trae— y en ese caso se
+       vuelven a pedir las fuentes, que si no se congelarían igual. */
+    if (fuentes && hayEleccionPropia()) {
+      cargarFuentes();
+    } else {
       pintarTasas();
       calcular();
     }
@@ -877,18 +901,18 @@ function calcular() {
   //
   // "Precio BCV" sí lo necesita de verdad: la pregunta entera parte de un
   // precio fijado a esa tasa, sin ella no hay nada que calcular.
-  if (!usd && !usdt) return vacio(salida, 'Sin tasas ahora mismo');
+  const eur = tasaDe('eur');
+  const zelle = tasaDe('zelle');
+  // Con que quede UNA tasa hay algo que enseñar. Mirar solo usd y usdt
+  // repetía un nivel más abajo el mismo error: una fuente frágil llevándose
+  // la pantalla entera por delante.
+  if (!usd && !usdt && !eur && !zelle) return vacio(salida, 'Sin tasas ahora mismo');
   if (!usd && modo === 'bcv') return vacio(salida, 'Sin tasa del BCV');
   if (!usdt && modo === 'usdt') return vacio(salida, 'Sin tasa p2p');
 
-  const filas = filasDelModo(monto, {
-    usd,
-    eur: tasaDe('eur'),
-    usdt: tasaDe('usdt'),
-    zelle: tasaDe('zelle'),
-  });
-
-  if (typeof filas === 'string') return vacio(salida, filas);
+  // filasDelModo siempre devuelve un array; la rama que devolvía un texto
+  // desapareció al validar los modos antes de llamarla.
+  const filas = filasDelModo(monto, { usd, eur, usdt, zelle });
 
   const buenas = filas.filter(Boolean).filter((f) => Number.isFinite(f.valor));
   if (!buenas.length) return vacio(salida, 'Sin tasas para este cálculo');

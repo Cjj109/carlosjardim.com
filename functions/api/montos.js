@@ -87,6 +87,25 @@ async function pasaElFreno(peticion) {
   return true;
 }
 
+/**
+ * ¿La petición viene de la propia web?
+ *
+ * `new URL(origen)` reventaba con Origin: null —un iframe en zona de
+ * pruebas, una cadena de redirecciones, algunos navegadores dentro de apps— y
+ * como la llamada estaba fuera del try, el endpoint devolvía un 500 en vez
+ * del 403 que se pretendía. Comprobado en producción: HTTP 500, error 1101.
+ */
+function mismoSitio(peticion) {
+  const origen = peticion.headers.get('Origin');
+  if (!origen) return true;
+  try {
+    return new URL(origen).host === new URL(peticion.url).host;
+  } catch {
+    // Un Origin opaco no es la propia web
+    return false;
+  }
+}
+
 export async function onRequestGet(context) {
   const db = context.env?.MONTOS;
   // Sin base de datos, una respuesta vacía y válida: el cliente se queda con
@@ -124,8 +143,7 @@ export async function onRequestPost(context) {
   const db = env?.MONTOS;
   if (!db) return json({ ok: true, guardado: false });
 
-  const origen = request.headers.get('Origin');
-  if (origen && new URL(origen).host !== new URL(request.url).host) {
+  if (!mismoSitio(request)) {
     return json({ error: 'Petición de otro sitio.' }, 403);
   }
 

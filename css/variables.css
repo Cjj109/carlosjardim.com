@@ -63,9 +63,14 @@
    tercero). Son las variables de 400 a 700, que cubre todos los pesos que
    usa el sitio con un solo archivo por subconjunto.
 
-   El unicode-range no es decorativo: hace que latin-ext solo se descargue
-   si aparece un glifo suyo. En la práctica los únicos del sitio son ₮ y ₿,
-   y ambos salen en mono, así que el latin-ext de Inter nunca se pide. */
+   El unicode-range no es decorativo: hace que latin-ext solo se descargue si
+   aparece un glifo suyo. Los únicos del sitio son ₮ y ₿ (U+20AE y U+20BF).
+
+   Aquí decía que "el latin-ext de Inter nunca se pide" porque esos dos solo
+   salían en mono. Dejó de ser cierto al pasar los números a Inter 800: el ₮
+   de cada resultado en USDT va ahora en Inter, así que esa cara sí se
+   descarga. Está recortada a cuatro glifos —1,7 KB— y precargada en el
+   service worker. */
 
 @font-face {
   font-family: 'Inter';

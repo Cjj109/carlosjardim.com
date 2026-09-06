@@ -339,7 +339,12 @@ function resolver(decision, tasas) {
       return { texto: `${decision.pulla}\n\nNo tengo la tasa de ${NOMBRE_TASA[tasa] || 'eso'} ahora mismo, así que no me la invento.` };
     }
 
-    const enBs = monto * origen;
+    // Respetando la operación, que aquí se daba por hecho que era multiplicar.
+    // Con "tengo 15.000 Bs, ¿cuánto me dan en cada tasa?" el modelo manda
+    // dividir, y multiplicar convertía quince mil bolívares en catorce
+    // millones antes de repartirlos: un error del tamaño de una tasa al
+    // cuadrado. Es el único sitio del archivo que no la miraba.
+    const enBs = operacion === 'dividir' ? monto : monto * origen;
     const destinos = decision.tasa_destino === 'todas'
       ? ['usdt', 'zelle', 'usd', 'eur'].filter((id) => id !== tasa && hay(tasas, id))
       : [decision.tasa_destino].filter((id) => hay(tasas, id));
@@ -356,7 +361,9 @@ function resolver(decision, tasas) {
     });
 
     const enBsTexto = `${cifra(enBs)} Bs.`;
-    const paso = `${cifra(monto)} ${SIMBOLO[tasa]} × ${cifra(origen)} = ${enBsTexto} · ${NOMBRE_TASA[tasa]}`;
+    const paso = operacion === 'dividir'
+      ? `${enBsTexto} de partida`
+      : `${cifra(monto)} ${SIMBOLO[tasa]} × ${cifra(origen)} = ${enBsTexto} · ${NOMBRE_TASA[tasa]}`;
 
     return {
       texto: `${decision.pulla}\n\n${lineas.map((l) => `${l.salida}  ·  ${l.detalle}`).join('\n')}\n\n${paso}`,
@@ -520,6 +527,25 @@ function contextoDeTasas(tasas) {
   return `Tasas de este momento:\n${lineas.join('\n')}`;
 }
 
+/**
+ * ¿La petición viene de la propia web?
+ *
+ * `new URL(origen)` reventaba con Origin: null —un iframe en zona de
+ * pruebas, una cadena de redirecciones, algunos navegadores dentro de apps— y
+ * como la llamada estaba fuera del try, el endpoint devolvía un 500 en vez
+ * del 403 que se pretendía. Comprobado en producción: HTTP 500, error 1101.
+ */
+function mismoSitio(peticion) {
+  const origen = peticion.headers.get('Origin');
+  if (!origen) return true;
+  try {
+    return new URL(origen).host === new URL(peticion.url).host;
+  } catch {
+    // Un Origin opaco no es la propia web
+    return false;
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -530,8 +556,7 @@ export async function onRequestPost(context) {
 
   // Solo desde la propia web. No para al que sepa lo que hace, pero sí al
   // script que encuentra el endpoint y se pone a tirar de él.
-  const origen = request.headers.get('Origin');
-  if (origen && new URL(origen).host !== new URL(request.url).host) {
+  if (!mismoSitio(request)) {
     return json({ error: 'Petición de otro sitio.' }, 403);
   }
 
