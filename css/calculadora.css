@@ -681,16 +681,32 @@ body {
    es solo otra lista de colores: no hay que tocar nada más.
    ============================================================ */
 
-/* ---------- Claro ---------- */
+/* ---------- Claro ----------
+
+   Sin blanco puro en ninguna superficie.
+
+   Medido en el tema anterior: el 57% de la pantalla era #ffffff al 100% de
+   luminancia. El fondo sí era un neutro suave —lo correcto— pero en este
+   diseño el fondo casi no se ve: las tarjetas y el panel lo tapan casi todo,
+   y esos sí eran blancos. Se había suavizado justo la parte que no se mira.
+
+   Ahora la superficie es #f5f7fa: un 93% de luminancia en vez del 100%, que
+   es lo que quita el deslumbramiento sin cambiar el carácter de la app. El
+   fondo baja a la par para que las tarjetas sigan leyéndose como elevadas.
+
+   El texto tenue pasa de #8a94a6 a #687284, y esto no es estética: sobre
+   blanco daba 3,06:1 y el mínimo accesible para texto pequeño es 4,5:1. Lo
+   usan las etiquetas de las tarjetas, el pie y la línea de tasa de cada
+   resultado —todo el texto explicativo—, y no cumplía. Ahora da 4,52:1. */
 :root[data-tema="claro"] {
-  --calc-fondo: #f4f6fa;
-  --calc-superficie: #ffffff;
-  --calc-superficie-alta: #ffffff;
-  --calc-borde: rgba(16, 24, 40, 0.09);
-  --calc-borde-fuerte: rgba(16, 24, 40, 0.2);
+  --calc-fondo: #e6eaf1;
+  --calc-superficie: #f5f7fa;
+  --calc-superficie-alta: #fafbfd;
+  --calc-borde: rgba(16, 24, 40, 0.10);
+  --calc-borde-fuerte: rgba(16, 24, 40, 0.22);
   --calc-texto: #101828;
   --calc-texto-suave: #475467;
-  --calc-texto-tenue: #8a94a6;
+  --calc-texto-tenue: #687284;
 
   /* Más saturados y oscuros: sobre blanco, los del tema oscuro se lavan */
   --calc-usd: #2563eb;
@@ -716,15 +732,11 @@ body {
   background: rgba(16, 24, 40, 0.04);
 }
 
+/* La pestaña activa y las filas usan la superficie elevada, no un blanco
+   fijo: eran tres sitios que anulaban el tema por su cuenta. */
 :root[data-tema="claro"] .calc-modo.is-active {
-  background: #ffffff;
+  background: var(--calc-superficie-alta);
   box-shadow: 0 1px 3px rgba(16, 24, 40, 0.12);
-}
-
-:root[data-tema="claro"] .res,
-:root[data-tema="claro"] .fuente,
-:root[data-tema="claro"] .hist {
-  background: #ffffff;
 }
 
 /* ---------- Navidad ---------- */
@@ -811,7 +823,7 @@ body {
 .muestra-oscuro span:nth-child(3) { background: #f5b544; }
 .muestra-oscuro span:nth-child(4) { background: #2ecc71; }
 
-.muestra-claro span:nth-child(1) { background: #f4f6fa; }
+.muestra-claro span:nth-child(1) { background: #eef1f6; }
 .muestra-claro span:nth-child(2) { background: #2563eb; }
 .muestra-claro span:nth-child(3) { background: #b45309; }
 .muestra-claro span:nth-child(4) { background: #15803d; }
