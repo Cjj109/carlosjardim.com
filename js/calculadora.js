@@ -1171,11 +1171,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // justo las tasas y los resultados que se venía a ver.
   }
 
-  $('calcBorrar')?.addEventListener('click', () => {
+  /* La X borra, y ya. Que abra o no el teclado depende de si estabas
+     escribiendo.
+
+     Antes hacía focus() siempre, así que tocarla mientras mirabas los
+     resultados te levantaba el teclado y te tapaba media pantalla para nada:
+     habías pedido borrar, no escribir.
+
+     Pero si venías tecleando y la usas para corregir, quitarte el teclado es
+     igual de molesto. Así que no se decide nada: se deja como estaba. Hay que
+     mirarlo en pointerdown porque para cuando llega el click el foco ya se lo
+     ha llevado el botón. */
+  const botonBorrar = $('calcBorrar');
+  let escribiendoAlBorrar = false;
+
+  botonBorrar?.addEventListener('pointerdown', () => {
+    escribiendoAlBorrar = document.activeElement === monto;
+  });
+
+  botonBorrar?.addEventListener('click', (e) => {
     if (!monto) return;
     monto.value = '';
     calcular();
-    monto.focus();
+
+    // e.detail 0 es activación por teclado (Enter o espacio): ahí sí se
+    // devuelve el foco al campo, que es a donde iba quien navega así.
+    if (escribiendoAlBorrar || e.detail === 0) monto.focus();
+    else monto.blur();
+
+    escribiendoAlBorrar = false;
   });
 
   const panelPrincipal = document.querySelector('.calc-panel');
