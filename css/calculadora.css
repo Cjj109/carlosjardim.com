@@ -725,10 +725,34 @@ body {
     var(--calc-fondo);
 }
 
+/* Profundidad.
+   La sombra de antes era casi plana —un desenfoque de 24px con -12 de
+   extensión, o sea recogida hacia dentro— y la superficie clara quedaba como
+   una pared de luz en vez de un objeto. Con una sombra que se ve, el mismo
+   color se lee como una tarjeta apoyada, y eso es lo que quita la sensación
+   de deslumbre tanto como bajar la luminancia.
+
+   Va escalada al tamaño de cada cosa: una sombra de 16px de caída sobre una
+   tarjeta de tasa, que mide setenta píxeles de alto, la despega demasiado. */
 :root[data-tema="claro"] .calc-panel,
-:root[data-tema="claro"] .calc-ajustes,
+:root[data-tema="claro"] .calc-ajustes {
+  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.10);
+  border-color: #dfe4ec;
+}
+
 :root[data-tema="claro"] .tasa {
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
+  box-shadow: 0 6px 14px rgba(17, 24, 39, 0.07);
+  border-color: #dfe4ec;
+}
+
+/* Las filas de dentro apenas se levantan: si cada una tuviera su sombra, la
+   lista entera se vuelve ruido y ya no se distingue qué está encima de qué */
+:root[data-tema="claro"] .res,
+:root[data-tema="claro"] .fuente,
+:root[data-tema="claro"] .hist,
+:root[data-tema="claro"] .tema {
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.05);
+  border-color: #e3e7ee;
 }
 
 :root[data-tema="claro"] .calc-modos,
