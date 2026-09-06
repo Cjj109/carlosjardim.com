@@ -228,7 +228,10 @@ function temaGuardado() {
 
 /* ---------- Elección de fuentes ---------- */
 
-const POR_DEFECTO = { bcv: 'bcv', paralelo: 'binance', zelle: 'zelle' };
+// La venta y no la media: es lo que te pagan de verdad al vender, que es para
+// lo que casi siempre se abre esta calculadora. Quien tenga guardada la vieja
+// 'binance' cae en la primera del grupo, que es justo la venta.
+const POR_DEFECTO = { bcv: 'bcv', paralelo: 'binance-venta', zelle: 'zelle' };
 const GRUPOS = [
   ['bcv', 'fuentesBcv'],
   ['paralelo', 'fuentesParalelo'],

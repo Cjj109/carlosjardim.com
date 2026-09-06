@@ -1,0 +1,6 @@
+{
+  "name": "tasa-p2p",
+  "private": true,
+  "type": "module",
+  "description": "Puente para leer el libro p2p de Binance, que bloquea las IP de Cloudflare"
+}
