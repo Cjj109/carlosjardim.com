@@ -115,19 +115,27 @@ export async function onRequestGet(context) {
   try {
     const desde = new Date(Date.now() - DIAS_VIGENTES * 86400_000).toISOString().split('T')[0];
 
+    // El recorte se hace en SQL, no en JavaScript.
+    //
+    // Antes se traía la tabla entera de los últimos 60 días —que crece con el
+    // uso— para quedarse con doce filas, y el índice (visto, modo, n DESC) no
+    // podía cubrir el ORDER BY: la columna principal se usa para el rango, así
+    // que SQLite tenía que materializar y ordenar todo el resultado igual.
+    // Con la función de ventana se leen doce.
     const { results } = await db
       .prepare(
-        `SELECT modo, monto, n FROM montos
-          WHERE visto >= ?
-          ORDER BY modo, n DESC`
+        `SELECT modo, monto FROM (
+           SELECT modo, monto, ROW_NUMBER() OVER (PARTITION BY modo ORDER BY n DESC) AS puesto
+             FROM montos
+            WHERE visto >= ?
+         ) WHERE puesto <= ?`
       )
-      .bind(desde)
+      .bind(desde, CUANTOS)
       .all();
 
     const montos = {};
     for (const fila of results || []) {
-      const lista = (montos[fila.modo] ??= []);
-      if (lista.length < CUANTOS) lista.push(fila.monto);
+      (montos[fila.modo] ??= []).push(fila.monto);
     }
 
     // Cinco minutos: esto se mueve despacio y no hay ninguna prisa

@@ -393,8 +393,17 @@ function resolver(decision, tasas) {
 
     if (!lineas.length) return { texto: `${decision.pulla}\n\nNo tengo ninguna tasa ahora mismo.` };
 
-    const cualquiera = ['usd', 'usdt', 'zelle', 'eur'].find((id) => hay(tasas, id));
-    const entrada = lineaResultado(monto, cualquiera, hay(tasas, cualquiera), operacion).entrada;
+    /* La etiqueta del monto de partida.
+       Salía de la primera tasa con dato —o sea, de 'usd' casi siempre— así
+       que "350 USDT en todas las tasas" encabezaba con "350,00 $". Un número
+       con la moneda equivocada al lado, en el mismo archivo que insiste en
+       que las unidades no se adivinan.
+       Dividiendo, la entrada son bolívares y no hay duda. Multiplicando no
+       hay UNA moneda de partida —esa es la gracia de "todas"—, así que se usa
+       la que dijo la persona, y si no dijo ninguna, ninguna. */
+    const entrada = operacion === 'dividir'
+      ? `${cifra(monto)} Bs.`
+      : `${cifra(monto)}${decision.unidad_entrada ? ` ${decision.unidad_entrada}` : ''}`;
 
     return {
       texto: `${decision.pulla}\n\n${entrada} es:\n${lineas.map((l) => `${l.salida}  ·  ${l.detalle}`).join('\n')}`,

@@ -143,12 +143,17 @@ async function leerLibro(url) {
  * corta para partirla en dos.
  */
 async function leerZelle() {
-  const intentos = ['SELL', 'BUY'].map((tradeType) =>
-    leerPagina(HOSTS[0], tradeType, 1, 'USD', ['Zelle'])
-  );
-
-  const respuestas = await Promise.allSettled(intentos);
-  const precios = respuestas.filter((r) => r.status === 'fulfilled').flatMap((r) => r.value);
+  // Con respaldo de host, igual que el libro principal. Solo miraba HOSTS[0],
+  // así que si ese era justo el bloqueado —la razón misma de tener dos— el
+  // Zelle desaparecía entero mientras el resto de tasas se veían sanas.
+  let precios = [];
+  for (const url of HOSTS) {
+    const respuestas = await Promise.allSettled(
+      ['SELL', 'BUY'].map((tradeType) => leerPagina(url, tradeType, 1, 'USD', ['Zelle']))
+    );
+    precios = respuestas.filter((r) => r.status === 'fulfilled').flatMap((r) => r.value);
+    if (precios.length >= 6) break;
+  }
 
   if (precios.length < 6) return null;
 
@@ -173,8 +178,12 @@ export default async function handler(req, res) {
 
   for (const url of HOSTS) {
     const leido = await leerLibro(url);
-    lados = leido.lados;
-    fallos = leido.fallos;
+    // Se acumula, no se reemplaza. Antes, si el primer host traía 9 anuncios
+    // —justo por debajo del umbral— y el segundo estaba limitado, los 9 se
+    // tiraban y el endpoint respondía 502 con la muestra en la mano.
+    lados.SELL.push(...leido.lados.SELL);
+    lados.BUY.push(...leido.lados.BUY);
+    fallos.push(...leido.fallos);
     if (lados.SELL.length + lados.BUY.length >= 10) break;
   }
 

@@ -744,26 +744,35 @@ function fichaFuente(f, elegida) {
     </button>`;
 }
 
-/** La fuente que manda en un grupo: la elegida si responde, si no la primera que sí */
-function fuenteActiva(grupo) {
+/**
+ * La fuente que manda en un grupo: la elegida si responde, si no la primera.
+ *
+ * Recibe las elecciones ya leídas. Antes llamaba a fuentesElegidas() por su
+ * cuenta, y como se invoca tres veces en pintarFuentes y otras tres en
+ * aplicarEleccion, eran seis lecturas de localStorage con su JSON.parse por
+ * cada repintado.
+ */
+function fuenteActiva(grupo, elegidas) {
   if (!fuentes) return null;
 
   const delGrupo = fuentes.filter((f) => f.grupo === grupo && f.rate != null);
   if (!delGrupo.length) return null;
 
-  const elegida = fuentesElegidas()[grupo] || POR_DEFECTO[grupo];
+  const elegida = elegidas[grupo] || POR_DEFECTO[grupo];
   return delGrupo.find((f) => f.id === elegida) || delGrupo[0];
 }
 
 function pintarFuentes() {
   if (!fuentes) return;
 
+  const elegidas = fuentesElegidas();
+
   for (const [grupo, idCaja] of GRUPOS) {
     const caja = $(idCaja);
     if (!caja) continue;
 
     const delGrupo = fuentes.filter((f) => f.grupo === grupo);
-    const activa = fuenteActiva(grupo);
+    const activa = fuenteActiva(grupo, elegidas);
 
     caja.innerHTML = delGrupo.length
       ? delGrupo.map((f) => fichaFuente(f, activa != null && f.id === activa.id)).join('')
@@ -775,9 +784,10 @@ function pintarFuentes() {
 function aplicarEleccion() {
   if (!fuentes || !tasas) return;
 
-  const oficial = fuenteActiva('bcv');
-  const paralelo = fuenteActiva('paralelo');
-  const zelle = fuenteActiva('zelle');
+  const elegidas = fuentesElegidas();
+  const oficial = fuenteActiva('bcv', elegidas);
+  const paralelo = fuenteActiva('paralelo', elegidas);
+  const zelle = fuenteActiva('zelle', elegidas);
 
   if (oficial) {
     tasas.usd = { rate: oficial.rate, date: oficial.date, symbol: '$', fuente: oficial.nombre };

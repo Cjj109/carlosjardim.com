@@ -114,6 +114,16 @@ export async function onRequestGet(context) {
       : r.reason?.message || 'sin respuesta';
     return m;
   };
+  /**
+   * El origen contestó, pero esa cifra concreta no viene.
+   *
+   * Pasaba con "Binance · compra" cuando ese lado del libro trae menos de
+   * ocho anuncios: el puente responde 200 y bien, pero sin `compra`. El panel
+   * lo pintaba como "sin respuesta" —o sea, caído— que es justo la confusión
+   * entre lenta y muerta que este campo vino a quitar.
+   */
+  const sinEsaCifra = (respondio) => (respondio ? 'respondió sin ese dato' : null);
+
   const motivoBcv = motivo(bcvRes);
   const motivoPuenteBcv = motivo(puenteBcvRes);
   const motivoPuente = motivo(puenteRes);
@@ -136,7 +146,7 @@ export async function onRequestGet(context) {
       rate: bcv?.usd ?? null,
       eur: bcv?.eur ?? null,
       date: bcv?.fecha ?? null,
-      motivo: motivoBcv,
+      motivo: motivoBcv ?? sinEsaCifra(bcv),
     },
     {
       id: 'bcv-puente',
@@ -146,7 +156,7 @@ export async function onRequestGet(context) {
       rate: puenteBcv?.usd ?? null,
       eur: puenteBcv?.eur ?? null,
       date: puenteBcv?.fecha ?? null,
-      motivo: motivoPuenteBcv,
+      motivo: motivoPuenteBcv ?? sinEsaCifra(puenteBcv),
     },
     {
       id: 'dolarapi',
@@ -180,7 +190,7 @@ export async function onRequestGet(context) {
         : 'Lo que te pagan si vendes USDT.',
       rate: puente?.venta ?? puente?.rate ?? null,
       date: soloFecha(puente?.updated_at),
-      motivo: motivoPuente,
+      motivo: motivoPuente ?? sinEsaCifra(puente),
     },
     {
       id: 'binance-compra',
@@ -191,7 +201,7 @@ export async function onRequestGet(context) {
         : 'Lo que pagas si compras USDT.',
       rate: puente?.compra ?? null,
       date: soloFecha(puente?.updated_at),
-      motivo: motivoPuente,
+      motivo: motivoPuente ?? sinEsaCifra(puente),
     },
     {
       id: 'binance-media',
@@ -202,7 +212,7 @@ export async function onRequestGet(context) {
         : 'El punto medio entre compra y venta.',
       rate: puente?.media ?? puente?.rate ?? null,
       date: soloFecha(puente?.updated_at),
-      motivo: motivoPuente,
+      motivo: motivoPuente ?? sinEsaCifra(puente),
     },
     {
       id: 'consenso',
@@ -211,7 +221,7 @@ export async function onRequestGet(context) {
       detalle: cotizave?.mercados ? `Mediana de ${cotizave.mercados} casas de cambio.` : 'Mediana de varias casas p2p.',
       rate: cotizave?.consenso ?? null,
       date: null,
-      motivo: motivoCotizave,
+      motivo: motivoCotizave ?? sinEsaCifra(cotizave),
     },
     {
       id: 'cotizave-binance',
@@ -220,7 +230,7 @@ export async function onRequestGet(context) {
       detalle: 'Lo que Cotizave reporta del mercado de Binance.',
       rate: cotizave?.binance?.mid ?? null,
       date: soloFecha(cotizave?.binance?.updated_at),
-      motivo: motivoCotizave,
+      motivo: motivoCotizave ?? sinEsaCifra(cotizave),
     },
     {
       // Grupo propio y no 'paralelo': es una tasa distinta, no otra medición
@@ -238,7 +248,7 @@ export async function onRequestGet(context) {
         ? Math.round(((puente.venta ?? puente.rate) / puente.zelle_por_usdt) * 100) / 100
         : null,
       date: soloFecha(puente?.updated_at),
-      motivo: motivoPuente,
+      motivo: motivoPuente ?? sinEsaCifra(puente),
     },
     {
       id: 'dolarapi-paralelo',

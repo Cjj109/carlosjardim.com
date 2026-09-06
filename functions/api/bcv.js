@@ -83,7 +83,11 @@ const TIMEOUT = 6000;
 
 /** fetch con tope. Sin él, una sola fuente lenta arrastra a las cinco demás. */
 function fetchConTope(url, opciones = {}) {
-  return fetch(url, { signal: AbortSignal.timeout(TIMEOUT), ...opciones });
+  // El signal va DESPUÉS del spread: puesto antes, cualquier llamada que
+  // pasara el suyo propio anulaba el tope en silencio, y todo el presupuesto
+  // de latencia de este endpoint depende de que ninguna fuente se quede sin
+  // él. Hoy nadie lo pasa, pero fetchJson reenvía opciones arbitrarias.
+  return fetch(url, { ...opciones, signal: opciones.signal ?? AbortSignal.timeout(TIMEOUT) });
 }
 
 async function fetchJson(url, opciones = {}) {
@@ -270,11 +274,20 @@ export async function onRequestGet(context) {
     // El BCV, moneda a moneda y no en bloque: si el directo lee el dólar pero
     // se atraganta con el euro, el euro lo pone el puente y el dólar se queda
     // con el bueno. Cogerlo entero obligaría a elegir entre los dos.
-    const bcv = {
-      usd: directo?.usd ?? puenteBcv?.usd ?? null,
-      eur: directo?.eur ?? puenteBcv?.eur ?? null,
-      fecha: directo?.fecha ?? puenteBcv?.fecha ?? hoy,
+    //
+    // Y cada una se lleva SU fecha. Antes había una sola para las dos, así que
+    // un euro venido del puente se sellaba con la fecha de la lectura directa:
+    // la tarjeta anunciaba una vigencia que nunca acompañó a ese número, que
+    // es el mismo tipo de etiqueta engañosa que `via` vino a evitar.
+    const elegirMoneda = (campo) => {
+      if (directo?.[campo] != null) return { rate: directo[campo], date: directo.fecha, via: 'bcv' };
+      if (puenteBcv?.[campo] != null) return { rate: puenteBcv[campo], date: puenteBcv.fecha, via: 'puente' };
+      return { rate: null, date: null, via: null };
     };
+
+    const bcvUsd = elegirMoneda('usd');
+    const bcvEur = elegirMoneda('eur');
+    const bcv = { usd: bcvUsd.rate, eur: bcvEur.rate, fecha: bcvUsd.date ?? bcvEur.date ?? hoy };
 
     // DolarAPI es el último recurso, y solo sirve para el dólar
     const usdRate = bcv.usd ?? (respaldo?.promedio ? parseFloat(respaldo.promedio) : null);
@@ -282,23 +295,23 @@ export async function onRequestGet(context) {
     // debajo o desorbitado, algo se leyo mal y se prefiere el respaldo.
     const binanceValido = binance && (!bcv.usd || (binance.rate > bcv.usd * 0.9 && binance.rate < bcv.usd * 5));
 
-    const usdFecha = bcv.usd
-      ? bcv.fecha
+    const usdFecha = bcvUsd.rate
+      ? bcvUsd.date ?? hoy
       : respaldo?.fechaActualizacion?.split('T')[0] ?? hoy;
 
     const output = {
       last_updated: new Date().toISOString(),
       // `via` dice de dónde salió cada una, que si no es imposible saber
       // desde fuera si el camino principal está caído
-      eur: bcv.eur
-        ? { rate: bcv.eur, date: bcv.fecha, symbol: '€', via: directo?.eur ? 'bcv' : 'puente' }
+      eur: bcvEur.rate
+        ? { rate: bcvEur.rate, date: bcvEur.date ?? hoy, symbol: '€', via: bcvEur.via }
         : null,
       usd: usdRate
         ? {
             rate: usdRate,
             date: usdFecha,
             symbol: '$',
-            via: directo?.usd ? 'bcv' : puenteBcv?.usd ? 'puente' : 'dolarapi',
+            via: bcvUsd.via ?? 'dolarapi',
           }
         : null,
       // El Zelle vale menos que el USDT porque quien lo recibe asume mas
