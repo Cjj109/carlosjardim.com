@@ -113,12 +113,39 @@ export async function onRequestGet(context) {
       rate: cotizave?.oficial?.mid ?? null,
       date: soloFecha(cotizave?.oficial?.updated_at),
     },
+    // Los dos lados del libro de Binance y su punto medio. Antes era una sola
+    // entrada con la media, que es un precio al que no ejecuta nadie: se veía
+    // una cifra y se cobraba otra. El orden importa —la venta va primera— por
+    // dos razones: es la que usa la calculadora, y a quien tenga guardada la
+    // vieja 'binance' se le cae a la primera del grupo, que es justo esta.
     {
-      id: 'binance',
+      id: 'binance-venta',
       grupo: 'paralelo',
-      nombre: 'Libro de Binance',
-      detalle: puente?.ads ? `Promedio de ${puente.ads} anuncios, sin los extremos.` : 'Lectura directa del libro p2p.',
-      rate: puente?.rate ?? null,
+      nombre: 'Binance · venta',
+      detalle: puente?.ads_venta
+        ? `Lo que te pagan por vender. ${puente.ads_venta} anuncios, sin los extremos.`
+        : 'Lo que te pagan si vendes USDT.',
+      rate: puente?.venta ?? puente?.rate ?? null,
+      date: soloFecha(puente?.updated_at),
+    },
+    {
+      id: 'binance-compra',
+      grupo: 'paralelo',
+      nombre: 'Binance · compra',
+      detalle: puente?.ads_compra
+        ? `Lo que pagas por comprar. ${puente.ads_compra} anuncios, sin los extremos.`
+        : 'Lo que pagas si compras USDT.',
+      rate: puente?.compra ?? null,
+      date: soloFecha(puente?.updated_at),
+    },
+    {
+      id: 'binance-media',
+      grupo: 'paralelo',
+      nombre: 'Binance · media',
+      detalle: puente?.spread
+        ? `El punto medio del spread, que hoy es de ${puente.spread} Bs. Es la cifra que publican los bots.`
+        : 'El punto medio entre compra y venta.',
+      rate: puente?.media ?? puente?.rate ?? null,
       date: soloFecha(puente?.updated_at),
     },
     {
@@ -138,14 +165,19 @@ export async function onRequestGet(context) {
       date: soloFecha(cotizave?.binance?.updated_at),
     },
     {
+      // Grupo propio y no 'paralelo': es una tasa distinta, no otra medición
+      // de la misma. Puesta entre las paralelas, elegirla reemplazaba la del
+      // USDT y la calculadora mostraba el mismo número dos veces.
       id: 'zelle',
-      grupo: 'paralelo',
+      grupo: 'zelle',
       nombre: 'Zelle',
       detalle: puente?.zelle_por_usdt
         ? `Un USDT cuesta ${puente.zelle_por_usdt} en Zelle, de ${puente.zelle_ads} anuncios.`
         : 'Calculado desde el libro de Binance.',
-      rate: puente?.rate && puente?.zelle_por_usdt
-        ? Math.round((puente.rate / puente.zelle_por_usdt) * 100) / 100
+      // Del lado de venta, no de la media: es la misma razón que en el USDT
+      // —lo que importa es a cuánto cobras, no el punto medio del spread.
+      rate: (puente?.venta ?? puente?.rate) && puente?.zelle_por_usdt
+        ? Math.round(((puente.venta ?? puente.rate) / puente.zelle_por_usdt) * 100) / 100
         : null,
       date: soloFecha(puente?.updated_at),
     },

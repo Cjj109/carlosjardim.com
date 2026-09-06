@@ -42,21 +42,37 @@ async function fetchConCabeceras(url, opciones = {}) {
 /**
  * Tasa p2p leida del libro de Binance a traves del puente.
  *
- * Devuelve el promedio recortado de hasta 80 anuncios de los dos lados del
- * mercado. El puente cachea un minuto, asi que preguntar seguido no castiga
- * a Binance.
+ * Devuelve el promedio recortado de hasta 80 anuncios, ahora con cada lado del
+ * mercado por separado. El puente cachea un minuto, asi que preguntar seguido
+ * no castiga a Binance.
+ *
+ * Se usa la VENTA, no la media. La media es el punto medio del spread y a ese
+ * precio no ejecuta nadie: quien abre esta calculadora casi siempre quiere
+ * saber cuanto le dan por vender, y eso es el lado de venta. Con el spread de
+ * hoy —unos 9,4 bolivares, un 1%— usar la media decia medio por ciento de mas
+ * en cada cuenta de "cuanto tengo que vender".
+ *
+ * El ?? mantiene el puente viejo funcionando: si todavia no devuelve `venta`,
+ * se sigue con `rate` como hasta ahora.
  */
 async function leerUsdtBinance() {
   const res = await fetch(PUENTE_P2P, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const datos = await res.json();
-  if (!datos.rate || datos.rate <= 0) return null;
+  const venta = datos.venta ?? datos.rate;
+  if (!venta || venta <= 0) return null;
 
   return {
-    rate: datos.rate,
+    rate: venta,
+    venta,
+    compra: datos.compra ?? null,
+    media: datos.media ?? datos.rate ?? null,
+    spread: datos.spread ?? null,
     date: (datos.updated_at || '').split('T')[0] || new Date().toISOString().split('T')[0],
     anuncios: datos.ads,
+    anunciosVenta: datos.ads_venta ?? null,
+    anunciosCompra: datos.ads_compra ?? null,
     // Cuantos dolares Zelle cuesta un USDT: de ahi sale la tasa del Zelle
     zellePorUsdt: datos.zelle_por_usdt || null,
     zelleAnuncios: datos.zelle_ads || 0,
@@ -198,7 +214,20 @@ export async function onRequestGet(context) {
           }
         : null,
       usdt: binanceValido
-        ? { rate: binance.rate, date: binance.date, symbol: '₮', live: true, market: 'binance-p2p', anuncios: binance.anuncios }
+        ? {
+            rate: binance.rate,
+            date: binance.date,
+            symbol: '₮',
+            live: true,
+            market: 'binance-p2p',
+            anuncios: binance.anuncios,
+            // El otro lado y el punto medio, por si la interfaz quiere
+            // enseñar el spread sin tener que preguntar otra vez
+            lado: 'venta',
+            compra: binance.compra,
+            media: binance.media,
+            spread: binance.spread,
+          }
         : usdt
         ? { rate: usdt.rate, date: usdt.date, symbol: '₮', live: true, market: usdt.market, mercados: usdt.mercados }
         : usdtRespaldo
