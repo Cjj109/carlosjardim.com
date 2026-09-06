@@ -268,6 +268,163 @@ const COLORES = {
   bs: 'var(--calc-texto)',
 };
 
+/* ---------- Montos rápidos ----------
+
+   Los cinco botones eran fijos y los mismos para los cuatro modos. En tres de
+   ellos se teclean divisas y 10/50/100/350/1.000 tiene sentido; en Bolívares
+   se teclean bolívares, y ahí los cinco eran inservibles: el más grande, mil
+   bolívares, son 1,23 $.
+
+   Ahora cada modo trae los suyos y además se adaptan. Los dos primeros no se
+   mueven —un botón que cambia de sitio en cada visita se vuelve imposible de
+   acertar con el pulgar— y los tres siguientes salen de lo que de verdad se
+   usa: primero lo tuyo, y si no hay historial, lo que más usa la gente. */
+
+const MONTOS_BASE = {
+  divisa: [10, 50, 100, 350, 1000],
+  bcv: [10, 50, 100, 350, 1000],
+  usdt: [10, 50, 100, 350, 1000],
+  // En bolívares, con el dólar sobre 800, esto es entre 6 y 600 dólares
+  bs: [5000, 15000, 50000, 100000, 500000],
+};
+
+const FIJOS = 2;
+const RAPIDOS = 5;
+
+/**
+ * Redondea a dos cifras significativas: 347 → 350, 15.234 → 15.000.
+ *
+ * Sirve para dos cosas a la vez. Agrupa montos parecidos, porque nadie repite
+ * "15.234" pero mucha gente ronda los quince mil; y da números que apetece
+ * tocar, que es de lo que va un botón de atajo. De paso, lo que se manda al
+ * contador global va redondeado y no es el importe exacto de nadie.
+ */
+function redondear(n) {
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const magnitud = 10 ** (Math.floor(Math.log10(n)) - 1);
+  return Math.round(n / magnitud) * magnitud;
+}
+
+// Con una sola vez no basta para ganarse un botón: un monto tecleado una vez
+// puede ser un error o algo irrepetible, y desplazaría a uno útil. Con dos ya
+// hay costumbre.
+const MINIMO_USOS = 2;
+
+/** Los montos que más usa esta persona en este modo, de más a menos */
+function montosPersonales(modoPedido) {
+  const cuenta = new Map();
+
+  for (const h of leerHistorial()) {
+    if (h.modo !== modoPedido) continue;
+    const m = redondear(Number(h.monto));
+    if (!m) continue;
+    cuenta.set(m, (cuenta.get(m) || 0) + 1);
+  }
+
+  // El historial ya viene del más nuevo al más viejo, así que a igualdad de
+  // usos gana el más reciente sin tener que mirar fechas.
+  return [...cuenta.entries()]
+    .filter(([, veces]) => veces >= MINIMO_USOS)
+    .sort((a, b) => b[1] - a[1])
+    .map(([m]) => m);
+}
+
+// Lo que más usa todo el mundo. Se pide una vez y solo si el endpoint existe:
+// mientras no haya base de datos detrás, esto se queda vacío y mandan los
+// valores por defecto, que es exactamente lo que se quiere.
+let montosGlobales = {};
+
+const APORTAR = 'calc-aportar';
+
+/**
+ * Si esta persona suma sus montos al contador de todos.
+ *
+ * Por defecto sí, porque lo que viaja es un número redondeado a dos cifras
+ * significativas y el modo: ni identificador, ni importe exacto, ni nada que
+ * apunte a nadie. Pero se puede apagar, y se respeta si el navegador pide no
+ * ser rastreado —cuesta una línea y es la respuesta correcta a alguien que ya
+ * ha dicho lo que quiere.
+ */
+function aportaMontos() {
+  if (navigator.doNotTrack === '1' || navigator.globalPrivacyControl) return false;
+  try {
+    return localStorage.getItem(APORTAR) !== 'no';
+  } catch {
+    return true;
+  }
+}
+
+async function cargarMontosGlobales() {
+  try {
+    const respuesta = await fetch('/api/montos', { signal: AbortSignal.timeout(4000) });
+    if (!respuesta.ok) return;
+
+    const datos = await respuesta.json();
+    if (!datos || typeof datos.montos !== 'object') return;
+
+    montosGlobales = datos.montos;
+    pintarRapidos(modo);
+  } catch {
+    // Sin contador global no pasa nada: quedan los tuyos y los de siempre
+  }
+}
+
+/** Suma un monto al contador de todos. Silencioso a propósito. */
+function aportarMonto(modoUsado, monto) {
+  const redondo = redondear(Number(monto));
+  if (!redondo || !MODOS[modoUsado] || !aportaMontos()) return;
+
+  // keepalive: esto suele pasar justo cuando se sale de la página
+  fetch('/api/montos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ modo: modoUsado, monto: redondo }),
+    keepalive: true,
+  }).catch(() => {
+    // Que falle no le importa a nadie: es una estadística, no el cálculo
+  });
+}
+
+/**
+ * La etiqueta del botón, con el mismo formato que tendrá en el campo.
+ *
+ * Nada de "15 k": el botón tiene que decir exactamente lo que va a escribir,
+ * porque justo debajo se va a ver "15.000" en la caja. Y ese "k" tampoco es
+ * como se lee un número en Venezuela.
+ */
+function etiquetaMonto(n) {
+  return new Intl.NumberFormat('es-VE').format(n);
+}
+
+function pintarRapidos(modoPedido) {
+  const caja = $('calcRapidos');
+  if (!caja) return;
+
+  const base = MONTOS_BASE[modoPedido] || MONTOS_BASE.divisa;
+  const fijos = base.slice(0, FIJOS);
+
+  // Lo tuyo manda; detrás, lo de todos; y al final los de siempre para
+  // rellenar mientras no haya ni una cosa ni otra.
+  const candidatos = [
+    ...montosPersonales(modoPedido),
+    ...(montosGlobales[modoPedido] || []),
+    ...base.slice(FIJOS),
+  ];
+
+  const elegidos = [];
+  for (const m of candidatos) {
+    if (elegidos.length >= RAPIDOS - FIJOS) break;
+    if (!fijos.includes(m) && !elegidos.includes(m)) elegidos.push(m);
+  }
+
+  // De menor a mayor: la fila se lee igual siempre aunque cambie el contenido
+  const fila = [...fijos, ...elegidos].sort((a, b) => a - b);
+
+  caja.innerHTML = fila
+    .map((m) => `<button type="button" data-monto="${esc(m)}">${esc(etiquetaMonto(m))}</button>`)
+    .join('');
+}
+
 const MODOS = {
   divisa: { pregunta: '¿Cuántos bolívares son, según cada tasa?', signo: '$' },
   bs: { pregunta: '¿Cuántas divisas salen, según cada tasa?', signo: 'Bs' },
@@ -428,6 +585,7 @@ function apuntarEnHistorial(entrada) {
   if (mismo) return;
 
   lista.unshift(entrada);
+  aportarMonto(entrada.modo, entrada.monto);
 
   try {
     localStorage.setItem(HISTORIAL, JSON.stringify(lista.slice(0, HISTORIAL_MAX)));
@@ -436,6 +594,7 @@ function apuntarEnHistorial(entrada) {
   }
 
   pintarHistorial();
+  pintarRapidos(modo);
 }
 
 function cuando(iso) {
@@ -831,6 +990,7 @@ function elegirModo(nuevo, { foco = false } = {}) {
   const signo = $('calcSigno');
   if (signo) signo.textContent = MODOS[nuevo].signo;
 
+  pintarRapidos(nuevo);
   calcular();
 }
 
@@ -904,6 +1064,8 @@ function programarRefresco() {
 
 document.addEventListener('DOMContentLoaded', () => {
   aplicarTema(temaGuardado());
+  pintarRapidos(modo);
+  cargarMontosGlobales();
   cargarTasas({ primera: true });
 
   const monto = $('calcMonto');
@@ -1059,6 +1221,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     pintarHistorial();
   });
+
+  // El interruptor de aportar montos
+  const aportar = $('calcAportar');
+  if (aportar) {
+    const rastreoApagado = navigator.doNotTrack === '1' || navigator.globalPrivacyControl;
+    aportar.checked = aportaMontos();
+
+    if (rastreoApagado) {
+      // El navegador ya dijo que no; se muestra apagado y no se deja tocar,
+      // en vez de fingir que la decisión sigue abierta.
+      aportar.disabled = true;
+      aportar.closest('label')?.setAttribute('title', 'Tu navegador pide no ser rastreado');
+    }
+
+    aportar.addEventListener('change', () => {
+      try {
+        localStorage.setItem(APORTAR, aportar.checked ? 'si' : 'no');
+      } catch {
+        // Sin almacenamiento la elección dura lo que la visita
+      }
+    });
+  }
 
   $('calcRestablecer')?.addEventListener('click', () => {
     try {

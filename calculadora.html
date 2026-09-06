@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=f625af78" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=22">
-  <link rel="stylesheet" href="/css/calculadora.css?r=22">
+  <link rel="stylesheet" href="/css/variables.css?r=24">
+  <link rel="stylesheet" href="/css/calculadora.css?r=24">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -182,7 +182,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v22</span>
+    <span class="calc-version" title="Versión de la app instalada">v24</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -290,10 +290,24 @@
     </div>
 
     <button type="button" id="calcRestablecer" class="calc-restablecer">Volver a las de siempre</button>
+
+    <!-- Los botones de atajo aprenden de lo que se usa. Lo que sale de aquí
+         es el modo y el monto redondeado, nada más; pero se dice y se puede
+         apagar, que es lo mínimo cuando se manda algo. -->
+    <div class="calc-grupo calc-aportar">
+      <h3>Montos rápidos</h3>
+      <label class="calc-interruptor">
+        <input type="checkbox" id="calcAportar" checked>
+        <span>
+          Ayudar a mejorar los atajos
+          <small>Manda solo el monto redondeado y el modo —nunca la cifra exacta, ni nada que identifique. Tus atajos siguen saliendo de tu historial aunque lo apagues.</small>
+        </span>
+      </label>
+    </div>
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=22" defer></script>
+<script src="/js/calculadora.js?r=24" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
