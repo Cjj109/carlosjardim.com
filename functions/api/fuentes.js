@@ -77,7 +77,9 @@ export async function onRequestGet(context) {
     leerBCV(),
     leerCotizave(clave),
     json(PUENTE_P2P),
-    json(PUENTE_BCV),
+    // Con tope: el panel puede esperar a las demas fuentes, pero no
+    // colgarse si Vercel arranca en frio.
+    json(PUENTE_BCV, { signal: AbortSignal.timeout(2500) }),
     json(DOLARAPI_OFICIAL),
     json(DOLARAPI_PARALELO),
   ]);

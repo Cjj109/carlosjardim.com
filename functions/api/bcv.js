@@ -204,9 +204,18 @@ async function leerBCV() {
   };
 }
 
+// El puente va en paralelo con todo lo demás, y Promise.allSettled espera a
+// que TODAS terminen: sin un tope, un arranque en frío de Vercel arrastraría
+// al endpoint entero. Con 2,5 s basta —el puente responde en ~680 ms— y si
+// tarda más, ya da igual: el BCV directo hace rato que contestó.
+const TIMEOUT_PUENTE = 2500;
+
 /** El mismo BCV, por el puente de Vercel. Solo se usa si el directo falla. */
 async function leerBCVPuente() {
-  const res = await fetch(PUENTE_BCV, { headers: { Accept: 'application/json' } });
+  const res = await fetch(PUENTE_BCV, {
+    headers: { Accept: 'application/json' },
+    signal: AbortSignal.timeout(TIMEOUT_PUENTE),
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const datos = await res.json();
