@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora de Tasas | Carlos Jardim</title>
   <meta name="description" content="Calculadora de tasas de cambio en Venezuela: dólar BCV, euro BCV y USDT paralelo. Compara cuánto vale un monto según cada tasa y cuánto vender para pagar un precio fijado a BCV.">
-  <meta name="theme-color" content="#050505">
+  <meta name="theme-color" content="#0a0b0f">
   <link rel="canonical" href="https://carlosjardim.com/calculadora">
 
   <meta property="og:type" content="website">
@@ -37,11 +37,41 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Tasas">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/variables.css?r=18">
-  <link rel="stylesheet" href="/css/calculadora.css?r=18">
+
+  <!-- Las dos caras que se ven en cuanto pinta la página. Van auto-hospedadas
+       en /fonts, así que no hay handshake con un tercero de por medio; el
+       preload las pone a bajar en paralelo con el CSS en vez de esperar a que
+       el navegador descubra el @font-face. -->
+  <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="/css/variables.css?r=19">
+  <link rel="stylesheet" href="/css/calculadora.css?r=19">
+
+  <script>
+    // Dos cosas que tienen que pasar ANTES de que pinte nada:
+    //
+    // 1. El tema. Se aplicaba en DOMContentLoaded, así que quien tenía el tema
+    //    claro se comía un fogonazo oscuro en cada apertura.
+    // 2. La petición de tasas. El script va con defer, o sea que no arranca
+    //    hasta que el HTML está parseado; lanzándola aquí se adelanta y para
+    //    cuando el código la necesita suele estar ya en camino.
+    (function () {
+      var COLORES = { oscuro: '#0a0b0f', claro: '#f4f6fa', navidad: '#0b1410' };
+      var tema = 'oscuro';
+      try { tema = localStorage.getItem('calc-tema') || 'oscuro'; } catch (e) {}
+      if (!COLORES[tema]) tema = 'oscuro';
+
+      document.documentElement.dataset.tema = tema;
+      document.documentElement.style.background = COLORES[tema];
+
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', COLORES[tema]);
+
+      // Si falla se ignora: calculadora.js reintenta por su cuenta.
+      window.__tasasEnVuelo = fetch('/api/bcv').catch(function () { return null; });
+    })();
+  </script>
 </head>
 <body>
 
@@ -77,6 +107,10 @@
     <p class="calc-sub">Dólar BCV, euro BCV y USDT paralelo</p>
   </header>
 
+  <noscript>
+    <p class="calc-sinjs">Esta calculadora necesita JavaScript para pedir las tasas y hacer las cuentas.</p>
+  </noscript>
+
   <!-- Tasas del momento -->
   <section class="calc-tasas" aria-label="Tasas actuales">
     <article class="tasa">
@@ -100,24 +134,34 @@
   <!-- Qué se quiere calcular -->
   <section class="calc-panel">
     <div class="calc-modos" id="calcModos" role="tablist" aria-label="Qué quieres calcular">
-      <button type="button" class="calc-modo is-active" data-modo="divisa" role="tab" aria-selected="true">Divisas</button>
-      <button type="button" class="calc-modo" data-modo="bs" role="tab" aria-selected="false">Bolívares</button>
-      <button type="button" class="calc-modo" data-modo="bcv" role="tab" aria-selected="false">Precio BCV</button>
-      <button type="button" class="calc-modo" data-modo="usdt" role="tab" aria-selected="false">USDT</button>
+      <button type="button" class="calc-modo is-active" data-modo="divisa" role="tab" aria-selected="true" aria-controls="calcResultados">Divisas</button>
+      <button type="button" class="calc-modo" data-modo="bs" role="tab" aria-selected="false" aria-controls="calcResultados" tabindex="-1">Bolívares</button>
+      <button type="button" class="calc-modo" data-modo="bcv" role="tab" aria-selected="false" aria-controls="calcResultados" tabindex="-1">Precio BCV</button>
+      <button type="button" class="calc-modo" data-modo="usdt" role="tab" aria-selected="false" aria-controls="calcResultados" tabindex="-1">USDT</button>
     </div>
 
     <p class="calc-pregunta" id="calcPregunta">¿Cuántos bolívares son, según cada tasa?</p>
 
     <div class="calc-monto">
       <span class="calc-monto-signo" id="calcSigno">$</span>
+      <!-- type="text" y no "number": el number nativo se come el separador de
+           miles, sube y baja con la rueda del ratón sin querer y en iOS no
+           deja escribir coma. El teclado numérico se pide con inputmode. -->
       <input
         type="text"
         id="calcMonto"
         inputmode="decimal"
         autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        enterkeyhint="done"
+        maxlength="18"
         placeholder="0"
         aria-label="Cantidad"
+        aria-describedby="calcPregunta"
       >
+      <button type="button" id="calcBorrar" class="calc-borrar" aria-label="Borrar la cantidad" hidden>×</button>
     </div>
 
     <div class="calc-rapidos" id="calcRapidos" role="group" aria-label="Montos rápidos">
@@ -128,15 +172,21 @@
       <button type="button" data-monto="1000">1.000</button>
     </div>
 
-    <div class="calc-resultados" id="calcResultados" aria-live="polite">
+    <!-- El aria-live va en el resumen de abajo, no aquí: anunciar la lista
+         entera en cada tecla dejaba el lector de pantalla inservible. -->
+    <div class="calc-resultados" id="calcResultados" role="tabpanel" aria-labelledby="calcModos">
       <p class="calc-vacio">Escribe una cantidad</p>
     </div>
+    <p class="calc-resumen" id="calcResumen" aria-live="polite" role="status"></p>
   </section>
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v18</span>
+    <span class="calc-version" title="Versión de la app instalada">v19</span>
     <div class="calc-pie-botones">
+      <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
+        60 IQ
+      </button>
       <button type="button" id="calcTema" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelTema">
         Tema
       </button>
@@ -149,6 +199,35 @@
       <button type="button" id="calcRefrescar" class="calc-refrescar">Actualizar</button>
     </div>
   </footer>
+
+  <!-- El 60 IQ: pregúntale en cristiano y él hace la cuenta (y te la devuelve
+       con una pulla por no haberla hecho tú). La clave de OpenAI no está aquí:
+       la petición va a /api/60iq, que es quien la tiene. -->
+  <section class="calc-ajustes calc-iq" id="calcPanel60iq" hidden>
+    <div class="calc-ajustes-cabecera">
+      <h2>60 IQ</h2>
+      <p>Pregúntale como hablas. Te va a insultar, pero te hace la cuenta.</p>
+    </div>
+
+    <div class="calc-iq-charla" id="iqCharla" aria-live="polite">
+      <p class="calc-iq-ejemplos">
+        Por ejemplo: <button type="button" class="calc-iq-ejemplo">Necesito 15.000 bolívares, ¿cuántos dólares vendo?</button>
+        <button type="button" class="calc-iq-ejemplo">¿Cuánto es 350 $ en USDT?</button>
+      </p>
+    </div>
+
+    <form class="calc-iq-caja" id="iqForm">
+      <input
+        type="text"
+        id="iqPregunta"
+        placeholder="¿Cuánto es…?"
+        autocomplete="off"
+        maxlength="400"
+        aria-label="Pregúntale al 60 IQ"
+      >
+      <button type="submit" id="iqEnviar">Preguntar</button>
+    </form>
+  </section>
 
   <!-- Temas -->
   <section class="calc-ajustes" id="calcPanelTema" hidden>
@@ -202,38 +281,44 @@
       <div class="calc-fuentes" id="fuentesParalelo" role="radiogroup" aria-label="Fuente de la tasa paralela"></div>
     </div>
 
+    <!-- El Zelle tiene grupo propio. Estaba entre las paralelas, y elegirlo
+         allí sustituía la tasa del USDT por la suya: las filas seguían
+         diciendo "USDT p2p" con el número del Zelle debajo. -->
+    <div class="calc-grupo">
+      <h3>Tasa Zelle</h3>
+      <div class="calc-fuentes" id="fuentesZelle" role="radiogroup" aria-label="Fuente de la tasa Zelle"></div>
+    </div>
+
     <button type="button" id="calcRestablecer" class="calc-restablecer">Volver a las de siempre</button>
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=18" defer></script>
+<script src="/js/calculadora.js?r=19" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
   // memoria seria peor que no tenerla.
   if ('serviceWorker' in navigator) {
+    // Recargar cuando el service worker nuevo toma el mando.
+    //
+    // Antes se recargaba al llegar al estado "installed", que es ANTES de que
+    // active: la página se recargaba mientras seguía mandando el viejo y hacía
+    // falta otra vuelta para ver el cambio. El evento correcto es
+    // controllerchange, y el cerrojo evita el bucle de recargas si por lo que
+    // sea se dispara más de una vez.
+    let recargando = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (recargando) return;
+      recargando = true;
+      window.location.reload();
+    });
+
     window.addEventListener('load', () => {
       // El service worker vive en la raíz para poder cubrir /calculadora, que ya
       // no es carpeta: la redirección que eso creaba impedía que WhatsApp leyera
       // la vista previa.
       navigator.serviceWorker.register('/sw-calculadora.js', { scope: '/calculadora' })
-        .then((registro) => {
-          // Si hay una version nueva esperando, se pone al mando y se recarga
-          // una vez. Sin esto, en la app instalada un cambio tardaba dos
-          // aperturas en aparecer.
-          registro.addEventListener('updatefound', () => {
-            const nuevo = registro.installing;
-            if (!nuevo) return;
-
-            nuevo.addEventListener('statechange', () => {
-              if (nuevo.state === 'installed' && navigator.serviceWorker.controller) {
-                window.location.reload();
-              }
-            });
-          });
-
-          registro.update();
-        })
+        .then((registro) => registro.update())
         .catch((error) => console.warn('No se pudo registrar el service worker:', error));
     });
   }

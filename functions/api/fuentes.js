@@ -138,8 +138,11 @@ export async function onRequestGet(context) {
       date: soloFecha(cotizave?.binance?.updated_at),
     },
     {
+      // Grupo propio y no 'paralelo': es una tasa distinta, no otra medición
+      // de la misma. Puesta entre las paralelas, elegirla reemplazaba la del
+      // USDT y la calculadora mostraba el mismo número dos veces.
       id: 'zelle',
-      grupo: 'paralelo',
+      grupo: 'zelle',
       nombre: 'Zelle',
       detalle: puente?.zelle_por_usdt
         ? `Un USDT cuesta ${puente.zelle_por_usdt} en Zelle, de ${puente.zelle_ads} anuncios.`

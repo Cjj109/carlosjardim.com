@@ -17,3 +17,12 @@ npm-debug.log*
 # Temporal
 *.log
 *.tmp
+
+# Secretos para las funciones en local (claves de API). En producción van como
+# variables de entorno del proyecto en Cloudflare, nunca en el repo.
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+# Estado local de wrangler (caché de miniflare, trazas). Se regenera solo.
+.wrangler/
