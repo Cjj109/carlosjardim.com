@@ -178,7 +178,13 @@ const NOMBRE_TASA = {
 // "USDT" y no "₮": el símbolo de Tether no lo reconoce nadie de un vistazo,
 // y encima es el glifo que obliga a bajar el subconjunto latin-ext de la
 // fuente. Escrito se lee solo.
-const SIMBOLO = { usd: '$', eur: '€', usdt: 'USDT', zelle: '$' };
+//
+// El Zelle igual, y aquí importa más: son dólares, así que llevaba "$" y no
+// se distinguía del dólar BCV. En la lista comparada el nombre está al lado,
+// pero cuando la respuesta es una sola cifra grande no hay etiqueta ninguna
+// —"441,86 $" a secas— y son dos tasas con casi cuarenta bolívares de
+// diferencia entre ellas.
+const SIMBOLO = { usd: '$', eur: '€', usdt: 'USDT', zelle: 'Zelle' };
 
 const cifra = (n, dec = 2) =>
   new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: dec }).format(n);
