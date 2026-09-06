@@ -66,10 +66,15 @@ for f in inter-latin inter-latin-ext jetbrains-mono-latin jetbrains-mono-latin-e
   [ -f "fonts/originales/$f.woff2" ] || cp "fonts/$f.woff2" "fonts/originales/$f.woff2"
 
   antes=$(wc -c < "fonts/originales/$f.woff2")
+  # kern y tnum, no ''. Vaciar las características OpenType quitaba también
+  # `tnum`, los dígitos tabulares, y entonces font-variant-numeric:tabular-nums
+  # en el CSS no hacía absolutamente nada: pedía algo que ya no existía en el
+  # archivo. Se nota en cuanto los números van en columna —las cuatro tarjetas
+  # de tasas—, porque el 1 es mucho más estrecho que el 8 y no cuadran.
   "$venv/bin/pyftsubset" "fonts/originales/$f.woff2" \
     --text-file=fonts/.subset.txt \
     --flavor=woff2 \
-    --layout-features='' \
+    --layout-features='kern,tnum' \
     --output-file="fonts/$f.woff2"
   despues=$(wc -c < "fonts/$f.woff2")
 

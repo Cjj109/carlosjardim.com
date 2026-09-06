@@ -1272,3 +1272,57 @@ body { overscroll-behavior-y: contain; }
   .calc-rapidos button { font-size: 0.68rem; padding-left: 0; padding-right: 0; }
   .calc-modo { font-size: 0.66rem; }
 }
+
+/* ============================================================
+   LOS NÚMEROS
+   ============================================================
+
+   Las cifras que se leen van en Inter 800, no en la monoespaciada.
+
+   El mono a 700 tiene trazo uniforme y letras separadas: se ve más fino y
+   más suelto. Inter a 800 es densa y apretada, y para un número que es la
+   respuesta a lo que viniste a preguntar, eso pesa.
+
+   Lo que daba el mono era la alineación en columna, y eso no se pierde:
+   `tabular-nums` fuerza que todos los dígitos ocupen igual. Hace falta que
+   la fuente conserve la característica `tnum` —el recorte la borraba, y
+   entonces la propiedad no hacía nada: el 1 medía 53 px donde el 8 medía 80,
+   y las cuatro tarjetas de tasas no cuadraban. Ver scripts/subset-fuentes.sh.
+
+   El mono se queda en las líneas técnicas pequeñas —la tasa bajo cada
+   resultado, la operación del 60 IQ, el sello de versión—, donde ese aire de
+   dato crudo va bien y no compite con nada. */
+
+.calc-monto input,
+.calc-monto-signo,
+.tasa-valor,
+.res-valor,
+.hist-valor,
+.fuente-tasa,
+.iq-resultado,
+.iq-fila b,
+.calc-rapidos button {
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.calc-monto input,
+.tasa-valor,
+.res-valor,
+.hist-valor,
+.fuente-tasa,
+.iq-resultado,
+.iq-fila b { font-weight: 800; }
+
+.calc-monto-signo { font-weight: 700; }
+.calc-rapidos button { font-weight: 600; }
+
+/* Los pequeños siguen en mono, pero con los dígitos alineados igual */
+.res-nota,
+.hist-operacion,
+.hist-tasa,
+.iq-operacion,
+.iq-encabezado,
+.calc-pie,
+.fuente-fecha { font-variant-numeric: tabular-nums; }
