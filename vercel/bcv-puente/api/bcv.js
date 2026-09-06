@@ -68,7 +68,11 @@ function bajarBCV() {
       BCV_URL,
       {
         ca: certificadosDeConfianza(),
-        timeout: 12000,
+        // 5 s y no 12: quien llama (carlosjardim.com/api/bcv) corta a los 6,
+        // asi que los 12 de antes eran tolerancia inalcanzable — el puente
+        // seguia trabajando en respuestas que ya nadie iba a recoger. Los dos
+        // presupuestos tienen que hablar entre si, y el de fuera manda.
+        timeout: 5000,
         headers: {
           Accept: 'text/html',
           'User-Agent': 'Mozilla/5.0 (compatible; carlosjardim.com/1.0)',

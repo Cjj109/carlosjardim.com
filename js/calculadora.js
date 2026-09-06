@@ -281,17 +281,16 @@ const MODOS = {
 // después de otra más nueva pisaba las tasas buenas con las viejas: pasa cada
 // vez que el refresco automático y el botón coinciden.
 let peticion = 0;
-let cargando = false;
 let ultimaBuena = 0;
 
 async function cargarTasas({ forzar = false, primera = false } = {}) {
   const boton = $('calcRefrescar');
   const aviso = $('calcActualizado');
 
-  if (cargando && !forzar) return;
-
+  // Nada de guardia por "ya hay una en curso": todas las llamadas menos la
+  // primera pasan forzar:true, asi que nunca cortaba nada. Quien protege el
+  // orden es el testigo `peticion`, que descarta la respuesta que llega tarde.
   const mia = ++peticion;
-  cargando = true;
   if (boton) boton.disabled = true;
   if (aviso && forzar) aviso.textContent = 'Actualizando…';
 
@@ -304,8 +303,16 @@ async function cargarTasas({ forzar = false, primera = false } = {}) {
     // Sin ?t=: el no-store ya evita la caché, y el parámetro variable hacía
     // que el service worker guardara una entrada nueva por minuto y que la
     // copia de emergencia no coincidiera nunca con lo que se pedía.
-    const respuesta = (enVuelo && (await enVuelo)) || (await fetch(API, { cache: 'no-store' }));
-    if (!respuesta || !respuesta.ok) throw new Error(`HTTP ${respuesta ? respuesta.status : 'sin respuesta'}`);
+    // Si la de la cabecera vino con error, se reintenta en vez de darse por
+    // vencido: un 502 pasajero en la carga inicial dejaba la app sin tasas
+    // cuando un segundo intento habria funcionado. Un Response con ok:false
+    // es truthy, asi que el `||` de antes se quedaba con el.
+    const adelantada = enVuelo ? await enVuelo : null;
+    const respuesta = adelantada?.ok
+      ? adelantada
+      : await fetch(API, { cache: 'no-store' });
+
+    if (!respuesta?.ok) throw new Error(`HTTP ${respuesta ? respuesta.status : 'sin respuesta'}`);
 
     const datos = await respuesta.json();
     if (mia !== peticion) return; // llegó tarde: manda una más nueva
@@ -327,10 +334,7 @@ async function cargarTasas({ forzar = false, primera = false } = {}) {
     if (tasas) pintarTasas({ falloDeRed: true });
     else if (aviso) aviso.textContent = navigator.onLine ? 'No se pudieron cargar las tasas' : 'Sin conexión';
   } finally {
-    if (mia === peticion) {
-      cargando = false;
-      if (boton) boton.disabled = false;
-    }
+    if (mia === peticion && boton) boton.disabled = false;
   }
 }
 
@@ -536,8 +540,11 @@ async function cargarFuentes() {
 
 function fichaFuente(f, elegida) {
   const caida = f.rate === null || f.rate === undefined;
+  // El motivo lo manda el servidor: "tardo demasiado" y "sin respuesta" se
+  // pintaban igual, y de un hueco sin numero se concluye que algo esta roto
+  // cuando a lo mejor solo iba despacio.
   const valor = caida
-    ? '<span class="fuente-tasa">sin respuesta</span>'
+    ? `<span class="fuente-tasa">${esc(f.motivo || 'sin respuesta')}</span>`
     : `<span class="fuente-tasa">${esc(num(Number(f.rate)))}</span>${f.date ? `<span class="fuente-fecha">${esc(fecha(f.date))}</span>` : ''}`;
 
   return `
@@ -628,7 +635,7 @@ function filasDelModo(monto, { usd, eur, usdt, zelle }) {
   if (modo === 'divisa') {
     // El euro va último en los dos modos: es el que menos se usa
     return [
-      { nombre: 'Dólar BCV', tasa: usd, valor: monto * usd, unidad: 'Bs.', color: COLORES.usd },
+      usd && { nombre: 'Dólar BCV', tasa: usd, valor: monto * usd, unidad: 'Bs.', color: COLORES.usd },
       usdt && { nombre: 'USDT p2p', tasa: usdt, valor: monto * usdt, unidad: 'Bs.', color: COLORES.usdt },
       zelle && { nombre: 'Zelle', tasa: zelle, valor: monto * zelle, unidad: 'Bs.', color: COLORES.zelle },
       eur && { nombre: 'Euro BCV', tasa: eur, valor: monto * eur, unidad: 'Bs.', color: COLORES.eur },
@@ -637,7 +644,7 @@ function filasDelModo(monto, { usd, eur, usdt, zelle }) {
 
   if (modo === 'bs') {
     return [
-      { nombre: 'En dólares BCV', tasa: usd, valor: monto / usd, unidad: '$', color: COLORES.usd },
+      usd && { nombre: 'En dólares BCV', tasa: usd, valor: monto / usd, unidad: '$', color: COLORES.usd },
       usdt && { nombre: 'En USDT', tasa: usdt, valor: monto / usdt, unidad: '₮', color: COLORES.usdt },
       zelle && { nombre: 'En Zelle', tasa: zelle, valor: monto / zelle, unidad: '$', color: COLORES.zelle },
       eur && { nombre: 'En euros BCV', tasa: eur, valor: monto / eur, unidad: '€', color: COLORES.eur },
@@ -654,15 +661,13 @@ function filasDelModo(monto, { usd, eur, usdt, zelle }) {
     ];
   }
 
-  if (!usdt) return 'Sin tasa p2p';
-
   const enBs = monto * usdt;
   return [
     { nombre: 'Son en bolívares', tasa: usdt, valor: enBs, unidad: 'Bs.', color: COLORES.usdt },
     // Vendiendo el USDT y cobrando por Zelle salen mas dolares, porque el
     // Zelle vale menos: es el mismo dinero contado en otra moneda.
     zelle && { nombre: 'Equivalen en Zelle', tasa: zelle, valor: enBs / zelle, unidad: '$', color: COLORES.zelle },
-    { nombre: 'Equivalen a BCV', tasa: usd, valor: enBs / usd, unidad: '$', color: COLORES.usd },
+    usd && { nombre: 'Equivalen a BCV', tasa: usd, valor: enBs / usd, unidad: '$', color: COLORES.usd },
   ];
 }
 
@@ -702,7 +707,20 @@ function calcular() {
   if (!Number.isFinite(monto) || monto <= 0) return vacio(salida, 'Escribe una cantidad');
 
   const usd = tasaDe('usd');
-  if (!usd) return vacio(salida, 'Sin tasa del BCV');
+  const usdt = tasaDe('usdt');
+
+  // Cada modo pide lo suyo, y solo lo suyo.
+  //
+  // Antes bastaba con que faltara el BCV para dejar la calculadora entera en
+  // blanco, incluso en modos donde es una fila más entre cuatro. Y el BCV es
+  // justo la fuente más frágil —la del certificado roto—, así que el corte
+  // saltaba precisamente cuando más falta hacía el resto.
+  //
+  // "Precio BCV" sí lo necesita de verdad: la pregunta entera parte de un
+  // precio fijado a esa tasa, sin ella no hay nada que calcular.
+  if (!usd && !usdt) return vacio(salida, 'Sin tasas ahora mismo');
+  if (!usd && modo === 'bcv') return vacio(salida, 'Sin tasa del BCV');
+  if (!usdt && modo === 'usdt') return vacio(salida, 'Sin tasa p2p');
 
   const filas = filasDelModo(monto, {
     usd,

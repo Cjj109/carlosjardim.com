@@ -65,14 +65,34 @@ const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 // euro: DolarAPI no lo publica, así que sin esto el euro no tenía respaldo.
 const PUENTE_BCV = 'https://bcv-puente.vercel.app/api/bcv';
 
-async function fetchJson(url) {
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+/**
+ * Presupuesto de tiempo de TODA fuente externa.
+ *
+ * Promise.allSettled espera a que terminen todas, así que este endpoint tarda
+ * lo que tarde la más lenta. Antes solo el puente del BCV tenía tope, que era
+ * justo la equivocada: el puente responde en menos de un segundo, mientras
+ * que el del p2p puede tardar 15 —tiene maxDuration 15, recorre dos hosts de
+ * Binance en serie y encima espera al Zelle— y no tenía ninguno. Con Binance
+ * lento, que es la razón misma de que ese puente exista, la calculadora se
+ * quedaba en blanco quince segundos.
+ *
+ * 6 s para todas: generoso con un BCV lento —que es cuando el puente hace
+ * falta— y aun así acota el endpoint entero.
+ */
+const TIMEOUT = 6000;
+
+/** fetch con tope. Sin él, una sola fuente lenta arrastra a las cinco demás. */
+function fetchConTope(url, opciones = {}) {
+  return fetch(url, { signal: AbortSignal.timeout(TIMEOUT), ...opciones });
 }
 
-async function fetchConCabeceras(url, opciones = {}) {
-  return fetch(url, opciones);
+async function fetchJson(url, opciones = {}) {
+  const res = await fetchConTope(url, {
+    headers: { Accept: 'application/json' },
+    ...opciones,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
 }
 
 /**
@@ -92,7 +112,7 @@ async function fetchConCabeceras(url, opciones = {}) {
  * se sigue con `rate` como hasta ahora.
  */
 async function leerUsdtBinance() {
-  const res = await fetch(PUENTE_P2P, { headers: { Accept: 'application/json' } });
+  const res = await fetchConTope(PUENTE_P2P, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   const datos = await res.json();
@@ -133,7 +153,7 @@ async function leerUsdtBinance() {
 async function leerUsdtP2P(clave) {
   if (!clave) return null;
 
-  const res = await fetchConCabeceras(COTIZAVE_API, {
+  const res = await fetchConTope(COTIZAVE_API, {
     headers: { 'X-API-Key': clave, Accept: 'application/json' },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -187,7 +207,7 @@ function leerFecha(html) {
 }
 
 async function leerBCV() {
-  const res = await fetch(BCV_URL, {
+  const res = await fetchConTope(BCV_URL, {
     headers: {
       Accept: 'text/html',
       'User-Agent': 'Mozilla/5.0 (compatible; carlosjardim.com/1.0)',
@@ -204,17 +224,19 @@ async function leerBCV() {
   };
 }
 
-// El puente va en paralelo con todo lo demás, y Promise.allSettled espera a
-// que TODAS terminen: sin un tope, un arranque en frío de Vercel arrastraría
-// al endpoint entero. Con 2,5 s basta —el puente responde en ~680 ms— y si
-// tarda más, ya da igual: el BCV directo hace rato que contestó.
-const TIMEOUT_PUENTE = 2500;
-
-/** El mismo BCV, por el puente de Vercel. Solo se usa si el directo falla. */
+/**
+ * El mismo BCV, por el puente de Vercel. Solo se usa si el directo falla.
+ *
+ * Con el presupuesto comun y no uno mas corto, aunque sea "solo" un respaldo.
+ * Tuvo 2,5 s y estaba mal pensado: los dos caminos leen el MISMO origen, asi
+ * que cuando bcv.org.ve va lento van lentos los dos, y el puente se abortaba
+ * precisamente en el apagon para el que existe. Y el euro depende de el:
+ * DolarAPI y Cotizave no publican euro, asi que si este cae, la tarjeta del
+ * euro se queda vacia sin nada detras.
+ */
 async function leerBCVPuente() {
-  const res = await fetch(PUENTE_BCV, {
+  const res = await fetchConTope(PUENTE_BCV, {
     headers: { Accept: 'application/json' },
-    signal: AbortSignal.timeout(TIMEOUT_PUENTE),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -328,6 +350,12 @@ export async function onRequestGet(context) {
           ? `ok (${usdtRes.value.mercados} mercados)`
           : `falla: ${usdtRes.reason?.message || 'sin datos'}`,
         bcv: bcvRes.status === 'fulfilled' ? 'ok' : `falla: ${bcvRes.reason?.message}`,
+        // Faltaba, y es el unico respaldo del euro: si se cae en silencio, la
+        // tarjeta del euro se vacia sin que nada lo explique. Es exactamente
+        // el fallo que este archivo dice en su cabecera que vino a resolver.
+        puenteBcv: puenteBcvRes.status === 'fulfilled' && puenteBcvRes.value
+          ? 'ok'
+          : `falla: ${puenteBcvRes.reason?.message || 'sin datos'}`,
       };
     }
 

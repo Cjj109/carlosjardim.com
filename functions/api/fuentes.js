@@ -17,14 +17,31 @@ const BCV_URL = 'https://www.bcv.org.ve/';
 
 const CACHE = 120;
 
+// Mas generoso que el de /api/bcv (6 s): este endpoint solo se pide al abrir
+// el panel, y ahi esperar medio segundo mas es preferible a informar de que
+// una fuente esta caida cuando lo unico que pasaba es que iba lenta. El panel
+// existe para saber quien esta vivo; equivocarse en eso lo hace inutil.
+const TIMEOUT = 8000;
+
 const soloFecha = (v) => (v ? String(v).split('T')[0] : null);
 
 function aNumero(texto) {
   return parseFloat(String(texto).trim().replace(/\./g, '').replace(',', '.'));
 }
 
+/**
+ * Con tope por defecto, sobreescribible.
+ *
+ * Va aqui y no en cada llamada: por este helper pasan cuatro de las seis
+ * fuentes, incluida la del p2p, que es la lenta de verdad. Ponerlo en un solo
+ * sitio evita que la proxima que se anada se quede sin el.
+ */
 async function json(url, opciones = {}) {
-  const res = await fetch(url, { headers: { Accept: 'application/json' }, ...opciones });
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(TIMEOUT),
+    headers: { Accept: 'application/json' },
+    ...opciones,
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
@@ -32,6 +49,7 @@ async function json(url, opciones = {}) {
 /** Página oficial del BCV: dólar y euro */
 async function leerBCV() {
   const res = await fetch(BCV_URL, {
+    signal: AbortSignal.timeout(TIMEOUT),
     headers: { Accept: 'text/html', 'User-Agent': 'Mozilla/5.0 (compatible; carlosjardim.com/1.0)' },
     cf: { cacheTtl: CACHE, cacheEverything: true },
   });
@@ -77,14 +95,31 @@ export async function onRequestGet(context) {
     leerBCV(),
     leerCotizave(clave),
     json(PUENTE_P2P),
-    // Con tope: el panel puede esperar a las demas fuentes, pero no
-    // colgarse si Vercel arranca en frio.
-    json(PUENTE_BCV, { signal: AbortSignal.timeout(2500) }),
+    json(PUENTE_BCV),
     json(DOLARAPI_OFICIAL),
     json(DOLARAPI_PARALELO),
   ]);
 
   const dato = (r) => (r.status === 'fulfilled' ? r.value : null);
+
+  /**
+   * Por que fallo una fuente, para que el panel no confunda "lenta" con
+   * "muerta": las dos se pintaban igual, como un hueco sin numero, y de ahi
+   * se concluye que algo esta roto cuando solo iba despacio.
+   */
+  const motivo = (r) => {
+    if (r.status === 'fulfilled') return null;
+    const m = r.reason?.name === 'TimeoutError' || /abort|timeout/i.test(r.reason?.message || '')
+      ? 'tardo demasiado'
+      : r.reason?.message || 'sin respuesta';
+    return m;
+  };
+  const motivoBcv = motivo(bcvRes);
+  const motivoPuenteBcv = motivo(puenteBcvRes);
+  const motivoPuente = motivo(puenteRes);
+  const motivoCotizave = motivo(cotizaveRes);
+  const motivoOficial = motivo(oficialRes);
+  const motivoParalelo = motivo(paraleloRes);
   const bcv = dato(bcvRes);
   const cotizave = dato(cotizaveRes);
   const puente = dato(puenteRes);
@@ -101,6 +136,7 @@ export async function onRequestGet(context) {
       rate: bcv?.usd ?? null,
       eur: bcv?.eur ?? null,
       date: bcv?.fecha ?? null,
+      motivo: motivoBcv,
     },
     {
       id: 'bcv-puente',
@@ -110,6 +146,7 @@ export async function onRequestGet(context) {
       rate: puenteBcv?.usd ?? null,
       eur: puenteBcv?.eur ?? null,
       date: puenteBcv?.fecha ?? null,
+      motivo: motivoPuenteBcv,
     },
     {
       id: 'dolarapi',
@@ -118,6 +155,7 @@ export async function onRequestGet(context) {
       detalle: 'Publica la tasa el día en que entra en vigor, no antes.',
       rate: oficial?.promedio ?? null,
       date: soloFecha(oficial?.fechaActualizacion),
+      motivo: motivoOficial,
     },
     {
       id: 'cotizave-oficial',
@@ -126,6 +164,7 @@ export async function onRequestGet(context) {
       detalle: 'Misma medición que DolarAPI, por otra vía.',
       rate: cotizave?.oficial?.mid ?? null,
       date: soloFecha(cotizave?.oficial?.updated_at),
+      motivo: motivoCotizave,
     },
     // Los dos lados del libro de Binance y su punto medio. Antes era una sola
     // entrada con la media, que es un precio al que no ejecuta nadie: se veía
@@ -141,6 +180,7 @@ export async function onRequestGet(context) {
         : 'Lo que te pagan si vendes USDT.',
       rate: puente?.venta ?? puente?.rate ?? null,
       date: soloFecha(puente?.updated_at),
+      motivo: motivoPuente,
     },
     {
       id: 'binance-compra',
@@ -151,6 +191,7 @@ export async function onRequestGet(context) {
         : 'Lo que pagas si compras USDT.',
       rate: puente?.compra ?? null,
       date: soloFecha(puente?.updated_at),
+      motivo: motivoPuente,
     },
     {
       id: 'binance-media',
@@ -161,6 +202,7 @@ export async function onRequestGet(context) {
         : 'El punto medio entre compra y venta.',
       rate: puente?.media ?? puente?.rate ?? null,
       date: soloFecha(puente?.updated_at),
+      motivo: motivoPuente,
     },
     {
       id: 'consenso',
@@ -169,6 +211,7 @@ export async function onRequestGet(context) {
       detalle: cotizave?.mercados ? `Mediana de ${cotizave.mercados} casas de cambio.` : 'Mediana de varias casas p2p.',
       rate: cotizave?.consenso ?? null,
       date: null,
+      motivo: motivoCotizave,
     },
     {
       id: 'cotizave-binance',
@@ -177,6 +220,7 @@ export async function onRequestGet(context) {
       detalle: 'Lo que Cotizave reporta del mercado de Binance.',
       rate: cotizave?.binance?.mid ?? null,
       date: soloFecha(cotizave?.binance?.updated_at),
+      motivo: motivoCotizave,
     },
     {
       // Grupo propio y no 'paralelo': es una tasa distinta, no otra medición
@@ -194,6 +238,7 @@ export async function onRequestGet(context) {
         ? Math.round(((puente.venta ?? puente.rate) / puente.zelle_por_usdt) * 100) / 100
         : null,
       date: soloFecha(puente?.updated_at),
+      motivo: motivoPuente,
     },
     {
       id: 'dolarapi-paralelo',
@@ -202,6 +247,7 @@ export async function onRequestGet(context) {
       detalle: 'Otra medición distinta al p2p. Se actualiza una vez al día.',
       rate: paralelo?.promedio ?? null,
       date: soloFecha(paralelo?.fechaActualizacion),
+      motivo: motivoParalelo,
     },
   ];
 

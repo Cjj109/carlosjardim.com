@@ -52,6 +52,16 @@ const CABECERAS = {
 // Por debajo de esto la muestra de un lado no da para un recortado con sentido
 const MINIMO_POR_LADO = 8;
 
+// Tope de cada peticion a Binance.
+//
+// No habia ninguno, y esta funcion tiene maxDuration 15: recorre dos hosts en
+// serie y luego espera al Zelle, asi que con Binance lento se comia los quince
+// segundos enteros. Quien la llama —carlosjardim.com— espera en paralelo a
+// otras cinco fuentes con Promise.allSettled, de modo que ese tapon dejaba la
+// calculadora en blanco todo ese rato. Y Binance yendo lento es precisamente
+// la razon de que este puente exista.
+const TIMEOUT_MS = 4000;
+
 function cuerpo(tradeType, page, fiat = 'VES', payTypes = []) {
   return JSON.stringify({
     asset: 'USDT',
@@ -76,6 +86,7 @@ async function leerPagina(url, tradeType, page, fiat, payTypes) {
     method: 'POST',
     headers: CABECERAS,
     body: cuerpo(tradeType, page, fiat, payTypes),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -154,6 +165,9 @@ export default async function handler(req, res) {
   // para pedirle el libro a Binance en cada visita.
   res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
+  // El Zelle no depende del libro, asi que se pide a la vez y no despues
+  const zelleEnVuelo = leerZelle().catch(() => null);
+
   let lados = { SELL: [], BUY: [] };
   let fallos = [];
 
@@ -190,7 +204,9 @@ export default async function handler(req, res) {
     : dosDecimales(promedioRecortado(todos));
 
   const ordenados = [...todos].sort((a, b) => a - b);
-  const zelle = await leerZelle().catch(() => null);
+  // Ya lanzado arriba, en paralelo con el libro: esperarlo en serie sumaba su
+  // latencia entera a la de la lectura principal sin ninguna necesidad.
+  const zelle = await zelleEnVuelo;
 
   return res.status(200).json({
     // `rate` sigue siendo la media, que es lo que devolvia antes: hay clientes
