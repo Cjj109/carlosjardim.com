@@ -11,20 +11,20 @@
  *   falla se recurre a la ultima respuesta, y la app avisa de cuando es.
  */
 
-const VERSION = 'tasas-v21';
+const VERSION = 'tasas-v22';
 
 // Las direcciones llevan ?r=<version>, asi que esta lista tiene que ir a la
 // par del HTML. Antes se precargaba /css/variables.css sin el parametro: la
 // entrada guardada no coincidia con lo que la pagina pedia y nunca se usaba.
-const REVISION = 21;
+const REVISION = 22;
 const APP = [
   '/calculadora',
   `/css/variables.css?r=${REVISION}`,
   `/css/calculadora.css?r=${REVISION}`,
   `/js/calculadora.js?r=${REVISION}`,
-  '/fonts/inter-latin.woff2',
-  '/fonts/jetbrains-mono-latin.woff2',
-  '/fonts/jetbrains-mono-latin-ext.woff2',
+  '/fonts/inter-latin.woff2?v=f625af78',
+  '/fonts/jetbrains-mono-latin.woff2?v=cf32987d',
+  '/fonts/jetbrains-mono-latin-ext.woff2?v=c9d70a4d',
   '/calculadora-app/icon-192.png',
   '/calculadora-app/icon-512.png',
 ];

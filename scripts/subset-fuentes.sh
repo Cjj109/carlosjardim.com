@@ -79,5 +79,12 @@ done
 
 rm -f fonts/.subset.txt
 echo
-echo "Recuerda subir la versión para que llegue a quien ya tenga la app:"
+
+# Sin esto el recorte no llega a nadie: _headers sirve las fuentes con
+# `immutable` a un año, así que cambiar el contenido dejando la misma
+# dirección hace que el CDN y los navegadores sigan dando la versión anterior.
+node scripts/huella-fuentes.mjs
+
+echo
+echo "Y sube la versión, para que llegue a quien ya tenga la app instalada:"
 echo "  node scripts/version-calculadora.mjs"
