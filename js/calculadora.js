@@ -944,10 +944,13 @@ function respuestaHTML(p) {
 
   if (p.resultado) trozos.push(`<span class="iq-resultado">${esc(p.resultado)}</span>`);
 
+  // El veredicto de una comparación: la respuesta, no el dato
+  if (p.veredicto) trozos.push(`<span class="iq-veredicto">${esc(p.veredicto)}</span>`);
+
   if (Array.isArray(p.lineas) && p.lineas.length) {
-    trozos.push(`<span class="iq-encabezado">${esc(p.encabezado || '')}</span>`);
+    if (p.encabezado) trozos.push(`<span class="iq-encabezado">${esc(p.encabezado)}</span>`);
     trozos.push(`<span class="iq-lista">${p.lineas
-      .map((l) => `<span class="iq-fila"><b>${esc(l.salida)}</b><i>${esc(l.detalle)}</i></span>`)
+      .map((l) => `<span class="iq-fila${l.gana ? ' es-gana' : ''}"><b>${esc(l.salida)}</b><i>${esc(l.detalle)}</i></span>`)
       .join('')}</span>`);
   }
 

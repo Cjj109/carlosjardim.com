@@ -1350,3 +1350,21 @@ body { overscroll-behavior-y: contain; }
 .iq-encabezado,
 .calc-pie,
 .fuente-fecha { font-variant-numeric: tabular-nums; }
+
+/* El veredicto de una comparación. Es la respuesta a "¿cuál me conviene?",
+   así que va con el peso de un resultado y no con el de una nota. */
+.iq-veredicto {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--calc-usdt);
+}
+
+/* La opción que gana se marca en la lista: leer dos cifras y deducir cuál es
+   menor es justo el trabajo que se venía a evitar */
+.iq-fila.es-gana {
+  border-left-color: var(--calc-usdt);
+  border-left-width: 3px;
+}
+
+.iq-fila.es-gana b { color: var(--calc-usdt); }

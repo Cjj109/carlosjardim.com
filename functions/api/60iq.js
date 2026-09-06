@@ -36,7 +36,11 @@ const MAX_PREGUNTA = 400;
 // un "a todas las tasas" no tenia a que referirse: contestaba con una broma
 // porque literalmente no sabia de que se le hablaba.
 const MAX_TURNOS = 6;
-const MAX_RESPUESTA = 220;
+// 220 se quedaba corto desde que el esquema admite comparaciones: la decisión
+// con dos opciones no cabía y el JSON llegaba cortado a la mitad, con un
+// "El 60 IQ se enredó" como toda respuesta. El modelo es barato; el tope
+// existe para acotar un disparate, no para apretar.
+const MAX_RESPUESTA = 700;
 
 // Es un endpoint público que gasta dinero de verdad, así que se pone freno.
 // El contador vive en la caché del centro de datos: no es exacto entre
@@ -121,6 +125,29 @@ Para eso está tasa_destino:
 
 Si la pregunta es una sola conversión, deja tasa_destino en null.
 
+COMPARAR DOS PRECIOS DE LO MISMO. Esta es la pregunta que más se falla.
+
+"Un mismo control vale 65 $ a BCV o 60 USDT, ¿cómo conviene pagarlo?"
+
+Convertir uno de los dos y parar ahí NO es la respuesta. Es el paso correcto
+a medias: quien pregunta quiere saber CUÁL sale mejor, y decirle "65 $ a BCV
+son 55,23 USDT" le deja el trabajo de compararlo con los 60 él mismo.
+
+Para eso está tipo "comparar" con el campo opciones, una entrada por precio:
+
+  tipo: "comparar"
+  opciones: [
+    { monto: 65, tasa: "usd",  etiqueta: "a BCV" },
+    { monto: 60, tasa: "usdt", etiqueta: "en USDT" }
+  ]
+
+La app las lleva a bolívares, las compara y dice cuál gana y por cuánto. Tú
+solo pones los dos precios, su tasa y una etiqueta corta que ayude a
+reconocer cada uno ("en la tienda A", "a BCV", "por Zelle").
+
+Sirve para cualquier "¿qué me conviene?", "¿cuál es más barato?", "¿pago con
+esto o con lo otro?", y admite más de dos opciones si las da.
+
 LA CONVERSACIÓN SIGUE. Lo que se dijo antes cuenta: si preguntó por un monto
 y ahora dice "y a todas las tasas" o "¿y en euros?", se refiere a ESE monto.
 No lo vuelvas a pedir, que ya te lo dio.
@@ -145,9 +172,26 @@ resultado, que las pone la app. Español de Venezuela.`;
 const ESQUEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_destino', 'tasa_que_falta', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion'],
+  required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_destino', 'tasa_que_falta', 'opciones', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion'],
   properties: {
-    tipo: { type: 'string', enum: ['calculo', 'falta_tasa', 'fuera_de_tema'] },
+    tipo: { type: 'string', enum: ['calculo', 'comparar', 'falta_tasa', 'fuera_de_tema'] },
+    // Comparar dos precios de lo mismo en monedas distintas: "vale 65 $ a BCV
+    // o 60 USDT, ¿cuál me conviene?". Antes esto no se podía expresar, así
+    // que convertía uno de los dos y ahí se quedaba, sin contestar cuál sale
+    // mejor, que era toda la pregunta.
+    opciones: {
+      type: ['array', 'null'],
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['monto', 'tasa', 'etiqueta'],
+        properties: {
+          monto: { type: 'number' },
+          tasa: { type: 'string', enum: ['usd', 'eur', 'usdt', 'zelle'] },
+          etiqueta: { type: 'string' },
+        },
+      },
+    },
     // Cual falta, en vez de un "falta la tasa" a secas. Si resulta que esa si
     // esta, el servidor lo detecta y no deja pasar la excusa.
     tasa_que_falta: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', null] },
@@ -219,6 +263,55 @@ function resolver(decision, tasas) {
   const { tipo, monto, tasa, operacion } = decision;
 
   if (tipo === 'fuera_de_tema') return { texto: decision.pulla };
+
+  /* COMPARAR DOS PRECIOS DE LO MISMO.
+     "Un control vale 65 $ a BCV o 60 USDT, ¿cómo conviene pagarlo?"
+
+     Antes esto se resolvía a medias: convertía los 65 $ a 55,23 USDT y ahí se
+     paraba. Es el paso correcto pero no la respuesta: quien pregunta quiere
+     saber CUÁL sale mejor, y ese "55,23 contra 60" hay que rematarlo.
+
+     Se llevan las dos a bolívares, que es el único terreno donde se pueden
+     comparar, y gana la más barata. La diferencia se da en bolívares y en la
+     moneda del que pierde, que es como se piensa: "me ahorro cinco dólares". */
+  if (tipo === 'comparar') {
+    const ops = (decision.opciones || [])
+      .map((o) => ({ ...o, valor: hay(tasas, o.tasa), monto: Number(o.monto) }))
+      .filter((o) => o.valor && Number.isFinite(o.monto) && o.monto > 0)
+      .map((o) => ({ ...o, enBs: o.monto * o.valor }));
+
+    if (ops.length < 2) {
+      return { texto: `${decision.pulla}\n\n${decision.explicacion || 'Dime los dos precios y con qué tasa va cada uno.'}` };
+    }
+
+    const ordenadas = [...ops].sort((a, b) => a.enBs - b.enBs);
+    const gana = ordenadas[0];
+    const pierde = ordenadas[ordenadas.length - 1];
+    const ahorroBs = pierde.enBs - gana.enBs;
+
+    const lineas = ops.map((o) => ({
+      salida: `${cifra(o.monto)} ${SIMBOLO[o.tasa]}`,
+      detalle: `${cifra(o.enBs)} Bs. · ${NOMBRE_TASA[o.tasa]}`,
+      gana: o === gana,
+    }));
+
+    // Empate real, que con dos tasas parecidas pasa
+    if (ahorroBs < 0.01) {
+      return {
+        texto: `${decision.pulla}\n\nDa igual: las dos salen por lo mismo.\n${lineas.map((l) => `${l.salida} = ${l.detalle}`).join('\n')}`,
+        partes: { pulla: decision.pulla, veredicto: 'Da igual: las dos salen por lo mismo', lineas },
+      };
+    }
+
+    const enSuMoneda = ahorroBs / pierde.valor;
+    const ahorro = `Te ahorras ${cifra(ahorroBs)} Bs. · unos ${cifra(enSuMoneda)} ${SIMBOLO[pierde.tasa]}`;
+    const veredicto = `Conviene pagar ${cifra(gana.monto)} ${SIMBOLO[gana.tasa]}${gana.etiqueta ? ` (${gana.etiqueta})` : ''}`;
+
+    return {
+      texto: `${decision.pulla}\n\n${veredicto}\n${lineas.map((l) => `${l.gana ? '→ ' : '  '}${l.salida} = ${l.detalle}`).join('\n')}\n\n${ahorro}`,
+      partes: { pulla: decision.pulla, veredicto, lineas, operacion: ahorro },
+    };
+  }
 
   // "Falta la tasa" solo cuela si de verdad falta. Dijo eso teniendo las
   // cuatro, y era la escapatoria fácil cuando dudaba de cuál usar; ahora
@@ -474,7 +567,9 @@ export async function onRequestPost(context) {
         'Content-Type': 'application/json',
         // OpenRouter los usa para las estadísticas de la cuenta
         'HTTP-Referer': 'https://carlosjardim.com/calculadora',
-        'X-Title': 'Calculadora de Tasas — 60 IQ',
+        // Solo ASCII: la raya em de antes hacía que la cabecera se enviara
+        // como UTF-8 crudo, y en un navegador eso es un TypeError.
+        'X-Title': 'Calculadora de Tasas - 60 IQ',
       },
       body: JSON.stringify({
         model: env.IQ_MODELO || MODELO_POR_DEFECTO,
