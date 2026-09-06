@@ -1173,3 +1173,86 @@ body {
   color: var(--calc-texto-tenue);
   opacity: 0.85;
 }
+
+/* ============================================================
+   MÓVIL
+   Aquí se usa el 99% de las veces, así que esto no es un ajuste
+   fino: es el caso principal.
+   ============================================================ */
+
+/* El notch y la barra de gestos.
+   La app se declara con status-bar-style black-translucent, que hace que la
+   página empiece DEBAJO de la barra de estado a propósito. Sin reservar el
+   hueco, en un iPhone instalado la cabecera se mete bajo el notch. */
+.calc {
+  padding-top: max(2rem, calc(env(safe-area-inset-top) + 1rem));
+  padding-bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2rem));
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+}
+
+/* Que arrastrar dentro de una lista no arrastre la página entera */
+body { overscroll-behavior-y: contain; }
+.calc-historial,
+.calc-iq-charla { overscroll-behavior: contain; }
+
+/* Con el dedo, 44 píxeles de alto como mínimo.
+   Medido antes de tocar nada: pestañas 33, atajos 32, botones del pie 30.
+   Todos por debajo de los 44 que pide Apple y los 48 de Material, que no son
+   una manía sino la anchura real de la yema de un pulgar.
+   Va en pointer:coarse y no en un ancho de pantalla, porque lo que manda es
+   con qué se toca, no cuánto mide la ventana: en el escritorio siguen
+   compactos. */
+@media (pointer: coarse) {
+  .calc-modo,
+  .calc-rapidos button,
+  .calc-pie-botones button,
+  .tema,
+  .fuente,
+  .hist,
+  .res,
+  .calc-iq-ejemplo,
+  .calc-iq-caja input,
+  .calc-iq-caja button,
+  .calc-restablecer {
+    min-height: 44px;
+  }
+
+  .calc-borrar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  /* iOS amplía la página al enfocar cualquier campo de menos de 16px, y se
+     queda ampliada. El campo del monto ya es grande; este no lo era. */
+  .calc-iq-caja input { font-size: 16px; }
+
+  /* Un botón no se selecciona ni se resalta como si fuera texto */
+  .calc button,
+  .calc-modo,
+  .res,
+  .fuente,
+  .hist,
+  .tema {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* El deslizamiento horizontal entre modos lo maneja la app; el vertical
+     sigue siendo scroll normal */
+  .calc-panel { touch-action: pan-y; }
+
+  /* Con el teclado abierto quedan unos 300 px de alto: 20rem de charla no
+     caben y empujan la caja de escribir fuera de la pantalla */
+  .calc-iq-charla { max-height: 45vh; }
+  .calc-historial { max-height: 50vh; }
+}
+
+/* Pantallas estrechas de verdad: que cinco atajos con "500.000" no se
+   aprieten hasta romperse */
+@media (max-width: 400px) {
+  .calc-rapidos { gap: 0.25rem; }
+  .calc-rapidos button { font-size: 0.68rem; padding-left: 0; padding-right: 0; }
+  .calc-modo { font-size: 0.66rem; }
+}

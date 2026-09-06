@@ -1033,6 +1033,47 @@ function elegirModo(nuevo, { foco = false } = {}) {
   calcular();
 }
 
+const ORDEN_MODOS = ['divisa', 'bs', 'bcv', 'usdt'];
+
+/**
+ * Deslizar de lado para cambiar de modo.
+ *
+ * Las cuatro pestañas son el gesto más repetido de la app y en el teléfono
+ * obligan a apuntar a un blanco estrecho arriba del panel. Deslizar sobre el
+ * propio panel es lo que la mano espera cuando hay pestañas.
+ *
+ * Solo cuenta si el movimiento es claramente horizontal —más de 50 px y al
+ * menos el doble que en vertical—; si no, se deja pasar como scroll, que es
+ * lo que se está haciendo el resto del tiempo.
+ */
+function deslizarEntreModos(panel) {
+  let x0 = 0;
+  let y0 = 0;
+  let siguiendo = false;
+
+  panel.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    // No robar el gesto a lo que ya se desplaza solo, ni al campo de texto
+    if (e.target.closest('.calc-iq-charla, .calc-historial, input')) return;
+    x0 = e.touches[0].clientX;
+    y0 = e.touches[0].clientY;
+    siguiendo = true;
+  }, { passive: true });
+
+  panel.addEventListener('touchend', (e) => {
+    if (!siguiendo) return;
+    siguiendo = false;
+
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 2) return;
+
+    const i = ORDEN_MODOS.indexOf(modo);
+    const destino = ORDEN_MODOS[i + (dx < 0 ? 1 : -1)];
+    if (destino) elegirModo(destino);
+  }, { passive: true });
+}
+
 /**
  * Flechas para moverse entre pestañas y entre opciones, que es como se espera
  * que funcionen un tablist y un radiogroup con el teclado.
@@ -1137,6 +1178,9 @@ document.addEventListener('DOMContentLoaded', () => {
     monto.focus();
   });
 
+  const panelPrincipal = document.querySelector('.calc-panel');
+  if (panelPrincipal) deslizarEntreModos(panelPrincipal);
+
   const modos = $('calcModos');
   modos?.addEventListener('click', (e) => {
     const boton = e.target.closest('.calc-modo');
@@ -1186,6 +1230,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('calc60iq')?.addEventListener('click', () => {
     if (!$('calcPanel60iq')?.hidden) iqCampo?.focus();
+  });
+
+  // El teclado del teléfono tapa la caja de escribir: el panel está al final
+  // de una página larga y al enfocar el campo queda justo debajo del teclado.
+  // iOS no encoge el viewport al abrirlo —solo lo desplaza—, así que hay que
+  // traerlo a la vista a mano, y esperar a que el teclado termine de subir.
+  const traerALaVista = () => {
+    setTimeout(() => iqCampo?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 320);
+  };
+
+  iqCampo?.addEventListener('focus', traerALaVista);
+  window.visualViewport?.addEventListener('resize', () => {
+    if (document.activeElement === iqCampo) traerALaVista();
   });
 
   $('iqForm')?.addEventListener('submit', (e) => {
