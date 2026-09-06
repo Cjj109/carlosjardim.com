@@ -909,6 +909,11 @@ function calcular() {
  */
 let iqPreguntando = false;
 
+// La conversación, para que un "y a todas las tasas" sepa a qué se refiere.
+// Vive en memoria y se va con la pestaña: es una charla, no un archivo.
+const iqCharlaPrevia = [];
+const IQ_MAX_TURNOS = 6;
+
 function burbuja(quien, texto, { error = false } = {}) {
   const charla = $('iqCharla');
   if (!charla) return null;
@@ -948,6 +953,11 @@ async function preguntarAl60IQ(pregunta) {
           usdt: tasaDe('usdt'),
           zelle: tasaDe('zelle'),
         },
+        // Lo que la persona tiene delante. Sin esto, "cuánto son 15000" no
+        // tenía respuesta posible —15000 de qué— y la respuesta estaba en la
+        // pantalla: el modo abierto dice la moneda.
+        contexto: { modo, monto: montoActual() || null },
+        historial: iqCharlaPrevia.slice(-IQ_MAX_TURNOS),
       }),
     });
 
@@ -960,6 +970,9 @@ async function preguntarAl60IQ(pregunta) {
     }
 
     burbuja('iq', datos.respuesta);
+    iqCharlaPrevia.push({ rol: 'user', texto: pregunta }, { rol: 'assistant', texto: datos.respuesta });
+    // Sin dejar que crezca sin freno: son turnos, no un historial
+    if (iqCharlaPrevia.length > IQ_MAX_TURNOS * 2) iqCharlaPrevia.splice(0, 2);
   } catch (error) {
     console.warn('Falló la consulta al 60 IQ:', error);
     esperando?.remove();

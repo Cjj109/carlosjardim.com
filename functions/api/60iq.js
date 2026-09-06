@@ -5,21 +5,37 @@
  * dólares vendo?"— haciendo la cuenta con las tasas que la propia calculadora
  * le pasa. No inventa tasas: las recibe en el mensaje.
  *
- * La clave de OpenAI vive SOLO aquí, en una variable de entorno del proyecto.
- * Si estuviera en el JavaScript de la página, cualquiera que abriera el código
- * fuente podría leerla y gastarla. Se configura con:
+ * POR QUÉ OPENROUTER Y NO OPENAI DIRECTAMENTE
  *
- *   npx wrangler pages secret put OPENAI_API_KEY
+ * Esto corre en el borde de Cloudflare, y el borde corre en el centro de datos
+ * más cercano a quien usa la app. Para alguien en Venezuela, eso es un PoP
+ * venezolano — y la petición a OpenAI sale desde ahí, desde donde OpenAI
+ * bloquea. Se veía como un fallo intermitente y difícil de explicar: funciona
+ * probándolo desde fuera y no funciona para quien vive allí.
  *
- * o en el panel de Cloudflare, en Settings → Environment variables.
+ * OpenRouter no tiene ese bloqueo, y de paso deja cambiar de modelo sin tocar
+ * código. Se mantiene la salida estructurada, que es de lo que depende todo el
+ * diseño: el modelo no calcula, solo decide qué cuenta hacer.
+ *
+ * La clave vive SOLO aquí, en una variable de entorno del proyecto. Si
+ * estuviera en el JavaScript de la página, cualquiera que abriera el código
+ * fuente podría leerla y gastarla.
+ *
+ *   npx wrangler pages secret put OPENROUTER_API_KEY
  */
 
-const OPENAI = 'https://api.openai.com/v1/chat/completions';
+const OPENROUTER = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Barato y de sobra para hacer una regla de tres y soltar una pulla.
-const MODELO_POR_DEFECTO = 'gpt-4o-mini';
+// Gemini 3.5 Flash Lite: barato de sobra para una regla de tres y una pulla,
+// y admite structured_outputs, que aquí no es opcional.
+const MODELO_POR_DEFECTO = 'google/gemini-3.5-flash-lite';
 
 const MAX_PREGUNTA = 400;
+
+// Cuantos turnos anteriores se le pasan. Sin esto cada pregunta iba suelta y
+// un "a todas las tasas" no tenia a que referirse: contestaba con una broma
+// porque literalmente no sabia de que se le hablaba.
+const MAX_TURNOS = 6;
 const MAX_RESPUESTA = 220;
 
 // Es un endpoint público que gasta dinero de verdad, así que se pone freno.
@@ -72,9 +88,25 @@ dólares" es venderlos en el mercado paralelo, y eso es la tasa usdt.
   BCV", una factura, un trámite, o si nombra el BCV.
 - Si dice Zelle → zelle. Si dice euros → eur.
 
+- Si pide "a todas", "en todas las tasas", "comparar" o algo así → tasa
+  "todas". La app las calcula todas y las pone en lista.
+
+LA CONVERSACIÓN SIGUE. Lo que se dijo antes cuenta: si preguntó por un monto
+y ahora dice "y a todas las tasas" o "¿y en euros?", se refiere a ESE monto.
+No lo vuelvas a pedir, que ya te lo dio.
+
+USA LO QUE TIENE EN PANTALLA. Más abajo va el modo que tiene abierto. Si suelta
+un número sin decir la moneda, es la de ese modo: en Bolívares, "15000" son
+quince mil bolívares. Preguntar "¿y de qué moneda?" cuando está escrito en su
+pantalla te deja a ti de tonto, no a él.
+
 tipo:
-- "calculo" cuando puedas rellenar la decisión.
-- "falta_tasa" si la tasa que hace falta viene "sin dato".
+- "calculo" cuando puedas rellenar la decisión. Es lo normal; agota esta vía
+  antes que ninguna otra.
+- "falta_tasa" SOLO si la tasa que hace falta aparece arriba como "sin dato".
+  Ponla en tasa_que_falta. Si están las cuatro, esto no es una salida: no
+  digas que falta una tasa cuando las tienes delante, porque es mentira y se
+  nota. Si dudas de cuál usar, elige con las reglas de arriba.
 - "fuera_de_tema" si la pregunta no va de tasas, cambio ni dinero.
 
 explicacion: una línea diciendo qué se hizo y con qué tasa. Sin cifras de
@@ -83,12 +115,17 @@ resultado, que las pone la app. Español de Venezuela.`;
 const ESQUEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['tipo', 'pulla', 'monto', 'tasa', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion'],
+  required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_que_falta', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion'],
   properties: {
     tipo: { type: 'string', enum: ['calculo', 'falta_tasa', 'fuera_de_tema'] },
+    // Cual falta, en vez de un "falta la tasa" a secas. Si resulta que esa si
+    // esta, el servidor lo detecta y no deja pasar la excusa.
+    tasa_que_falta: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', null] },
     pulla: { type: 'string' },
     monto: { type: ['number', 'null'] },
-    tasa: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', null] },
+    // "todas" es una respuesta legitima y antes no habia forma de decirla:
+    // preguntar "¿a cuanto sale a todas las tasas?" es de lo mas normal.
+    tasa: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', 'todas', null] },
     operacion: { type: ['string', 'null'], enum: ['multiplicar', 'dividir', null] },
     unidad_entrada: { type: ['string', 'null'] },
     unidad_salida: { type: ['string', 'null'] },
@@ -108,17 +145,72 @@ const SIMBOLO = { usd: '$', eur: '€', usdt: '₮', zelle: '$' };
 const cifra = (n, dec = 2) =>
   new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: dec }).format(n);
 
+const hay = (tasas, id) => {
+  const v = Number(tasas?.[id]);
+  return Number.isFinite(v) && v > 0 ? v : null;
+};
+
+/** Una línea de resultado: "334.904,50 Bs. — 350,00 ₮ × 956,87 · USDT p2p" */
+function lineaResultado(monto, tasa, valor, operacion) {
+  const resultado = operacion === 'multiplicar' ? monto * valor : monto / valor;
+  if (!Number.isFinite(resultado)) return null;
+
+  const dec = Math.abs(resultado) >= 1 ? 2 : Math.abs(resultado) >= 0.01 ? 4 : 6;
+  const porTasa = operacion === 'multiplicar';
+
+  return {
+    resultado,
+    // Las unidades salen de la operación, no de lo que diga el modelo:
+    // multiplicar por una tasa SIEMPRE da bolívares, dividir SIEMPRE da la
+    // moneda de esa tasa. Eso no es opinable.
+    entrada: `${cifra(monto)} ${porTasa ? SIMBOLO[tasa] : 'Bs.'}`,
+    salida: `${cifra(resultado, dec)} ${porTasa ? 'Bs.' : SIMBOLO[tasa]}`,
+    signo: porTasa ? '×' : '÷',
+    valor,
+  };
+}
+
 /** Aquí se hace la cuenta de verdad, con los números de la app */
 function resolver(decision, tasas) {
   const { tipo, monto, tasa, operacion } = decision;
 
   if (tipo === 'fuera_de_tema') return { texto: decision.pulla };
+
+  // "Falta la tasa" solo cuela si de verdad falta. Dijo eso teniendo las
+  // cuatro, y era la escapatoria fácil cuando dudaba de cuál usar; ahora
+  // tiene que decir CUÁL falta, y si esa está, no se le acepta la excusa.
+  if (tipo === 'falta_tasa') {
+    const cual = decision.tasa_que_falta;
+    if (cual && !hay(tasas, cual)) {
+      return { texto: `${decision.pulla}\n\nNo tengo la tasa de ${NOMBRE_TASA[cual]} ahora mismo, así que no me la invento.` };
+    }
+    return { texto: `${decision.pulla}\n\n${decision.explicacion || 'Dime en qué moneda y te la hago.'}` };
+  }
+
   if (tipo !== 'calculo' || !Number.isFinite(monto) || monto <= 0 || !operacion) {
     return { texto: `${decision.pulla}\n\n${decision.explicacion || 'Esa no te la puedo hacer.'}` };
   }
 
-  const valor = Number(tasas?.[tasa]);
-  if (!Number.isFinite(valor) || valor <= 0) {
+  // Todas las tasas a la vez, que es una pregunta de lo más normal
+  if (tasa === 'todas') {
+    const lineas = ['usd', 'usdt', 'zelle', 'eur']
+      .map((id) => [id, hay(tasas, id)])
+      .filter(([, v]) => v)
+      .map(([id, v]) => {
+        const l = lineaResultado(monto, id, v, operacion);
+        return l && `${l.salida}  ·  ${NOMBRE_TASA[id]} a ${cifra(v)}`;
+      })
+      .filter(Boolean);
+
+    if (!lineas.length) return { texto: `${decision.pulla}\n\nNo tengo ninguna tasa ahora mismo.` };
+
+    const cualquiera = ['usd', 'usdt', 'zelle', 'eur'].find((id) => hay(tasas, id));
+    const entrada = lineaResultado(monto, cualquiera, hay(tasas, cualquiera), operacion).entrada;
+    return { texto: `${decision.pulla}\n\n${entrada} es:\n${lineas.join('\n')}` };
+  }
+
+  const valor = hay(tasas, tasa);
+  if (!valor) {
     return { texto: `${decision.pulla}\n\nNo tengo la tasa de ${NOMBRE_TASA[tasa] || 'eso'} ahora mismo, así que no me la invento.` };
   }
 
@@ -178,6 +270,36 @@ async function pasaElFreno(peticion) {
   return true;
 }
 
+const NOMBRE_MODO = {
+  divisa: 'Divisas — el campo son divisas y se quiere saber cuantos bolivares son',
+  bs: 'Bolivares — el campo son BOLIVARES y se quiere saber cuantas divisas salen',
+  bcv: 'Precio BCV — un precio fijado a tasa BCV y se quiere saber que hay que pagar',
+  usdt: 'USDT — el campo son USDT y se quiere saber cuanto es y a cuanto equivale',
+};
+
+/**
+ * Lo que la persona tiene delante mientras pregunta.
+ *
+ * Sin esto, "cuanto son 15000" no tenia respuesta posible: 15000 de que. Y la
+ * respuesta estaba en la pantalla, en el modo que tiene abierto. Si esta en
+ * Bolivares, son bolivares.
+ */
+function contextoDeLaApp(ctx) {
+  if (!ctx || typeof ctx !== 'object') return '';
+
+  const partes = [];
+  if (NOMBRE_MODO[ctx.modo]) {
+    partes.push(`Tiene abierto el modo: ${NOMBRE_MODO[ctx.modo]}.`);
+    partes.push('Si dice un numero sin decir la moneda, es la de ese modo. No preguntes lo que ya esta en la pantalla.');
+  }
+  const monto = Number(ctx.monto);
+  if (Number.isFinite(monto) && monto > 0) {
+    partes.push(`En la caja tiene escrito: ${monto}.`);
+  }
+
+  return partes.length ? `\n\nLo que tiene delante ahora mismo:\n${partes.join('\n')}` : '';
+}
+
 /** Las tasas, en un texto corto que el modelo no pueda malinterpretar */
 function contextoDeTasas(tasas) {
   if (!tasas || typeof tasas !== 'object') return 'No hay tasas disponibles ahora mismo.';
@@ -203,7 +325,8 @@ function contextoDeTasas(tasas) {
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  if (!env?.OPENAI_API_KEY) {
+  const clave = env?.OPENROUTER_API_KEY;
+  if (!clave) {
     return json({ error: 'El 60 IQ está sin configurar en el servidor.' }, 503);
   }
 
@@ -224,19 +347,32 @@ export async function onRequestPost(context) {
   const pregunta = String(cuerpo?.pregunta ?? '').trim().slice(0, MAX_PREGUNTA);
   if (!pregunta) return json({ error: 'Escribe algo, aunque sea.' }, 400);
 
+  // Los turnos anteriores, recortados y saneados. Vienen del cliente, así que
+  // no se confía en su forma: solo se aceptan los dos roles válidos y se
+  // limita el largo, para que nadie use este campo como cuña.
+  const turnos = Array.isArray(cuerpo?.historial)
+    ? cuerpo.historial
+        .slice(-MAX_TURNOS)
+        .filter((m) => m && (m.rol === 'user' || m.rol === 'assistant') && typeof m.texto === 'string')
+        .map((m) => ({ role: m.rol, content: m.texto.slice(0, MAX_PREGUNTA) }))
+    : [];
+
   if (!(await pasaElFreno(request))) {
     return json({ error: 'Ya preguntaste bastante por hoy. Usa la calculadora.' }, 429);
   }
 
   try {
-    const respuesta = await fetch(OPENAI, {
+    const respuesta = await fetch(OPENROUTER, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${clave}`,
         'Content-Type': 'application/json',
+        // OpenRouter los usa para las estadísticas de la cuenta
+        'HTTP-Referer': 'https://carlosjardim.com/calculadora',
+        'X-Title': 'Calculadora de Tasas — 60 IQ',
       },
       body: JSON.stringify({
-        model: env.OPENAI_MODEL || MODELO_POR_DEFECTO,
+        model: env.IQ_MODELO || MODELO_POR_DEFECTO,
         max_tokens: MAX_RESPUESTA,
         // Baja a propósito: con 0.8 la misma pregunta elegía unas veces el
         // USDT y otras el BCV, y eso en una calculadora es una respuesta
@@ -249,7 +385,14 @@ export async function onRequestPost(context) {
           json_schema: { name: 'decision', strict: true, schema: ESQUEMA },
         },
         messages: [
-          { role: 'system', content: `${PERSONA}\n\n${contextoDeTasas(cuerpo?.tasas)}` },
+          {
+            role: 'system',
+            content: `${PERSONA}\n\n${contextoDeTasas(cuerpo?.tasas)}${contextoDeLaApp(cuerpo?.contexto)}`,
+          },
+          // Sin los turnos anteriores, un "a todas las tasas" no tenía a qué
+          // referirse y contestaba con una broma, porque literalmente no sabía
+          // de qué se le hablaba.
+          ...turnos,
           { role: 'user', content: pregunta },
         ],
       }),
@@ -257,7 +400,7 @@ export async function onRequestPost(context) {
 
     if (!respuesta.ok) {
       const detalle = await respuesta.text();
-      console.error('OpenAI respondió', respuesta.status, detalle.slice(0, 300));
+      console.error('OpenRouter respondió', respuesta.status, detalle.slice(0, 300));
       return json({ error: 'El 60 IQ se quedó pensando. Intenta de nuevo.' }, 502);
     }
 
