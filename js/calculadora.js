@@ -914,7 +914,7 @@ let iqPreguntando = false;
 const iqCharlaPrevia = [];
 const IQ_MAX_TURNOS = 6;
 
-function burbuja(quien, texto, { error = false } = {}) {
+function burbuja(quien, texto, { error = false, partes = null } = {}) {
   const charla = $('iqCharla');
   if (!charla) return null;
 
@@ -923,11 +923,37 @@ function burbuja(quien, texto, { error = false } = {}) {
 
   const nodo = document.createElement('p');
   nodo.className = `calc-iq-dice calc-iq-${quien}${error ? ' es-error' : ''}`;
-  nodo.textContent = texto;
+
+  if (partes) nodo.innerHTML = respuestaHTML(partes);
+  else nodo.textContent = texto;
 
   charla.appendChild(nodo);
   charla.scrollTop = charla.scrollHeight;
   return nodo;
+}
+
+/**
+ * La respuesta en tres pesos distintos.
+ *
+ * Antes salía todo del mismo tamaño y en el mismo tono, así que la cuenta de
+ * abajo competía con el resultado. Cada cosa se lee de una manera: la pulla se
+ * lee, el resultado se mira, y la operación solo se comprueba de reojo.
+ */
+function respuestaHTML(p) {
+  const trozos = [`<span class="iq-pulla">${esc(p.pulla)}</span>`];
+
+  if (p.resultado) trozos.push(`<span class="iq-resultado">${esc(p.resultado)}</span>`);
+
+  if (Array.isArray(p.lineas) && p.lineas.length) {
+    trozos.push(`<span class="iq-encabezado">${esc(p.encabezado || '')}</span>`);
+    trozos.push(`<span class="iq-lista">${p.lineas
+      .map((l) => `<span class="iq-fila"><b>${esc(l.salida)}</b><i>${esc(l.detalle)}</i></span>`)
+      .join('')}</span>`);
+  }
+
+  if (p.operacion) trozos.push(`<span class="iq-operacion">${esc(p.operacion)}</span>`);
+
+  return trozos.join('');
 }
 
 async function preguntarAl60IQ(pregunta) {
@@ -969,7 +995,7 @@ async function preguntarAl60IQ(pregunta) {
       return;
     }
 
-    burbuja('iq', datos.respuesta);
+    burbuja('iq', datos.respuesta, { partes: datos.partes });
     iqCharlaPrevia.push({ rol: 'user', texto: pregunta }, { rol: 'assistant', texto: datos.respuesta });
     // Sin dejar que crezca sin freno: son turnos, no un historial
     if (iqCharlaPrevia.length > IQ_MAX_TURNOS * 2) iqCharlaPrevia.splice(0, 2);

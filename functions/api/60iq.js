@@ -91,6 +91,36 @@ dólares" es venderlos en el mercado paralelo, y eso es la tasa usdt.
 - Si pide "a todas", "en todas las tasas", "comparar" o algo así → tasa
   "todas". La app las calcula todas y las pone en lista.
 
+POR DEFECTO, "todas". Y esta manda sobre las reglas de arriba: si la persona
+NO nombra una tasa ni una moneda de destino, das "todas". Ejemplos:
+
+  "cuánto son 15 mil bolívares"        → todas. No dijo en qué quiere verlo.
+  "cuánto son 15 mil bolívares en USDT" → usdt. Ahí sí lo dijo.
+  "tengo 350"                           → todas.
+  "y a bcv"                             → usd. Lo nombró.
+  "necesito 15000 Bs, cuánto vendo"     → usdt. "Vender" ya dice cuál es.
+
+La razón: cuando alguien pregunta a secas, lo que quiere es comparar. Darle
+una sola tasa elegida por ti le obliga a preguntar otra vez, y encima parece
+que le escondes el resto.
+
+PREGUNTAS DE DOS PASOS, que son las más comunes y las que más se fallan.
+
+"130 dólares a BCV, ¿cuántos USDT debo vender?" no es una cuenta, son dos:
+primero los 130 $ a bolívares por la tasa BCV, y después esos bolívares entre
+la tasa del USDT. Contestar solo los bolívares es dejar sin responder justo lo
+que se preguntó.
+
+Para eso está tasa_destino:
+  tasa         = la tasa a la que está FIJADO el precio (aquí, usd)
+  tasa_destino = lo que la persona va a vender o pagar (aquí, usdt)
+
+  "130 dólares a BCV, cuántos USDT vendo"   → tasa usd, tasa_destino usdt
+  "me cobran 500 $ a tasa BCV, qué pago"    → tasa usd, tasa_destino todas
+  "un precio de 80 € del BCV en Zelle"      → tasa eur, tasa_destino zelle
+
+Si la pregunta es una sola conversión, deja tasa_destino en null.
+
 LA CONVERSACIÓN SIGUE. Lo que se dijo antes cuenta: si preguntó por un monto
 y ahora dice "y a todas las tasas" o "¿y en euros?", se refiere a ESE monto.
 No lo vuelvas a pedir, que ya te lo dio.
@@ -115,7 +145,7 @@ resultado, que las pone la app. Español de Venezuela.`;
 const ESQUEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_que_falta', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion'],
+  required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_destino', 'tasa_que_falta', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion'],
   properties: {
     tipo: { type: 'string', enum: ['calculo', 'falta_tasa', 'fuera_de_tema'] },
     // Cual falta, en vez de un "falta la tasa" a secas. Si resulta que esa si
@@ -126,6 +156,11 @@ const ESQUEMA = {
     // "todas" es una respuesta legitima y antes no habia forma de decirla:
     // preguntar "¿a cuanto sale a todas las tasas?" es de lo mas normal.
     tasa: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', 'todas', null] },
+    // El segundo paso. "130 dolares a BCV, cuantos USDT vendo" son DOS
+    // cuentas encadenadas y el esquema solo sabia expresar una: contestaba el
+    // primer paso —los bolivares— y se quedaba ahi, dejando sin responder
+    // justo lo que se preguntaba.
+    tasa_destino: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', 'todas', null] },
     operacion: { type: ['string', 'null'], enum: ['multiplicar', 'dividir', null] },
     unidad_entrada: { type: ['string', 'null'] },
     unidad_salida: { type: ['string', 'null'] },
@@ -140,7 +175,10 @@ const NOMBRE_TASA = {
   zelle: 'Zelle',
 };
 
-const SIMBOLO = { usd: '$', eur: '€', usdt: '₮', zelle: '$' };
+// "USDT" y no "₮": el símbolo de Tether no lo reconoce nadie de un vistazo,
+// y encima es el glifo que obliga a bajar el subconjunto latin-ext de la
+// fuente. Escrito se lee solo.
+const SIMBOLO = { usd: '$', eur: '€', usdt: 'USDT', zelle: '$' };
 
 const cifra = (n, dec = 2) =>
   new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: dec }).format(n);
@@ -191,6 +229,51 @@ function resolver(decision, tasas) {
     return { texto: `${decision.pulla}\n\n${decision.explicacion || 'Esa no te la puedo hacer.'}` };
   }
 
+  // DOS PASOS: un precio fijado a una tasa, y cuánto hay que vender de otra
+  // cosa para pagarlo. "130 dólares a BCV, ¿cuántos USDT vendo?" es eso, y
+  // antes se contestaba solo el primer paso —los bolívares— dejando sin
+  // responder justo lo que se preguntaba. Es el modo "Precio BCV" de la
+  // calculadora, que existe porque es la pregunta más común de todas.
+  if (decision.tasa_destino) {
+    const origen = hay(tasas, tasa);
+    if (!origen) {
+      return { texto: `${decision.pulla}\n\nNo tengo la tasa de ${NOMBRE_TASA[tasa] || 'eso'} ahora mismo, así que no me la invento.` };
+    }
+
+    const enBs = monto * origen;
+    const destinos = decision.tasa_destino === 'todas'
+      ? ['usdt', 'zelle', 'usd', 'eur'].filter((id) => id !== tasa && hay(tasas, id))
+      : [decision.tasa_destino].filter((id) => hay(tasas, id));
+
+    if (!destinos.length) {
+      return { texto: `${decision.pulla}\n\nNo tengo la tasa de ${NOMBRE_TASA[decision.tasa_destino] || 'eso'} ahora mismo, así que no me la invento.` };
+    }
+
+    const lineas = destinos.map((id) => {
+      const v = hay(tasas, id);
+      const cuanto = enBs / v;
+      const dec = Math.abs(cuanto) >= 1 ? 2 : 4;
+      return { salida: `${cifra(cuanto, dec)} ${SIMBOLO[id]}`, detalle: `${NOMBRE_TASA[id]} a ${cifra(v)}` };
+    });
+
+    const enBsTexto = `${cifra(enBs)} Bs.`;
+    const paso = `${cifra(monto)} ${SIMBOLO[tasa]} × ${cifra(origen)} = ${enBsTexto} · ${NOMBRE_TASA[tasa]}`;
+
+    return {
+      texto: `${decision.pulla}\n\n${lineas.map((l) => `${l.salida}  ·  ${l.detalle}`).join('\n')}\n\n${paso}`,
+      partes: {
+        pulla: decision.pulla,
+        // Un solo destino: el número grande. Varios: la lista comparable.
+        ...(lineas.length === 1
+          ? { resultado: lineas[0].salida }
+          : { encabezado: `${enBsTexto} son:`, lineas }),
+        operacion: lineas.length === 1
+          ? `${paso}\n${enBsTexto} ÷ ${cifra(hay(tasas, destinos[0]))} · ${NOMBRE_TASA[destinos[0]]}`
+          : paso,
+      },
+    };
+  }
+
   // Todas las tasas a la vez, que es una pregunta de lo más normal
   if (tasa === 'todas') {
     const lineas = ['usd', 'usdt', 'zelle', 'eur']
@@ -198,7 +281,7 @@ function resolver(decision, tasas) {
       .filter(([, v]) => v)
       .map(([id, v]) => {
         const l = lineaResultado(monto, id, v, operacion);
-        return l && `${l.salida}  ·  ${NOMBRE_TASA[id]} a ${cifra(v)}`;
+        return l && { salida: l.salida, detalle: `${NOMBRE_TASA[id]} a ${cifra(v)}` };
       })
       .filter(Boolean);
 
@@ -206,7 +289,15 @@ function resolver(decision, tasas) {
 
     const cualquiera = ['usd', 'usdt', 'zelle', 'eur'].find((id) => hay(tasas, id));
     const entrada = lineaResultado(monto, cualquiera, hay(tasas, cualquiera), operacion).entrada;
-    return { texto: `${decision.pulla}\n\n${entrada} es:\n${lineas.join('\n')}` };
+
+    return {
+      texto: `${decision.pulla}\n\n${entrada} es:\n${lineas.map((l) => `${l.salida}  ·  ${l.detalle}`).join('\n')}`,
+      partes: {
+        pulla: decision.pulla,
+        encabezado: `${entrada} es:`,
+        lineas,
+      },
+    };
   }
 
   const valor = hay(tasas, tasa);
@@ -231,9 +322,17 @@ function resolver(decision, tasas) {
   const salida = `${cifra(resultado, dec)} ${porTasa ? 'Bs.' : SIMBOLO[tasa]}`;
   const signo = porTasa ? '×' : '÷';
 
+  const operacionTexto = `${entrada} ${signo} ${cifra(valor)} · ${NOMBRE_TASA[tasa]}`;
+
   return {
-    texto: `${decision.pulla}\n\n${salida}\n\n${entrada} ${signo} ${cifra(valor)} · ${NOMBRE_TASA[tasa]}`,
-    resultado: cifra(resultado, dec),
+    texto: `${decision.pulla}\n\n${salida}\n\n${operacionTexto}`,
+    // En partes para que el cliente le dé a cada una su tamaño: la pulla se
+    // lee, el resultado se mira y la operación solo se comprueba.
+    partes: {
+      pulla: decision.pulla,
+      resultado: salida,
+      operacion: operacionTexto,
+    },
   };
 }
 
@@ -416,7 +515,8 @@ export async function onRequestPost(context) {
       return json({ error: 'El 60 IQ se enredó. Intenta de nuevo.' }, 502);
     }
 
-    return json({ respuesta: resolver(decision, cuerpo?.tasas).texto });
+    const resuelto = resolver(decision, cuerpo?.tasas);
+    return json({ respuesta: resuelto.texto, partes: resuelto.partes ?? null });
   } catch (error) {
     console.error('Falló la consulta al 60 IQ:', error);
     return json({ error: 'No se pudo consultar. Revisa la conexión.' }, 502);

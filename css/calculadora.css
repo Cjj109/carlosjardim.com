@@ -1109,3 +1109,67 @@ body {
 
 .calc-interruptor input:disabled,
 .calc-interruptor input:disabled + span { opacity: 0.55; cursor: not-allowed; }
+
+/* ---------- Las tres voces de una respuesta del 60 IQ ----------
+   Antes salía todo del mismo tamaño y la cuenta de abajo competía con el
+   resultado. Cada parte se lee de una manera distinta. */
+
+.calc-iq-iq { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.iq-pulla { font-size: 0.82rem; line-height: 1.45; }
+
+/* El número, que es a lo que se viene */
+.iq-resultado {
+  font-family: var(--mono, monospace);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--calc-usdt);
+}
+
+.iq-encabezado {
+  font-family: var(--mono, monospace);
+  font-size: 0.7rem;
+  color: var(--calc-texto-suave);
+}
+
+.iq-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* Una tasa por línea, con el número alineado a la izquierda para poder
+   compararlos de un vistazo sin leer las etiquetas */
+.iq-fila {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--calc-borde-fuerte);
+}
+
+.iq-fila b {
+  font-family: var(--mono, monospace);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--calc-texto);
+  white-space: nowrap;
+}
+
+.iq-fila i {
+  font-style: normal;
+  font-size: 0.66rem;
+  text-align: right;
+  color: var(--calc-texto-tenue);
+}
+
+/* La comprobación: se mira de reojo, no se lee */
+.iq-operacion {
+  font-family: var(--mono, monospace);
+  font-size: 0.62rem;
+  line-height: 1.4;
+  color: var(--calc-texto-tenue);
+  opacity: 0.85;
+}
