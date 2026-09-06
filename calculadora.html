@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=f625af78" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=32">
-  <link rel="stylesheet" href="/css/calculadora.css?r=32">
+  <link rel="stylesheet" href="/css/variables.css?r=33">
+  <link rel="stylesheet" href="/css/calculadora.css?r=33">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -57,7 +57,7 @@
     //    hasta que el HTML está parseado; lanzándola aquí se adelanta y para
     //    cuando el código la necesita suele estar ya en camino.
     (function () {
-      var COLORES = { oscuro: '#0a0b0f', claro: '#eef1f6', navidad: '#0b1410' };
+      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410' };
       var tema = 'oscuro';
       try { tema = localStorage.getItem('calc-tema') || 'oscuro'; } catch (e) {}
       if (!COLORES[tema]) tema = 'oscuro';
@@ -182,7 +182,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v32</span>
+    <span class="calc-version" title="Versión de la app instalada">v33</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -307,7 +307,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=32" defer></script>
+<script src="/js/calculadora.js?r=33" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

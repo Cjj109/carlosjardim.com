@@ -20,7 +20,7 @@ const TEMA = 'calc-tema';
 // de que pinte nada; si cambia una, cambia la otra.
 const TEMAS = {
   oscuro: '#0a0b0f',
-  claro: '#eef1f6',
+  claro: '#e6ebf3',
   navidad: '#0b1410',
 };
 

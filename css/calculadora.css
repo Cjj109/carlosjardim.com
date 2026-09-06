@@ -699,25 +699,29 @@ body {
    usan las etiquetas de las tarjetas, el pie y la línea de tasa de cada
    resultado —todo el texto explicativo—, y no cumplía. Ahora da 4,52:1. */
 :root[data-tema="claro"] {
-  --calc-fondo: #e6eaf1;
-  --calc-superficie: #f5f7fa;
-  --calc-superficie-alta: #fafbfd;
-  --calc-borde: rgba(16, 24, 40, 0.10);
-  --calc-borde-fuerte: rgba(16, 24, 40, 0.22);
+  --calc-fondo: #dde3ec;
+  --calc-superficie: #eef1f6;
+  --calc-superficie-alta: #f4f6fa;
+  --calc-borde: rgba(16, 24, 40, 0.11);
+  --calc-borde-fuerte: rgba(16, 24, 40, 0.24);
   --calc-texto: #101828;
-  --calc-texto-suave: #475467;
-  --calc-texto-tenue: #687284;
+  --calc-texto-suave: #414c5e;
+  /* Al bajar la superficie de 93% a 88%, estos bajan con ella. Si no, el
+     contraste se pierde por el otro lado: mismo texto sobre menos luz. Los
+     tres estaban justo en el filo y habrían caído por debajo de 4,5:1. */
+  --calc-texto-tenue: #646d7f;
 
-  /* Más saturados y oscuros: sobre blanco, los del tema oscuro se lavan */
-  --calc-usd: #2563eb;
-  --calc-eur: #b45309;
-  --calc-usdt: #15803d;
+  /* Más saturados y oscuros: sobre claro, los del tema oscuro se lavan.
+     Ajustados al bajar la superficie, para que sigan pasando AA. */
+  --calc-usd: #2562e9;
+  --calc-eur: #b05109;
+  --calc-usdt: #157d3c;
 }
 
 :root[data-tema="claro"] body {
   background:
-    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(37, 99, 235, 0.10), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(21, 128, 61, 0.07), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(37, 99, 235, 0.08), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(21, 128, 61, 0.06), transparent 70%),
     var(--calc-fondo);
 }
 
@@ -823,10 +827,10 @@ body {
 .muestra-oscuro span:nth-child(3) { background: #f5b544; }
 .muestra-oscuro span:nth-child(4) { background: #2ecc71; }
 
-.muestra-claro span:nth-child(1) { background: #eef1f6; }
-.muestra-claro span:nth-child(2) { background: #2563eb; }
-.muestra-claro span:nth-child(3) { background: #b45309; }
-.muestra-claro span:nth-child(4) { background: #15803d; }
+.muestra-claro span:nth-child(1) { background: #e6ebf3; }
+.muestra-claro span:nth-child(2) { background: #2562e9; }
+.muestra-claro span:nth-child(3) { background: #b05109; }
+.muestra-claro span:nth-child(4) { background: #157d3c; }
 
 .muestra-navidad span:nth-child(1) { background: #0b1410; }
 .muestra-navidad span:nth-child(2) { background: #e5484d; }
