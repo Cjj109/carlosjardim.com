@@ -1,0 +1,6 @@
+{
+  "name": "bcv-puente",
+  "private": true,
+  "type": "module",
+  "description": "Lee el dolar y el euro del BCV completando a mano la cadena de certificados que su servidor entrega mal"
+}

@@ -9,6 +9,7 @@
  */
 
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
+const PUENTE_BCV = 'https://bcv-puente.vercel.app/api/bcv';
 const COTIZAVE = 'https://api.cotizave.com/v1/fx/rates';
 const DOLARAPI_OFICIAL = 'https://ve.dolarapi.com/v1/dolares/oficial';
 const DOLARAPI_PARALELO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
@@ -72,10 +73,11 @@ async function leerCotizave(clave) {
 export async function onRequestGet(context) {
   const clave = context.env?.COTIZAVE_API_KEY;
 
-  const [bcvRes, cotizaveRes, puenteRes, oficialRes, paraleloRes] = await Promise.allSettled([
+  const [bcvRes, cotizaveRes, puenteRes, puenteBcvRes, oficialRes, paraleloRes] = await Promise.allSettled([
     leerBCV(),
     leerCotizave(clave),
     json(PUENTE_P2P),
+    json(PUENTE_BCV),
     json(DOLARAPI_OFICIAL),
     json(DOLARAPI_PARALELO),
   ]);
@@ -84,6 +86,7 @@ export async function onRequestGet(context) {
   const bcv = dato(bcvRes);
   const cotizave = dato(cotizaveRes);
   const puente = dato(puenteRes);
+  const puenteBcv = dato(puenteBcvRes);
   const oficial = dato(oficialRes);
   const paralelo = dato(paraleloRes);
 
@@ -96,6 +99,15 @@ export async function onRequestGet(context) {
       rate: bcv?.usd ?? null,
       eur: bcv?.eur ?? null,
       date: bcv?.fecha ?? null,
+    },
+    {
+      id: 'bcv-puente',
+      grupo: 'bcv',
+      nombre: 'BCV vía Vercel',
+      detalle: 'La misma página del BCV, leída desde otro sitio. Es el respaldo del euro.',
+      rate: puenteBcv?.usd ?? null,
+      eur: puenteBcv?.eur ?? null,
+      date: puenteBcv?.fecha ?? null,
     },
     {
       id: 'dolarapi',

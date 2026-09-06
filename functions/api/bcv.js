@@ -10,9 +10,33 @@
  * venía de otra medición que se actualiza una vez de madrugada, así que a
  * media mañana ya iba 13 bolívares por detrás del p2p real.
  *
- * Nota: bcv.org.ve entrega la cadena de certificados incompleta y ni Node ni
- * workerd local la aceptan, pero la red de Cloudflare en producción sí — que
- * es donde corre esto. Si algún día fallara, queda DolarAPI de respaldo.
+ * EL LÍO DEL CERTIFICADO DE bcv.org.ve
+ *
+ * Aquí decía que el BCV "entrega la cadena de certificados incompleta". No es
+ * eso, y la diferencia importa a la hora de diagnosticar:
+ *
+ *   El certificado de *.bcv.org.ve lo emite
+ *     "Sectigo Public Server Authentication CA DV R36"
+ *   pero el servidor entrega como intermedio
+ *     "Sectigo RSA Domain Validation Secure Server CA"
+ *
+ * Son CAs distintas. No falta un eslabón: el que manda es EQUIVOCADO, un
+ * sobrante de un certificado anterior, y el bueno no viaja en la conexión.
+ *
+ * Los navegadores y la red de Cloudflare lo salvan haciendo AIA fetching:
+ * leen la extensión "CA Issuers" del propio certificado, que apunta a
+ * http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVR36.crt, se
+ * bajan el intermedio que falta y cierran la cadena solos. Node no hace eso,
+ * y por eso en local —y en cualquier runtime de Node— falla con
+ * UNABLE_TO_VERIFY_LEAF_SIGNATURE.
+ *
+ * En producción esto corre en Cloudflare, así que funciona. Si el dólar
+ * fallara queda DolarAPI de respaldo; el euro no tiene otro sitio de donde
+ * salir, y por eso existe el puente de Vercel (vercel/bcv-puente), que sí
+ * completa la cadena a mano.
+ *
+ * El certificado del BCV caduca el 20/11/2026: cuando lo renueven, esto puede
+ * arreglarse solo o romperse de otra forma.
  *
  * Cache: 5 minutos en el CDN.
  */
@@ -28,6 +52,18 @@ const CACHE_MAX_AGE = 300;
 // si acepta. Comprobado: mismo codigo, desde aqui devuelve vacio y desde
 // alli 82 anuncios.
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
+
+// El mismo BCV, leído desde Vercel completando a mano la cadena de
+// certificados. Va de RESPALDO, no de principal, y esto está medido: leerlo
+// desde aquí tarda ~555 ms haciendo además otras cuatro consultas en
+// paralelo, mientras que pasar por Vercel cuesta ~680 ms él solo. Ponerlo
+// primero sería meter un salto de red extra y un tercero del que depender
+// para arreglar algo que hoy no está roto.
+//
+// Se pide en paralelo con todo lo demás, así que estar ahí no cuesta tiempo:
+// solo se usa si el BCV directo falla. Y cubre el hueco de verdad, que es el
+// euro: DolarAPI no lo publica, así que sin esto el euro no tenía respaldo.
+const PUENTE_BCV = 'https://bcv-puente.vercel.app/api/bcv';
 
 async function fetchJson(url) {
   const res = await fetch(url, { headers: { Accept: 'application/json' } });
@@ -168,39 +204,72 @@ async function leerBCV() {
   };
 }
 
+/** El mismo BCV, por el puente de Vercel. Solo se usa si el directo falla. */
+async function leerBCVPuente() {
+  const res = await fetch(PUENTE_BCV, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const datos = await res.json();
+  if (!datos.usd && !datos.eur) return null;
+
+  return { usd: datos.usd ?? null, eur: datos.eur ?? null, fecha: datos.fecha ?? null };
+}
+
 export async function onRequestGet(context) {
   const hoy = new Date().toISOString().split('T')[0];
   const conDiagnostico = new URL(context.request.url).searchParams.has('debug');
 
   try {
-    const [bcvRes, binanceRes, usdtRes, usdtRespaldoRes, respaldoRes] = await Promise.allSettled([
+    const [bcvRes, puenteBcvRes, binanceRes, usdtRes, usdtRespaldoRes, respaldoRes] = await Promise.allSettled([
       leerBCV(),
+      leerBCVPuente(),
       leerUsdtBinance(),
       leerUsdtP2P(context.env?.COTIZAVE_API_KEY),
       fetchJson(USDT_RESPALDO),
       fetchJson(USD_RESPALDO),
     ]);
 
-    const bcv = bcvRes.status === 'fulfilled' ? bcvRes.value : null;
+    const directo = bcvRes.status === 'fulfilled' ? bcvRes.value : null;
+    const puenteBcv = puenteBcvRes.status === 'fulfilled' ? puenteBcvRes.value : null;
     const binance = binanceRes.status === 'fulfilled' ? binanceRes.value : null;
     const usdt = usdtRes.status === 'fulfilled' ? usdtRes.value : null;
     const usdtRespaldo = usdtRespaldoRes.status === 'fulfilled' ? usdtRespaldoRes.value : null;
     const respaldo = respaldoRes.status === 'fulfilled' ? respaldoRes.value : null;
 
-    // El respaldo solo entra si el BCV no dio dólar
-    const usdRate = bcv?.usd ?? (respaldo?.promedio ? parseFloat(respaldo.promedio) : null);
+    // El BCV, moneda a moneda y no en bloque: si el directo lee el dólar pero
+    // se atraganta con el euro, el euro lo pone el puente y el dólar se queda
+    // con el bueno. Cogerlo entero obligaría a elegir entre los dos.
+    const bcv = {
+      usd: directo?.usd ?? puenteBcv?.usd ?? null,
+      eur: directo?.eur ?? puenteBcv?.eur ?? null,
+      fecha: directo?.fecha ?? puenteBcv?.fecha ?? hoy,
+    };
+
+    // DolarAPI es el último recurso, y solo sirve para el dólar
+    const usdRate = bcv.usd ?? (respaldo?.promedio ? parseFloat(respaldo.promedio) : null);
     // El p2p en Venezuela siempre esta por encima del oficial. Si sale por
     // debajo o desorbitado, algo se leyo mal y se prefiere el respaldo.
-    const binanceValido = binance && (!bcv?.usd || (binance.rate > bcv.usd * 0.9 && binance.rate < bcv.usd * 5));
+    const binanceValido = binance && (!bcv.usd || (binance.rate > bcv.usd * 0.9 && binance.rate < bcv.usd * 5));
 
-    const usdFecha = bcv?.usd
+    const usdFecha = bcv.usd
       ? bcv.fecha
       : respaldo?.fechaActualizacion?.split('T')[0] ?? hoy;
 
     const output = {
       last_updated: new Date().toISOString(),
-      eur: bcv?.eur ? { rate: bcv.eur, date: bcv.fecha, symbol: '€' } : null,
-      usd: usdRate ? { rate: usdRate, date: usdFecha, symbol: '$' } : null,
+      // `via` dice de dónde salió cada una, que si no es imposible saber
+      // desde fuera si el camino principal está caído
+      eur: bcv.eur
+        ? { rate: bcv.eur, date: bcv.fecha, symbol: '€', via: directo?.eur ? 'bcv' : 'puente' }
+        : null,
+      usd: usdRate
+        ? {
+            rate: usdRate,
+            date: usdFecha,
+            symbol: '$',
+            via: directo?.usd ? 'bcv' : puenteBcv?.usd ? 'puente' : 'dolarapi',
+          }
+        : null,
       // El Zelle vale menos que el USDT porque quien lo recibe asume mas
       // riesgo. El sobreprecio se lee del libro de Binance, no se inventa.
       zelle: binanceValido && binance.zellePorUsdt

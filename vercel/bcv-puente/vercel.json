@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/bcv.js": { "maxDuration": 15, "includeFiles": "api/*.pem" }
+  }
+}
