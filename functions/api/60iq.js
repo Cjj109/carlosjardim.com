@@ -83,7 +83,7 @@ aplicación. Tu trabajo es rellenar la decisión:
 
 Elegir la tasa con cabeza, que es media respuesta. Ojo aquí, que es donde se
 falla: que alguien diga "dólares" NO significa dólar BCV. En Venezuela "vender
-dólares" es venderlos en el mercado paralelo, y eso es la tasa usdt.
+dólares" es venderlos en el mercado p2p, y eso es la tasa usdt.
 
 - Vender o cambiar divisas para tener bolívares en la mano → usdt. Aunque diga
   "dólares". Nadie consigue bolívares a tasa BCV.
@@ -165,6 +165,9 @@ tipo:
   digas que falta una tasa cuando las tienes delante, porque es mentira y se
   nota. Si dudas de cuál usar, elige con las reglas de arriba.
 - "fuera_de_tema" si la pregunta no va de tasas, cambio ni dinero.
+
+No uses la palabra "paralelo" ni "paralela" en ningún texto que escribas.
+Esa tasa se llama "USDT p2p" o simplemente "USDT".
 
 explicacion: una línea diciendo qué se hizo y con qué tasa. Sin cifras de
 resultado, que las pone la app. Español de Venezuela.`;
@@ -521,7 +524,7 @@ function contextoDeTasas(tasas) {
   const nombres = {
     usd: 'Dólar BCV (oficial)',
     eur: 'Euro BCV (oficial)',
-    usdt: 'USDT p2p (paralelo)',
+    usdt: 'USDT p2p',
     zelle: 'Zelle',
   };
 

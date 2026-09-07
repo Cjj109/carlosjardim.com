@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora de Tasas | Carlos Jardim</title>
-  <meta name="description" content="Calculadora de tasas de cambio en Venezuela: dólar BCV, euro BCV y USDT paralelo. Compara cuánto vale un monto según cada tasa y cuánto vender para pagar un precio fijado a BCV.">
+  <meta name="description" content="Calculadora de tasas de cambio en Venezuela: dólar BCV, euro BCV, USDT y Zelle. Compara cuánto vale un monto según cada tasa y cuánto vender para pagar un precio fijado a BCV.">
   <meta name="theme-color" content="#0a0b0f">
   <link rel="canonical" href="https://carlosjardim.com/calculadora">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Calculadora de Tasas | Carlos Jardim">
-  <meta property="og:description" content="Dólar BCV, euro BCV y USDT paralelo. Compara tasas y calcula cuánto vender.">
+  <meta property="og:description" content="Dólar BCV, euro BCV, USDT y Zelle. Compara tasas y calcula cuánto vender.">
   <meta property="og:url" content="https://carlosjardim.com/calculadora">
   <meta property="og:site_name" content="Carlos Jardim">
   <meta property="og:locale" content="es_VE">
@@ -21,11 +21,11 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:alt" content="Calculadora de tasas: dólar BCV, euro BCV y USDT paralelo">
+  <meta property="og:image:alt" content="Calculadora de tasas: dólar BCV, euro BCV, USDT y Zelle">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Calculadora de Tasas | Carlos Jardim">
-  <meta name="twitter:description" content="Dólar BCV, euro BCV y USDT paralelo. Compara tasas y calcula cuánto vender.">
+  <meta name="twitter:description" content="Dólar BCV, euro BCV, USDT y Zelle. Compara tasas y calcula cuánto vender.">
   <meta name="twitter:image" content="https://carlosjardim.com/calculadora-app/og.jpg">
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=46">
-  <link rel="stylesheet" href="/css/calculadora.css?r=46">
+  <link rel="stylesheet" href="/css/variables.css?r=47">
+  <link rel="stylesheet" href="/css/calculadora.css?r=47">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -104,7 +104,7 @@
   <header class="calc-head">
     <a class="calc-volver" href="/">← carlosjardim.com</a>
     <h1>Calculadora de tasas</h1>
-    <p class="calc-sub">Dólar BCV, euro BCV y USDT paralelo</p>
+    <p class="calc-sub">Dólar BCV, euro BCV, USDT y Zelle</p>
   </header>
 
   <noscript>
@@ -182,7 +182,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v46</span>
+    <span class="calc-version" title="Versión de la app instalada">v47</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -278,8 +278,8 @@
     </div>
 
     <div class="calc-grupo">
-      <h3>Tasa paralela</h3>
-      <div class="calc-fuentes" id="fuentesParalelo" role="radiogroup" aria-label="Fuente de la tasa paralela"></div>
+      <h3>Tasa del USDT</h3>
+      <div class="calc-fuentes" id="fuentesParalelo" role="radiogroup" aria-label="Fuente de la tasa del USDT"></div>
     </div>
 
     <!-- El Zelle tiene grupo propio. Estaba entre las paralelas, y elegirlo
@@ -308,7 +308,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=46" defer></script>
+<script src="/js/calculadora.js?r=47" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

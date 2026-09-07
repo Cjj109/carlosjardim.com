@@ -253,7 +253,7 @@ export async function onRequestGet(context) {
     {
       id: 'dolarapi-paralelo',
       grupo: 'paralelo',
-      nombre: 'Paralelo DolarAPI',
+      nombre: 'DolarAPI · mercado',
       detalle: 'Otra medición distinta al p2p. Se actualiza una vez al día.',
       rate: paralelo?.promedio ?? null,
       date: soloFecha(paralelo?.fechaActualizacion),

@@ -49,7 +49,7 @@ const svg = `
         font-size="70" font-weight="bold" fill="#e8e9ee">Calculadora de tasas</text>
 
   <text x="96" y="425" font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
-        font-size="34" fill="#9aa0ae">Dólar BCV · Euro BCV · USDT paralelo</text>
+        font-size="34" fill="#9aa0ae">Dólar BCV · Euro BCV · USDT · Zelle</text>
 
   <text x="96" y="500" font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
         font-size="27" fill="#626878">Cuánto vale un monto según cada tasa, y cuánto vender</text>
