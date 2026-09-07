@@ -1285,6 +1285,13 @@ document.addEventListener('DOMContentLoaded', () => {
     escribiendoAlBorrar = document.activeElement === monto;
   });
 
+  /* Y que no le robe el foco al campo.
+     Sin esto, el navegador se lo lleva al botón —el teclado se cierra— y el
+     click de después tiene que devolvérselo, que es cuando se reabre. Con el
+     foco quieto no hay nada que deshacer. En mousedown y no en pointerdown
+     para no comerse el gesto de desplazar empezado sobre el botón. */
+  botonBorrar?.addEventListener('mousedown', (e) => e.preventDefault());
+
   botonBorrar?.addEventListener('click', (e) => {
     if (!monto) return;
     monto.value = '';
@@ -1379,6 +1386,11 @@ document.addEventListener('DOMContentLoaded', () => {
   window.visualViewport?.addEventListener('resize', () => {
     if (document.activeElement === iqCampo) traerALaVista();
   });
+
+  /* Lo mismo para "Preguntar": el foco se queda en el campo mientras se
+     toca. Así el teclado no se mueve, la página no da el salto y el click
+     llega a la primera. */
+  $('iqEnviar')?.addEventListener('mousedown', (e) => e.preventDefault());
 
   $('iqForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -1535,9 +1547,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const activo = document.activeElement;
     if (!(activo instanceof HTMLInputElement)) return;
     if (e.target === activo || e.target.closest('input')) return;
-    // Ajustar la cifra con un atajo o copiar un resultado no es dejar de
-    // escribir: ahí el teclado se queda.
-    if (e.target.closest('#calcRapidos, .res')) return;
+    /* Ajustar la cifra con un atajo o copiar un resultado no es dejar de
+       escribir: ahí el teclado se queda.
+
+       Y los dos botones que ACTÚAN sobre el campo tampoco cuentan, aunque
+       estén fuera de él. Quitarles el foco aquí rompía las dos cosas:
+
+         La X borraba, este blur cerraba el teclado y el click de después
+         volvía a enfocar el campo: se cerraba y se reabría de un tirón. En el
+         iPad se ve clarísimo.
+
+         "Preguntar" era peor. El teclado se cerraba, la página crecía de
+         golpe y para cuando tocaba disparar el click el botón ya no estaba
+         bajo el dedo: no pasaba nada, y había que tocar dos veces. La primera
+         parecía "cerrar el teclado" porque es justo lo que hacía.
+
+       El teclado del 60 IQ se cierra igual, pero en el submit, que es cuando
+       de verdad ya preguntaste. */
+    if (e.target.closest('#calcRapidos, .res, #calcBorrar, #iqEnviar')) return;
     activo.blur();
   }, { passive: true });
 
