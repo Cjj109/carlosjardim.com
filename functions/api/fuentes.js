@@ -8,7 +8,7 @@
  * enterarse el mismo día.
  */
 
-import { hoyCaracas, esFutura, guardarVigencia, vigenteEn, snapshotEstatico } from './_vigencia.js';
+import { hoyCaracas, guardarVigencia, vigenteEn, proximaTras, snapshotEstatico } from './_vigencia.js';
 
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 const PUENTE_BCV = 'https://bcv-puente.vercel.app/api/bcv';
@@ -141,31 +141,40 @@ export async function onRequestGet(context) {
 
   /* Lo que este panel enseña es lo que se va a usar para calcular: elegir una
      ficha sustituye la tasa de la calculadora. Así que las dos que leen la
-     página del BCV enseñan la que RIGE hoy, no la que el BCV acaba de colgar
-     para mañana, y la nueva se anuncia aparte en `proxima`. Sin esto, elegir
-     "Página del BCV" una tarde de publicación convertía con la tasa del día
-     siguiente. */
+     página del BCV enseñan la que YA SE APLICA, no la que el BCV acaba de
+     colgar, y la que viene se anuncia aparte en `proxima`. Sin esto, elegir
+     "Página del BCV" una tarde de publicación convertía con una tasa que aún
+     no había entrado.
+
+     Manda la tabla y no la lectura: un sábado el BCV sigue enseñando la fecha
+     valor del lunes, pero esa tasa ya se aplica desde el sábado. */
   const hoy = hoyCaracas();
   // Los dos leen la misma página, así que comparten fecha valor
   await guardarVigencia(
     context.env?.MONTOS,
     bcv?.fecha ?? puenteBcv?.fecha,
     bcv?.usd ?? puenteBcv?.usd,
-    bcv?.eur ?? puenteBcv?.eur
+    bcv?.eur ?? puenteBcv?.eur,
+    hoy
   );
 
-  const anterior = esFutura(bcv?.fecha ?? puenteBcv?.fecha, hoy)
-    ? (await vigenteEn(context.env?.MONTOS, hoy)) ?? (await snapshotEstatico(context.request.url, hoy))
-    : null;
+  const aplicando =
+    (await vigenteEn(context.env?.MONTOS, hoy)) ??
+    (await snapshotEstatico(context.request.url, hoy));
+  const siguiente = await proximaTras(context.env?.MONTOS, hoy);
 
-  /** La lectura tal cual si ya rige; la anterior si se adelantó */
+  /** Cambia la lectura por la que ya se aplica, si es que son distintas */
   const vigente = (lectura) => {
-    if (!lectura || !esFutura(lectura.fecha, hoy) || !anterior) return lectura;
+    if (!lectura || !aplicando) return lectura;
+    if (aplicando.fecha === lectura.fecha) return lectura;
+
     return {
-      usd: anterior.usd ?? lectura.usd,
-      eur: anterior.eur ?? lectura.eur,
-      fecha: anterior.fecha,
-      proxima: { rate: lectura.usd, eur: lectura.eur, date: lectura.fecha },
+      usd: aplicando.usd ?? lectura.usd,
+      eur: aplicando.eur ?? lectura.eur,
+      fecha: aplicando.desde ?? aplicando.fecha,
+      proxima: siguiente
+        ? { rate: siguiente.usd, eur: siguiente.eur, date: siguiente.desde ?? siguiente.fecha }
+        : null,
     };
   };
 
@@ -177,7 +186,7 @@ export async function onRequestGet(context) {
       id: 'bcv',
       grupo: 'bcv',
       nombre: 'Página del BCV',
-      detalle: 'La fuente oficial. Por la tarde publica la del día siguiente.',
+      detalle: 'La fuente oficial. Lo que publica por la tarde entra al día siguiente.',
       rate: bcvHoy?.usd ?? null,
       eur: bcvHoy?.eur ?? null,
       date: bcvHoy?.fecha ?? null,

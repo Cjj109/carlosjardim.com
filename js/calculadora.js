@@ -581,9 +581,11 @@ function pintarTasas({ falloDeRed = false } = {}) {
      cifra que se usa es la que rige HOY, así que la fecha la confirma, y la
      que el BCV ya colgó para mañana se anuncia detrás. */
   const bcv = tasas?.usd;
-  const vigencia = bcv?.date ? ` · BCV del ${fecha(bcv.date)}` : '';
+  // "desde el" y no "del": la fecha es desde cuándo se aplica, que un fin de
+  // semana no coincide con la fecha valor que enseña el BCV.
+  const vigencia = bcv?.date ? ` · BCV desde el ${fecha(bcv.date)}` : '';
   const proxima = bcv?.proxima?.rate
-    ? ` · desde el ${fecha(bcv.proxima.date)}, ${num(Number(bcv.proxima.rate))}`
+    ? ` · luego ${num(Number(bcv.proxima.rate))} el ${fecha(bcv.proxima.date)}`
     : '';
 
   aviso.textContent = `${hora} · ${origen}${vigencia}${proxima}`;
@@ -741,7 +743,7 @@ function fichaFuente(f, elegida) {
   // de la ficha es la que rige —es la que se usará si se elige— y la que ya
   // viene se cuenta aquí, que es una línea de texto y no una columna estrecha.
   const detalle = f.proxima?.rate
-    ? `${f.detalle} Ya publicó ${num(Number(f.proxima.rate))} para el ${fecha(f.proxima.date)}.`
+    ? `${f.detalle} Ya publicó ${num(Number(f.proxima.rate))}, que entra el ${fecha(f.proxima.date)}.`
     : f.detalle;
 
   return `

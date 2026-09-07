@@ -10,11 +10,13 @@
  * venía de otra medición que se actualiza una vez de madrugada, así que a
  * media mañana ya iba 13 bolívares por detrás del p2p real.
  *
- * LO PUBLICADO NO ES LO VIGENTE
+ * LO PUBLICADO NO ES LO QUE SE APLICA
  *
- * El BCV cuelga por la tarde la tasa del día SIGUIENTE. Aquí se sirve la que
- * rige hoy —hoy en Caracas, no en UTC— y la recién publicada va aparte, en
- * `proxima`. La memoria de cuál regía antes está en _vigencia.js.
+ * El BCV cuelga por la tarde una tasa que empieza a aplicarse al día
+ * SIGUIENTE. Aquí se sirve la que ya se aplica hoy —hoy en Caracas, no en
+ * UTC— y la que viene va aparte, en `proxima`. Ojo con el fin de semana: lo
+ * publicado el viernes trae fecha valor del lunes, pero se aplica desde el
+ * sábado. La regla y la memoria están en _vigencia.js.
  *
  * EL LÍO DEL CERTIFICADO DE bcv.org.ve
  *
@@ -47,7 +49,7 @@
  * Cache: 5 minutos en el CDN.
  */
 
-import { hoyCaracas, esFutura, guardarVigencia, vigenteEn, snapshotEstatico } from './_vigencia.js';
+import { hoyCaracas, guardarVigencia, vigenteEn, proximaTras, snapshotEstatico } from './_vigencia.js';
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
@@ -296,43 +298,51 @@ export async function onRequestGet(context) {
     const bcvUsd = elegirMoneda('usd');
     const bcvEur = elegirMoneda('eur');
 
-    /* PUBLICADA NO ES VIGENTE
+    /* PUBLICADA NO ES LO QUE SE APLICA
 
-       El BCV cuelga por la tarde la tasa del día SIGUIENTE, y esa fecha valor
-       viene en el propio HTML. Hasta aquí se cogía el número recién publicado
-       y se convertía con él en el acto: el 7 de septiembre por la noche la
-       calculadora ya cobraba a 814,6908, que no regía hasta el 8. El aviso
-       del pie lo decía —"BCV rige 08/09"— pero la cuenta se hacía igual.
+       El BCV cuelga por la tarde una tasa que empieza al día SIGUIENTE, y su
+       fecha valor viene en el propio HTML. Hasta aquí se cogía el número
+       recién publicado y se convertía con él en el acto: el 7 de septiembre
+       por la noche la calculadora ya cobraba a 814,6908, que no entraba hasta
+       el 8. El aviso del pie lo decía —"BCV rige 08/09"— pero la cuenta se
+       hacía igual.
 
-       Así que la publicada se apunta con su fecha valor, y mientras esa fecha
-       no llegue se sirve la anterior. La memoria vive en D1 (_vigencia.js);
-       al pasar la medianoche de Caracas la de mañana pasa a ser la de hoy
-       sola, sin desplegar nada. */
+       Así que se apunta con las dos fechas y manda la TABLA, no la lectura de
+       ahora. Esto último importa el fin de semana: un sábado la página del
+       BCV sigue enseñando la fecha valor del lunes, pero esa tasa ya se aplica
+       desde el sábado porque así quedó apuntada el viernes. La lectura del
+       sábado, por sí sola, no sabe eso. */
     const publicada = { usd: bcvUsd.rate, eur: bcvEur.rate, fecha: bcvUsd.date ?? bcvEur.date ?? null };
-    await guardarVigencia(context.env?.MONTOS, publicada.fecha, publicada.usd, publicada.eur);
+    await guardarVigencia(context.env?.MONTOS, publicada.fecha, publicada.usd, publicada.eur, hoy);
 
-    const adelantada = esFutura(publicada.fecha, hoy);
-    const anterior = adelantada
-      ? (await vigenteEn(context.env?.MONTOS, hoy)) ?? (await snapshotEstatico(context.request.url, hoy))
-      : null;
+    const aplicando =
+      (await vigenteEn(context.env?.MONTOS, hoy)) ??
+      (await snapshotEstatico(context.request.url, hoy));
+    const siguiente = await proximaTras(context.env?.MONTOS, hoy);
 
     /**
-     * La que rige hoy, y aparte la que ya está publicada para después.
+     * La que se aplica hoy, y aparte la que ya viene con su día de entrada.
      *
-     * Si el BCV se adelantó y no hay memoria de la anterior —el primer
-     * despliegue, o la base caída— se sigue con la publicada: es lo único que
-     * hay, y es lo que se venía haciendo. En ese caso `date` sigue delatando
-     * que la vigencia es futura.
+     * Sin memoria —el primer despliegue, o la base caída— se sigue con la
+     * publicada: es lo único que hay, y es lo que se venía haciendo. En ese
+     * caso `date` sigue delatando que la fecha aún no ha llegado.
      */
     const resolver = (campo, publicado) => {
-      if (!adelantada || !anterior?.[campo]) return { ...publicado, proxima: null };
+      if (aplicando?.[campo] == null) return { ...publicado, proxima: null };
+
       return {
-        // 'vigencia' y no 'bcv': el número sale de la memoria, no de la
-        // lectura de ahora. Es la misma honestidad que `via` vino a dar.
-        via: 'vigencia',
-        rate: anterior[campo],
-        date: anterior.fecha,
-        proxima: { rate: publicado.rate, date: publicada.fecha },
+        // 'bcv' solo si lo que se sirve ES lo que la página dice ahora mismo;
+        // si sale de la memoria, 'vigencia'. Es la honestidad que `via` vino
+        // a dar: desde fuera no hay otra forma de saberlo.
+        via: aplicando.fecha === publicada.fecha ? publicado.via : 'vigencia',
+        rate: aplicando[campo],
+        date: aplicando.desde ?? aplicando.fecha,
+        // La fecha valor oficial del BCV, que puede no ser la de arriba
+        fechaValor: aplicando.fecha ?? null,
+        proxima:
+          siguiente?.[campo] != null
+            ? { rate: siguiente[campo], date: siguiente.desde ?? siguiente.fecha }
+            : null,
       };
     };
 
@@ -357,11 +367,14 @@ export async function onRequestGet(context) {
       eur: eurBcv.rate
         ? {
             rate: eurBcv.rate,
+            // `date` es desde cuándo se aplica; `fechaValor`, lo que dice el
+            // BCV. Coinciden salvo el fin de semana.
             date: eurBcv.date ?? hoy,
+            fechaValor: eurBcv.fechaValor ?? null,
             symbol: '€',
             via: eurBcv.via,
-            // La que ya está publicada y todavía no rige, para que la
-            // interfaz pueda anunciarla sin convertir con ella
+            // La que ya viene y todavía no entra, para que la interfaz pueda
+            // anunciarla sin convertir con ella
             proxima: eurBcv.proxima,
           }
         : null,
@@ -369,6 +382,7 @@ export async function onRequestGet(context) {
         ? {
             rate: usdRate,
             date: usdFecha,
+            fechaValor: usdBcv.fechaValor ?? null,
             symbol: '$',
             via: usdBcv.via ?? 'dolarapi',
             proxima: usdBcv.proxima,
