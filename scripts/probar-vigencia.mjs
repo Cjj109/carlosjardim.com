@@ -22,6 +22,7 @@
  */
 import { DatabaseSync } from 'node:sqlite';
 import { onRequestGet } from '../functions/api/bcv.js';
+import { desdeCuandoSeAplica } from '../functions/api/_vigencia.js';
 
 const ESQUEMA = `
   CREATE TABLE bcv_vigencias (
@@ -116,6 +117,16 @@ function comprobar(titulo, real, esperado) {
   const ok = real === esperado;
   if (!ok) fallos++;
   console.log(`  ${ok ? '✓' : '✗'} ${titulo.padEnd(52)} ${real}${ok ? '' : `  (esperado ${esperado})`}`);
+}
+
+console.log('\nLA REGLA, A SOLAS: min(fecha valor, día siguiente a verla)');
+{
+  // Lo demás la prueba de paso; aquí se prueba de frente, que es donde se lee
+  // si está bien. Los tres casos que la definen.
+  comprobar('viernes 11, fecha valor lunes 14', desdeCuandoSeAplica('2026-09-14', '2026-09-11'), '2026-09-12');
+  comprobar('  con el lunes feriado: fecha valor martes 15', desdeCuandoSeAplica('2026-09-15', '2026-09-11'), '2026-09-12');
+  comprobar('entre semana coincide con la fecha valor', desdeCuandoSeAplica('2026-09-08', '2026-09-07'), '2026-09-08');
+  comprobar('vista tarde: manda la fecha valor, nunca más tarde', desdeCuandoSeAplica('2026-09-14', '2026-09-16'), '2026-09-14');
 }
 
 console.log('\nFIN DE SEMANA, CON EL BCV PARPADEANDO AL PUBLICAR');

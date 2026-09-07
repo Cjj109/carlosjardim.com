@@ -51,8 +51,8 @@ export function hoyCaracas(ahora = new Date()) {
 
 export const esFecha = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 
-/** true si esa fecha todavía no ha llegado */
-export const esFutura = (fecha, hoy) => esFecha(fecha) && fecha > hoy;
+/** true si esa fecha todavía no ha llegado. Solo la usa snapshotEstatico */
+const esFutura = (fecha, hoy) => esFecha(fecha) && fecha > hoy;
 
 /** "2026-09-11" -> "2026-09-12"; días de calendario, sin zonas de por medio */
 const diaSiguiente = (iso) =>
