@@ -8,6 +8,8 @@
  * enterarse el mismo día.
  */
 
+import { hoyCaracas, esFutura, guardarVigencia, vigenteEn, snapshotEstatico } from './_vigencia.js';
+
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 const PUENTE_BCV = 'https://bcv-puente.vercel.app/api/bcv';
 const COTIZAVE = 'https://api.cotizave.com/v1/fx/rates';
@@ -137,15 +139,49 @@ export async function onRequestGet(context) {
   const oficial = dato(oficialRes);
   const paralelo = dato(paraleloRes);
 
+  /* Lo que este panel enseña es lo que se va a usar para calcular: elegir una
+     ficha sustituye la tasa de la calculadora. Así que las dos que leen la
+     página del BCV enseñan la que RIGE hoy, no la que el BCV acaba de colgar
+     para mañana, y la nueva se anuncia aparte en `proxima`. Sin esto, elegir
+     "Página del BCV" una tarde de publicación convertía con la tasa del día
+     siguiente. */
+  const hoy = hoyCaracas();
+  // Los dos leen la misma página, así que comparten fecha valor
+  await guardarVigencia(
+    context.env?.MONTOS,
+    bcv?.fecha ?? puenteBcv?.fecha,
+    bcv?.usd ?? puenteBcv?.usd,
+    bcv?.eur ?? puenteBcv?.eur
+  );
+
+  const anterior = esFutura(bcv?.fecha ?? puenteBcv?.fecha, hoy)
+    ? (await vigenteEn(context.env?.MONTOS, hoy)) ?? (await snapshotEstatico(context.request.url, hoy))
+    : null;
+
+  /** La lectura tal cual si ya rige; la anterior si se adelantó */
+  const vigente = (lectura) => {
+    if (!lectura || !esFutura(lectura.fecha, hoy) || !anterior) return lectura;
+    return {
+      usd: anterior.usd ?? lectura.usd,
+      eur: anterior.eur ?? lectura.eur,
+      fecha: anterior.fecha,
+      proxima: { rate: lectura.usd, eur: lectura.eur, date: lectura.fecha },
+    };
+  };
+
+  const bcvHoy = vigente(bcv);
+  const puenteHoy = vigente(puenteBcv);
+
   const fuentes = [
     {
       id: 'bcv',
       grupo: 'bcv',
       nombre: 'Página del BCV',
-      detalle: 'La fuente oficial. Publica la tasa del próximo día hábil.',
-      rate: bcv?.usd ?? null,
-      eur: bcv?.eur ?? null,
-      date: bcv?.fecha ?? null,
+      detalle: 'La fuente oficial. Por la tarde publica la del día siguiente.',
+      rate: bcvHoy?.usd ?? null,
+      eur: bcvHoy?.eur ?? null,
+      date: bcvHoy?.fecha ?? null,
+      proxima: bcvHoy?.proxima ?? null,
       motivo: motivoBcv ?? sinEsaCifra(bcv),
     },
     {
@@ -153,9 +189,10 @@ export async function onRequestGet(context) {
       grupo: 'bcv',
       nombre: 'BCV vía Vercel',
       detalle: 'La misma página del BCV, leída desde otro sitio. Es el respaldo del euro.',
-      rate: puenteBcv?.usd ?? null,
-      eur: puenteBcv?.eur ?? null,
-      date: puenteBcv?.fecha ?? null,
+      rate: puenteHoy?.usd ?? null,
+      eur: puenteHoy?.eur ?? null,
+      date: puenteHoy?.fecha ?? null,
+      proxima: puenteHoy?.proxima ?? null,
       motivo: motivoPuenteBcv ?? sinEsaCifra(puenteBcv),
     },
     {
@@ -261,7 +298,7 @@ export async function onRequestGet(context) {
     },
   ];
 
-  return new Response(JSON.stringify({ fuentes, eur: bcv?.eur ?? null, eurFecha: bcv?.fecha ?? null }), {
+  return new Response(JSON.stringify({ fuentes, eur: bcvHoy?.eur ?? null, eurFecha: bcvHoy?.fecha ?? null }), {
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': `public, max-age=${CACHE}, s-maxage=${CACHE}`,

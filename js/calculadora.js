@@ -575,11 +575,18 @@ function pintarTasas({ falloDeRed = false } = {}) {
     minute: '2-digit',
   });
 
-  // La fecha sale de las tarjetas —las hacia mas altas— pero la del BCV
-  // importa: dice que esa tasa rige el proximo dia habil, no hoy.
-  const vigencia = tasas?.usd?.date ? ` · BCV rige ${fecha(tasas.usd.date)}` : '';
+  /* La fecha del BCV sale de las tarjetas —las hacía más altas— pero importa,
+     y ahora dice otra cosa. Antes ponía "BCV rige 08/09" mientras convertía
+     con esa misma tasa del 8: avisaba de la trampa sin quitarla. Ahora la
+     cifra que se usa es la que rige HOY, así que la fecha la confirma, y la
+     que el BCV ya colgó para mañana se anuncia detrás. */
+  const bcv = tasas?.usd;
+  const vigencia = bcv?.date ? ` · BCV del ${fecha(bcv.date)}` : '';
+  const proxima = bcv?.proxima?.rate
+    ? ` · desde el ${fecha(bcv.proxima.date)}, ${num(Number(bcv.proxima.rate))}`
+    : '';
 
-  aviso.textContent = `${hora} · ${origen}${vigencia}`;
+  aviso.textContent = `${hora} · ${origen}${vigencia}${proxima}`;
 }
 
 /* ---------- Historial ---------- */
@@ -730,6 +737,13 @@ function fichaFuente(f, elegida) {
     ? `<span class="fuente-tasa">${esc(f.motivo || 'sin respuesta')}</span>`
     : `<span class="fuente-tasa">${esc(num(Number(f.rate)))}</span>${f.date ? `<span class="fuente-fecha">${esc(fecha(f.date))}</span>` : ''}`;
 
+  // La página del BCV publica por la tarde la tasa del día siguiente. La cifra
+  // de la ficha es la que rige —es la que se usará si se elige— y la que ya
+  // viene se cuenta aquí, que es una línea de texto y no una columna estrecha.
+  const detalle = f.proxima?.rate
+    ? `${f.detalle} Ya publicó ${num(Number(f.proxima.rate))} para el ${fecha(f.proxima.date)}.`
+    : f.detalle;
+
   return `
     <button type="button" role="radio" aria-checked="${elegida}" tabindex="${elegida ? 0 : -1}"
       class="fuente${elegida ? ' is-elegida' : ''}${caida ? ' fuente-caida' : ''}"
@@ -738,7 +752,7 @@ function fichaFuente(f, elegida) {
         <span class="fuente-nombre">
           ${esc(f.nombre)}${elegida ? '<span class="fuente-marca">en uso</span>' : ''}
         </span>
-        <span class="fuente-detalle">${esc(f.detalle)}</span>
+        <span class="fuente-detalle">${esc(detalle)}</span>
       </span>
       <span class="fuente-valor">${valor}</span>
     </button>`;
@@ -790,7 +804,15 @@ function aplicarEleccion() {
   const zelle = fuenteActiva('zelle', elegidas);
 
   if (oficial) {
-    tasas.usd = { rate: oficial.rate, date: oficial.date, symbol: '$', fuente: oficial.nombre };
+    // `proxima` viaja con la tasa: sin esto, elegir una fuente a mano borraba
+    // el aviso de la tasa que ya viene.
+    tasas.usd = {
+      rate: oficial.rate,
+      date: oficial.date,
+      symbol: '$',
+      fuente: oficial.nombre,
+      proxima: oficial.proxima ?? null,
+    };
   }
   if (paralelo) {
     tasas.usdt = { rate: paralelo.rate, date: paralelo.date, symbol: '₮', market: paralelo.id, fuente: paralelo.nombre };

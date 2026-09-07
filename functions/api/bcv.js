@@ -10,6 +10,12 @@
  * venía de otra medición que se actualiza una vez de madrugada, así que a
  * media mañana ya iba 13 bolívares por detrás del p2p real.
  *
+ * LO PUBLICADO NO ES LO VIGENTE
+ *
+ * El BCV cuelga por la tarde la tasa del día SIGUIENTE. Aquí se sirve la que
+ * rige hoy —hoy en Caracas, no en UTC— y la recién publicada va aparte, en
+ * `proxima`. La memoria de cuál regía antes está en _vigencia.js.
+ *
  * EL LÍO DEL CERTIFICADO DE bcv.org.ve
  *
  * Aquí decía que el BCV "entrega la cadena de certificados incompleta". No es
@@ -40,6 +46,8 @@
  *
  * Cache: 5 minutos en el CDN.
  */
+
+import { hoyCaracas, esFutura, guardarVigencia, vigenteEn, snapshotEstatico } from './_vigencia.js';
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
@@ -251,7 +259,7 @@ async function leerBCVPuente() {
 }
 
 export async function onRequestGet(context) {
-  const hoy = new Date().toISOString().split('T')[0];
+  const hoy = hoyCaracas();
   const conDiagnostico = new URL(context.request.url).searchParams.has('debug');
 
   try {
@@ -287,31 +295,83 @@ export async function onRequestGet(context) {
 
     const bcvUsd = elegirMoneda('usd');
     const bcvEur = elegirMoneda('eur');
-    const bcv = { usd: bcvUsd.rate, eur: bcvEur.rate, fecha: bcvUsd.date ?? bcvEur.date ?? hoy };
 
-    // DolarAPI es el último recurso, y solo sirve para el dólar
-    const usdRate = bcv.usd ?? (respaldo?.promedio ? parseFloat(respaldo.promedio) : null);
+    /* PUBLICADA NO ES VIGENTE
+
+       El BCV cuelga por la tarde la tasa del día SIGUIENTE, y esa fecha valor
+       viene en el propio HTML. Hasta aquí se cogía el número recién publicado
+       y se convertía con él en el acto: el 7 de septiembre por la noche la
+       calculadora ya cobraba a 814,6908, que no regía hasta el 8. El aviso
+       del pie lo decía —"BCV rige 08/09"— pero la cuenta se hacía igual.
+
+       Así que la publicada se apunta con su fecha valor, y mientras esa fecha
+       no llegue se sirve la anterior. La memoria vive en D1 (_vigencia.js);
+       al pasar la medianoche de Caracas la de mañana pasa a ser la de hoy
+       sola, sin desplegar nada. */
+    const publicada = { usd: bcvUsd.rate, eur: bcvEur.rate, fecha: bcvUsd.date ?? bcvEur.date ?? null };
+    await guardarVigencia(context.env?.MONTOS, publicada.fecha, publicada.usd, publicada.eur);
+
+    const adelantada = esFutura(publicada.fecha, hoy);
+    const anterior = adelantada
+      ? (await vigenteEn(context.env?.MONTOS, hoy)) ?? (await snapshotEstatico(context.request.url, hoy))
+      : null;
+
+    /**
+     * La que rige hoy, y aparte la que ya está publicada para después.
+     *
+     * Si el BCV se adelantó y no hay memoria de la anterior —el primer
+     * despliegue, o la base caída— se sigue con la publicada: es lo único que
+     * hay, y es lo que se venía haciendo. En ese caso `date` sigue delatando
+     * que la vigencia es futura.
+     */
+    const resolver = (campo, publicado) => {
+      if (!adelantada || !anterior?.[campo]) return { ...publicado, proxima: null };
+      return {
+        // 'vigencia' y no 'bcv': el número sale de la memoria, no de la
+        // lectura de ahora. Es la misma honestidad que `via` vino a dar.
+        via: 'vigencia',
+        rate: anterior[campo],
+        date: anterior.fecha,
+        proxima: { rate: publicado.rate, date: publicada.fecha },
+      };
+    };
+
+    const usdBcv = resolver('usd', bcvUsd);
+    const eurBcv = resolver('eur', bcvEur);
+
+    // DolarAPI es el último recurso, y solo sirve para el dólar. Publica el
+    // día en que la tasa entra en vigor, así que no se adelanta nunca.
+    const usdRate = usdBcv.rate ?? (respaldo?.promedio ? parseFloat(respaldo.promedio) : null);
     // El p2p en Venezuela siempre esta por encima del oficial. Si sale por
     // debajo o desorbitado, algo se leyo mal y se prefiere el respaldo.
-    const binanceValido = binance && (!bcv.usd || (binance.rate > bcv.usd * 0.9 && binance.rate < bcv.usd * 5));
+    const binanceValido = binance && (!usdRate || (binance.rate > usdRate * 0.9 && binance.rate < usdRate * 5));
 
-    const usdFecha = bcvUsd.rate
-      ? bcvUsd.date ?? hoy
+    const usdFecha = usdBcv.rate
+      ? usdBcv.date ?? hoy
       : respaldo?.fechaActualizacion?.split('T')[0] ?? hoy;
 
     const output = {
       last_updated: new Date().toISOString(),
       // `via` dice de dónde salió cada una, que si no es imposible saber
       // desde fuera si el camino principal está caído
-      eur: bcvEur.rate
-        ? { rate: bcvEur.rate, date: bcvEur.date ?? hoy, symbol: '€', via: bcvEur.via }
+      eur: eurBcv.rate
+        ? {
+            rate: eurBcv.rate,
+            date: eurBcv.date ?? hoy,
+            symbol: '€',
+            via: eurBcv.via,
+            // La que ya está publicada y todavía no rige, para que la
+            // interfaz pueda anunciarla sin convertir con ella
+            proxima: eurBcv.proxima,
+          }
         : null,
       usd: usdRate
         ? {
             rate: usdRate,
             date: usdFecha,
             symbol: '$',
-            via: bcvUsd.via ?? 'dolarapi',
+            via: usdBcv.via ?? 'dolarapi',
+            proxima: usdBcv.proxima,
           }
         : null,
       // El Zelle vale menos que el USDT porque quien lo recibe asume mas
