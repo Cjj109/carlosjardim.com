@@ -1149,6 +1149,7 @@ function crearPaneles(lista, alTocar) {
 
     for (const [boton, otro] of nodos) {
       const activo = abrir && otro === panel;
+      if (!activo && otro.contains(document.activeElement)) document.activeElement.blur();
       otro.hidden = !activo;
       boton.setAttribute('aria-expanded', String(activo));
     }
@@ -1163,6 +1164,9 @@ function crearPaneles(lista, alTocar) {
   function cerrar(panel) {
     for (const [boton, otro] of nodos) {
       if (panel && otro !== panel) continue;
+      // Si el foco estaba dentro del que se cierra, soltarlo: un campo que
+      // desaparece deja el teclado puesto sin nada donde escribir.
+      if (otro.contains(document.activeElement)) document.activeElement.blur();
       otro.hidden = true;
       boton.setAttribute('aria-expanded', 'false');
     }
@@ -1176,8 +1180,17 @@ function crearPaneles(lista, alTocar) {
   }
 
   // Escape cierra el que esté abierto, como cualquier menú
+  /* Escape va de dentro afuera, como en cualquier interfaz: primero suelta
+     el campo —quitando el teclado en una tableta con teclado físico— y solo
+     si no había ninguno enfocado cierra el panel. */
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+
+    if (document.activeElement instanceof HTMLInputElement) {
+      document.activeElement.blur();
+      return;
+    }
+
     const abierto = nodos.find(([, p]) => !p.hidden);
     if (!abierto) return;
     cerrar(null);
@@ -1316,7 +1329,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const iqCampo = $('iqPregunta');
 
   $('calc60iq')?.addEventListener('click', () => {
-    if (!$('calcPanel60iq')?.hidden) iqCampo?.focus();
+    // Con ratón se enfoca; con el dedo no, igual que el campo del monto. Los
+    // ejemplos de debajo se tocan, y con el teclado encima no se ven.
+    if (!$('calcPanel60iq')?.hidden && !CON_DEDO.matches) iqCampo?.focus();
   });
 
   // El teclado del teléfono tapa la caja de escribir: el panel está al final
@@ -1324,6 +1339,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // iOS no encoge el viewport al abrirlo —solo lo desplaza—, así que hay que
   // traerlo a la vista a mano, y esperar a que el teclado termine de subir.
   const traerALaVista = () => {
+    // Solo cuando el panel sale debajo. Al lado ya se ve, y desplazarse
+    // entonces mueve la pantalla sin motivo.
+    if (HAY_SITIO.matches) return;
     setTimeout(() => iqCampo?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 320);
   };
 
@@ -1337,6 +1355,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const pregunta = iqCampo?.value.trim();
     if (!pregunta) return;
     iqCampo.value = '';
+    // Ya preguntaste: lo que viene ahora es leer la respuesta, y el teclado
+    // la tapaba entera en un teléfono.
+    cerrarTeclado();
     preguntarAl60IQ(pregunta);
   });
 
@@ -1464,6 +1485,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  /* Con el dedo no se pone el foco solo: abrir el teclado sin que nadie lo
+     haya pedido tapa media pantalla. Con ratón sí, que ahí no cuesta nada. */
+  const CON_DEDO = window.matchMedia('(pointer: coarse)');
+
+  /** Cierra el teclado si lo hay. Un solo sitio para no dejar cabos sueltos. */
+  const cerrarTeclado = () => {
+    const activo = document.activeElement;
+    if (activo instanceof HTMLInputElement) activo.blur();
+  };
+
   /* Tocar fuera cierra el teclado.
      En iOS y iPadOS, tocar el fondo no quita el foco de un campo por sí solo:
      el teclado se queda puesto tapando media pantalla hasta que le das a la
@@ -1474,6 +1505,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const activo = document.activeElement;
     if (!(activo instanceof HTMLInputElement)) return;
     if (e.target === activo || e.target.closest('input')) return;
+    // Ajustar la cifra con un atajo o copiar un resultado no es dejar de
+    // escribir: ahí el teclado se queda.
     if (e.target.closest('#calcRapidos, .res')) return;
     activo.blur();
   }, { passive: true });
