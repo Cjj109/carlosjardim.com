@@ -149,6 +149,17 @@ export async function proximaTras(db, hoy) {
   }
 }
 
+/** La fecha valor más alta apuntada, incluidas las que aún no han entrado */
+export async function ultimaFechaValor(db) {
+  if (!db) return null;
+  try {
+    const fila = await db.prepare('SELECT MAX(fecha) AS fecha FROM bcv_vigencias').first();
+    return fila?.fecha ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Último recurso: la foto que deja el workflow en data/bcv-rates.json.
  *

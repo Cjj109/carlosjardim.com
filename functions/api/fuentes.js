@@ -163,10 +163,16 @@ export async function onRequestGet(context) {
     (await snapshotEstatico(context.request.url, hoy));
   const siguiente = await proximaTras(context.env?.MONTOS, hoy);
 
-  /** Cambia la lectura por la que ya se aplica, si es que son distintas */
+  /**
+   * Cambia la lectura por la que ya se aplica.
+   *
+   * Siempre, aunque la fila y la lectura sean la misma tasa: la ficha tiene
+   * que enseñar la fecha DESDE la que se aplica, no la fecha valor. Un sábado
+   * son distintas —12/09 y 14/09— y poner la del BCV ahí, junto a un número
+   * que ya se está cobrando, decía que aún no había entrado.
+   */
   const vigente = (lectura) => {
     if (!lectura || !aplicando) return lectura;
-    if (aplicando.fecha === lectura.fecha) return lectura;
 
     return {
       usd: aplicando.usd ?? lectura.usd,

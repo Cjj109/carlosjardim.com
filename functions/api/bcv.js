@@ -49,7 +49,14 @@
  * Cache: 5 minutos en el CDN.
  */
 
-import { hoyCaracas, guardarVigencia, vigenteEn, proximaTras, snapshotEstatico } from './_vigencia.js';
+import {
+  hoyCaracas,
+  guardarVigencia,
+  vigenteEn,
+  proximaTras,
+  ultimaFechaValor,
+  snapshotEstatico,
+} from './_vigencia.js';
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
@@ -315,10 +322,30 @@ export async function onRequestGet(context) {
     const publicada = { usd: bcvUsd.rate, eur: bcvEur.rate, fecha: bcvUsd.date ?? bcvEur.date ?? null };
     await guardarVigencia(context.env?.MONTOS, publicada.fecha, publicada.usd, publicada.eur, hoy);
 
-    const aplicando =
+    const memoria =
       (await vigenteEn(context.env?.MONTOS, hoy)) ??
       (await snapshotEstatico(context.request.url, hoy));
     const siguiente = await proximaTras(context.env?.MONTOS, hoy);
+
+    /* La memoria no puede tapar a una fuente viva que va por delante.
+       Si el BCV y el puente llevan días caídos, lo apuntado se queda atrás
+       mientras DolarAPI sigue publicando; servir la fila vieja sería
+       exactamente el fallo que este endpoint existe para evitar —el sitio
+       cobrando con una tasa muerta sin que nadie lo note.
+
+       Se comparan FECHAS VALOR entre sí: la del BCV y la de DolarAPI son la
+       misma magnitud, desde cuándo rige oficialmente. Contra `desde` no, que
+       es otra cosa y el fin de semana no coinciden.
+
+       Solo afecta al dólar: el euro no tiene respaldo en ningún sitio, y ahí
+       una tasa vieja sigue siendo mejor que una tarjeta vacía. */
+    const respaldoFecha = respaldo?.fechaActualizacion?.split('T')[0] ?? null;
+    const ultimaApuntada = (await ultimaFechaValor(context.env?.MONTOS)) ?? memoria?.fecha ?? null;
+    const memoriaAtrasada =
+      !!respaldoFecha && respaldoFecha <= hoy && (!ultimaApuntada || respaldoFecha > ultimaApuntada);
+
+    const aplicando =
+      memoria && memoriaAtrasada ? { ...memoria, usd: null } : memoria;
 
     /**
      * La que se aplica hoy, y aparte la que ya viene con su día de entrada.
