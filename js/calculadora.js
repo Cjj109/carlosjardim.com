@@ -1089,6 +1089,15 @@ function deslizarEntreModos(panel) {
   let siguiendo = false;
 
   panel.addEventListener('touchstart', (e) => {
+    /* Apagarlo SIEMPRE al empezar.
+       Antes se salía sin hacerlo cuando el toque caía en el campo, así que
+       quedaba encendido con las coordenadas del gesto anterior: tocabas la
+       caja del monto, el touchend calculaba un desplazamiento enorme desde
+       donde estuvo el dedo la vez pasada, y la app cambiaba de modo. Se
+       redibujaba todo y el teclado ni llegaba a abrirse. Desde fuera parecía
+       que el campo "no respondía bien". */
+    siguiendo = false;
+
     if (e.touches.length !== 1) return;
     // No robar el gesto a lo que ya se desplaza solo, ni al campo de texto
     if (e.target.closest('.calc-iq-charla, .calc-historial, input')) return;
@@ -1130,7 +1139,7 @@ function navegarConFlechas(contenedor, selector, alElegir) {
 }
 
 /** Abre un panel y cierra los demás: apilados, en el teléfono no se ve nada */
-function crearPaneles(lista) {
+function crearPaneles(lista, alTocar) {
   const nodos = lista
     .map(([b, p]) => [$(b), $(p)])
     .filter(([b, p]) => b && p);
@@ -1144,7 +1153,11 @@ function crearPaneles(lista) {
       boton.setAttribute('aria-expanded', String(activo));
     }
 
-    if (abrir) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Solo se desplaza si el panel sale DEBAJO. Con sitio para dos columnas
+    // aparece al lado, y desplazarse ahí mueve la pantalla sin motivo.
+    if (abrir && !window.matchMedia('(min-width: 900px)').matches) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
   function cerrar(panel) {
@@ -1156,7 +1169,10 @@ function crearPaneles(lista) {
   }
 
   for (const [boton, panel] of nodos) {
-    boton.addEventListener('click', () => alternar(panel));
+    boton.addEventListener('click', () => {
+      alTocar?.();
+      alternar(panel);
+    });
   }
 
   // Escape cierra el que esté abierto, como cualquier menú
@@ -1279,12 +1295,22 @@ document.addEventListener('DOMContentLoaded', () => {
     programarRefresco();
   });
 
+  /* En una tableta en horizontal el 60 IQ arranca abierto.
+     Ahí sobra ancho: con el panel al lado se ven la calculadora y el ayudante
+     a la vez, y al cerrarlo la calculadora se queda sola en el centro y más
+     grande. El cambio de disposición lo hace el CSS con :has(), así que aquí
+     solo hay que abrirlo.
+     No se vuelve a abrir solo al girar la tableta: sería discutirle al usuario
+     lo que acaba de decidir. */
+  const HAY_SITIO = window.matchMedia('(min-width: 900px)');
+  let panelesTocados = false;
+
   const paneles = crearPaneles([
     ['calc60iq', 'calcPanel60iq'],
     ['calcTema', 'calcPanelTema'],
     ['calcHistorial', 'calcPanelHistorial'],
     ['calcAjustes', 'calcPanelAjustes'],
-  ]);
+  ], () => { panelesTocados = true; });
 
   // 60 IQ
   const iqCampo = $('iqPregunta');
@@ -1412,6 +1438,19 @@ document.addEventListener('DOMContentLoaded', () => {
     paneles.cerrar(panelFuentes);
   });
 
+  /* Y también al girar la tableta, mientras el usuario no haya decidido él.
+     Cargar en vertical y girar a horizontal es el caso normal en una tableta,
+     y ahí el ancho aparece después del arranque. En cuanto toca cualquier
+     botón de panel manda su decisión y esto no vuelve a meterse. */
+  const abrirSiHaySitio = () => {
+    if (HAY_SITIO.matches && !panelesTocados && $('calcPanel60iq')?.hidden) {
+      paneles.alternar($('calcPanel60iq'));
+    }
+  };
+
+  abrirSiHaySitio();
+  HAY_SITIO.addEventListener('change', abrirSiHaySitio);
+
   // El p2p se mueve durante el dia; el BCV no. Se refresca solo cada minuto.
   programarRefresco();
 
@@ -1424,6 +1463,20 @@ document.addEventListener('DOMContentLoaded', () => {
       programarRefresco();
     }
   });
+
+  /* Tocar fuera cierra el teclado.
+     En iOS y iPadOS, tocar el fondo no quita el foco de un campo por sí solo:
+     el teclado se queda puesto tapando media pantalla hasta que le das a la
+     tecla de bajar.
+     Los atajos de monto y las filas de resultado no cuentan: ahí sí tiene
+     sentido seguir con el teclado abierto para ajustar la cifra. */
+  document.addEventListener('pointerdown', (e) => {
+    const activo = document.activeElement;
+    if (!(activo instanceof HTMLInputElement)) return;
+    if (e.target === activo || e.target.closest('input')) return;
+    if (e.target.closest('#calcRapidos, .res')) return;
+    activo.blur();
+  }, { passive: true });
 
   // Al recuperar la señal se vuelve a preguntar en el acto, sin esperar al
   // minuto: es justo cuando lo que hay en pantalla está más viejo.

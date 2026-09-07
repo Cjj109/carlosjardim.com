@@ -1421,10 +1421,30 @@ body { overscroll-behavior-y: contain; }
 }
 
 @media (min-width: 900px) {
-  /* Los paneles al lado, no debajo: la calculadora se queda quieta mientras
-     miras el historial o le preguntas al 60 IQ */
+  /* Dos estados, y la propia página decide en cuál está.
+     El truco es :has(): si hay un panel abierto, la calculadora se aparta a
+     la izquierda y le hace sitio al lado; si no lo hay, se queda sola en el
+     centro y crece, que para eso está la pantalla.
+     Sin :has() —navegadores viejos— se queda en el estado ancho de una
+     columna y los paneles caen debajo, que es como estaba antes. */
+
+  /* CERRADO: sola en el centro y más grande */
   .calc {
-    max-width: 58rem;
+    max-width: 42rem;
+    transition: max-width 0.28s ease;
+  }
+
+  .calc-tasas { grid-template-columns: repeat(4, 1fr); }
+  .calc-monto input { font-size: 3rem; }
+  .calc-monto-signo { font-size: 1.9rem; }
+  .tasa-valor { font-size: 1.35rem; }
+  .res-valor { font-size: 1.5rem; }
+  .calc-modo { font-size: 0.85rem; }
+  .calc-rapidos button { font-size: 0.85rem; }
+
+  /* ABIERTO: se aparta y el panel va al lado */
+  .calc:has(.calc-ajustes:not([hidden])) {
+    max-width: 62rem;
     display: grid;
     grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
     grid-template-rows: auto auto auto 1fr;
@@ -1432,25 +1452,40 @@ body { overscroll-behavior-y: contain; }
     align-items: start;
   }
 
-  .calc-head { grid-column: 1 / -1; grid-row: 1; }
-  .calc-tasas { grid-column: 1 / -1; grid-row: 2; }
-  .calc-panel { grid-column: 1; grid-row: 3; }
-  .calc-pie { grid-column: 1; grid-row: 4; align-self: start; }
+  .calc:has(.calc-ajustes:not([hidden])) .calc-head { grid-column: 1 / -1; grid-row: 1; }
+  .calc:has(.calc-ajustes:not([hidden])) .calc-tasas { grid-column: 1 / -1; grid-row: 2; }
+  .calc:has(.calc-ajustes:not([hidden])) .calc-panel { grid-column: 1; grid-row: 3; }
+  .calc:has(.calc-ajustes:not([hidden])) .calc-pie { grid-column: 1; grid-row: 4; align-self: start; }
+  .calc:has(.calc-ajustes:not([hidden])) .noscript,
+  .calc:has(.calc-ajustes:not([hidden])) noscript { grid-column: 1 / -1; }
 
   /* Solo hay uno visible a la vez, así que todos comparten celda */
-  .calc-ajustes {
+  .calc:has(.calc-ajustes:not([hidden])) .calc-ajustes {
     grid-column: 2;
     grid-row: 3 / span 2;
     margin-top: 0;
     align-self: start;
   }
 
-  .calc-tasas { grid-template-columns: repeat(4, 1fr); }
+  /* Al apartarse, el monto vuelve a su tamaño de columna estrecha */
+  .calc:has(.calc-ajustes:not([hidden])) .calc-monto input { font-size: 2.3rem; }
+  .calc:has(.calc-ajustes:not([hidden])) .calc-monto-signo { font-size: 1.5rem; }
+  .calc:has(.calc-ajustes:not([hidden])) .tasa-valor { font-size: 1.2rem; }
+  .calc:has(.calc-ajustes:not([hidden])) .res-valor { font-size: 1.35rem; }
+
   .calc-iq-charla { max-height: 26rem; }
   .calc-historial { max-height: 26rem; }
 }
 
 @media (min-width: 1200px) {
-  .calc { max-width: 64rem; grid-template-columns: minmax(0, 34rem) minmax(0, 1fr); }
-  .calc-monto input { font-size: 2.6rem; }
+  .calc { max-width: 48rem; }
+  .calc:has(.calc-ajustes:not([hidden])) {
+    max-width: 68rem;
+    grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
+  }
+  .calc-monto input { font-size: 3.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calc { transition: none; }
 }
