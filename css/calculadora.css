@@ -1368,3 +1368,89 @@ body { overscroll-behavior-y: contain; }
 }
 
 .iq-fila.es-gana b { color: var(--calc-usdt); }
+
+/* ============================================================
+   EL PIE, CUANDO LOS CINCO BOTONES NO CABEN
+   ============================================================
+
+   En un teléfono ancho pero no infinito —un S26 Ultra, por ejemplo— los
+   cinco entran en una fila menos uno, y "Actualizar" se caía abajo pegado a
+   la derecha con un hueco a su izquierda. La culpa era de
+   justify-content: flex-end: el que sobra baja, y baja alineado a la derecha.
+
+   Ahora los botones crecen para llenar su fila. Si sobra uno, ocupa el ancho
+   entero y parece que va así a propósito, que es lo que se quiere: un botón
+   solo y descolgado se lee como un error de maquetación. */
+
+.calc-pie-botones button { flex: 1 1 auto; }
+
+@media (max-width: 620px) {
+  /* El texto de estado y la versión arriba, los botones en su propia fila */
+  .calc-pie {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .calc-pie > span:first-child { order: -1; }
+  .calc-version { position: absolute; right: 0.25rem; }
+  .calc-pie { position: relative; }
+  .calc-pie-botones { width: 100%; }
+}
+
+/* ============================================================
+   TABLETAS
+   ============================================================
+
+   Hasta ahora la columna se quedaba en 30rem pasara lo que pasara, así que
+   en un iPad quedaba una tira estrecha en medio de una pantalla enorme, y
+   abrir el 60 IQ o el historial empujaba todo hacia abajo obligando a
+   desplazarse en una pantalla donde sobraba sitio.
+
+   Dos escalones, y el segundo solo cuando hay ancho de verdad para dos
+   columnas sin apretar ninguna: un iPad de 11" en vertical son 834 px, que
+   no dan, y por eso el corte está en 900. */
+
+@media (min-width: 700px) {
+  .calc { max-width: 34rem; }
+  .calc-head h1 { font-size: 1.9rem; }
+  .calc-monto input { font-size: 2.3rem; }
+  .tasa-valor { font-size: 1.2rem; }
+  .res-valor { font-size: 1.35rem; }
+  .calc-modo { font-size: 0.8rem; }
+}
+
+@media (min-width: 900px) {
+  /* Los paneles al lado, no debajo: la calculadora se queda quieta mientras
+     miras el historial o le preguntas al 60 IQ */
+  .calc {
+    max-width: 58rem;
+    display: grid;
+    grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 1.5rem;
+    align-items: start;
+  }
+
+  .calc-head { grid-column: 1 / -1; grid-row: 1; }
+  .calc-tasas { grid-column: 1 / -1; grid-row: 2; }
+  .calc-panel { grid-column: 1; grid-row: 3; }
+  .calc-pie { grid-column: 1; grid-row: 4; align-self: start; }
+
+  /* Solo hay uno visible a la vez, así que todos comparten celda */
+  .calc-ajustes {
+    grid-column: 2;
+    grid-row: 3 / span 2;
+    margin-top: 0;
+    align-self: start;
+  }
+
+  .calc-tasas { grid-template-columns: repeat(4, 1fr); }
+  .calc-iq-charla { max-height: 26rem; }
+  .calc-historial { max-height: 26rem; }
+}
+
+@media (min-width: 1200px) {
+  .calc { max-width: 64rem; grid-template-columns: minmax(0, 34rem) minmax(0, 1fr); }
+  .calc-monto input { font-size: 2.6rem; }
+}
