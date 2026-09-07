@@ -17,7 +17,8 @@
  *   - EL PARPADEO. Al publicar, la pagina del BCV va y viene entre la vieja y
  *     la nueva. El miedo es que el sistema tome la vieja por nueva.
  *
- * Requiere Node 22.5 o mas nuevo, por node:sqlite.
+ * Requiere Node 22.13 o mas nuevo: antes de esa version node:sqlite
+ * necesita --experimental-sqlite, y antes de la 22.5 no existe.
  */
 import { DatabaseSync } from 'node:sqlite';
 import { onRequestGet } from '../functions/api/bcv.js';
@@ -172,6 +173,22 @@ console.log('\nEL BCV CAÍDO');
   await momento(db2, '2026-09-11T16:00:00', 830, 910, '2026-09-14');
   const atrasado = { promedio: 820, fechaActualizacion: '2026-09-13T00:00:00-04:00' };
   comprobar('domingo: DolarAPI atrasado no manda', (await momento(db2, '2026-09-13T10:00:00', 830, 910, '2026-09-14', atrasado)).usd, 830);
+}
+
+console.log('\nCUANDO NO HAY NINGUNA NUEVA PUBLICADA');
+{
+  // Lunes por la mañana: la del lunes ya entró y el BCV todavía no publica la
+  // del martes. Son unas dieciséis horas al día en ese estado, así que no es
+  // un caso raro: es la mañana.
+  const db = nuevaD1();
+  await momento(db, '2026-09-11T16:00:00', 830, 910, '2026-09-14');
+  const lunes = await momento(db, '2026-09-14T09:00:00', 830, 910, '2026-09-14');
+  comprobar('se cobra la que entró', lunes.usd, 830);
+  comprobar('  y no se anuncia ninguna próxima', lunes.proxima, null);
+
+  // Esa misma tarde publica la del martes
+  const tarde = await momento(db, '2026-09-14T16:30:00', 840, 920, '2026-09-15');
+  comprobar('por la tarde ya hay una que viene', `${tarde.proxima?.rate}@${tarde.proxima?.date}`, '840@2026-09-15');
 }
 
 console.log('\nLA PRÓXIMA SE ANUNCIA CON EL DÍA EN QUE ENTRA');

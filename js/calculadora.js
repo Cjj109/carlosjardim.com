@@ -815,6 +815,12 @@ function aplicarEleccion() {
       fuente: oficial.nombre,
       proxima: oficial.proxima ?? null,
     };
+    // El euro va con el dólar. Antes se quedaba siempre con el de /api/bcv, y
+    // eso se notaba al elegir "la que viene": el dólar cambiaba y el euro no,
+    // enseñando dos tasas de días distintos una al lado de la otra.
+    if (oficial.eur) {
+      tasas.eur = { rate: oficial.eur, date: oficial.date, symbol: '€', fuente: oficial.nombre };
+    }
   }
   if (paralelo) {
     tasas.usdt = { rate: paralelo.rate, date: paralelo.date, symbol: '₮', market: paralelo.id, fuente: paralelo.nombre };

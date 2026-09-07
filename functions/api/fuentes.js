@@ -210,6 +210,25 @@ export async function onRequestGet(context) {
       proxima: puenteHoy?.proxima ?? null,
       motivo: motivoPuenteBcv ?? sinEsaCifra(puenteBcv),
     },
+    /* La que el BCV ya publicó y todavía no entra.
+       Va como una ficha más, elegible, y no como una nota al pie: si tienes
+       que pagarle a alguien que ya cobra con ella, la quieres en la
+       calculadora, no solo enterarte de que existe. La elección se guarda en
+       el navegador de cada quien, como las demás.
+
+       Cuando entra en vigor, esta ficha desaparece —ya no hay "siguiente"— y
+       quien la tuviera elegida cae en la primera del grupo, que es la del
+       BCV, y que para entonces ya trae ese mismo número. */
+    siguiente && {
+      id: 'bcv-proxima',
+      grupo: 'bcv',
+      nombre: 'BCV · la que viene',
+      detalle: 'Publicada y todavía sin entrar. Elígela si tienes que pagar a quien ya cobra con ella.',
+      rate: siguiente.usd ?? null,
+      eur: siguiente.eur ?? null,
+      date: siguiente.desde ?? siguiente.fecha,
+      motivo: null,
+    },
     {
       id: 'dolarapi',
       grupo: 'bcv',
@@ -313,7 +332,10 @@ export async function onRequestGet(context) {
     },
   ];
 
-  return new Response(JSON.stringify({ fuentes, eur: bcvHoy?.eur ?? null, eurFecha: bcvHoy?.fecha ?? null }), {
+  // El .filter quita la ficha de "la que viene" cuando no hay ninguna
+  const salida = { fuentes: fuentes.filter(Boolean), eur: bcvHoy?.eur ?? null, eurFecha: bcvHoy?.fecha ?? null };
+
+  return new Response(JSON.stringify(salida), {
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': `public, max-age=${CACHE}, s-maxage=${CACHE}`,
