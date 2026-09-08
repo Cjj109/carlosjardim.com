@@ -1400,12 +1400,27 @@ body { overscroll-behavior-y: contain; }
    ORGULLO
    ============================================================
 
-   La bandera ya estaba medio puesta: el dólar era azul, el euro amarillo, el
-   USDT verde y el Zelle violeta. Cuatro de los seis colores, cada uno donde
-   ya significaba algo. Así que el tema no reparte colores nuevos por encima
-   —eso habría roto la lectura de las tarjetas—, sino que los sube de tono y
-   mete el rojo y el naranja que faltaban donde no compiten con ningún dato:
-   el título y la franja del panel.                                          */
+   La primera versión colgaba una franja de seis colores encima del panel, en
+   el mismo sitio donde navidad pone su guirnalda. Ahí no funcionaba: la
+   guirnalda es un objeto que se cuelga de una pared y ese es su sitio; una
+   bandera plana pegada en el mismo borde es una pegatina encima de una
+   interfaz que no la pidió.
+
+   Así que aquí no hay ninguna pieza decorativa. El color sale de lo que la
+   calculadora YA tiene, que resulta que llevaba media bandera puesta desde el
+   principio: el dólar azul, el euro amarillo, el USDT verde y el Zelle
+   violeta. Cuatro de los seis, cada uno donde significa algo.
+
+   Lo que se añade son los dos que faltaban, y solo donde hay una razón:
+
+     el título          recorre los seis, despacio
+     la caja del monto  al escribir en ella, el borde se vuelve la bandera
+     la pestaña activa  lleva debajo el trozo de bandera que le toca
+
+   La idea de la caja es la que sostiene el tema: el color no está puesto ahí
+   esperando, aparece cuando tocas. Y las pestañas reparten los seis colores
+   entre las cuatro, así que la bandera se completa usando la app, no
+   mirándola.                                                                */
 
 :root[data-tema="orgullo"] {
   --calc-fondo: #0b0910;
@@ -1420,14 +1435,26 @@ body { overscroll-behavior-y: contain; }
   --calc-usd: #4a9eff;
   --calc-eur: #ffd23f;
   --calc-usdt: #3ddc84;
+
+  /* La bandera, en un solo sitio: si se retoca un color se retoca aquí */
+  --bandera: linear-gradient(
+    90deg,
+    #e63946 0 16.66%, #ff8c42 16.66% 33.33%, #ffd23f 33.33% 50%,
+    #3ddc84 50% 66.66%, #4a9eff 66.66% 83.33%, #b57bff 83.33% 100%
+  );
+  /* El fondo de la caja del monto, opaco. Hace falta opaco porque debajo va
+     el degradado del borde: con el rgba de siempre se transparentaba y la
+     bandera se veía por el medio de la cifra. Es el mismo color que resulta
+     de poner ese negro al 28% sobre la superficie. */
+  --monto-fondo: #100e16;
 }
 
 :root[data-tema="orgullo"] body {
   background:
-    radial-gradient(ellipse 55% 40% at 10% -5%, rgba(230, 57, 70, 0.16), transparent 70%),
-    radial-gradient(ellipse 55% 40% at 50% -8%, rgba(255, 210, 63, 0.10), transparent 70%),
-    radial-gradient(ellipse 55% 40% at 90% -5%, rgba(74, 158, 255, 0.15), transparent 70%),
-    radial-gradient(ellipse 70% 40% at 50% 105%, rgba(181, 123, 255, 0.14), transparent 70%),
+    radial-gradient(ellipse 55% 40% at 10% -5%, rgba(230, 57, 70, 0.15), transparent 70%),
+    radial-gradient(ellipse 55% 40% at 50% -8%, rgba(255, 210, 63, 0.09), transparent 70%),
+    radial-gradient(ellipse 55% 40% at 90% -5%, rgba(74, 158, 255, 0.14), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 105%, rgba(181, 123, 255, 0.13), transparent 70%),
     var(--calc-fondo);
 }
 
@@ -1449,24 +1476,53 @@ body { overscroll-behavior-y: contain; }
   100% { background-position: 200% center; }
 }
 
-/* La franja, arriba del panel. Mismo sitio que la guirnalda de navidad:
-   se ve siempre y no le quita espacio a nada. */
-:root[data-tema="orgullo"] .calc-panel { position: relative; padding-top: 1.4rem; }
+/* La caja del monto: en reposo es la de siempre; al escribir, el borde se
+   vuelve la bandera. Dos capas de fondo —el relleno por dentro y el degradado
+   por fuera— que es como se hace un borde en degradado sin pintar un div
+   extra debajo. */
+:root[data-tema="orgullo"] .calc-monto {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--monto-fondo), var(--monto-fondo)) padding-box,
+    linear-gradient(var(--calc-borde), var(--calc-borde)) border-box;
+  transition: background 0.22s ease;
+}
 
-:root[data-tema="orgullo"] .calc-panel::before {
+:root[data-tema="orgullo"] .calc-monto:focus-within {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--monto-fondo), var(--monto-fondo)) padding-box,
+    var(--bandera) border-box;
+}
+
+/* Las pestañas se reparten la bandera: cada una lleva debajo su trozo, y solo
+   se enciende la que está activa. Al ir cambiando de modo se recorre entera. */
+:root[data-tema="orgullo"] .calc-modo {
+  position: relative;
+  overflow: hidden;
+}
+
+:root[data-tema="orgullo"] .calc-modo::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 14px;
-  right: 14px;
-  height: 5px;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(
-    90deg,
-    #e63946 0 16.66%, #ff8c42 16.66% 33.33%, #ffd23f 33.33% 50%,
-    #3ddc84 50% 66.66%, #4a9eff 66.66% 83.33%, #b57bff 83.33% 100%
-  );
+  left: 22%;
+  right: 22%;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--bandera);
+  background-size: 400% 100%;
+  opacity: 0;
+  transition: opacity 0.18s ease;
 }
+
+/* A cada pestaña le toca un cuarto de la bandera */
+:root[data-tema="orgullo"] .calc-modo:nth-child(1)::after { background-position: 0% 0; }
+:root[data-tema="orgullo"] .calc-modo:nth-child(2)::after { background-position: 33.33% 0; }
+:root[data-tema="orgullo"] .calc-modo:nth-child(3)::after { background-position: 66.66% 0; }
+:root[data-tema="orgullo"] .calc-modo:nth-child(4)::after { background-position: 100% 0; }
+
+:root[data-tema="orgullo"] .calc-modo.is-active::after { opacity: 1; }
 
 /* Un halo frío en las tarjetas, como el cálido de navidad */
 :root[data-tema="orgullo"] .tasa {
