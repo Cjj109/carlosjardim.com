@@ -71,7 +71,6 @@
   <link rel="stylesheet" href="css/chocolate-shop.css?r=18" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/matrix-mode.css?r=18" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/new-features.css?r=18" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/bcv-calculator.css?r=18" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/utilities.css?r=18" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/monetary-indicators.css?r=18" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/commodities.css?r=18" media="print" onload="this.media='all'">
@@ -87,7 +86,6 @@
     <link rel="stylesheet" href="css/chocolate-shop.css?r=18">
     <link rel="stylesheet" href="css/matrix-mode.css?r=18">
     <link rel="stylesheet" href="css/new-features.css?r=18">
-    <link rel="stylesheet" href="css/bcv-calculator.css?r=18">
     <link rel="stylesheet" href="css/utilities.css?r=18">
     <link rel="stylesheet" href="css/monetary-indicators.css?r=18">
     <link rel="stylesheet" href="css/commodities.css?r=18">
@@ -102,7 +100,6 @@
   <script src="js/chocolate-shop.js?r=18" defer></script>
   <script src="js/side-a-enhancements.js?r=18" defer></script>
   <script src="js/gym-widget.js?r=18" defer></script>
-  <script src="js/bcv-calculator.js?r=18" defer></script>
   <script src="js/utilities.js?r=18" defer></script>
   <script src="js/monetary-indicators.js?r=18" defer></script>
   <script src="js/commodities.js?r=18" defer></script>
@@ -810,75 +807,11 @@
   <!-- ============================================
        BCV CALCULATOR MODAL
        ============================================ -->
-  <div class="bcv-overlay" id="bcvCalculatorModal" role="dialog" aria-modal="true" aria-label="Calculadora BCV">
-    <div class="bcv-container">
-      <button class="bcv-close" onclick="closeBCVCalculator()" aria-label="Cerrar">✕</button>
-
-      <div class="bcv-header">
-        <div class="bcv-title">💱 Tasas de Cambio</div>
-        <div class="bcv-subtitle">BCV Oficial + USDT P2P</div>
-      </div>
-
-      <!-- Current Rates -->
-      <div class="bcv-rates bcv-rates-3">
-        <div class="bcv-rate-card">
-          <div class="bcv-rate-symbol">$</div>
-          <div class="bcv-rate-label">USD BCV</div>
-          <div class="bcv-rate-value" id="bcvUsdRate">---</div>
-        </div>
-
-        <div class="bcv-rate-card">
-          <div class="bcv-rate-symbol">€</div>
-          <div class="bcv-rate-label">EUR BCV</div>
-          <div class="bcv-rate-value" id="bcvEurRate">---</div>
-        </div>
-
-        <div class="bcv-rate-card bcv-rate-usdt">
-          <div class="bcv-rate-symbol">₮</div>
-          <div class="bcv-rate-label">USDT P2P <span id="usdtLiveIndicator" class="live-indicator" style="display:none">●</span></div>
-          <div class="bcv-rate-value" id="bcvUsdtRate">---</div>
-        </div>
-      </div>
-
-      <!-- Calculadora: se escribe una cantidad y salen las otras tres a la vez -->
-      <div class="bcv-calculator">
-        <div class="bcv-calc-title">🧮 Convertir</div>
-
-        <div class="bcv-modo" id="bcvFromChips" role="group" aria-label="Qué tengo">
-          <button type="button" class="bcv-modo-btn is-active" data-modo="divisa" aria-pressed="true">Divisas</button>
-          <button type="button" class="bcv-modo-btn" data-modo="bs" aria-pressed="false">Bolívares</button>
-          <button type="button" class="bcv-modo-btn" data-modo="bcv" aria-pressed="false">Precio a BCV</button>
-        </div>
-
-        <input
-          type="number"
-          id="bcvAmount"
-          class="bcv-input bcv-input-grande"
-          placeholder="0"
-          step="0.01"
-          min="0"
-          inputmode="decimal"
-          aria-label="Cantidad"
-        />
-
-        <div class="bcv-quick" id="bcvQuick" role="group" aria-label="Montos rápidos">
-          <button type="button" class="bcv-quick-btn" data-amount="1">1</button>
-          <button type="button" class="bcv-quick-btn" data-amount="10">10</button>
-          <button type="button" class="bcv-quick-btn" data-amount="50">50</button>
-          <button type="button" class="bcv-quick-btn" data-amount="100">100</button>
-          <button type="button" class="bcv-quick-btn" data-amount="500">500</button>
-        </div>
-
-        <div class="bcv-results" id="bcvResults" aria-live="polite">
-          <div class="bcv-result-empty">Escribe una cantidad</div>
-        </div>
-      </div>
-
-      <div class="bcv-update-info" id="bcvUpdateInfo">
-        Cargando...
-      </div>
-    </div>
-  </div>
+  <!-- La calculadora de tasas ya no vive aquí.
+       Estaba como modal y pedía /api/bcv desde la portada pública. Ahora ese
+       endpoint está detrás del acceso por passkeys, así que dejarla habría
+       sido enseñar una calculadora que no puede calcular. Vive entera en
+       /calculadora, y el menú de utilidades ya enlazaba allí. -->
 
   <!-- Utilities Menu Modal -->
   <div class="utilities-overlay" id="utilitiesModal">

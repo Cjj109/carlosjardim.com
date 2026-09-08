@@ -161,7 +161,6 @@ document.addEventListener('keydown', (e) => {
     ['underageOverlay', 'closeUnderageOverlay'],
     ['ageGateModal', 'closeAgeGateModal'],
     ['videoModal', 'closeVideoModal'],
-    ['bcvCalculatorModal', 'closeBCVCalculator'],
     ['monetaryModal', 'closeMonetaryIndicators'],
     ['commoditiesModal', 'closeCommodities'],
     ['gymWidgetModal', 'closeGymWidget'],

@@ -3,6 +3,18 @@
 User-agent: *
 Allow: /
 
+# Lo privado no se indexa.
+#
+# Va DENTRO del bloque de "User-agent: *", que es lo que hace que valga para
+# todos: en robots.txt cada regla pertenece al bloque que la precede, y
+# puesta más abajo solo habría aplicado al último agente nombrado.
+#
+# Esto no protege nada por sí solo —el buscador que quiera obedecer obedece, y
+# el que no, no—. Quien protege es el acceso por passkeys. Esto solo evita que
+# la calculadora salga en resultados de búsqueda.
+Disallow: /calculadora
+Disallow: /acceso
+
 # Sitemap
 Sitemap: https://carlosjardim.com/sitemap.xml
 

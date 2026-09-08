@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Acceso | Carlos Jardim</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a0b0f">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">
+  <style>
+    :root {
+      --fondo: #0a0b0f;
+      --superficie: #14161d;
+      --borde: rgba(255, 255, 255, 0.09);
+      --texto: #e8e9ee;
+      --suave: #9aa0ae;
+      --tenue: #626878;
+      --acento: #5b93ff;
+      --malo: #ff6b6b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 1.5rem;
+      background:
+        radial-gradient(ellipse 70% 45% at 50% -10%, rgba(91, 147, 255, 0.10), transparent 70%),
+        var(--fondo);
+      color: var(--texto);
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      line-height: 1.5;
+    }
+    .caja {
+      width: 100%;
+      max-width: 27rem;
+      padding: 2rem 1.6rem;
+      border-radius: 18px;
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+    }
+    h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+    .sub { margin-top: 0.4rem; color: var(--suave); font-size: 0.9rem; }
+    .bloque { margin-top: 1.6rem; }
+    button {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 0;
+      border-radius: 12px;
+      background: var(--acento);
+      color: #06122e;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+    button.secundario {
+      background: transparent;
+      border: 1px solid var(--borde);
+      color: var(--suave);
+      font-weight: 500;
+    }
+    button.secundario:hover { border-color: rgba(255, 255, 255, 0.2); color: var(--texto); }
+    .fila { display: flex; gap: 0.6rem; margin-top: 0.7rem; }
+    input {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--borde);
+      background: rgba(0, 0, 0, 0.28);
+      color: var(--texto);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    input:focus { border-color: rgba(255, 255, 255, 0.22); }
+    label { display: block; margin-bottom: 0.4rem; font-size: 0.8rem; color: var(--tenue); }
+    .mensaje { margin-top: 1rem; font-size: 0.85rem; color: var(--suave); }
+    .mensaje.es-malo { color: var(--malo); }
+    ul { list-style: none; margin-top: 0.8rem; }
+    li {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 0.8rem;
+      padding: 0.6rem 0;
+      border-top: 1px solid var(--borde);
+      font-size: 0.88rem;
+    }
+    .ap-fecha { color: var(--tenue); font-size: 0.78rem; white-space: nowrap; }
+    .nota { margin-top: 1.4rem; font-size: 0.78rem; color: var(--tenue); }
+    a { color: var(--suave); }
+    .volver { display: inline-block; margin-bottom: 1.4rem; font-size: 0.82rem; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="caja">
+    <a class="volver" href="/">← carlosjardim.com</a>
+
+    <p id="cargando" class="sub">Un momento…</p>
+
+    <!-- Sin sesión y sin invitación: entrar -->
+    <div id="fuera" hidden>
+      <h1>Acceso</h1>
+      <p class="sub">Esta parte del sitio es privada. Se entra con la huella, la cara o el PIN de tu propio aparato.</p>
+      <div class="bloque">
+        <button id="btnEntrar" type="button">Entrar con mi passkey</button>
+      </div>
+      <p class="nota">
+        ¿Tienes la llave en otro teléfono? En el diálogo que sale, elige usar una passkey de otro
+        dispositivo y escanea el código con él.
+      </p>
+    </div>
+
+    <!-- Con invitación: darse de alta -->
+    <div id="alta" hidden>
+      <h1>Te invitaron</h1>
+      <p class="sub">Esta invitación es para <strong id="invitadoA">…</strong> y solo sirve una vez.</p>
+      <div class="bloque">
+        <label for="apodo">¿Qué aparato es este?</label>
+        <input id="apodo" type="text" maxlength="60" placeholder="Mi iPhone" autocomplete="off">
+        <div class="fila">
+          <button id="btnAlta" type="button">Crear mi passkey</button>
+        </div>
+      </div>
+      <p class="nota">
+        No se crea ninguna contraseña. La llave se queda en este aparato y no se puede copiar ni
+        contar por teléfono.
+      </p>
+    </div>
+
+    <!-- Con sesión -->
+    <div id="dentro" hidden>
+      <h1 id="saludo">Ya estás dentro</h1>
+      <p class="sub">Tus aparatos con acceso:</p>
+      <ul id="aparatos"></ul>
+      <div class="bloque">
+        <label for="apodoNuevo">Añadir el aparato que estás usando</label>
+        <input id="apodoNuevo" type="text" maxlength="60" placeholder="Mi Samsung" autocomplete="off">
+        <div class="fila">
+          <button id="btnAnadir" type="button">Crear passkey aquí</button>
+        </div>
+      </div>
+      <div class="fila">
+        <button class="secundario" type="button" onclick="location.href='/calculadora'">Ir a la calculadora</button>
+        <button id="btnSalir" class="secundario" type="button">Salir</button>
+      </div>
+      <p class="nota">
+        Las passkeys de Apple y las de Google no se pasan de un lado al otro. Si usas un Samsung y
+        un iPhone, entra en cada uno y crea aquí su propia llave.
+      </p>
+    </div>
+
+    <p id="mensaje" class="mensaje" hidden></p>
+  </main>
+
+  <script src="/js/acceso.js?r=1" defer></script>
+</body>
+</html>

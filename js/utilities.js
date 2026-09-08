@@ -25,19 +25,6 @@ function closeUtilitiesMenu() {
 }
 
 /**
- * Open BCV calculator from utilities menu
- */
-function openBCVFromUtilities() {
-  // Close utilities menu first
-  closeUtilitiesMenu();
-
-  // Small delay to allow menu to close smoothly
-  setTimeout(() => {
-    openBCVCalculator();
-  }, 100);
-}
-
-/**
  * Open monetary indicators from utilities menu
  */
 function openMonetaryFromUtilities() {
