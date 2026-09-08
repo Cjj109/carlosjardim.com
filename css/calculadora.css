@@ -861,16 +861,16 @@ body {
 .muestra-navidad span:nth-child(3) { background: #e8b93a; }
 .muestra-navidad span:nth-child(4) { background: #3fbf71; }
 
-/* La muestra del orgullo lleva la bandera entera, no cuatro colores sueltos:
+/* La muestra lleva la bandera entera, no cuatro colores sueltos:
    con seis franjas se reconoce de un vistazo, que es para lo que está. */
-.muestra-orgullo {
+.muestra-miguel {
   background: linear-gradient(
     90deg,
     #e63946 0 16.66%, #ff8c42 16.66% 33.33%, #ffd23f 33.33% 50%,
     #3ddc84 50% 66.66%, #4a9eff 66.66% 83.33%, #b57bff 83.33% 100%
   );
 }
-.muestra-orgullo span { background: none; }
+.muestra-miguel span { background: none; }
 
 /* ---------- Detalles del tema navideño ---------- */
 
@@ -1118,7 +1118,7 @@ body {
 :root { --calc-zelle: #a855f7; }
 :root[data-tema="claro"] { --calc-zelle: #7e22ce; }
 :root[data-tema="navidad"] { --calc-zelle: #d98cff; }
-:root[data-tema="orgullo"] { --calc-zelle: #b57bff; }
+:root[data-tema="miguel"] { --calc-zelle: #b57bff; }
 
 /* ---------- Interruptor de aportar montos ---------- */
 
@@ -1397,8 +1397,13 @@ body { overscroll-behavior-y: contain; }
 .iq-fila.es-gana b { color: var(--calc-usdt); }
 
 /* ============================================================
-   ORGULLO
+   MIGUEL
    ============================================================
+
+   El tema del orgullo, que se llama Miguel porque el dueño quiso dedicárselo
+   a su mejor amigo. El nombre va también en el código y no solo en la
+   etiqueta: el tema se llama así, y ver `data-tema="miguel"` por dentro y
+   "Miguel" por fuera sería dejar el nombre a medias.
 
    La primera versión colgaba una franja de seis colores encima del panel, en
    el mismo sitio donde navidad pone su guirnalda. Ahí no funcionaba: la
@@ -1422,7 +1427,7 @@ body { overscroll-behavior-y: contain; }
    entre las cuatro, así que la bandera se completa usando la app, no
    mirándola.                                                                */
 
-:root[data-tema="orgullo"] {
+:root[data-tema="miguel"] {
   --calc-fondo: #0b0910;
   --calc-superficie: #16131f;
   --calc-superficie-alta: #1d1929;
@@ -1449,7 +1454,7 @@ body { overscroll-behavior-y: contain; }
   --monto-fondo: #100e16;
 }
 
-:root[data-tema="orgullo"] body {
+:root[data-tema="miguel"] body {
   background:
     radial-gradient(ellipse 55% 40% at 10% -5%, rgba(230, 57, 70, 0.15), transparent 70%),
     radial-gradient(ellipse 55% 40% at 50% -8%, rgba(255, 210, 63, 0.09), transparent 70%),
@@ -1459,7 +1464,7 @@ body { overscroll-behavior-y: contain; }
 }
 
 /* El título sí lleva los seis, y se mueve despacio */
-:root[data-tema="orgullo"] .calc-head h1 {
+:root[data-tema="miguel"] .calc-head h1 {
   background: linear-gradient(
     100deg,
     #e63946, #ff8c42, #ffd23f, #3ddc84, #4a9eff, #b57bff, #e63946
@@ -1468,10 +1473,10 @@ body { overscroll-behavior-y: contain; }
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: brilloOrgullo 9s linear infinite;
+  animation: brilloMiguel 9s linear infinite;
 }
 
-@keyframes brilloOrgullo {
+@keyframes brilloMiguel {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
 }
@@ -1480,7 +1485,7 @@ body { overscroll-behavior-y: contain; }
    vuelve la bandera. Dos capas de fondo —el relleno por dentro y el degradado
    por fuera— que es como se hace un borde en degradado sin pintar un div
    extra debajo. */
-:root[data-tema="orgullo"] .calc-monto {
+:root[data-tema="miguel"] .calc-monto {
   border-color: transparent;
   background:
     linear-gradient(var(--monto-fondo), var(--monto-fondo)) padding-box,
@@ -1488,7 +1493,7 @@ body { overscroll-behavior-y: contain; }
   transition: background 0.22s ease;
 }
 
-:root[data-tema="orgullo"] .calc-monto:focus-within {
+:root[data-tema="miguel"] .calc-monto:focus-within {
   border-color: transparent;
   background:
     linear-gradient(var(--monto-fondo), var(--monto-fondo)) padding-box,
@@ -1497,12 +1502,12 @@ body { overscroll-behavior-y: contain; }
 
 /* Las pestañas se reparten la bandera: cada una lleva debajo su trozo, y solo
    se enciende la que está activa. Al ir cambiando de modo se recorre entera. */
-:root[data-tema="orgullo"] .calc-modo {
+:root[data-tema="miguel"] .calc-modo {
   position: relative;
   overflow: hidden;
 }
 
-:root[data-tema="orgullo"] .calc-modo::after {
+:root[data-tema="miguel"] .calc-modo::after {
   content: '';
   position: absolute;
   left: 22%;
@@ -1517,20 +1522,20 @@ body { overscroll-behavior-y: contain; }
 }
 
 /* A cada pestaña le toca un cuarto de la bandera */
-:root[data-tema="orgullo"] .calc-modo:nth-child(1)::after { background-position: 0% 0; }
-:root[data-tema="orgullo"] .calc-modo:nth-child(2)::after { background-position: 33.33% 0; }
-:root[data-tema="orgullo"] .calc-modo:nth-child(3)::after { background-position: 66.66% 0; }
-:root[data-tema="orgullo"] .calc-modo:nth-child(4)::after { background-position: 100% 0; }
+:root[data-tema="miguel"] .calc-modo:nth-child(1)::after { background-position: 0% 0; }
+:root[data-tema="miguel"] .calc-modo:nth-child(2)::after { background-position: 33.33% 0; }
+:root[data-tema="miguel"] .calc-modo:nth-child(3)::after { background-position: 66.66% 0; }
+:root[data-tema="miguel"] .calc-modo:nth-child(4)::after { background-position: 100% 0; }
 
-:root[data-tema="orgullo"] .calc-modo.is-active::after { opacity: 1; }
+:root[data-tema="miguel"] .calc-modo.is-active::after { opacity: 1; }
 
 /* Un halo frío en las tarjetas, como el cálido de navidad */
-:root[data-tema="orgullo"] .tasa {
+:root[data-tema="miguel"] .tasa {
   box-shadow: 0 0 24px -14px rgba(181, 123, 255, 0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root[data-tema="orgullo"] .calc-head h1 { animation: none; }
+  :root[data-tema="miguel"] .calc-head h1 { animation: none; }
 }
 
 /* ============================================================
