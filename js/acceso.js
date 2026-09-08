@@ -57,19 +57,24 @@ function nombreDelAparato() {
 
 /* ---------- Entrar ---------- */
 
-async function entrar() {
+async function entrar(correo) {
   aviso('Pidiéndole la firma al aparato…');
-  const { reto } = await pedir('/api/acceso/reto?tipo=entrada');
+  const url = correo ? `/api/acceso/reto?tipo=entrada&correo=${encodeURIComponent(correo)}` : '/api/acceso/reto?tipo=entrada';
+  const { reto, llaves } = await pedir(url);
 
-  /* Sin allowCredentials: las llaves son descubribles, así que el navegador
-     enseña las que tiene para este sitio y se entra con un gesto, sin escribir
-     usuario. Es el "un solo paso" que se pidió. */
+  /* Sin correo no se pasa allowCredentials: las llaves son descubribles, así
+     que el navegador enseña las que tiene para este sitio y se entra con un
+     gesto, sin escribir nada. Con correo se le dice exactamente cuál pedir,
+     que es el repuesto para cuando ese listado no aparece. */
   const cred = await navigator.credentials.get({
     publicKey: {
       challenge: aBytes(reto),
       rpId: location.hostname,
       userVerification: 'preferred',
       timeout: 120000,
+      ...(llaves?.length
+        ? { allowCredentials: llaves.map((id) => ({ type: 'public-key', id: aBytes(id) })) }
+        : {}),
     },
   });
   if (!cred) throw new Error('No se eligió ninguna llave');
@@ -134,6 +139,7 @@ async function darDeAlta() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       codigo: CODIGO,
+      correo: ($('correo')?.value || '').trim(),
       credencial: cred.id,
       // getPublicKey da la clave en SPKI ya lista: así el servidor no tiene
       // que leer CBOR para sacarla
@@ -221,11 +227,16 @@ async function pintar() {
     $('fuera').hidden = true;
     $('alta').hidden = true;
     $('saludo').textContent = `Hola, ${yo.nombre}.`;
+    const soloUno = yo.aparatos.length <= 1;
     $('aparatos').innerHTML = yo.aparatos
       .map(
         (a) =>
           `<li><span class="ap-nombre">${a.apodo.replace(/[<>&]/g, '')}</span>` +
-          `<span class="ap-fecha">desde ${fecha(a.desde)}</span></li>`
+          `<span class="ap-fecha">desde ${fecha(a.desde)}</span>` +
+          (soloUno
+            ? ''
+            : `<button class="quitar" type="button" data-llave="${a.id.replace(/"/g, '')}">Quitar</button>`) +
+          `</li>`
       )
       .join('');
     aviso('');
@@ -249,6 +260,24 @@ async function pintar() {
   }
 }
 
+/**
+ * Quitar la llave de un aparato que ya no se tiene.
+ *
+ * La última no se puede quitar y por eso su botón ni aparece: ofrecer un clic
+ * que deja a alguien fuera de su propio sitio, y explicárselo después con un
+ * mensaje de error, es enseñar una puerta que no lleva a ninguna parte.
+ */
+async function quitarLlave(id, comoSeLlama) {
+  if (!confirm(`¿Quitar el acceso de "${comoSeLlama}"? Ese aparato tendrá que darse de alta otra vez.`)) return;
+  await pedir('/api/acceso/revocar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  await pintar();
+  aviso('Quitado.');
+}
+
 /* ---------- Arranque ---------- */
 
 const conAviso = (fn) => async () => {
@@ -268,9 +297,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return aviso('Este navegador no admite passkeys. Prueba con Safari, Chrome o Edge al día.', true);
   }
 
-  $('btnEntrar')?.addEventListener('click', conAviso(entrar));
+  $('btnEntrar')?.addEventListener('click', conAviso(() => entrar()));
+  $('btnEntrarCorreo')?.addEventListener('click', conAviso(() => {
+    const correo = ($('correoEntrar').value || '').trim();
+    if (!correo) return aviso('Escribe tu correo', true);
+    return entrar(correo);
+  }));
   $('btnAlta')?.addEventListener('click', conAviso(darDeAlta));
   $('btnAnadir')?.addEventListener('click', conAviso(darDeAlta));
+  $('aparatos')?.addEventListener('click', (e) => {
+    const boton = e.target.closest('.quitar');
+    if (boton) conAviso(() => quitarLlave(boton.dataset.llave, boton.closest('li').querySelector('.ap-nombre').textContent))();
+  });
   $('btnInvitar')?.addEventListener('click', conAviso(invitar));
   $('btnCopiar')?.addEventListener('click', conAviso(copiarEnlace));
   $('btnPrimera')?.addEventListener('click', conAviso(primeraInvitacion));

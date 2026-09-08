@@ -88,7 +88,14 @@
       border-top: 1px solid var(--borde);
       font-size: 0.88rem;
     }
-    .ap-fecha { color: var(--tenue); font-size: 0.78rem; white-space: nowrap; }
+    .ap-fecha { color: var(--tenue); font-size: 0.78rem; white-space: nowrap; margin-left: auto; }
+    .quitar {
+      width: auto; padding: 0.3rem 0.6rem;
+      background: transparent; border: 1px solid var(--borde);
+      color: var(--tenue); font-size: 0.72rem; font-weight: 500;
+      border-radius: 8px;
+    }
+    .quitar:hover { color: var(--malo); border-color: var(--malo); }
     .nota { margin-top: 1.4rem; font-size: 0.78rem; color: var(--tenue); }
     code {
       display: block;
@@ -130,6 +137,20 @@
       <div class="bloque">
         <button id="btnEntrar" type="button">Entrar con mi passkey</button>
       </div>
+      <details class="primera">
+        <summary>No me sale ninguna llave</summary>
+        <p class="nota" style="margin-top:0.8rem">
+          Algunos navegadores no enseñan la lista solos. Escribe tu correo y se le pide la llave
+          directamente.
+        </p>
+        <label for="correoEntrar">Tu correo</label>
+        <input id="correoEntrar" type="email" maxlength="120" placeholder="tucorreo@ejemplo.com"
+               autocomplete="email" inputmode="email">
+        <div class="fila">
+          <button id="btnEntrarCorreo" class="secundario" type="button">Entrar con mi correo</button>
+        </div>
+      </details>
+
       <p class="nota">
         ¿Tienes la llave en otro teléfono? En el diálogo que sale, elige usar una passkey de otro
         dispositivo y escanea el código con él.
@@ -165,7 +186,10 @@
       <h1>Te invitaron</h1>
       <p class="sub">Esta invitación es para <strong id="invitadoA">…</strong> y solo sirve una vez.</p>
       <div class="bloque">
-        <label for="apodo">¿Qué aparato es este?</label>
+        <label for="correo">Tu correo</label>
+        <input id="correo" type="email" maxlength="120" placeholder="tucorreo@ejemplo.com"
+               autocomplete="email" inputmode="email">
+        <label for="apodo" style="margin-top:0.9rem">¿Qué aparato es este?</label>
         <input id="apodo" type="text" maxlength="60" placeholder="Mi iPhone" autocomplete="off">
         <div class="fila">
           <button id="btnAlta" type="button">Crear mi passkey</button>
@@ -213,7 +237,13 @@
       </div>
       <p class="nota">
         Las passkeys de Apple y las de Google no se pasan de un lado al otro. Si usas un Samsung y
-        un iPhone, entra en cada uno y crea aquí su propia llave.
+        un iPhone, entra en cada uno y crea aquí su propia llave. Tener dos también es lo que evita
+        quedarse fuera si se pierde uno.
+      </p>
+      <p class="nota">
+        <strong>Si pierdes todos tus aparatos:</strong> vuelve a poner <code>ACCESO_BOOTSTRAP</code> en
+        Cloudflare, entra aquí por «Primera vez», créate una invitación nueva y luego bórrala otra
+        vez de Cloudflare.
       </p>
     </div>
 

@@ -1,10 +1,22 @@
 /**
  * Crea una invitación de un solo uso.
  *
- * Quien ya está dentro puede invitar. Y para el primero, cuando todavía no
- * hay nadie dentro, vale ACCESO_BOOTSTRAP: una clave que se pone a mano en
- * las variables de Cloudflare y se borra en cuanto entra el primero. Así no
- * hay ninguna credencial escrita en el repositorio ni en la página.
+ * Quien ya está dentro puede invitar.
+ *
+ * LA CLAVE MAESTRA ES UN ROMPER-EL-CRISTAL
+ *
+ * ACCESO_BOOTSTRAP vale siempre que esté puesta en las variables de
+ * Cloudflare, no solo la primera vez. La primera versión solo la aceptaba
+ * cuando no había nadie dado de alta, y eso dejaba una trampa: quien perdiera
+ * su único aparato se quedaba fuera de su propio sitio, sin más salida que
+ * entrar a la base de datos a mano.
+ *
+ * Que valga siempre no la debilita, porque la variable no existe salvo que
+ * alguien la ponga: es una llave que se saca del cajón, se usa y se guarda.
+ * El modo de uso es ese —ponerla, invitarse, quitarla— y está escrito en la
+ * página de acceso para que no dependa de acordarse.
+ *
+ * No hay ninguna credencial escrita en el repositorio ni en la página.
  *
  * El código es aleatorio de 256 bits, así que no se adivina probando. Caduca
  * en tres días: una invitación que se queda viva para siempre es una puerta
@@ -37,11 +49,7 @@ export async function onRequestPost(context) {
     if (!maestra || !igualesEnTiempoConstante(String(cuerpo?.maestra || ''), maestra)) {
       return json({ ok: false, error: 'No autorizado' }, 403);
     }
-    const hayGente = await db.prepare('SELECT 1 FROM personas WHERE activa = 1 LIMIT 1').first();
-    if (hayGente) {
-      return json({ ok: false, error: 'Ya hay personas dadas de alta: invita desde dentro' }, 403);
-    }
-    quien = 'bootstrap';
+    quien = 'clave maestra';
   }
 
   const codigo = aleatorio(32);

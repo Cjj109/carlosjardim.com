@@ -9,7 +9,7 @@
  *                   iCloud a Google, así que cada aparato lleva la suya y las
  *                   dos apuntan a la misma persona.
  */
-import { revisarClientData, crearSesion, sesionDe, identidadDelSitio, aleatorio, json } from '../../_acceso.js';
+import { revisarClientData, crearSesion, sesionDe, identidadDelSitio, aleatorio, huellaCorreo, json } from '../../_acceso.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -23,7 +23,7 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'Petición ilegible' }, 400);
   }
 
-  const { codigo, credencial, clavePublica, algoritmo, clientData, apodo } = cuerpo || {};
+  const { codigo, credencial, clavePublica, algoritmo, clientData, apodo, correo } = cuerpo || {};
   if (!credencial || !clavePublica || !clientData || typeof algoritmo !== 'number') {
     return json({ ok: false, error: 'Faltan datos del alta' }, 400);
   }
@@ -52,8 +52,19 @@ export async function onRequestPost(context) {
       .first();
     if (!gastada) return json({ ok: false, error: 'Invitación no válida o ya usada' }, 403);
 
+    /* El correo solo se pide a quien se da de alta, no al añadir un aparato:
+       la persona ya existe y su huella no cambia. */
+    const huella = await huellaCorreo(correo);
+    if (!huella) return json({ ok: false, error: 'Hace falta un correo válido' }, 400);
+
+    const yaEsta = await db.prepare('SELECT 1 FROM personas WHERE correo_hash = ?').bind(huella).first();
+    if (yaEsta) return json({ ok: false, error: 'Ese correo ya tiene acceso' }, 409);
+
     personaId = aleatorio(16);
-    await db.prepare('INSERT INTO personas (id, nombre) VALUES (?, ?)').bind(personaId, gastada.para).run();
+    await db
+      .prepare('INSERT INTO personas (id, nombre, correo_hash) VALUES (?, ?, ?)')
+      .bind(personaId, gastada.para, huella)
+      .run();
     await db.prepare('UPDATE invitaciones SET persona_id = ? WHERE codigo = ?').bind(personaId, codigo).run();
   }
 

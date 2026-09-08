@@ -61,6 +61,27 @@ export function igualesEnTiempoConstante(a, b) {
 
 export const aleatorio = (n = 32) => aB64u(crypto.getRandomValues(new Uint8Array(n)));
 
+/* ---------- Correo ---------- */
+
+/**
+ * La huella del correo, que es lo unico que se guarda.
+ *
+ * Se normaliza antes: minusculas y sin espacios alrededor. Sin eso, el mismo
+ * correo escrito con una mayuscula seria otra huella y otra persona, y quien
+ * lo escribiera asi se quedaria fuera sin entender por que.
+ *
+ * No lleva sal a proposito. Una sal por persona impediria buscar por correo,
+ * que es justamente para lo que sirve; y una sal fija no aporta nada que no
+ * aporte ya el que nadie tenga esta base. Lo que se busca aqui no es que sea
+ * irrompible, es que no haya una lista legible de nombres y correos.
+ */
+export async function huellaCorreo(correo) {
+  const limpio = String(correo || '').trim().toLowerCase();
+  if (!limpio || !limpio.includes('@')) return null;
+  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(limpio));
+  return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 /* ---------- Dominio y origen ---------- */
 
 /**
