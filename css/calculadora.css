@@ -1493,7 +1493,14 @@ body { overscroll-behavior-y: contain; }
   transition: background 0.22s ease;
 }
 
-:root[data-tema="miguel"] .calc-monto:focus-within {
+/* Mientras se escribe, y mientras quede algo escrito.
+   Solo con :focus-within, el Enter la borraba: ese Enter llama a blur() a
+   propósito —en el teléfono es lo que baja el teclado— así que la bandera se
+   apagaba justo en el momento de ponerse a leer el resultado, que es cuando
+   más rato pasa uno mirando la caja. Con una cantidad puesta la caja sigue
+   estando en uso aunque el cursor ya no esté dentro. */
+:root[data-tema="miguel"] .calc-monto:focus-within,
+:root[data-tema="miguel"] .calc-monto:has(input:not(:placeholder-shown)) {
   border-color: transparent;
   background:
     linear-gradient(var(--monto-fondo), var(--monto-fondo)) padding-box,
