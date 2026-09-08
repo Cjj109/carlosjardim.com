@@ -861,6 +861,17 @@ body {
 .muestra-navidad span:nth-child(3) { background: #e8b93a; }
 .muestra-navidad span:nth-child(4) { background: #3fbf71; }
 
+/* La muestra del orgullo lleva la bandera entera, no cuatro colores sueltos:
+   con seis franjas se reconoce de un vistazo, que es para lo que está. */
+.muestra-orgullo {
+  background: linear-gradient(
+    90deg,
+    #e63946 0 16.66%, #ff8c42 16.66% 33.33%, #ffd23f 33.33% 50%,
+    #3ddc84 50% 66.66%, #4a9eff 66.66% 83.33%, #b57bff 83.33% 100%
+  );
+}
+.muestra-orgullo span { background: none; }
+
 /* ---------- Detalles del tema navideño ---------- */
 
 /* Nieve: solo existe en navidad y solo si el sistema no pide quietud */
@@ -1107,6 +1118,7 @@ body {
 :root { --calc-zelle: #a855f7; }
 :root[data-tema="claro"] { --calc-zelle: #7e22ce; }
 :root[data-tema="navidad"] { --calc-zelle: #d98cff; }
+:root[data-tema="orgullo"] { --calc-zelle: #b57bff; }
 
 /* ---------- Interruptor de aportar montos ---------- */
 
@@ -1383,6 +1395,87 @@ body { overscroll-behavior-y: contain; }
 }
 
 .iq-fila.es-gana b { color: var(--calc-usdt); }
+
+/* ============================================================
+   ORGULLO
+   ============================================================
+
+   La bandera ya estaba medio puesta: el dólar era azul, el euro amarillo, el
+   USDT verde y el Zelle violeta. Cuatro de los seis colores, cada uno donde
+   ya significaba algo. Así que el tema no reparte colores nuevos por encima
+   —eso habría roto la lectura de las tarjetas—, sino que los sube de tono y
+   mete el rojo y el naranja que faltaban donde no compiten con ningún dato:
+   el título y la franja del panel.                                          */
+
+:root[data-tema="orgullo"] {
+  --calc-fondo: #0b0910;
+  --calc-superficie: #16131f;
+  --calc-superficie-alta: #1d1929;
+  --calc-borde: rgba(255, 255, 255, 0.08);
+  --calc-borde-fuerte: rgba(181, 123, 255, 0.42);
+  --calc-texto: #f2eef8;
+  --calc-texto-suave: #a9a2bb;
+  --calc-texto-tenue: #6d6681;
+
+  --calc-usd: #4a9eff;
+  --calc-eur: #ffd23f;
+  --calc-usdt: #3ddc84;
+}
+
+:root[data-tema="orgullo"] body {
+  background:
+    radial-gradient(ellipse 55% 40% at 10% -5%, rgba(230, 57, 70, 0.16), transparent 70%),
+    radial-gradient(ellipse 55% 40% at 50% -8%, rgba(255, 210, 63, 0.10), transparent 70%),
+    radial-gradient(ellipse 55% 40% at 90% -5%, rgba(74, 158, 255, 0.15), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 105%, rgba(181, 123, 255, 0.14), transparent 70%),
+    var(--calc-fondo);
+}
+
+/* El título sí lleva los seis, y se mueve despacio */
+:root[data-tema="orgullo"] .calc-head h1 {
+  background: linear-gradient(
+    100deg,
+    #e63946, #ff8c42, #ffd23f, #3ddc84, #4a9eff, #b57bff, #e63946
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: brilloOrgullo 9s linear infinite;
+}
+
+@keyframes brilloOrgullo {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* La franja, arriba del panel. Mismo sitio que la guirnalda de navidad:
+   se ve siempre y no le quita espacio a nada. */
+:root[data-tema="orgullo"] .calc-panel { position: relative; padding-top: 1.4rem; }
+
+:root[data-tema="orgullo"] .calc-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 5px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(
+    90deg,
+    #e63946 0 16.66%, #ff8c42 16.66% 33.33%, #ffd23f 33.33% 50%,
+    #3ddc84 50% 66.66%, #4a9eff 66.66% 83.33%, #b57bff 83.33% 100%
+  );
+}
+
+/* Un halo frío en las tarjetas, como el cálido de navidad */
+:root[data-tema="orgullo"] .tasa {
+  box-shadow: 0 0 24px -14px rgba(181, 123, 255, 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-tema="orgullo"] .calc-head h1 { animation: none; }
+}
 
 /* ============================================================
    EL PIE, CUANDO LOS CINCO BOTONES NO CABEN

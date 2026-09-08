@@ -11,12 +11,12 @@
  *   falla se recurre a la ultima respuesta, y la app avisa de cuando es.
  */
 
-const VERSION = 'tasas-v53';
+const VERSION = 'tasas-v54';
 
 // Las direcciones llevan ?r=<version>, asi que esta lista tiene que ir a la
 // par del HTML. Antes se precargaba /css/variables.css sin el parametro: la
 // entrada guardada no coincidia con lo que la pagina pedia y nunca se usaba.
-const REVISION = 53;
+const REVISION = 54;
 const APP = [
   '/calculadora',
   `/css/variables.css?r=${REVISION}`,

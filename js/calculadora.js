@@ -22,6 +22,7 @@ const TEMAS = {
   oscuro: '#0a0b0f',
   claro: '#e6ebf3',
   navidad: '#0b1410',
+  orgullo: '#0b0910',
 };
 
 /* ---------- Utilidades ---------- */
