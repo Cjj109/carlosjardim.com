@@ -1214,6 +1214,21 @@ body {
   opacity: 0.85;
 }
 
+/* Salvo cuando NO es una comprobación.
+   Esa misma pieza lleva dos cosas distintas según la respuesta: en un cálculo
+   normal es la aritmética —"15.000 ÷ 813,74 · dólar BCV"—, que se comprueba
+   de reojo y por eso va apagada; pero en una comparación es "Te ahorras 46,12
+   Bs.", que no es una comprobación sino la razón de haber preguntado. Iba en
+   el mismo gris de la aritmética y se perdía debajo de la tabla.
+
+   Se distingue por el veredicto: solo las comparaciones lo llevan, y la
+   operación siempre va detrás. */
+.iq-veredicto ~ .iq-operacion {
+  font-size: 0.68rem;
+  color: var(--calc-texto);
+  opacity: 1;
+}
+
 /* ============================================================
    MÓVIL
    Aquí se usa el 99% de las veces, así que esto no es un ajuste
