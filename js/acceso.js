@@ -148,6 +148,65 @@ async function darDeAlta() {
   else await pintar();
 }
 
+/* ---------- Invitar ---------- */
+
+/**
+ * Crear una invitación desde la propia página.
+ *
+ * Existía solo como una llamada a la API, y eso obligaba a abrir una terminal
+ * para dar de alta a alguien. Quien lleva esto lo hace desde el teléfono: si
+ * añadir a una persona pide un ordenador, al final no se añade a nadie o se
+ * acaba compartiendo una llave que no se debía compartir.
+ */
+async function invitar() {
+  const nombre = ($('invitado').value || '').trim();
+  if (!nombre) return aviso('¿Para quién es la invitación?', true);
+
+  aviso('Creando la invitación…');
+  const { enlace, para } = await pedir('/api/acceso/invitar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ para: nombre }),
+  });
+
+  $('invitacionPara').textContent = para;
+  $('invitacionUrl').textContent = enlace;
+  $('invitacion').hidden = false;
+  $('invitado').value = '';
+  aviso('');
+}
+
+async function copiarEnlace() {
+  const texto = $('invitacionUrl').textContent;
+  try {
+    await navigator.clipboard.writeText(texto);
+    aviso('Enlace copiado. Pásaselo por donde quieras.');
+  } catch {
+    // Sin permiso de portapapeles queda el texto a la vista para copiarlo a mano
+    aviso('Cópialo a mano de la caja de arriba.', true);
+  }
+}
+
+/** La primerísima invitación, con la clave de arranque de Cloudflare */
+async function primeraInvitacion() {
+  const maestra = ($('maestra').value || '').trim();
+  const nombre = ($('primerNombre').value || '').trim();
+  if (!maestra || !nombre) return aviso('Hacen falta la clave y tu nombre', true);
+
+  aviso('Creando tu invitación…');
+  const { enlace } = await pedir('/api/acceso/invitar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ para: nombre, maestra }),
+  });
+
+  $('maestra').value = '';
+  $('invitacionPrimeraUrl').textContent = enlace;
+  $('invitacionPrimera').hidden = false;
+  $('btnIrPrimera').onclick = () => { location.href = enlace; };
+  aviso('');
+}
+
 /* ---------- Estado de la página ---------- */
 
 const fecha = (iso) => (iso ? new Date(iso.replace(' ', 'T') + 'Z').toLocaleDateString('es-VE') : '—');
@@ -212,6 +271,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('btnEntrar')?.addEventListener('click', conAviso(entrar));
   $('btnAlta')?.addEventListener('click', conAviso(darDeAlta));
   $('btnAnadir')?.addEventListener('click', conAviso(darDeAlta));
+  $('btnInvitar')?.addEventListener('click', conAviso(invitar));
+  $('btnCopiar')?.addEventListener('click', conAviso(copiarEnlace));
+  $('btnPrimera')?.addEventListener('click', conAviso(primeraInvitacion));
   $('btnSalir')?.addEventListener('click', conAviso(async () => {
     await pedir('/api/acceso/salir', { method: 'POST' });
     location.reload();

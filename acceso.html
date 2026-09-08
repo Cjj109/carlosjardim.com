@@ -90,6 +90,29 @@
     }
     .ap-fecha { color: var(--tenue); font-size: 0.78rem; white-space: nowrap; }
     .nota { margin-top: 1.4rem; font-size: 0.78rem; color: var(--tenue); }
+    code {
+      display: block;
+      margin-top: 0.5rem;
+      padding: 0.7rem 0.8rem;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--borde);
+      color: var(--suave);
+      font-size: 0.72rem;
+      word-break: break-all;
+      font-family: ui-monospace, monospace;
+    }
+    .primera {
+      margin-top: 1.6rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--borde);
+    }
+    .primera summary {
+      font-size: 0.8rem;
+      color: var(--tenue);
+      cursor: pointer;
+    }
+    .primera label { margin-top: 0.8rem; }
     a { color: var(--suave); }
     .volver { display: inline-block; margin-bottom: 1.4rem; font-size: 0.82rem; text-decoration: none; }
   </style>
@@ -111,6 +134,30 @@
         ¿Tienes la llave en otro teléfono? En el diálogo que sale, elige usar una passkey de otro
         dispositivo y escanea el código con él.
       </p>
+
+      <!-- Solo para la primerísima vez, cuando todavía no hay nadie dentro.
+           El servidor lo rechaza en cuanto existe una persona dada de alta,
+           así que esto deja de funcionar solo. -->
+      <details class="primera">
+        <summary>Primera vez, todavía no hay nadie dentro</summary>
+        <p class="nota" style="margin-top:0.8rem">
+          Hace falta la clave que pusiste en Cloudflare como <code>ACCESO_BOOTSTRAP</code>.
+        </p>
+        <label for="maestra">Clave de arranque</label>
+        <input id="maestra" type="password" placeholder="La que pusiste en Cloudflare" autocomplete="off">
+        <label for="primerNombre" style="margin-top:0.8rem">Tu nombre</label>
+        <input id="primerNombre" type="text" maxlength="60" placeholder="Carlos" autocomplete="off">
+        <div class="fila">
+          <button id="btnPrimera" class="secundario" type="button">Crear mi invitación</button>
+        </div>
+        <div id="invitacionPrimera" class="enlace" hidden>
+          <p class="nota" style="margin-top:0.9rem">Ábrelo en este mismo aparato:</p>
+          <code id="invitacionPrimeraUrl"></code>
+          <div class="fila">
+            <button id="btnIrPrimera" type="button">Abrir y crear mi passkey</button>
+          </div>
+        </div>
+      </details>
     </div>
 
     <!-- Con invitación: darse de alta -->
@@ -142,6 +189,24 @@
           <button id="btnAnadir" type="button">Crear passkey aquí</button>
         </div>
       </div>
+      <div class="bloque">
+        <label for="invitado">Invitar a alguien</label>
+        <input id="invitado" type="text" maxlength="60" placeholder="Nombre de la persona" autocomplete="off">
+        <div class="fila">
+          <button id="btnInvitar" type="button">Crear invitación</button>
+        </div>
+        <div id="invitacion" class="enlace" hidden>
+          <p class="nota" style="margin-top:0.9rem">
+            Pásale este enlace a <strong id="invitacionPara"></strong>. Sirve <strong>una sola vez</strong> y caduca
+            en tres días.
+          </p>
+          <code id="invitacionUrl"></code>
+          <div class="fila">
+            <button id="btnCopiar" class="secundario" type="button">Copiar enlace</button>
+          </div>
+        </div>
+      </div>
+
       <div class="fila">
         <button class="secundario" type="button" onclick="location.href='/calculadora'">Ir a la calculadora</button>
         <button id="btnSalir" class="secundario" type="button">Salir</button>
