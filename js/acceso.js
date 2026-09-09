@@ -249,6 +249,11 @@ async function pintar() {
     $('fuera').hidden = true;
     $('alta').hidden = true;
     $('saludo').textContent = `Hola, ${yo.nombre}.`;
+    /* La casilla de invitar solo se enseña a quien puede usarla. Dejarla a la
+       vista y contestar con un error al pulsarla es ofrecer algo que no se
+       tiene: quien la vea pensará que el sistema falla, no que no le toca.
+       Añadir aparatos propios sigue siendo de todos. */
+    $('bloqueInvitar').hidden = !yo.puedeInvitar;
     const soloUno = yo.aparatos.length <= 1;
     $('aparatos').innerHTML = yo.aparatos
       .map(

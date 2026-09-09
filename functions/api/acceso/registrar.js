@@ -46,7 +46,7 @@ export async function onRequestPost(context) {
       .prepare(
         `UPDATE invitaciones SET usada_en = datetime('now')
          WHERE codigo = ? AND usada_en IS NULL AND expira_en > datetime('now')
-         RETURNING para, persona_id`
+         RETURNING para, persona_id, creada_por`
       )
       .bind(codigo)
       .first();
@@ -65,7 +65,13 @@ export async function onRequestPost(context) {
       personaId = gastada.persona_id;
     } else {
       personaId = aleatorio(16);
-      await db.prepare('INSERT INTO personas (id, nombre) VALUES (?, ?)').bind(personaId, gastada.para).run();
+      /* Quien entra por la clave maestra es el dueño, y es el único que
+         reparte accesos. Se deduce de por dónde entró, no se marca a mano. */
+      const esDueno = gastada.creada_por === 'clave maestra' ? 1 : 0;
+      await db
+        .prepare('INSERT INTO personas (id, nombre, puede_invitar) VALUES (?, ?, ?)')
+        .bind(personaId, gastada.para, esDueno)
+        .run();
       await db.prepare('UPDATE invitaciones SET persona_id = ? WHERE codigo = ?').bind(personaId, codigo).run();
     }
   }

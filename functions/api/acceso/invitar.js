@@ -55,6 +55,21 @@ export async function onRequestPost(context) {
 
   let quien = sesion?.nombre;
 
+  /* Invitar a OTRA persona es una facultad; añadir un aparato propio no.
+     Antes bastaba con estar dentro, y entonces quien entraba podía invitar, y
+     su invitado también: el círculo crecía solo sin que nadie lo decidiera.
+     Añadir tu segundo teléfono sigue abierto para todos, porque eso no mete
+     a nadie nuevo. */
+  if (sesion && !paraMiOtroAparato) {
+    const puede = await db
+      .prepare('SELECT puede_invitar FROM personas WHERE id = ?')
+      .bind(sesion.id)
+      .first();
+    if (!puede?.puede_invitar) {
+      return json({ ok: false, error: 'Solo el dueño puede invitar a otras personas' }, 403);
+    }
+  }
+
   if (!sesion) {
     const maestra = env.ACCESO_BOOTSTRAP;
     // Sin la variable puesta, esta puerta no existe: no es que falle, es que

@@ -90,6 +90,19 @@ const lista = await tel2.pag.textContent('#aparatos');
 ok('el iPhone está en la lista', lista.includes('iPhone'), true);
 ok('y el Samsung también', lista.includes('Samsung'), true);
 
+console.log('\n¿SE PUEDE INVITAR DESDE LOS DOS, O SOLO DESDE EL PRIMERO?');
+// No hay aparato "principal": lo único que se pide para invitar es tener
+// sesión, y los dos teléfonos la tienen.
+for (const [nombre, aparatoUsado] of [['el primero', tel1], ['el segundo', tel2]]) {
+  await aparatoUsado.pag.goto(`${BASE}/acceso`);
+  await aparatoUsado.pag.waitForSelector('#dentro:not([hidden])');
+  await aparatoUsado.pag.fill('#invitado', `Invitado desde ${nombre}`);
+  await aparatoUsado.pag.click('#btnInvitar');
+  await aparatoUsado.pag.waitForSelector('#invitacion:not([hidden])', { timeout: 10000 });
+  const enlace = await aparatoUsado.pag.textContent('#invitacionUrl');
+  ok(`invita desde ${nombre} teléfono`, enlace.includes('/acceso?codigo='), true);
+}
+
 console.log('\nY LA APP INSTALADA EN EL SEGUNDO TELÉFONO');
 const app2 = await aparato(await tel2.llaves());
 await app2.pag.goto(`${BASE}/acceso`);
