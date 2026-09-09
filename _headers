@@ -45,8 +45,11 @@
 /acceso
   Cache-Control: no-store, must-revalidate
   Content-Type: text/html; charset=utf-8
+  # frame-ancestors 'none' es quien prohíbe enmarcar, y manda sobre
+  # X-Frame-Options en todo navegador que quede. No se repite aquí el
+  # X-Frame-Options: el bloque /* ya pone SAMEORIGIN y dos cabeceras iguales
+  # con valores distintos las hay que se saltan las dos.
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
-  X-Frame-Options: DENY
   X-Robots-Tag: noindex, nofollow
 
 /
