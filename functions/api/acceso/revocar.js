@@ -31,20 +31,29 @@ export async function onRequestPost(context) {
 
   /* No se deja borrar la última: quien lo hiciera se quedaría fuera de su
      propio sitio con un clic y sin aviso. Para irse del todo hay otra
-     conversación, no un botón junto a los demás. */
-  const cuantas = await db
-    .prepare('SELECT COUNT(*) AS n FROM llaves WHERE persona_id = ?')
-    .bind(sesion.id)
-    .first();
-  if ((cuantas?.n || 0) <= 1) {
-    return json({ ok: false, error: 'Es tu única llave: añade otra antes de quitar esta' }, 400);
-  }
+     conversación, no un botón junto a los demás.
 
+     La cuenta va DENTRO del borrado. Contando aparte y borrando después,
+     dos peticiones a la vez con dos llaves distintas contaban dos las dos y
+     borraban las dos: cero llaves y a la calle. */
   const fuera = await db
-    .prepare('DELETE FROM llaves WHERE id = ? AND persona_id = ? RETURNING id')
-    .bind(id, sesion.id)
+    .prepare(
+      `DELETE FROM llaves WHERE id = ? AND persona_id = ?
+         AND (SELECT COUNT(*) FROM llaves WHERE persona_id = ?) > 1
+       RETURNING id`
+    )
+    .bind(id, sesion.id, sesion.id)
     .first();
-  if (!fuera) return json({ ok: false, error: 'Esa llave no es tuya' }, 404);
+
+  if (!fuera) {
+    const suya = await db
+      .prepare('SELECT 1 FROM llaves WHERE id = ? AND persona_id = ?')
+      .bind(id, sesion.id)
+      .first();
+    return suya
+      ? json({ ok: false, error: 'Es tu única llave: añade otra antes de quitar esta' }, 400)
+      : json({ ok: false, error: 'Esa llave no es tuya' }, 404);
+  }
 
   return json({ ok: true });
 }

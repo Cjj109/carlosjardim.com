@@ -115,13 +115,21 @@ export async function crearReto(db, tipo) {
  */
 export async function consumirReto(db, valor, tipo) {
   if (!valor) return false;
+
+  /* Borrar y leer en la MISMA sentencia.
+     Antes eran dos —un SELECT y luego un DELETE— y entre las dos cabía otra
+     petición: dos llegadas a la vez con el mismo reto lo encontraban las dos
+     y las dos daban por bueno. Un reto que vale dos veces es exactamente lo
+     que un reto viene a impedir. Con DELETE ... RETURNING solo una se lo
+     lleva. */
   const fila = await db
-    .prepare("SELECT tipo FROM retos WHERE valor = ? AND expira_en > datetime('now')")
+    .prepare("DELETE FROM retos WHERE valor = ? AND expira_en > datetime('now') RETURNING tipo")
     .bind(valor)
     .first();
-  await db.prepare('DELETE FROM retos WHERE valor = ?').bind(valor).run();
-  // De paso, la basura: los caducados no los borra nadie más
+
+  // La basura de los caducados, que no la borra nadie más
   await db.prepare("DELETE FROM retos WHERE expira_en <= datetime('now')").run();
+
   return !!fila && fila.tipo === tipo;
 }
 

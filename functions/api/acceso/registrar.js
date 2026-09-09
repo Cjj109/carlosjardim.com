@@ -68,15 +68,29 @@ export async function onRequestPost(context) {
     await db.prepare('UPDATE invitaciones SET persona_id = ? WHERE codigo = ?').bind(personaId, codigo).run();
   }
 
-  try {
-    await db
-      .prepare('INSERT INTO llaves (id, persona_id, clave_publica, algoritmo, apodo) VALUES (?, ?, ?, ?, ?)')
-      .bind(credencial, personaId, clavePublica, algoritmo, (apodo || '').slice(0, 60) || null)
-      .run();
-  } catch (e) {
-    // La misma llave dos veces no es un fallo que haya que contarle a nadie
-    if (!String(e.message).includes('UNIQUE')) throw e;
-  }
+  /* Se actualiza si ya existe, pero solo si es de esta misma persona.
+     Antes se hacía un INSERT y se tragaba el error de clave duplicada, y eso
+     escondía un caso feo: si el guardado fallaba, la persona salía con sesión
+     abierta —o sea, "funcionó"— y al día siguiente no podía entrar porque su
+     llave no estaba en ninguna parte. Un fallo que solo aparece mañana.
+
+     Registrar dos veces en el mismo aparato sí es normal, y ahí se actualiza.
+     Que la llave sea de otra persona no puede pasar sin tener su clave
+     privada, pero si pasara, callarlo sería lo peor. */
+  const guardada = await db
+    .prepare(
+      `INSERT INTO llaves (id, persona_id, clave_publica, algoritmo, apodo) VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         clave_publica = excluded.clave_publica,
+         algoritmo = excluded.algoritmo,
+         apodo = COALESCE(excluded.apodo, llaves.apodo)
+       WHERE llaves.persona_id = excluded.persona_id
+       RETURNING id`
+    )
+    .bind(credencial, personaId, clavePublica, algoritmo, (apodo || '').slice(0, 60) || null)
+    .first();
+
+  if (!guardada) return json({ ok: false, error: 'Esa llave ya está en uso' }, 409);
 
   const cookie = await crearSesion(db, personaId);
   return json({ ok: true, nueva: !sesion }, 200, { 'Set-Cookie': cookie });

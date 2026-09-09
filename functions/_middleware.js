@@ -21,16 +21,53 @@
 import { sesionDe } from './_acceso.js';
 
 /* /api/montos queda dentro aunque no sea una tasa: dice qué cantidades teclea
-   la gente, y eso también es información de uso de la calculadora. */
+   la gente, y eso también es información de uso de la calculadora.
+
+   Y los archivos de /data. Esto es lo que casi se me escapa: la puerta estaba
+   puesta en la página y en los endpoints, pero las mismas tasas estaban
+   además en tres archivos estáticos que Pages sirve tal cual. Uno traía la
+   tasa del día, otro el USDT del p2p y el tercero UN AÑO de histórico. Toda
+   la puerta se rodeaba escribiendo la dirección del archivo.
+
+   bcv-liquidity.json se queda fuera de la lista a propósito: es masa
+   monetaria que publica el propio banco central, no una tasa, y lo usa la
+   portada pública. */
 const CERRADO = [
-  /^\/calculadora(\/|$|\.html$)/,
+  /^\/calculadora(\.html)?$/,
   /^\/api\/bcv$/,
   /^\/api\/fuentes$/,
   /^\/api\/60iq$/,
   /^\/api\/montos$/,
+  /^\/data\/bcv-rates(-history)?\.json$/,
+  /^\/data\/p2p\.json$/,
 ];
 
-const esCerrado = (ruta) => CERRADO.some((re) => re.test(ruta));
+/**
+ * Las formas en que se puede escribir la misma ruta.
+ *
+ * Aquí había dos agujeros de verdad, encontrados probando a rodear la puerta:
+ * `/api/bcv/` con barra final y `/API/BCV` en mayúsculas devolvían las tasas
+ * enteras sin sesión. Las expresiones exigían coincidencia exacta, pero
+ * Cloudflare Pages enruta sin distinguir mayúsculas y tolera la barra: la
+ * función se ejecutaba igual y el filtro no la reconocía.
+ *
+ * Como esta lista es de lo que se CIERRA, comparar contra más formas solo
+ * puede cerrar más, nunca abrir de más. Por eso también se prueba la ruta
+ * descodificada: si alguna vez Pages resolviera `%62` como `b`, ya está
+ * cubierto.
+ */
+function variantes(ruta) {
+  const limpiar = (r) => r.toLowerCase().replace(/\/{2,}/g, '/').replace(/\/+$/, '') || '/';
+  const formas = new Set([limpiar(ruta)]);
+  try {
+    formas.add(limpiar(decodeURIComponent(ruta)));
+  } catch {
+    // Mal codificada: con la cruda basta, y no vamos a rechazarla por eso
+  }
+  return [...formas];
+}
+
+const esCerrado = (ruta) => variantes(ruta).some((r) => CERRADO.some((re) => re.test(r)));
 
 export async function onRequest(context) {
   const { request, env, next } = context;
@@ -55,7 +92,7 @@ export async function onRequest(context) {
      redirección: quien la hace es el JavaScript de la página, y una
      redirección le devolvería el HTML del acceso como si fuera la respuesta,
      que es un error de los que cuesta media tarde entender. */
-  if (ruta.startsWith('/api/')) {
+  if (ruta.toLowerCase().startsWith('/api/')) {
     return new Response(JSON.stringify({ ok: false, error: 'Hace falta iniciar sesión' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },

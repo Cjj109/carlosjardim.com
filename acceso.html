@@ -109,17 +109,17 @@
       word-break: break-all;
       font-family: ui-monospace, monospace;
     }
-    .primera {
+    .plegable {
       margin-top: 1.6rem;
       padding-top: 1rem;
       border-top: 1px solid var(--borde);
     }
-    .primera summary {
+    .plegable summary {
       font-size: 0.8rem;
       color: var(--tenue);
       cursor: pointer;
     }
-    .primera label { margin-top: 0.8rem; }
+    .plegable label { margin-top: 0.8rem; }
     a { color: var(--suave); }
     .volver { display: inline-block; margin-bottom: 1.4rem; font-size: 0.82rem; text-decoration: none; }
   </style>
@@ -137,7 +137,7 @@
       <div class="bloque">
         <button id="btnEntrar" type="button">Entrar con mi passkey</button>
       </div>
-      <details class="primera">
+      <details class="plegable">
         <summary>No me sale ninguna llave</summary>
         <p class="nota" style="margin-top:0.8rem">
           Algunos navegadores no enseñan la lista solos. Escribe tu correo y se le pide la llave
@@ -159,10 +159,12 @@
       <!-- Solo para la primerísima vez, cuando todavía no hay nadie dentro.
            El servidor lo rechaza en cuanto existe una persona dada de alta,
            así que esto deja de funcionar solo. -->
-      <details class="primera">
-        <summary>Primera vez, todavía no hay nadie dentro</summary>
+      <details class="plegable" id="primeraVez">
+        <summary>Primera vez, o he perdido todos mis aparatos</summary>
         <p class="nota" style="margin-top:0.8rem">
           Hace falta la clave que pusiste en Cloudflare como <code>ACCESO_BOOTSTRAP</code>.
+          Ponla, crea tu invitación, y <strong>bórrala de Cloudflare al terminar</strong>: es una
+          llave que se saca del cajón, se usa y se guarda.
         </p>
         <label for="maestra">Clave de arranque</label>
         <input id="maestra" type="password" placeholder="La que pusiste en Cloudflare" autocomplete="off">
