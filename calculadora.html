@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=60">
-  <link rel="stylesheet" href="/css/calculadora.css?r=60">
+  <link rel="stylesheet" href="/css/variables.css?r=61">
+  <link rel="stylesheet" href="/css/calculadora.css?r=61">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -182,7 +182,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v60</span>
+    <span class="calc-version" title="Versión de la app instalada">v61</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -233,6 +233,14 @@
       >
       <button type="submit" id="iqEnviar">Preguntar</button>
     </form>
+
+    <!-- Lo que va aprendiendo. A la vista y con botón de olvidar: si guarda
+         cosas de alguien, ese alguien tiene que poder verlas sin preguntar. -->
+    <details class="calc-iq-memoria" id="iqMemoria">
+      <summary>Lo que sabe de ti</summary>
+      <p class="calc-iq-notas" id="iqNotas">Todavía nada.</p>
+      <button type="button" id="iqOlvidar" class="calc-iq-borrar">Que lo olvide</button>
+    </details>
   </section>
 
   <!-- Temas -->
@@ -317,7 +325,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=60" defer></script>
+<script src="/js/calculadora.js?r=61" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

@@ -592,6 +592,33 @@ function pintarTasas({ falloDeRed = false } = {}) {
   aviso.textContent = `${hora} · ${origen}${vigencia}${proxima}`;
 }
 
+/** Lo que el 60 IQ ha aprendido de quien mira */
+async function pintarMemoria() {
+  const caja = $('iqNotas');
+  if (!caja) return;
+  try {
+    const r = await fetch('/api/iq-memoria', { credentials: 'same-origin' });
+    const d = await r.json();
+    caja.textContent = d.notas?.trim() || 'Todavía nada.';
+  } catch {
+    caja.textContent = 'No se pudo consultar.';
+  }
+}
+
+/**
+ * Que se olvide de ti: lo aprendido y la conversación guardada.
+ *
+ * Las dos cosas juntas, porque "olvídame" dejando doce turnos guardados no es
+ * olvidar. Esto sí pide confirmación —al revés que limpiar la pantalla—
+ * porque aquí sí se pierde algo que no vuelve.
+ */
+async function olvidarMemoria() {
+  if (!confirm('¿Que olvide todo lo que sabe de ti? Esto no se puede deshacer.')) return;
+  await fetch('/api/iq-memoria', { method: 'DELETE' });
+  iqCharlaPrevia.length = 0;
+  await pintarMemoria();
+}
+
 /* ---------- Historial ---------- */
 
 const HISTORIAL = 'calc-historial';
@@ -1011,29 +1038,29 @@ function burbuja(quien, texto, { error = false, partes = null } = {}) {
 }
 
 /**
- * Vacía la conversación.
+ * Limpia la pantalla del 60 IQ. Solo la pantalla.
  *
  * Es cosa de ruido visual: se pregunta, se lee la respuesta y esa respuesta se
- * queda ahí ocupando pantalla cuando ya no dice nada nuevo. Se borra lo que se
- * ve y también lo que el 60 IQ recuerda, porque si no seguiría contestando
- * como si la charla anterior siguiera viva: pantalla limpia y cabeza limpia
- * tienen que ir juntas, o la próxima respuesta no se entiende.
+ * queda ocupando sitio cuando ya no dice nada nuevo. Con una tabla de
+ * comparación son diez líneas entre uno y lo siguiente que quiere preguntar.
  *
- * No hace falta confirmar: no se pierde nada que no se pueda volver a
- * preguntar, y un "¿seguro?" por cada limpieza cansa más de lo que protege.
+ * NO borra nada más, y es a propósito. La primera versión se llevaba también
+ * lo que el 60 IQ recordaba, con el argumento de que pantalla limpia y cabeza
+ * limpia debían ir juntas. El dueño lo corrigió y tiene razón: quien limpia
+ * está despejando la vista para SEGUIR hablando, no empezando de cero. Que
+ * pierda el hilo ahí es un castigo por ordenar.
+ *
+ * Para que olvide de verdad está "Que lo olvide", que es otra cosa y se pide
+ * aparte.
  */
 function limpiarCharla() {
   const charla = $('iqCharla');
   if (!charla) return;
 
   charla.innerHTML = ejemplosDeInicio || '';
-  iqCharlaPrevia.length = 0;
 
   const borrar = $('iqBorrar');
   if (borrar) borrar.hidden = true;
-
-  const campo = $('iqPregunta');
-  if (campo) campo.value = '';
 }
 
 /**
@@ -1433,6 +1460,10 @@ document.addEventListener('DOMContentLoaded', () => {
   $('iqEnviar')?.addEventListener('mousedown', (e) => e.preventDefault());
 
   $('iqBorrar')?.addEventListener('click', limpiarCharla);
+  $('iqOlvidar')?.addEventListener('click', olvidarMemoria);
+  // Se consulta al desplegarlo, no al cargar: casi nadie lo abre y sería una
+  // petición de más en cada apertura de la app.
+  $('iqMemoria')?.addEventListener('toggle', (e) => { if (e.target.open) pintarMemoria(); });
 
   $('iqForm')?.addEventListener('submit', (e) => {
     e.preventDefault();

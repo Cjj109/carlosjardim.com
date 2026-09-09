@@ -1,3 +1,5 @@
+import { sesionDe } from '../_acceso.js';
+
 /**
  * "60 IQ": el ayudante que te insulta por no saber usar una calculadora.
  *
@@ -159,6 +161,16 @@ reconocer cada uno ("en la tienda A", "a BCV", "por Zelle").
 Sirve para cualquier "¿qué me conviene?", "¿cuál es más barato?", "¿pago con
 esto o con lo otro?", y admite más de dos opciones si las da.
 
+SABES CON QUIÉN HABLAS. Más abajo va su nombre y lo que ya sabes de esa
+persona. Úsalo: llámala por su nombre de vez en cuando —no en cada frase, que
+cansa— y no le preguntes lo que ya está escrito ahí.
+
+Y puedes aprender. En "aprendido" pon UNA observación que siga siendo verdad
+dentro de un mes, o null si no la hay. Vale "paga casi siempre en USDT" o
+"suele mover cantidades de 15 a 50 dólares". No vale "preguntó por 15 dólares":
+eso es lo que pasó hoy, no cómo es. Llenar esto de sucesos lo vuelve inútil, y
+casi siempre la respuesta correcta es null.
+
 LA CONVERSACIÓN SIGUE. Lo que se dijo antes cuenta: si preguntó por un monto
 y ahora dice "y a todas las tasas" o "¿y en euros?", se refiere a ESE monto.
 No lo vuelvas a pedir, que ya te lo dio.
@@ -186,7 +198,7 @@ resultado, que las pone la app. Español de Venezuela.`;
 const ESQUEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_destino', 'tasa_que_falta', 'opciones', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion'],
+  required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_destino', 'tasa_que_falta', 'opciones', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion', 'aprendido'],
   properties: {
     tipo: { type: 'string', enum: ['calculo', 'comparar', 'falta_tasa', 'fuera_de_tema'] },
     // Comparar dos precios de lo mismo en monedas distintas: "vale 65 $ a BCV
@@ -226,6 +238,11 @@ const ESQUEMA = {
     // justo lo que se preguntaba.
     tasa_destino: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', 'todas', null] },
     operacion: { type: ['string', 'null'], enum: ['multiplicar', 'dividir', null] },
+    /* Una observación duradera sobre quien pregunta, o null.
+       No es un resumen de la charla: es lo que seguirá siendo verdad dentro de
+       un mes. "Paga casi siempre en USDT" sirve; "preguntó por 15 dólares" no,
+       y llenar las notas de eso las vuelve inútiles. */
+    aprendido: { type: ['string', 'null'] },
     unidad_entrada: { type: ['string', 'null'] },
     unidad_salida: { type: ['string', 'null'] },
     explicacion: { type: 'string' },
@@ -595,6 +612,77 @@ function mismoSitio(peticion) {
   }
 }
 
+/* ---------- La memoria de cada persona ---------- */
+
+const IQ_TURNOS_GUARDADOS = 12;   // seis idas y venidas
+const IQ_NOTAS_MAX = 600;
+
+/** Lo que se sabe de quien pregunta: sus notas y por dónde iba la charla */
+async function memoriaDe(db, personaId) {
+  if (!db || !personaId) return { notas: '', turnos: [] };
+  try {
+    const notas = await db.prepare('SELECT notas FROM iq_notas WHERE persona_id = ?').bind(personaId).first();
+    const turnos = await db
+      .prepare('SELECT rol, texto FROM iq_turnos WHERE persona_id = ? ORDER BY id DESC LIMIT ?')
+      .bind(personaId, IQ_TURNOS_GUARDADOS)
+      .all();
+    return {
+      notas: notas?.notas || '',
+      // Vienen del más nuevo al más viejo por el LIMIT; se devuelven en orden
+      turnos: (turnos.results || []).reverse().map((t) => ({ role: t.rol, content: t.texto })),
+    };
+  } catch (e) {
+    // La memoria es un extra: si falla, se contesta igual sin ella
+    console.warn('[60iq] no se pudo leer la memoria:', e.message);
+    return { notas: '', turnos: [] };
+  }
+}
+
+/** Apunta lo dicho y, si el modelo aprendió algo, lo añade a las notas */
+async function guardarMemoria(db, personaId, pregunta, respuesta, aprendido) {
+  if (!db || !personaId) return;
+  try {
+    await db.batch([
+      db.prepare('INSERT INTO iq_turnos (persona_id, rol, texto) VALUES (?, ?, ?)').bind(personaId, 'user', pregunta),
+      db.prepare('INSERT INTO iq_turnos (persona_id, rol, texto) VALUES (?, ?, ?)').bind(personaId, 'assistant', respuesta),
+    ]);
+
+    /* Se recorta a los últimos. Sin esto la tabla crece sin fin y el contexto
+       que se le manda al modelo también: más caro cada vez y peor, porque lo
+       viejo tapa lo reciente. */
+    await db
+      .prepare(
+        `DELETE FROM iq_turnos WHERE persona_id = ? AND id NOT IN (
+           SELECT id FROM iq_turnos WHERE persona_id = ? ORDER BY id DESC LIMIT ?
+         )`
+      )
+      .bind(personaId, personaId, IQ_TURNOS_GUARDADOS)
+      .run();
+
+    const nota = String(aprendido || '').trim();
+    if (!nota) return;
+
+    /* Las notas se acumulan, no se sustituyen: cada una es una observación
+       suelta. Se recortan por el final —lo más viejo cae primero— para que no
+       crezcan sin límite ni se coman el contexto. */
+    const previas = (await db.prepare('SELECT notas FROM iq_notas WHERE persona_id = ?').bind(personaId).first())?.notas || '';
+    if (previas.includes(nota)) return;
+
+    const juntas = (previas ? `${previas}\n` : '') + `- ${nota}`;
+    const recortadas = juntas.length > IQ_NOTAS_MAX ? juntas.slice(-IQ_NOTAS_MAX) : juntas;
+
+    await db
+      .prepare(
+        `INSERT INTO iq_notas (persona_id, notas) VALUES (?, ?)
+         ON CONFLICT(persona_id) DO UPDATE SET notas = excluded.notas, actualizado = datetime('now')`
+      )
+      .bind(personaId, recortadas)
+      .run();
+  } catch (e) {
+    console.warn('[60iq] no se pudo guardar la memoria:', e.message);
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -633,6 +721,24 @@ export async function onRequestPost(context) {
     return json({ error: 'Ya preguntaste bastante por hoy. Usa la calculadora.' }, 429);
   }
 
+  /* Quién pregunta y qué se sabe de esa persona.
+     Este endpoint está detrás del acceso, así que siempre hay sesión; se
+     comprueba igual porque una memoria sin dueño es una memoria compartida, y
+     eso sería peor que no tenerla. */
+  const db = env.MONTOS;
+  const sesion = await sesionDe(db, request);
+  const { notas, turnos: turnosGuardados } = await memoriaDe(db, sesion?.id);
+
+  /* Los turnos que manda el navegador mandan sobre los guardados: si acaba de
+     borrar la conversación, viene vacío y eso es exactamente lo que quiso
+     decir. Los guardados solo entran cuando el cliente no trae nada, que es
+     el caso de abrir la app en otro teléfono y seguir donde se quedó. */
+  const contexto = turnos.length ? turnos : turnosGuardados;
+
+  const quienEs = sesion
+    ? `\n\nHABLAS CON: ${sesion.nombre}.` + (notas ? `\nLo que ya sabes de ${sesion.nombre}:\n${notas}` : '')
+    : '';
+
   try {
     const respuesta = await fetch(OPENROUTER, {
       method: 'POST',
@@ -661,12 +767,12 @@ export async function onRequestPost(context) {
         messages: [
           {
             role: 'system',
-            content: `${PERSONA}\n\n${contextoDeTasas(cuerpo?.tasas)}${contextoDeLaApp(cuerpo?.contexto)}`,
+            content: `${PERSONA}\n\n${contextoDeTasas(cuerpo?.tasas)}${contextoDeLaApp(cuerpo?.contexto)}${quienEs}`,
           },
           // Sin los turnos anteriores, un "a todas las tasas" no tenía a qué
           // referirse y contestaba con una broma, porque literalmente no sabía
           // de qué se le hablaba.
-          ...turnos,
+          ...contexto,
           { role: 'user', content: pregunta },
         ],
       }),
@@ -691,6 +797,12 @@ export async function onRequestPost(context) {
     }
 
     const resuelto = resolver(decision, cuerpo?.tasas);
+
+    /* Se apunta después de contestar y sin esperar a que termine: guardar la
+       memoria no puede retrasar la respuesta, y si falla tampoco puede
+       tumbarla —lo peor que pasa es que esta vez no se acuerde. */
+    context.waitUntil(guardarMemoria(db, sesion?.id, pregunta, resuelto.texto, decision.aprendido));
+
     return json({ respuesta: resuelto.texto, partes: resuelto.partes ?? null });
   } catch (error) {
     console.error('Falló la consulta al 60 IQ:', error);

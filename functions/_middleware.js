@@ -38,6 +38,7 @@ const CERRADO = [
   /^\/api\/fuentes$/,
   /^\/api\/60iq$/,
   /^\/api\/montos$/,
+  /^\/api\/iq-memoria$/,
   /^\/data\/bcv-rates(-history)?\.json$/,
   /^\/data\/p2p\.json$/,
 ];

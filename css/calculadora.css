@@ -1247,6 +1247,27 @@ body {
   border-color: var(--calc-borde-fuerte);
 }
 
+/* Lo que el 60 IQ ha aprendido: plegado, porque no se consulta a diario */
+.calc-iq-memoria { margin-top: 1rem; }
+
+.calc-iq-memoria summary {
+  font-size: 0.78rem;
+  color: var(--calc-texto-tenue);
+  cursor: pointer;
+}
+
+.calc-iq-notas {
+  margin: 0.7rem 0;
+  padding: 0.7rem 0.8rem;
+  border-radius: var(--calc-radio-sm);
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--calc-borde);
+  color: var(--calc-texto-suave);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 /* La comprobación: se mira de reojo, no se lee */
 .iq-operacion {
   font-family: var(--mono, monospace);
