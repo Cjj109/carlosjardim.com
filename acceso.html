@@ -137,23 +137,13 @@
       <div class="bloque">
         <button id="btnEntrar" type="button">Entrar con mi passkey</button>
       </div>
-      <details class="plegable">
-        <summary>No me sale ninguna llave</summary>
-        <p class="nota" style="margin-top:0.8rem">
-          Algunos navegadores no enseñan la lista solos. Escribe tu correo y se le pide la llave
-          directamente.
-        </p>
-        <label for="correoEntrar">Tu correo</label>
-        <input id="correoEntrar" type="email" maxlength="120" placeholder="tucorreo@ejemplo.com"
-               autocomplete="email" inputmode="email">
-        <div class="fila">
-          <button id="btnEntrarCorreo" class="secundario" type="button">Entrar con mi correo</button>
-        </div>
-      </details>
-
       <p class="nota">
         ¿Tienes la llave en otro teléfono? En el diálogo que sale, elige usar una passkey de otro
         dispositivo y escanea el código con él.
+      </p>
+      <p class="nota">
+        ¿No sale ninguna? Algunos navegadores no enseñan la lista solos. Pide otra invitación y
+        crea aquí una llave nueva: no se pierde nada, una persona puede tener varias.
       </p>
 
       <!-- Solo para la primerísima vez, cuando todavía no hay nadie dentro.
@@ -188,10 +178,7 @@
       <h1>Te invitaron</h1>
       <p class="sub">Esta invitación es para <strong id="invitadoA">…</strong> y solo sirve una vez.</p>
       <div class="bloque">
-        <label for="correo">Tu correo</label>
-        <input id="correo" type="email" maxlength="120" placeholder="tucorreo@ejemplo.com"
-               autocomplete="email" inputmode="email">
-        <label for="apodo" style="margin-top:0.9rem">¿Qué aparato es este?</label>
+        <label for="apodo">¿Qué aparato es este?</label>
         <input id="apodo" type="text" maxlength="60" placeholder="Mi iPhone" autocomplete="off">
         <div class="fila">
           <button id="btnAlta" type="button">Crear mi passkey</button>

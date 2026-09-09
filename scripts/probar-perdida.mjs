@@ -1,5 +1,5 @@
 /**
- * Correo, pérdida del aparato y recuperación.
+ * Pérdida del aparato y recuperación.
  * Es la pregunta del dueño: ¿y si pierdo el teléfono que tiene la llave?
  */
 import { createRequire } from 'module';
@@ -25,33 +25,19 @@ const aparato = async () => {
   return { ctx, pag };
 };
 
-const alta = async (a, enlace, correo, apodo) => {
+const alta = async (a, enlace, apodo) => {
   await a.pag.goto(enlace.replace('https://', 'http://'));
   await a.pag.waitForSelector('#alta:not([hidden])');
-  if (correo !== null) await a.pag.fill('#correo', correo);
   await a.pag.fill('#apodo', apodo);
   await a.pag.click('#btnAlta');
 };
 
-console.log('\nALTA CON CORREO');
+console.log('\nALTA CON INVITACIÓN');
 const inv1 = await (await fetch(`${BASE}/api/acceso/invitar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ para: 'Carlos', maestra: MAESTRA }) })).json();
 const samsung = await aparato();
-await alta(samsung, inv1.enlace, 'carlos@ejemplo.com', 'Samsung');
+await alta(samsung, inv1.enlace, 'Samsung');
 await samsung.pag.waitForURL(/\/calculadora/, { timeout: 15000 });
-ok('entra tras darse de alta con su correo', (await samsung.ctx.request.get(`${BASE}/api/bcv`)).status(), 200);
-
-console.log('\nSIN CORREO NO SE PUEDE DAR DE ALTA');
-const inv2 = await (await fetch(`${BASE}/api/acceso/invitar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ para: 'SinCorreo', maestra: MAESTRA }) })).json();
-const otro = await aparato();
-await alta(otro, inv2.enlace, '', 'Sin correo');
-await otro.pag.waitForTimeout(2500);
-ok('se le pide un correo válido', (await otro.pag.textContent('#mensaje')).includes('correo'), true);
-
-console.log('\nENTRAR ESCRIBIENDO EL CORREO (el camino de repuesto)');
-const conCorreo = await (await fetch(`${BASE}/api/acceso/reto?tipo=entrada&correo=carlos@ejemplo.com`)).json();
-ok('devuelve la llave de esa persona', conCorreo.llaves.length, 1);
-const desconocido = await (await fetch(`${BASE}/api/acceso/reto?tipo=entrada&correo=nadie@ejemplo.com`)).json();
-ok('un correo desconocido no delata nada', { ok: desconocido.ok, llaves: desconocido.llaves.length }, { ok: true, llaves: 0 });
+ok('entra tras darse de alta', (await samsung.ctx.request.get(`${BASE}/api/bcv`)).status(), 200);
 
 console.log('\nSEGUNDO APARATO Y QUITAR EL PERDIDO');
 await samsung.pag.goto(`${BASE}/acceso`);
@@ -73,7 +59,7 @@ const perdido = await aparato();
 ok('desde uno nuevo, no se entra', (await perdido.ctx.request.get(`${BASE}/api/bcv`)).status(), 401);
 const rescate = await (await fetch(`${BASE}/api/acceso/invitar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ para: 'Carlos otra vez', maestra: MAESTRA }) })).json();
 ok('la clave maestra SÍ rescata, ya con gente dentro', rescate.ok, true);
-await alta(perdido, rescate.enlace, 'carlos2@ejemplo.com', 'Teléfono nuevo');
+await alta(perdido, rescate.enlace, 'Teléfono nuevo');
 await perdido.pag.waitForURL(/\/calculadora/, { timeout: 15000 });
 ok('y se vuelve a entrar', (await perdido.ctx.request.get(`${BASE}/api/bcv`)).status(), 200);
 

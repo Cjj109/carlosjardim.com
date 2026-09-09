@@ -6,7 +6,7 @@
  * del aparato—. Para darse de alta hay que traer una invitación sin usar o
  * venir ya con la sesión puesta, que es como se añade un segundo aparato.
  */
-import { crearReto, sesionDe, huellaCorreo, json } from '../../_acceso.js';
+import { crearReto, sesionDe, json } from '../../_acceso.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -41,37 +41,6 @@ export async function onRequestGet(context) {
       para: sesion.nombre,
       usuarioId: sesion.id,
       nuevo: false,
-    });
-  }
-
-  /* Entrar con el correo es el camino de repuesto.
-     Lo normal es que el navegador enseñe solo las llaves de este sitio y se
-     entre con un gesto, sin escribir nada. Pero hay navegadores y situaciones
-     —una ventana privada, un Android viejo— donde ese listado no aparece y la
-     persona se queda mirando un botón que no hace nada. Escribiendo el correo
-     se le dice al navegador exactamente qué llave pedir.
-
-     Con un correo desconocido se devuelve un reto igual, sin llaves y sin
-     decir que no existe: contestar distinto convertiría esto en una forma de
-     averiguar quién tiene acceso, que es justo la lista que no queremos que
-     se pueda reconstruir. */
-  const correo = new URL(request.url).searchParams.get('correo');
-  if (correo) {
-    const huella = await huellaCorreo(correo);
-    const llaves = huella
-      ? await db
-          .prepare(
-            `SELECT l.id FROM llaves l JOIN personas p ON p.id = l.persona_id
-             WHERE p.correo_hash = ? AND p.activa = 1`
-          )
-          .bind(huella)
-          .all()
-      : { results: [] };
-
-    return json({
-      ok: true,
-      reto: await crearReto(db, 'entrada'),
-      llaves: (llaves.results || []).map((l) => l.id),
     });
   }
 

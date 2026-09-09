@@ -41,7 +41,6 @@ ok('la página le da su enlace', (await carlos.pag.textContent('#invitacionPrime
 
 await carlos.pag.click('#btnIrPrimera');
 await carlos.pag.waitForSelector('#alta:not([hidden])', { timeout: 10000 });
-await carlos.pag.fill('#correo', 'carlos@ejemplo.com');
 await carlos.pag.fill('#apodo', 'Samsung');
 await carlos.pag.click('#btnAlta');
 await carlos.pag.waitForURL(/\/calculadora/, { timeout: 15000 });
@@ -63,7 +62,6 @@ ok('antes de entrar, no ve nada', (await miguel.ctx.request.get(`${BASE}/api/bcv
 await miguel.pag.goto(enlaceMiguel.replace('https://', 'http://'));
 await miguel.pag.waitForSelector('#alta:not([hidden])', { timeout: 10000 });
 ok('su invitación dice su nombre', await miguel.pag.textContent('#invitadoA'), 'Miguel');
-await miguel.pag.fill('#correo', 'miguel@ejemplo.com');
 await miguel.pag.fill('#apodo', 'iPhone de Miguel');
 await miguel.pag.click('#btnAlta');
 await miguel.pag.waitForURL(/\/calculadora/, { timeout: 15000 });

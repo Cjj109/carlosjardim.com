@@ -57,24 +57,19 @@ function nombreDelAparato() {
 
 /* ---------- Entrar ---------- */
 
-async function entrar(correo) {
+async function entrar() {
   aviso('Pidiéndole la firma al aparato…');
-  const url = correo ? `/api/acceso/reto?tipo=entrada&correo=${encodeURIComponent(correo)}` : '/api/acceso/reto?tipo=entrada';
-  const { reto, llaves } = await pedir(url);
+  const { reto } = await pedir('/api/acceso/reto?tipo=entrada');
 
-  /* Sin correo no se pasa allowCredentials: las llaves son descubribles, así
-     que el navegador enseña las que tiene para este sitio y se entra con un
-     gesto, sin escribir nada. Con correo se le dice exactamente cuál pedir,
-     que es el repuesto para cuando ese listado no aparece. */
+  /* Sin allowCredentials: las llaves son descubribles, así que el navegador
+     enseña las que tiene para este sitio y se entra con un gesto, sin escribir
+     nada. Es el "un solo paso" que se pidió. */
   const cred = await navigator.credentials.get({
     publicKey: {
       challenge: aBytes(reto),
       rpId: location.hostname,
       userVerification: 'preferred',
       timeout: 120000,
-      ...(llaves?.length
-        ? { allowCredentials: llaves.map((id) => ({ type: 'public-key', id: aBytes(id) })) }
-        : {}),
     },
   });
   if (!cred) throw new Error('No se eligió ninguna llave');
@@ -139,7 +134,6 @@ async function darDeAlta() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       codigo: CODIGO,
-      correo: ($('correo')?.value || '').trim(),
       credencial: cred.id,
       // getPublicKey da la clave en SPKI ya lista: así el servidor no tiene
       // que leer CBOR para sacarla
@@ -297,12 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return aviso('Este navegador no admite passkeys. Prueba con Safari, Chrome o Edge al día.', true);
   }
 
-  $('btnEntrar')?.addEventListener('click', conAviso(() => entrar()));
-  $('btnEntrarCorreo')?.addEventListener('click', conAviso(() => {
-    const correo = ($('correoEntrar').value || '').trim();
-    if (!correo) return aviso('Escribe tu correo', true);
-    return entrar(correo);
-  }));
+  $('btnEntrar')?.addEventListener('click', conAviso(entrar));
   $('btnAlta')?.addEventListener('click', conAviso(darDeAlta));
   $('btnAnadir')?.addEventListener('click', conAviso(darDeAlta));
   $('aparatos')?.addEventListener('click', (e) => {
