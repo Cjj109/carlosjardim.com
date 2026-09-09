@@ -137,9 +137,20 @@ Para eso está tipo "comparar" con el campo opciones, una entrada por precio:
 
   tipo: "comparar"
   opciones: [
-    { monto: 65, tasa: "usd",  etiqueta: "a BCV" },
-    { monto: 60, tasa: "usdt", etiqueta: "en USDT" }
+    { monto: 65, tasa: "usd",  moneda: "divisa", etiqueta: "a BCV" },
+    { monto: 60, tasa: "usdt", moneda: "divisa", etiqueta: "en USDT" }
   ]
+
+MONEDA es en qué está escrito ESE precio, y hay que acertarla:
+
+  "divisa"  el precio va en la moneda de su tasa: 65 dólares, 60 USDT, 40 €
+  "bs"      el precio ya viene en bolívares: "15000 bs", "quince mil a BCV"
+
+"Me cobran 15 USDT o 15000 bs a BCV" son { 15, usdt, divisa } y
+{ 15000, usd, bs }: lo segundo son quince mil BOLÍVARES, no quince mil
+dólares. Poner "divisa" ahí convierte quince mil bolívares en doce millones y
+la respuesta queda ridícula. La tasa sigue haciendo falta aunque el precio ya
+esté en bolívares, porque es la que dice de qué mercado se habla.
 
 La app las lleva a bolívares, las compara y dice cuál gana y por cuánto. Tú
 solo pones los dos precios, su tasa y una etiqueta corta que ayude a
@@ -187,9 +198,15 @@ const ESQUEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['monto', 'tasa', 'etiqueta'],
+        required: ['monto', 'tasa', 'etiqueta', 'moneda'],
         properties: {
           monto: { type: 'number' },
+          /* En qué está escrito ese precio.
+             Faltaba, y la app daba por hecho que todo venía en divisa: a
+             "15 USDT o 15000 bs" convertía los bolívares como si fueran
+             quince mil dólares y salían doce millones. El veredicto acertaba
+             de casualidad y las cifras eran un disparate. */
+          moneda: { type: 'string', enum: ['divisa', 'bs'] },
           tasa: { type: 'string', enum: ['usd', 'eur', 'usdt', 'zelle'] },
           etiqueta: { type: 'string' },
         },
@@ -261,8 +278,15 @@ function lineaResultado(monto, tasa, valor, operacion) {
   };
 }
 
-/** Aquí se hace la cuenta de verdad, con los números de la app */
-function resolver(decision, tasas) {
+/**
+ * Aquí se hace la cuenta de verdad, con los números de la app.
+ *
+ * Exportada para poder probarla sin gastar una llamada al modelo: lo que
+ * decide el modelo es QUÉ cuenta hacer, y la cuenta la hace esto. Poder
+ * comprobarla a solas es lo que permitió cazar que una comparación con un
+ * precio en bolívares salía por doce millones.
+ */
+export function resolver(decision, tasas) {
   const { tipo, monto, tasa, operacion } = decision;
 
   if (tipo === 'fuera_de_tema') return { texto: decision.pulla };
@@ -281,7 +305,10 @@ function resolver(decision, tasas) {
     const ops = (decision.opciones || [])
       .map((o) => ({ ...o, valor: hay(tasas, o.tasa), monto: Number(o.monto) }))
       .filter((o) => o.valor && Number.isFinite(o.monto) && o.monto > 0)
-      .map((o) => ({ ...o, enBs: o.monto * o.valor }));
+      /* A bolívares, que es el único terreno donde se comparan. Lo que ya
+         está en bolívares se queda como está; lo que está en divisa se
+         multiplica por su tasa. Antes se multiplicaba siempre. */
+      .map((o) => ({ ...o, enBs: o.moneda === 'bs' ? o.monto : o.monto * o.valor }));
 
     if (ops.length < 2) {
       return { texto: `${decision.pulla}\n\n${decision.explicacion || 'Dime los dos precios y con qué tasa va cada uno.'}` };
@@ -293,8 +320,13 @@ function resolver(decision, tasas) {
     const ahorroBs = pierde.enBs - gana.enBs;
 
     const lineas = ops.map((o) => ({
-      salida: `${cifra(o.monto)} ${SIMBOLO[o.tasa]}`,
-      detalle: `${cifra(o.enBs)} Bs. · ${NOMBRE_TASA[o.tasa]}`,
+      // Un precio en bolívares se enseña en bolívares, no con el símbolo de
+      // su tasa: poner "15.000,00 $" a quince mil bolívares es mentir.
+      salida: o.moneda === 'bs' ? `${cifra(o.monto)} Bs.` : `${cifra(o.monto)} ${SIMBOLO[o.tasa]}`,
+      detalle:
+        o.moneda === 'bs'
+          ? `en bolívares, tal cual`
+          : `${cifra(o.enBs)} Bs. · ${NOMBRE_TASA[o.tasa]}`,
       gana: o === gana,
     }));
 
@@ -306,8 +338,13 @@ function resolver(decision, tasas) {
       };
     }
 
-    const enSuMoneda = ahorroBs / pierde.valor;
-    const ahorro = `Te ahorras ${cifra(ahorroBs)} Bs. · unos ${cifra(enSuMoneda)} ${SIMBOLO[pierde.tasa]}`;
+    /* El ahorro también en la moneda del que pierde, que es como se piensa:
+       "me ahorro cinco dólares". Salvo que el que pierde ya esté en bolívares:
+       ahí decirlo dos veces no aclara nada. */
+    const ahorro =
+      pierde.moneda === 'bs'
+        ? `Te ahorras ${cifra(ahorroBs)} Bs.`
+        : `Te ahorras ${cifra(ahorroBs)} Bs. · unos ${cifra(ahorroBs / pierde.valor)} ${SIMBOLO[pierde.tasa]}`;
     const veredicto = `Conviene pagar ${cifra(gana.monto)} ${SIMBOLO[gana.tasa]}${gana.etiqueta ? ` (${gana.etiqueta})` : ''}`;
 
     return {
