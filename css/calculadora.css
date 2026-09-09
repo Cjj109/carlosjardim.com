@@ -1217,6 +1217,36 @@ body {
   color: var(--calc-texto-tenue);
 }
 
+/* La cabecera del 60 IQ lleva el botón de borrar a la derecha */
+.calc-iq-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+/* Discreto a propósito: se usa de vez en cuando y no compite con la
+   conversación, que es lo que se viene a leer. Pero con área de toque de
+   sobra, que en el móvil un botón pequeño de verdad es un botón que falla. */
+.calc-iq-borrar {
+  flex-shrink: 0;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--calc-radio-sm);
+  border: 1px solid var(--calc-borde);
+  background: transparent;
+  color: var(--calc-texto-tenue);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.calc-iq-borrar:hover {
+  color: var(--calc-texto-suave);
+  border-color: var(--calc-borde-fuerte);
+}
+
 /* La comprobación: se mira de reojo, no se lee */
 .iq-operacion {
   font-family: var(--mono, monospace);
@@ -1281,6 +1311,8 @@ body { overscroll-behavior-y: contain; }
   .calc-iq-ejemplo,
   .calc-iq-caja input,
   .calc-iq-caja button,
+  .calc-iq-borrar { min-height: 36px; }
+
   .calc-restablecer {
     min-height: 44px;
   }

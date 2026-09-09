@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=59">
-  <link rel="stylesheet" href="/css/calculadora.css?r=59">
+  <link rel="stylesheet" href="/css/variables.css?r=60">
+  <link rel="stylesheet" href="/css/calculadora.css?r=60">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -182,7 +182,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v59</span>
+    <span class="calc-version" title="Versión de la app instalada">v60</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -204,9 +204,14 @@
        con una pulla por no haberla hecho tú). La clave de OpenAI no está aquí:
        la petición va a /api/60iq, que es quien la tiene. -->
   <section class="calc-ajustes calc-iq" id="calcPanel60iq" hidden>
-    <div class="calc-ajustes-cabecera">
-      <h2>60 IQ</h2>
-      <p>Pregúntale como hablas. Te va a insultar, pero te hace la cuenta.</p>
+    <div class="calc-ajustes-cabecera calc-iq-cabecera">
+      <div>
+        <h2>60 IQ</h2>
+        <p>Pregúntale como hablas. Te va a insultar, pero te hace la cuenta.</p>
+      </div>
+      <!-- Se enciende cuando hay algo que borrar: un botón que no hace nada
+           enseña una acción falsa. -->
+      <button type="button" id="iqBorrar" class="calc-iq-borrar" hidden>Borrar</button>
     </div>
 
     <div class="calc-iq-charla" id="iqCharla" aria-live="polite">
@@ -312,7 +317,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=59" defer></script>
+<script src="/js/calculadora.js?r=60" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

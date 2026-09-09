@@ -979,12 +979,21 @@ let iqPreguntando = false;
 const iqCharlaPrevia = [];
 const IQ_MAX_TURNOS = 6;
 
+/* Los ejemplos de inicio, guardados tal cual antes de que la primera pregunta
+   los quite. Al borrar la conversación se devuelven: dejar el hueco en blanco
+   convierte "borrar" en "romper", y esos ejemplos son además lo que enseña a
+   usar esto a quien llega. */
+let ejemplosDeInicio = null;
+
 function burbuja(quien, texto, { error = false, partes = null } = {}) {
   const charla = $('iqCharla');
   if (!charla) return null;
 
   const ejemplos = charla.querySelector('.calc-iq-ejemplos');
-  if (ejemplos) ejemplos.remove();
+  if (ejemplos) {
+    if (ejemplosDeInicio === null) ejemplosDeInicio = ejemplos.outerHTML;
+    ejemplos.remove();
+  }
 
   const nodo = document.createElement('p');
   nodo.className = `calc-iq-dice calc-iq-${quien}${error ? ' es-error' : ''}`;
@@ -994,7 +1003,37 @@ function burbuja(quien, texto, { error = false, partes = null } = {}) {
 
   charla.appendChild(nodo);
   charla.scrollTop = charla.scrollHeight;
+
+  const borrar = $('iqBorrar');
+  if (borrar) borrar.hidden = false;
+
   return nodo;
+}
+
+/**
+ * Vacía la conversación.
+ *
+ * Es cosa de ruido visual: se pregunta, se lee la respuesta y esa respuesta se
+ * queda ahí ocupando pantalla cuando ya no dice nada nuevo. Se borra lo que se
+ * ve y también lo que el 60 IQ recuerda, porque si no seguiría contestando
+ * como si la charla anterior siguiera viva: pantalla limpia y cabeza limpia
+ * tienen que ir juntas, o la próxima respuesta no se entiende.
+ *
+ * No hace falta confirmar: no se pierde nada que no se pueda volver a
+ * preguntar, y un "¿seguro?" por cada limpieza cansa más de lo que protege.
+ */
+function limpiarCharla() {
+  const charla = $('iqCharla');
+  if (!charla) return;
+
+  charla.innerHTML = ejemplosDeInicio || '';
+  iqCharlaPrevia.length = 0;
+
+  const borrar = $('iqBorrar');
+  if (borrar) borrar.hidden = true;
+
+  const campo = $('iqPregunta');
+  if (campo) campo.value = '';
 }
 
 /**
@@ -1392,6 +1431,8 @@ document.addEventListener('DOMContentLoaded', () => {
      toca. Así el teclado no se mueve, la página no da el salto y el click
      llega a la primera. */
   $('iqEnviar')?.addEventListener('mousedown', (e) => e.preventDefault());
+
+  $('iqBorrar')?.addEventListener('click', limpiarCharla);
 
   $('iqForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
