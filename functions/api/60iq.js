@@ -617,6 +617,45 @@ function mismoSitio(peticion) {
 const IQ_TURNOS_GUARDADOS = 12;   // seis idas y venidas
 const IQ_NOTAS_MAX = 600;
 
+/**
+ * Junta lo guardado en la base con lo que trae el navegador.
+ *
+ * Elegir uno de los dos estaba mal. Al abrir la app el modelo veía los doce
+ * turnos guardados, pero en cuanto se le preguntaba algo el navegador ya traía
+ * dos y esos dos SUSTITUÍAN a los doce: la segunda pregunta se contestaba con
+ * menos memoria que la primera, y desde fuera parecía que se le olvidaba todo
+ * a mitad de conversación.
+ *
+ * Sumarlos también cubre la carrera al guardar: lo último se apunta después de
+ * responder, así que una repregunta rápida puede llegar antes de que esté en
+ * la base. Viene del navegador y no se pierde.
+ *
+ * Suelta y exportada porque es la única lógica de aquí que puede equivocarse
+ * de forma silenciosa, y probarla no debería costar una llamada al modelo.
+ */
+export function mezclarContexto(guardados, delNavegador, tope = MAX_TURNOS * 2) {
+  const clave = (t) => `${t.role}\u0000${t.content}`;
+  const vistos = new Set(guardados.map(clave));
+  return [...guardados, ...delNavegador.filter((t) => !vistos.has(clave(t)))].slice(-tope);
+}
+
+/**
+ * Añade una observación a las notas, recortando por líneas enteras.
+ *
+ * Cortando por caracteres quedaba media frase colgando —"asi siempre en
+ * USDT"— y eso no solo se ve feo en la pantalla de "lo que sabe de ti": se le
+ * manda al modelo como si fuera una observación suya.
+ */
+export function anadirNota(previas, nota, tope = IQ_NOTAS_MAX) {
+  const limpia = String(nota || '').trim();
+  if (!limpia) return previas;
+  if (previas.includes(limpia)) return previas;
+
+  const lineas = ((previas ? `${previas}\n` : '') + `- ${limpia}`).split('\n');
+  while (lineas.join('\n').length > tope && lineas.length > 1) lineas.shift();
+  return lineas.join('\n');
+}
+
 /** Lo que se sabe de quien pregunta: sus notas y por dónde iba la charla */
 async function memoriaDe(db, personaId) {
   if (!db || !personaId) return { notas: '', turnos: [] };
@@ -659,17 +698,13 @@ async function guardarMemoria(db, personaId, pregunta, respuesta, aprendido) {
       .bind(personaId, personaId, IQ_TURNOS_GUARDADOS)
       .run();
 
-    const nota = String(aprendido || '').trim();
-    if (!nota) return;
+    if (!String(aprendido || '').trim()) return;
 
     /* Las notas se acumulan, no se sustituyen: cada una es una observación
-       suelta. Se recortan por el final —lo más viejo cae primero— para que no
-       crezcan sin límite ni se coman el contexto. */
+       suelta que sigue valiendo. */
     const previas = (await db.prepare('SELECT notas FROM iq_notas WHERE persona_id = ?').bind(personaId).first())?.notas || '';
-    if (previas.includes(nota)) return;
-
-    const juntas = (previas ? `${previas}\n` : '') + `- ${nota}`;
-    const recortadas = juntas.length > IQ_NOTAS_MAX ? juntas.slice(-IQ_NOTAS_MAX) : juntas;
+    const recortadas = anadirNota(previas, aprendido);
+    if (recortadas === previas) return;
 
     await db
       .prepare(
@@ -729,18 +764,18 @@ export async function onRequestPost(context) {
   const sesion = await sesionDe(db, request);
   const { notas, turnos: turnosGuardados } = await memoriaDe(db, sesion?.id);
 
-  /* Los turnos que manda el navegador mandan sobre los guardados: si acaba de
-     borrar la conversación, viene vacío y eso es exactamente lo que quiso
-     decir. Los guardados solo entran cuando el cliente no trae nada, que es
-     el caso de abrir la app en otro teléfono y seguir donde se quedó. */
-  const contexto = turnos.length ? turnos : turnosGuardados;
+  const contexto = mezclarContexto(turnosGuardados, turnos);
 
   const quienEs = sesion
     ? `\n\nHABLAS CON: ${sesion.nombre}.` + (notas ? `\nLo que ya sabes de ${sesion.nombre}:\n${notas}` : '')
     : '';
 
   try {
-    const respuesta = await fetch(OPENROUTER, {
+    /* La dirección se puede sustituir por una variable, como ya se hace con el
+       modelo. Es lo que permite probar qué se le manda y qué se guarda sin
+       gastar llamadas de verdad: la petición la hace el servidor, así que
+       desde el navegador no hay forma de interceptarla. */
+    const respuesta = await fetch(env.IQ_URL || OPENROUTER, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${clave}`,
