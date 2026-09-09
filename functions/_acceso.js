@@ -88,7 +88,9 @@ export async function crearReto(db, tipo) {
   await db.prepare("DELETE FROM retos WHERE expira_en <= datetime('now')").run();
   const vivos = await db.prepare('SELECT COUNT(*) AS n FROM retos').first();
   if ((vivos?.n || 0) >= RETOS_VIVOS_MAX) {
-    throw new Error('Demasiados intentos a la vez, prueba en un minuto');
+    const e = new Error('Demasiados intentos a la vez, prueba en un minuto');
+    e.saturado = true;
+    throw e;
   }
 
   const valor = aleatorio(32);
@@ -182,6 +184,27 @@ const PARAMS = {
   '-257': { importar: { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, verificar: { name: 'RSASSA-PKCS1-v1_5' }, der: false },
 };
 
+export const ALGORITMOS = Object.keys(PARAMS).map(Number);
+
+/**
+ * ¿Se puede importar esta clave pública, y con este algoritmo?
+ *
+ * Se pregunta en el alta, no en la entrada. Si se guarda una clave que
+ * WebCrypto no sabe leer, el alta dice "listo" y la persona se queda dentro
+ * con la sesión recién puesta; el fallo aparece mañana, cuando vuelve y su
+ * firma no verifica nunca. Y la invitación ya se gastó. Mejor decirlo ahora.
+ */
+export async function clavePublicaUsable(clavePublicaB64u, algoritmo) {
+  const params = PARAMS[String(algoritmo)];
+  if (!params) return false;
+  try {
+    await crypto.subtle.importKey('spki', aBytes(clavePublicaB64u), params.importar, false, ['verify']);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Verifica la firma sobre authenticatorData || SHA-256(clientDataJSON) */
 export async function firmaValida(llave, authDataB64u, clientDataB64u, firmaB64u) {
   const params = PARAMS[String(llave.algoritmo)];
@@ -213,7 +236,15 @@ export async function firmaValida(llave, authDataB64u, clientDataB64u, firmaB64u
  * el navegador y se podría falsear; esto no.
  */
 export async function authDataValida(authDataB64u, rpId) {
-  const d = aBytes(authDataB64u);
+  /* Esto llega de fuera y sin autenticar: si no es base64 válido, atob lanza.
+     Fuera del try eso subía hasta arriba y salía un 500 sin cuerpo, cuando lo
+     honrado es decir que el dato viene mal. */
+  let d;
+  try {
+    d = aBytes(authDataB64u);
+  } catch {
+    return { ok: false, error: 'Datos del autenticador ilegibles' };
+  }
   if (d.length < 37) return { ok: false, error: 'Datos del autenticador incompletos' };
 
   const esperado = await sha256(new TextEncoder().encode(rpId));
@@ -278,6 +309,10 @@ export function leerCookie(request, nombre) {
   return null;
 }
 
+/** Fecha de hace N días con el formato de datetime('now') de SQLite */
+const hace = (dias) =>
+  new Date(Date.now() - dias * 86400000).toISOString().slice(0, 19).replace('T', ' ');
+
 /** La persona de esta petición, o null */
 export async function sesionDe(db, request) {
   const testigo = leerCookie(request, COOKIE);
@@ -287,7 +322,7 @@ export async function sesionDe(db, request) {
     const hash = hex(await sha256(new TextEncoder().encode(testigo)));
     const fila = await db
       .prepare(
-        `SELECT s.persona_id, p.nombre FROM sesiones s
+        `SELECT s.persona_id, s.ultimo_uso, p.nombre FROM sesiones s
          JOIN personas p ON p.id = s.persona_id
          WHERE s.hash = ? AND s.expira_en > datetime('now') AND p.activa = 1`
       )
@@ -295,7 +330,13 @@ export async function sesionDe(db, request) {
       .first();
     if (!fila) return null;
 
-    await db.prepare("UPDATE sesiones SET ultimo_uso = datetime('now') WHERE hash = ?").bind(hash).run();
+    // `ultimo_uso` es informativo: sirve para ver cuándo se usó una sesión por
+    // última vez, no para caducarla. Escribirlo en cada petición costaría una
+    // escritura por minuto y por pestaña abierta (la calculadora repregunta la
+    // tasa cada 60 s), así que se refresca como mucho una vez al día.
+    if (!fila.ultimo_uso || fila.ultimo_uso < hace(1)) {
+      await db.prepare("UPDATE sesiones SET ultimo_uso = datetime('now') WHERE hash = ?").bind(hash).run();
+    }
     return { id: fila.persona_id, nombre: fila.nombre };
   } catch (e) {
     console.error('[acceso] error leyendo la sesión:', e.message);

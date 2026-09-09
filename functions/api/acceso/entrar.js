@@ -20,7 +20,9 @@ export async function onRequestPost(context) {
   }
 
   const { credencial, clientData, authData, firma } = cuerpo || {};
-  if (!credencial || !clientData || !authData || !firma) {
+  // Todo esto llega sin autenticar: si no son cadenas, atob y las consultas
+  // se encuentran con lo que no esperan y el fallo sale como un 500 mudo.
+  if (![credencial, clientData, authData, firma].every((v) => typeof v === 'string' && v)) {
     return json({ ok: false, error: 'Faltan datos de la entrada' }, 400);
   }
 

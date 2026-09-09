@@ -59,7 +59,10 @@ await pag.evaluate(() => { window.__confirmar = window.confirm; window.confirm =
 // Se siembra memoria en la base, que es lo que el modelo llenaría en producción
 const { execSync } = await import('node:child_process');
 const DB = '/Users/carlosjardim/Desktop/carlosjardim.com/.wrangler/state/v3/d1/miniflare-D1DatabaseObject/0b59cbbbe68fea6379b8b6d9dcc0fbcced0dd88b0b03cbdbb78c723bb48b08cf.sqlite';
-const persona = execSync(`sqlite3 "${DB}" "SELECT id FROM personas LIMIT 1;"`).toString().trim();
+/* La persona de ESTA prueba, no la primera de la tabla: la base local se
+   queda con la gente de las pruebas anteriores y con `LIMIT 1` se sembraba
+   la memoria de otro. Salía en rojo sin que nada estuviera roto. */
+const persona = execSync(`sqlite3 "${DB}" "SELECT id FROM personas ORDER BY creada_en DESC, rowid DESC LIMIT 1;"`).toString().trim();
 execSync(`sqlite3 "${DB}" "INSERT OR REPLACE INTO iq_notas (persona_id, notas) VALUES ('${persona}', '- paga casi siempre en USDT'); INSERT INTO iq_turnos (persona_id, rol, texto) VALUES ('${persona}','user','hola'),('${persona}','assistant','qué tal');"`);
 
 const antes = await (await ctx.request.get(`${BASE}/api/iq-memoria`)).json();

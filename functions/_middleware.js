@@ -8,10 +8,14 @@
  * la página. Una puerta delante de la vista y ninguna delante del dato es
  * sensación de seguridad, no seguridad. Así que se cierran los dos.
  *
- * La lista es de lo que SE CIERRA, no de lo que se abre. Al revés —una lista
- * de excepciones y todo lo demás cerrado— sería más estricto, pero este sitio
- * tiene una portada pública que debe seguir siéndolo, y una lista de permitidos
- * que se olvida de un archivo tumba la web entera sin avisar.
+ * Para los archivos del sitio la lista es de lo que SE CIERRA, no de lo que se
+ * abre: este sitio tiene una portada pública que debe seguir siéndolo, y una
+ * lista de permitidos que se olvida de un icono tumba la web entera sin
+ * avisar.
+ *
+ * Bajo /api/ va al revés: cerrado por defecto y una lista corta de abiertas.
+ * Ahí el olvido caro es el otro —una ruta nueva sirviendo datos a cualquiera
+ * sin que nada se vea raro— y son siete rutas que se añaden a mano.
  *
  * Lo que queda fuera de la puerta a propósito:
  *   /acceso y /api/acceso/*   la propia puerta, que si no no se podría abrir
@@ -68,7 +72,27 @@ function variantes(ruta) {
   return [...formas];
 }
 
-const esCerrado = (ruta) => variantes(ruta).some((r) => CERRADO.some((re) => re.test(r)));
+/* Bajo /api/ se le da la vuelta: cerrado salvo lo que esté aquí.
+   La lista de arriba es de lo que se cierra, y para los archivos del sitio eso
+   está bien: olvidar uno deja algo público, pero una lista de permitidos que
+   se olvide de una fuente o de un icono tumba la web entera.
+   En /api/ el cálculo es el contrario. Son siete rutas contadas, se añaden de
+   una en una y a mano, y olvidar meter la nueva en la lista de cerrados la
+   deja sirviendo datos a cualquiera —sin error, sin aviso y sin que nada se
+   vea raro—. Al revés, olvidarla aquí devuelve un 401 en la cara la primera
+   vez que se prueba. De los dos olvidos, este avisa. */
+const API_ABIERTA = [
+  /^\/api\/acceso\/(reto|entrar|registrar|invitar|revocar|salir|yo)$/, // la propia puerta
+  /^\/api\/chat$/,            // el chat de la portada, que es pública
+  /^\/api\/admin\/login$/,    // el acceso del panel viejo
+];
+
+const esCerrado = (ruta) =>
+  variantes(ruta).some(
+    (r) =>
+      CERRADO.some((re) => re.test(r)) ||
+      (r.startsWith('/api/') && !API_ABIERTA.some((re) => re.test(r)))
+  );
 
 export async function onRequest(context) {
   const { request, env, next } = context;

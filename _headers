@@ -37,6 +37,18 @@
   # ejecutarse antes de que pinte nada.
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'self'; object-src 'none'
 
+# La página de acceso tampoco lleva extensión, así que ni la regla de *.html
+# ni la de /calculadora la cubrían: se quedaba con el valor por defecto de
+# Cloudflare. Es el mismo caso que dejó la calculadora vieja en Safari, y aquí
+# duele más: una copia guardada del acceso es una copia de la pantalla donde
+# se firma con la passkey y donde sale el enlace de invitación.
+/acceso
+  Cache-Control: no-store, must-revalidate
+  Content-Type: text/html; charset=utf-8
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+  X-Frame-Options: DENY
+  X-Robots-Tag: noindex, nofollow
+
 /
   Cache-Control: no-cache, must-revalidate
   Content-Type: text/html; charset=utf-8

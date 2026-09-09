@@ -367,10 +367,33 @@ function aportaMontos() {
   }
 }
 
+/**
+ * La sesión se acabó mientras la app estaba abierta.
+ *
+ * Pasa cuando desde otro aparato se quita esta llave, o cuando caduca la
+ * cookie. Sin esto, la calculadora se quedaba abierta para siempre con las
+ * últimas cifras en pantalla: el fallo se recogía como "no se pudieron
+ * cargar las tasas" y quien mirara veía números viejos sin saber que ya no
+ * tenía entrada. Quitarle la llave a un teléfono perdido tiene que notarse
+ * en cuanto lo usen, no la próxima vez que a alguien se le ocurra recargar.
+ *
+ * Se manda a la puerta una sola vez: varias peticiones fallan a la vez y no
+ * hace falta un redirección por cada una.
+ */
+let saliendo = false;
+function fueraDeSesion(respuesta) {
+  if (respuesta?.status !== 401) return false;
+  if (saliendo) return true;
+  saliendo = true;
+  const volver = encodeURIComponent(location.pathname);
+  location.replace(`/acceso?volver=${volver}`);
+  return true;
+}
+
 async function cargarMontosGlobales() {
   try {
     const respuesta = await fetch('/api/montos', { signal: AbortSignal.timeout(4000) });
-    if (!respuesta.ok) return;
+    if (fueraDeSesion(respuesta) || !respuesta.ok) return;
 
     const datos = await respuesta.json();
     if (!datos || typeof datos.montos !== 'object') return;
@@ -482,6 +505,7 @@ async function cargarTasas({ forzar = false, primera = false } = {}) {
       ? adelantada
       : await fetch(API, { cache: 'no-store' });
 
+    if (fueraDeSesion(respuesta)) return;
     if (!respuesta?.ok) throw new Error(`HTTP ${respuesta ? respuesta.status : 'sin respuesta'}`);
 
     const datos = await respuesta.json();
@@ -739,6 +763,7 @@ async function cargarFuentes() {
 
   try {
     const respuesta = await fetch(API_FUENTES, { cache: 'no-store' });
+    if (fueraDeSesion(respuesta)) return;
     if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
 
     const datos = await respuesta.json();
@@ -1124,6 +1149,7 @@ async function preguntarAl60IQ(pregunta) {
     const datos = await respuesta.json().catch(() => ({}));
     esperando?.remove();
 
+    if (fueraDeSesion(respuesta)) return;
     if (!respuesta.ok || !datos.respuesta) {
       burbuja('iq', datos.error || 'No se pudo preguntar. Intenta de nuevo.', { error: true });
       return;

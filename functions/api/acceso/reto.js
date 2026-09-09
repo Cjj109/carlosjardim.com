@@ -9,6 +9,18 @@
 import { crearReto, sesionDe, json } from '../../_acceso.js';
 
 export async function onRequestGet(context) {
+  try {
+    return await repartir(context);
+  } catch (e) {
+    // El cupo de retos vivos se llena: alguien está martillando la puerta.
+    // Se dice con 429 (vuelve luego), no con un 500 que no explica nada.
+    if (e?.saturado) return json({ ok: false, error: e.message }, 429);
+    console.error('[acceso] error repartiendo el reto:', e?.message);
+    return json({ ok: false, error: 'No se pudo empezar, prueba otra vez' }, 503);
+  }
+}
+
+async function repartir(context) {
   const { request, env } = context;
   const db = env.MONTOS;
   if (!db) return json({ ok: false, error: 'Acceso no configurado' }, 503);

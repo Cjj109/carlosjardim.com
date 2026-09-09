@@ -27,8 +27,19 @@ for r in "/api/bcv" "/api/bcv/" "/API/BCV" "/Api/Bcv/" "//api/bcv" "/api/%62cv" 
   fi
 done
 
+# Bajo /api/ todo está cerrado salvo lo que la lista abra. Una ruta que no
+# existe tiene que dar 401 y no 404: si diera 404 querría decir que la puerta
+# ni la mira, y entonces el día que exista nacería pública.
+echo ""
+for r in "/api/inventada" "/api/acceso" "/api/admin/quien-sea" "/api/60iq/otra"; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 --path-as-is "$BASE$r")
+  if [ "$code" = "401" ]; then echo "  ✓ $r nace cerrada ($code)"
+  else echo "  ✗ $r debería dar 401 y da $code"; FALLOS=$((FALLOS+1)); fi
+done
+
 # Estas SÍ deben seguir públicas
-for r in "/" "/acceso" "/data/bcv-liquidity.json"; do
+echo ""
+for r in "/" "/acceso" "/data/bcv-liquidity.json" "/api/acceso/reto"; do
   code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 --path-as-is "$BASE$r")
   if [ "$code" = "200" ]; then echo "  ✓ $r sigue pública ($code)"
   else echo "  ✗ $r debería ser pública y da $code"; FALLOS=$((FALLOS+1)); fi

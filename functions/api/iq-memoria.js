@@ -19,16 +19,21 @@ export async function onRequestGet(context) {
   const sesion = await sesionDe(db, request);
   if (!sesion) return json({ ok: false, error: 'No autorizado' }, 401);
 
-  const notas = await db.prepare('SELECT notas, actualizado FROM iq_notas WHERE persona_id = ?').bind(sesion.id).first();
-  const cuantos = await db.prepare('SELECT COUNT(*) AS n FROM iq_turnos WHERE persona_id = ?').bind(sesion.id).first();
+  try {
+    const notas = await db.prepare('SELECT notas, actualizado FROM iq_notas WHERE persona_id = ?').bind(sesion.id).first();
+    const cuantos = await db.prepare('SELECT COUNT(*) AS n FROM iq_turnos WHERE persona_id = ?').bind(sesion.id).first();
 
-  return json({
-    ok: true,
-    nombre: sesion.nombre,
-    notas: notas?.notas || '',
-    actualizado: notas?.actualizado || null,
-    turnosGuardados: cuantos?.n || 0,
-  });
+    return json({
+      ok: true,
+      nombre: sesion.nombre,
+      notas: notas?.notas || '',
+      actualizado: notas?.actualizado || null,
+      turnosGuardados: cuantos?.n || 0,
+    });
+  } catch (e) {
+    console.error('[60iq] error leyendo la memoria:', e?.message);
+    return json({ ok: false, error: 'No se pudo leer la memoria' }, 503);
+  }
 }
 
 export async function onRequestDelete(context) {
@@ -37,10 +42,17 @@ export async function onRequestDelete(context) {
   const sesion = await sesionDe(db, request);
   if (!sesion) return json({ ok: false, error: 'No autorizado' }, 401);
 
-  await db.batch([
-    db.prepare('DELETE FROM iq_notas WHERE persona_id = ?').bind(sesion.id),
-    db.prepare('DELETE FROM iq_turnos WHERE persona_id = ?').bind(sesion.id),
-  ]);
+  try {
+    await db.batch([
+      db.prepare('DELETE FROM iq_notas WHERE persona_id = ?').bind(sesion.id),
+      db.prepare('DELETE FROM iq_turnos WHERE persona_id = ?').bind(sesion.id),
+    ]);
+  } catch (e) {
+    // Decir "listo, olvidado" cuando no se borró nada sería mentir en lo único
+    // que la persona vino a pedir.
+    console.error('[60iq] error olvidando:', e?.message);
+    return json({ ok: false, error: 'No se pudo borrar la memoria' }, 503);
+  }
 
   return json({ ok: true });
 }

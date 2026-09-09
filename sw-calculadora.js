@@ -11,12 +11,12 @@
  *   falla se recurre a la ultima respuesta, y la app avisa de cuando es.
  */
 
-const VERSION = 'tasas-v62';
+const VERSION = 'tasas-v63';
 
 // Las direcciones llevan ?r=<version>, asi que esta lista tiene que ir a la
 // par del HTML. Antes se precargaba /css/variables.css sin el parametro: la
 // entrada guardada no coincidia con lo que la pagina pedia y nunca se usaba.
-const REVISION = 62;
+const REVISION = 63;
 const APP = [
   '/calculadora',
   `/css/variables.css?r=${REVISION}`,
@@ -55,6 +55,40 @@ self.addEventListener('activate', (evento) => {
         claves.filter((c) => c !== VERSION).map((c) => caches.delete(c))
       ))
       .then(() => self.clients.claim())
+  );
+});
+
+/**
+ * Borra de memoria lo que hay detras de la puerta.
+ *
+ * Cerrar sesion mataba la cookie y dejaba el resto donde estaba: las ultimas
+ * tasas, la pantalla de la calculadora y lo que el 60 IQ hubiera contestado
+ * seguian guardados en el telefono. Sin senal, la copia de /calculadora se
+ * servia igual —el 302 a /acceso no llega si no hay red— y quien tuviera el
+ * aparato veia los datos de quien acababa de salir.
+ *
+ * La app (estilos, codigo, fuentes) no se toca: no dice nada de nadie y
+ * volver a bajarla seria pagar el arranque otra vez.
+ */
+async function olvidarLoPrivado() {
+  const cache = await caches.open(VERSION);
+  const claves = await cache.keys();
+  await Promise.all(
+    claves
+      .filter((p) => {
+        const { pathname } = new URL(p.url);
+        return pathname.startsWith('/api/') || pathname === '/calculadora';
+      })
+      .map((p) => cache.delete(p))
+  );
+}
+
+self.addEventListener('message', (evento) => {
+  if (evento.data !== 'salir') return;
+  // El puerto de vuelta: la pagina espera a que esto termine antes de
+  // recargar, porque recargar primero deja la purga a medias.
+  evento.waitUntil(
+    olvidarLoPrivado().then(() => evento.ports?.[0]?.postMessage('listo'))
   );
 });
 
@@ -98,6 +132,12 @@ self.addEventListener('fetch', (evento) => {
   // emergencia no se encontraba jamas, porque se buscaba por una direccion que
   // solo habia existido una vez.
   if (url.pathname.startsWith('/api/')) {
+    /* La memoria del 60 IQ no se guarda nunca.
+       Son las notas que la maquina se apunta sobre una persona. Sin senal no
+       hacen ninguna falta —no hay modelo al que preguntarle—, asi que
+       guardarlas solo consigue dejarlas escritas en el disco del telefono. */
+    if (url.pathname.startsWith('/api/iq-memoria')) return;
+
     const clave = new Request(url.origin + url.pathname);
 
     evento.respondWith(

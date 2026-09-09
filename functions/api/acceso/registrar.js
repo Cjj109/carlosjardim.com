@@ -9,7 +9,15 @@
  *                   iCloud a Google, así que cada aparato lleva la suya y las
  *                   dos apuntan a la misma persona.
  */
-import { revisarClientData, crearSesion, sesionDe, identidadDelSitio, aleatorio, json } from '../../_acceso.js';
+import {
+  revisarClientData,
+  crearSesion,
+  sesionDe,
+  identidadDelSitio,
+  clavePublicaUsable,
+  aleatorio,
+  json,
+} from '../../_acceso.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -24,8 +32,18 @@ export async function onRequestPost(context) {
   }
 
   const { codigo, credencial, clavePublica, algoritmo, clientData, apodo } = cuerpo || {};
-  if (!credencial || !clavePublica || !clientData || typeof algoritmo !== 'number') {
+  const textos = [credencial, clavePublica, clientData].every((v) => typeof v === 'string' && v);
+  if (!textos || typeof algoritmo !== 'number') {
     return json({ ok: false, error: 'Faltan datos del alta' }, 400);
+  }
+
+  /* Antes de gastar la invitación: que la llave sirva para entrar mañana.
+     Un id o una clave desmedidos tampoco: esto va a una fila de la base. */
+  if (credencial.length > 512 || clavePublica.length > 2048) {
+    return json({ ok: false, error: 'Datos del alta fuera de medida' }, 400);
+  }
+  if (!(await clavePublicaUsable(clavePublica, algoritmo))) {
+    return json({ ok: false, error: 'Esa llave no se puede usar para entrar aquí' }, 400);
   }
 
   const { origen } = identidadDelSitio(request);

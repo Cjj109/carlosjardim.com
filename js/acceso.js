@@ -320,6 +320,34 @@ const conAviso = (fn) => async () => {
   }
 };
 
+/**
+ * Cerrar sesion tambien vacia lo que el telefono tenia guardado.
+ *
+ * La cookie se va, pero el service worker seguia teniendo las ultimas tasas y
+ * la pantalla de la calculadora en memoria. Sin senal esa copia se sirve
+ * igual, asi que salir no sacaba a nadie de verdad hasta la proxima vez que
+ * hubiera red. Se espera la confirmacion antes de recargar; si el service
+ * worker no contesta en un segundo, se sigue: no vale dejar a nadie mirando
+ * un boton que no responde.
+ */
+async function olvidarLoGuardado() {
+  /* Se busca por registro, no por `controller`.
+     El service worker vive con alcance /calculadora, asi que esta pagina no
+     esta bajo su mando y `controller` sale nulo: la purga no se llegaba a
+     pedir. El registro si se encuentra desde cualquier pagina del sitio. */
+  const reg = await navigator.serviceWorker?.getRegistration('/calculadora');
+  const sw = reg?.active;
+  if (!sw) return;
+  try {
+    await new Promise((listo) => {
+      const canal = new MessageChannel();
+      canal.port1.onmessage = () => listo();
+      sw.postMessage('salir', [canal.port2]);
+      setTimeout(listo, 1000);
+    });
+  } catch { /* sin service worker no hay nada guardado que borrar */ }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   if (!window.PublicKeyCredential) {
     $('cargando').hidden = true;
@@ -340,6 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('btnPrimera')?.addEventListener('click', conAviso(primeraInvitacion));
   $('btnSalir')?.addEventListener('click', conAviso(async () => {
     await pedir('/api/acceso/salir', { method: 'POST' });
+    await olvidarLoGuardado();
     location.reload();
   }));
 

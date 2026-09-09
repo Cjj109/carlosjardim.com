@@ -2,6 +2,15 @@
 import { sesionDe, json } from '../../_acceso.js';
 
 export async function onRequestGet(context) {
+  try {
+    return await quienSoy(context);
+  } catch (e) {
+    console.error('[acceso] error leyendo la cuenta:', e?.message);
+    return json({ ok: false, error: 'No se pudo leer la cuenta' }, 503);
+  }
+}
+
+async function quienSoy(context) {
   const { request, env } = context;
   const db = env.MONTOS;
   if (!db) return json({ ok: false, error: 'Acceso no configurado' }, 503);

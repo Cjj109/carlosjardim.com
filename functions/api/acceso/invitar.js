@@ -24,6 +24,8 @@
  */
 import { sesionDe, aleatorio, igualesEnTiempoConstante, json } from '../../_acceso.js';
 
+const INVITACIONES_VIVAS_MAX = 10;
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const db = env.MONTOS;
@@ -78,6 +80,26 @@ export async function onRequestPost(context) {
       return json({ ok: false, error: 'No autorizado' }, 403);
     }
     quien = 'clave maestra';
+  }
+
+  /* Un tope de invitaciones vivas por persona.
+     Cada invitación es una puerta abierta tres días. Sin tope, un botón que
+     se puede pulsar mil veces deja mil puertas, y las de `paraMi` las puede
+     crear cualquiera que esté dentro. Diez a la vez sobran para el uso real
+     —un segundo teléfono, un par de personas— y las usadas no cuentan. */
+  const vivas = await db
+    .prepare(
+      `SELECT COUNT(*) AS n FROM invitaciones
+        WHERE usada_en IS NULL AND expira_en > datetime('now')
+          AND creada_por IS ?`
+    )
+    .bind(quien || null)
+    .first();
+  if ((vivas?.n || 0) >= INVITACIONES_VIVAS_MAX) {
+    return json(
+      { ok: false, error: 'Tienes demasiadas invitaciones sin usar. Espera a que caduquen o que las usen.' },
+      429
+    );
   }
 
   const codigo = aleatorio(32);
