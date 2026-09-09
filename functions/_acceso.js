@@ -77,7 +77,20 @@ export function identidadDelSitio(request) {
 
 const MINUTOS = 60 * 1000;
 
+/* Un tope de retos vivos.
+   Pedir reto es publico y no cuesta nada —tiene que serlo, si no no se podria
+   ni intentar entrar—, asi que un script puede llenar la tabla. Con 5 minutos
+   de vida y este tope, lo peor que consigue es que durante un rato nadie mas
+   pueda pedir uno; sin el, es crecimiento sin limite en una base que se paga. */
+const RETOS_VIVOS_MAX = 500;
+
 export async function crearReto(db, tipo) {
+  await db.prepare("DELETE FROM retos WHERE expira_en <= datetime('now')").run();
+  const vivos = await db.prepare('SELECT COUNT(*) AS n FROM retos').first();
+  if ((vivos?.n || 0) >= RETOS_VIVOS_MAX) {
+    throw new Error('Demasiados intentos a la vez, prueba en un minuto');
+  }
+
   const valor = aleatorio(32);
   await db
     .prepare("INSERT INTO retos (valor, tipo, expira_en) VALUES (?, ?, datetime('now', '+5 minutes'))")
@@ -208,8 +221,16 @@ export async function authDataValida(authDataB64u, rpId) {
     if (d[i] !== esperado[i]) return { ok: false, error: 'El dominio no coincide' };
   }
 
+  /* Dos bits distintos y hacen falta los dos:
+       UP (0x01)  hubo un gesto: alguien tocó el aparato
+       UV (0x04)  ese alguien se identificó: cara, huella o PIN
+
+     Antes solo se miraba UP, y eso deja pasar un teléfono desbloqueado en
+     manos ajenas: basta tocarlo. UV es justo lo que convierte "tengo el
+     aparato" en "soy yo", y es lo único que protege si te lo quitan abierto. */
   const flags = d[32];
   if (!(flags & 0x01)) return { ok: false, error: 'Falta la confirmación de la persona' };
+  if (!(flags & 0x04)) return { ok: false, error: 'Hace falta tu cara, huella o PIN' };
 
   const contador = (d[33] << 24) | (d[34] << 16) | (d[35] << 8) | d[36];
   return { ok: true, contador: contador >>> 0 };
@@ -228,13 +249,18 @@ const DURACION_DIAS = 180;
  * La passkey sigue estando para renovarla, así que una sesión larga no baja
  * el listón de entrar, solo evita repetirlo cada semana.
  */
-export async function crearSesion(db, personaId) {
+export async function crearSesion(db, personaId, llaveId = null) {
   const testigo = aleatorio(32);
   const hash = hex(await sha256(new TextEncoder().encode(testigo)));
 
+  /* Se guarda de qué llave nació. Sin eso, quitar la llave de un teléfono
+     perdido no cerraba su sesión: la cookie seguía valiendo medio año, y el
+     botón "Quitar" prometía algo que no hacía. */
   await db
-    .prepare("INSERT INTO sesiones (hash, persona_id, expira_en) VALUES (?, ?, datetime('now', '+180 days'))")
-    .bind(hash, personaId)
+    .prepare(
+      "INSERT INTO sesiones (hash, persona_id, llave_id, expira_en) VALUES (?, ?, ?, datetime('now', '+180 days'))"
+    )
+    .bind(hash, personaId, llaveId)
     .run();
   await db.prepare("DELETE FROM sesiones WHERE expira_en <= datetime('now')").run();
 

@@ -55,5 +55,10 @@ export async function onRequestPost(context) {
       : json({ ok: false, error: 'Esa llave no es tuya' }, 404);
   }
 
+  /* Y las sesiones que salieron de esa llave. Solo esas: los demás aparatos
+     de la misma persona siguen dentro, que es lo que se espera al quitar UNO.
+     Sin esto, el teléfono perdido conservaba su cookie medio año. */
+  await db.prepare('DELETE FROM sesiones WHERE llave_id = ?').bind(id).run();
+
   return json({ ok: true });
 }

@@ -100,6 +100,6 @@ export async function onRequestPost(context) {
 
   if (!guardada) return json({ ok: false, error: 'Esa llave ya está en uso' }, 409);
 
-  const cookie = await crearSesion(db, personaId);
+  const cookie = await crearSesion(db, personaId, credencial);
   return json({ ok: true, nueva: !sesion }, 200, { 'Set-Cookie': cookie });
 }

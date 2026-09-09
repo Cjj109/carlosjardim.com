@@ -60,6 +60,6 @@ export async function onRequestPost(context) {
     .bind(auth.contador, llave.id)
     .run();
 
-  const cookie = await crearSesion(db, llave.persona_id);
+  const cookie = await crearSesion(db, llave.persona_id, llave.id);
   return json({ ok: true }, 200, { 'Set-Cookie': cookie });
 }

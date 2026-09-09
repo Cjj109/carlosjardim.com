@@ -68,7 +68,9 @@ async function entrar() {
     publicKey: {
       challenge: aBytes(reto),
       rpId: location.hostname,
-      userVerification: 'preferred',
+      // 'required' y no 'preferred': se pide cara, huella o PIN cada vez. Es
+      // lo único que protege si te quitan el teléfono desbloqueado.
+      userVerification: 'required',
       timeout: 120000,
     },
   });
@@ -118,7 +120,7 @@ async function darDeAlta() {
         // Descubrible: es lo que permite entrar sin escribir nada
         residentKey: 'required',
         requireResidentKey: true,
-        userVerification: 'preferred',
+        userVerification: 'required',
       },
       // Sin attestation: no se le pide al aparato que se identifique de qué
       // marca es. No hace falta y es un dato menos que viaja.
