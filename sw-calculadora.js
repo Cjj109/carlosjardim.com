@@ -11,12 +11,12 @@
  *   falla se recurre a la ultima respuesta, y la app avisa de cuando es.
  */
 
-const VERSION = 'tasas-v57';
+const VERSION = 'tasas-v58';
 
 // Las direcciones llevan ?r=<version>, asi que esta lista tiene que ir a la
 // par del HTML. Antes se precargaba /css/variables.css sin el parametro: la
 // entrada guardada no coincidia con lo que la pagina pedia y nunca se usaba.
-const REVISION = 57;
+const REVISION = 58;
 const APP = [
   '/calculadora',
   `/css/variables.css?r=${REVISION}`,
@@ -80,6 +80,15 @@ self.addEventListener('fetch', (evento) => {
 
   const url = new URL(evento.request.url);
   if (url.origin !== self.location.origin) return;
+
+  /* La puerta, nunca de memoria.
+     Servir una pagina de acceso guardada es servir una version vieja del
+     mecanismo que decide quien entra, y eso ya paso: el codigo de /acceso se
+     quedo cacheado con la primera version del dia mientras cambiaba ocho
+     veces, y la casilla de invitar no aparecia por eso. Una pantalla de
+     entrada tiene que venir de la red siempre; si no hay red, no hay entrada,
+     que es lo correcto. */
+  if (url.pathname === '/acceso' || url.pathname.startsWith('/js/acceso.js')) return;
 
   // Las tasas: red primero, y la copia solo como red de seguridad.
   //

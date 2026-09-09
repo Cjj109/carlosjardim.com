@@ -2,11 +2,12 @@
 /**
  * Sube la versión de la calculadora en los sitios donde hay que subirla.
  *
- * Son cinco, repartidos en dos archivos, y hay que tocarlos todos a la vez:
+ * Son seis, repartidos en tres archivos, y hay que tocarlos todos a la vez:
  *
  *   calculadora.html   ?r=N en variables.css, calculadora.css y calculadora.js
  *                      el sello "vN" del pie
  *   sw-calculadora.js  VERSION ('tasas-vN') y REVISION (N)
+ *   acceso.html        ?r=N en acceso.js
  *
  * Olvidar uno no da ningún error: el service worker guarda los archivos por
  * su dirección y sirve de memoria lo que ya tiene, así que un cambio sin
@@ -26,9 +27,17 @@ import { fileURLToPath } from 'node:url';
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
 const HTML = join(raiz, 'calculadora.html');
 const SW = join(raiz, 'sw-calculadora.js');
+/* acceso.html va con los demas.
+   Estuvo fuera y se quedo con ?r=1 fijo mientras su codigo cambiaba ocho
+   veces en un dia: el navegador y el service worker siguieron sirviendo la
+   primera version, y la casilla de invitar no aparecia. Es exactamente el
+   fallo silencioso del que avisa la cabecera de este archivo, cometido por
+   dejar una pagina fuera de la lista. */
+const ACCESO = join(raiz, 'acceso.html');
 
 const html = readFileSync(HTML, 'utf8');
 const sw = readFileSync(SW, 'utf8');
+const acceso = readFileSync(ACCESO, 'utf8');
 
 const actual = Number(sw.match(/const REVISION = (\d+);/)?.[1]);
 if (!Number.isInteger(actual)) {
@@ -53,6 +62,11 @@ htmlNuevo = htmlNuevo.replace(/(title="Versión de la app instalada">)v\d+/, (_,
   return `${pre}v${nueva}`;
 });
 
+const accesoNuevo = acceso.replace(/\?r=\d+/g, () => {
+  cambios.push('acceso.html ?r=');
+  return `?r=${nueva}`;
+});
+
 const swNuevo = sw
   .replace(/const VERSION = 'tasas-v\d+';/, () => {
     cambios.push('VERSION');
@@ -66,6 +80,7 @@ const swNuevo = sw
 // Que no queden versiones sueltas: si una se escapa, el fallo es silencioso
 const sueltas = [
   ...[...htmlNuevo.matchAll(/\?r=(\d+)/g)].map((m) => m[1]),
+  ...[...accesoNuevo.matchAll(/\?r=(\d+)/g)].map((m) => m[1]),
   ...[...swNuevo.matchAll(/tasas-v(\d+)|REVISION = (\d+)/g)].map((m) => m[1] ?? m[2]),
 ].filter((v) => Number(v) !== nueva);
 
@@ -76,5 +91,6 @@ if (sueltas.length) {
 
 writeFileSync(HTML, htmlNuevo);
 writeFileSync(SW, swNuevo);
+writeFileSync(ACCESO, accesoNuevo);
 
 console.log(`✓ v${actual} → v${nueva}  (${cambios.length} sitios: ${cambios.join(', ')})`);
