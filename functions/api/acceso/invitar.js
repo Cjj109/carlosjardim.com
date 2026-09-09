@@ -36,10 +36,23 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'Petición ilegible' }, 400);
   }
 
-  const para = String(cuerpo?.para || '').trim().slice(0, 60);
+  const sesion = await sesionDe(db, request);
+
+  /* Un enlace para MI otro aparato.
+     Sin esto, quien tiene dos teléfonos tenía que pedir una segunda
+     invitación, y esa creaba una persona nueva: el mismo Miguel salía dos
+     veces en la lista y no podía ver sus dos aparatos juntos. La otra salida
+     era el código QR entre dispositivos, que funciona pero es un baile.
+
+     Con la invitación atada a la persona, se abre el enlace en el segundo
+     teléfono y la llave nueva cae en la misma cuenta. */
+  const paraMiOtroAparato = !!cuerpo?.paraMi && !!sesion;
+
+  const para = paraMiOtroAparato
+    ? sesion.nombre
+    : String(cuerpo?.para || '').trim().slice(0, 60);
   if (!para) return json({ ok: false, error: 'Falta para quién es' }, 400);
 
-  const sesion = await sesionDe(db, request);
   let quien = sesion?.nombre;
 
   if (!sesion) {
@@ -54,10 +67,19 @@ export async function onRequestPost(context) {
 
   const codigo = aleatorio(32);
   await db
-    .prepare("INSERT INTO invitaciones (codigo, para, creada_por, expira_en) VALUES (?, ?, ?, datetime('now', '+3 days'))")
-    .bind(codigo, para, quien || null)
+    .prepare(
+      `INSERT INTO invitaciones (codigo, para, creada_por, persona_id, expira_en)
+       VALUES (?, ?, ?, ?, datetime('now', '+3 days'))`
+    )
+    .bind(codigo, para, quien || null, paraMiOtroAparato ? sesion.id : null)
     .run();
 
   const url = new URL(request.url);
-  return json({ ok: true, para, enlace: `${url.origin}/acceso?codigo=${codigo}`, caduca: '3 días' });
+  return json({
+    ok: true,
+    para,
+    paraMi: paraMiOtroAparato,
+    enlace: `${url.origin}/acceso?codigo=${codigo}`,
+    caduca: '3 días',
+  });
 }

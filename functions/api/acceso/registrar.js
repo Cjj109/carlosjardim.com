@@ -46,15 +46,28 @@ export async function onRequestPost(context) {
       .prepare(
         `UPDATE invitaciones SET usada_en = datetime('now')
          WHERE codigo = ? AND usada_en IS NULL AND expira_en > datetime('now')
-         RETURNING para`
+         RETURNING para, persona_id`
       )
       .bind(codigo)
       .first();
     if (!gastada) return json({ ok: false, error: 'Invitación no válida o ya usada' }, 403);
 
-    personaId = aleatorio(16);
-    await db.prepare('INSERT INTO personas (id, nombre) VALUES (?, ?)').bind(personaId, gastada.para).run();
-    await db.prepare('UPDATE invitaciones SET persona_id = ? WHERE codigo = ?').bind(personaId, codigo).run();
+    /* Si la invitación viene atada a una persona, es un enlace que alguien se
+       mandó a sí mismo para su segundo teléfono: la llave va a su cuenta y no
+       se crea a nadie. Sin eso, quien tuviera dos aparatos acabaría siendo dos
+       personas distintas en la lista. */
+    if (gastada.persona_id) {
+      const suya = await db
+        .prepare('SELECT id FROM personas WHERE id = ? AND activa = 1')
+        .bind(gastada.persona_id)
+        .first();
+      if (!suya) return json({ ok: false, error: 'Esa cuenta ya no está activa' }, 403);
+      personaId = gastada.persona_id;
+    } else {
+      personaId = aleatorio(16);
+      await db.prepare('INSERT INTO personas (id, nombre) VALUES (?, ?)').bind(personaId, gastada.para).run();
+      await db.prepare('UPDATE invitaciones SET persona_id = ? WHERE codigo = ?').bind(personaId, codigo).run();
+    }
   }
 
   /* Se actualiza si ya existe, pero solo si es de esta misma persona.

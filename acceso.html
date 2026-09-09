@@ -196,10 +196,25 @@
       <p class="sub">Tus aparatos con acceso:</p>
       <ul id="aparatos"></ul>
       <div class="bloque">
-        <label for="apodoNuevo">Añadir el aparato que estás usando</label>
+        <label for="apodoNuevo">Añadir el aparato que estás usando ahora</label>
         <input id="apodoNuevo" type="text" maxlength="60" placeholder="Mi Samsung" autocomplete="off">
         <div class="fila">
           <button id="btnAnadir" type="button">Crear passkey aquí</button>
+        </div>
+        <div class="fila">
+          <button id="btnOtroAparato" class="secundario" type="button">
+            Enlace para mi otro teléfono
+          </button>
+        </div>
+        <div id="enlaceAparato" class="enlace" hidden>
+          <p class="nota" style="margin-top:0.9rem">
+            Abre este enlace <strong>en el otro teléfono</strong> y crea allí su propia llave. Sigue
+            siendo tu misma cuenta, no una nueva.
+          </p>
+          <code id="enlaceAparatoUrl"></code>
+          <div class="fila">
+            <button id="btnCopiarAparato" class="secundario" type="button">Copiar enlace</button>
+          </div>
         </div>
       </div>
       <div class="bloque">

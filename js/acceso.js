@@ -176,6 +176,34 @@ async function invitar() {
   aviso('');
 }
 
+/**
+ * Un enlace para el segundo teléfono de uno mismo.
+ *
+ * El camino sin esto era el código QR entre dispositivos, que funciona pero es
+ * un baile: hay que tener los dos aparatos delante, con Bluetooth, y acertar
+ * a la primera. Con un enlace se abre el otro teléfono cuando toque.
+ */
+async function enlaceOtroAparato() {
+  aviso('Creando el enlace…');
+  const { enlace } = await pedir('/api/acceso/invitar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paraMi: true }),
+  });
+  $('enlaceAparatoUrl').textContent = enlace;
+  $('enlaceAparato').hidden = false;
+  aviso('');
+}
+
+async function copiar(id) {
+  try {
+    await navigator.clipboard.writeText($(id).textContent);
+    aviso('Enlace copiado.');
+  } catch {
+    aviso('Cópialo a mano de la caja de arriba.', true);
+  }
+}
+
 async function copiarEnlace() {
   const texto = $('invitacionUrl').textContent;
   try {
@@ -300,6 +328,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   $('btnInvitar')?.addEventListener('click', conAviso(invitar));
   $('btnCopiar')?.addEventListener('click', conAviso(copiarEnlace));
+  $('btnOtroAparato')?.addEventListener('click', conAviso(enlaceOtroAparato));
+  $('btnCopiarAparato')?.addEventListener('click', conAviso(() => copiar('enlaceAparatoUrl')));
   $('btnPrimera')?.addEventListener('click', conAviso(primeraInvitacion));
   $('btnSalir')?.addEventListener('click', conAviso(async () => {
     await pedir('/api/acceso/salir', { method: 'POST' });
