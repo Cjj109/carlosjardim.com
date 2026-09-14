@@ -57,11 +57,11 @@ import {
   ultimaFechaValor,
   snapshotEstatico,
 } from './_vigencia.js';
+import { tasasCotizave } from './_cotizave.js';
 
 const BCV_URL = 'https://www.bcv.org.ve/';
 const USD_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/oficial';
 const USDT_RESPALDO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
-const COTIZAVE_API = 'https://api.cotizave.com/v1/fx/rates';
 
 const CACHE_MAX_AGE = 300;
 // Binance rechaza las peticiones que salen de la red de Cloudflare, asi que
@@ -171,15 +171,11 @@ async function leerUsdtBinance() {
  * Para una medicion propia del libro de Binance esta scripts/fetch_p2p.py,
  * que se ejecuta a mano desde cualquier maquina que Binance no bloquee.
  */
-async function leerUsdtP2P(clave) {
+async function leerUsdtP2P(clave, base) {
   if (!clave) return null;
 
-  const res = await fetchConTope(COTIZAVE_API, {
-    headers: { 'X-API-Key': clave, Accept: 'application/json' },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-  const datos = await res.json();
+  // Con caché y con pausa ante un 429: ver _cotizave.js
+  const datos = await tasasCotizave(clave, base, TIMEOUT);
   const mercados = (datos.rates || []).filter((r) => r.type === 'p2p' && r.mid > 0);
   if (!mercados.length) return null;
 
@@ -272,11 +268,11 @@ export async function onRequestGet(context) {
   const conDiagnostico = new URL(context.request.url).searchParams.has('debug');
 
   try {
-    const [bcvRes, puenteBcvRes, binanceRes, usdtRes, usdtRespaldoRes, respaldoRes] = await Promise.allSettled([
+    // Cotizave no va aquí: se pide más abajo y solo si Binance falla
+    const [bcvRes, puenteBcvRes, binanceRes, usdtRespaldoRes, respaldoRes] = await Promise.allSettled([
       leerBCV(),
       leerBCVPuente(),
       leerUsdtBinance(),
-      leerUsdtP2P(context.env?.COTIZAVE_API_KEY),
       fetchJson(USDT_RESPALDO),
       fetchJson(USD_RESPALDO),
     ]);
@@ -284,7 +280,6 @@ export async function onRequestGet(context) {
     const directo = bcvRes.status === 'fulfilled' ? bcvRes.value : null;
     const puenteBcv = puenteBcvRes.status === 'fulfilled' ? puenteBcvRes.value : null;
     const binance = binanceRes.status === 'fulfilled' ? binanceRes.value : null;
-    const usdt = usdtRes.status === 'fulfilled' ? usdtRes.value : null;
     const usdtRespaldo = usdtRespaldoRes.status === 'fulfilled' ? usdtRespaldoRes.value : null;
     const respaldo = respaldoRes.status === 'fulfilled' ? respaldoRes.value : null;
 
@@ -383,6 +378,20 @@ export async function onRequestGet(context) {
     // debajo o desorbitado, algo se leyo mal y se prefiere el respaldo.
     const binanceValido = binance && (!usdRate || (binance.rate > usdRate * 0.9 && binance.rate < usdRate * 5));
 
+    /* Cotizave, solo si hace falta.
+       Se pedía en paralelo con todo lo demás en CADA petición, y su cifra
+       solo se usa cuando el puente de Binance falla. Eso gastó el límite
+       mensual del plan gratis y trajo un aviso de que podían bloquear la
+       clave. Pedirla después cuesta tiempo solo el día en que Binance falla;
+       pedirla siempre costaba la cuota entera. */
+    let fallaCotizave = null;
+    const usdt = binanceValido
+      ? null
+      : await leerUsdtP2P(context.env?.COTIZAVE_API_KEY, context.request.url).catch((e) => {
+          fallaCotizave = e;
+          return null;
+        });
+
     const usdFecha = usdBcv.rate
       ? usdBcv.date ?? hoy
       : respaldo?.fechaActualizacion?.split('T')[0] ?? hoy;
@@ -460,9 +469,11 @@ export async function onRequestGet(context) {
         binanceDirecto: binanceRes.status === 'fulfilled' && binanceRes.value
           ? `ok (${binanceRes.value.anuncios} anuncios)`
           : `falla: ${binanceRes.reason?.message || 'sin datos'}`,
-        cotizave: usdtRes.status === 'fulfilled' && usdtRes.value
-          ? `ok (${usdtRes.value.mercados} mercados)`
-          : `falla: ${usdtRes.reason?.message || 'sin datos'}`,
+        cotizave: binanceValido
+          ? 'no hizo falta'
+          : usdt
+            ? `ok (${usdt.mercados} mercados)`
+            : `falla: ${fallaCotizave?.message || 'sin datos'}`,
         bcv: bcvRes.status === 'fulfilled' ? 'ok' : `falla: ${bcvRes.reason?.message}`,
         // Faltaba, y es el unico respaldo del euro: si se cae en silencio, la
         // tarjeta del euro se vacia sin que nada lo explique. Es exactamente

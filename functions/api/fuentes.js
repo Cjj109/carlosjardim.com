@@ -17,10 +17,10 @@ import {
   proximaSegunFechaValor,
   snapshotEstatico,
 } from './_vigencia.js';
+import { tasasCotizave } from './_cotizave.js';
 
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 const PUENTE_BCV = 'https://bcv-puente.vercel.app/api/bcv';
-const COTIZAVE = 'https://api.cotizave.com/v1/fx/rates';
 const DOLARAPI_OFICIAL = 'https://ve.dolarapi.com/v1/dolares/oficial';
 const DOLARAPI_PARALELO = 'https://ve.dolarapi.com/v1/dolares/paralelo';
 const BCV_URL = 'https://www.bcv.org.ve/';
@@ -80,9 +80,10 @@ async function leerBCV() {
 }
 
 /** Los siete mercados p2p que publica Cotizave */
-async function leerCotizave(clave) {
-  if (!clave) throw new Error('sin clave');
-  const datos = await json(COTIZAVE, { headers: { 'X-API-Key': clave, Accept: 'application/json' } });
+async function leerCotizave(clave, base) {
+  // Con caché y con pausa ante un 429: el panel se pide cada minuto a quien
+  // tiene una fuente propia elegida, y sin freno eso también gastaba cuota
+  const datos = await tasasCotizave(clave, base, TIMEOUT);
   const tasas = datos.rates || [];
 
   const p2p = tasas.filter((r) => r.type === 'p2p' && r.mid > 0).map((r) => r.mid).sort((a, b) => a - b);
@@ -101,9 +102,9 @@ async function leerCotizave(clave) {
 export async function onRequestGet(context) {
   const clave = context.env?.COTIZAVE_API_KEY;
 
-  const [bcvRes, cotizaveRes, puenteRes, puenteBcvRes, oficialRes, paraleloRes] = await Promise.allSettled([
+  // Cotizave no va aquí: es respaldo y se pide más abajo, solo si hace falta
+  const [bcvRes, puenteRes, puenteBcvRes, oficialRes, paraleloRes] = await Promise.allSettled([
     leerBCV(),
-    leerCotizave(clave),
     json(PUENTE_P2P),
     json(PUENTE_BCV),
     json(DOLARAPI_OFICIAL),
@@ -137,15 +138,32 @@ export async function onRequestGet(context) {
   const motivoBcv = motivo(bcvRes);
   const motivoPuenteBcv = motivo(puenteBcvRes);
   const motivoPuente = motivo(puenteRes);
-  const motivoCotizave = motivo(cotizaveRes);
   const motivoOficial = motivo(oficialRes);
   const motivoParalelo = motivo(paraleloRes);
   const bcv = dato(bcvRes);
-  const cotizave = dato(cotizaveRes);
   const puente = dato(puenteRes);
   const puenteBcv = dato(puenteBcvRes);
   const oficial = dato(oficialRes);
   const paralelo = dato(paraleloRes);
+
+  /* COTIZAVE, SOLO DE RESPALDO
+     Se consultaba siempre, para enseñarla en el panel junto a las demás, y
+     entre esto y /api/bcv se gastó el límite mensual del plan gratis. Ahora
+     es lo que es: un respaldo. Se pregunta solo cuando lo nuestro falla —la
+     página del BCV y su puente para la oficial, el puente de Binance para el
+     USDT— y sus fichas salen solo entonces. Si lo nuestro va bien, ni se
+     consulta ni aparece. */
+  const fallaNuestroBcv = bcv?.usd == null && puenteBcv?.usd == null;
+  const fallaNuestroP2p = (puente?.venta ?? puente?.rate) == null;
+
+  const cotizaveRes = fallaNuestroBcv || fallaNuestroP2p
+    ? await leerCotizave(clave, context.request.url).then(
+        (value) => ({ status: 'fulfilled', value }),
+        (reason) => ({ status: 'rejected', reason })
+      )
+    : { status: 'fulfilled', value: null };
+  const motivoCotizave = motivo(cotizaveRes);
+  const cotizave = dato(cotizaveRes);
 
   /* Lo que este panel enseña es lo que se va a usar para calcular: elegir una
      ficha sustituye la tasa de la calculadora. Así que las dos que leen la
@@ -275,11 +293,12 @@ export async function onRequestGet(context) {
       date: soloFecha(oficial?.fechaActualizacion),
       motivo: motivoOficial,
     },
-    {
+    // Las tres de Cotizave salen solo cuando lo suyo falla: ver arriba
+    fallaNuestroBcv && {
       id: 'cotizave-oficial',
       grupo: 'bcv',
       nombre: 'Cotizave',
-      detalle: 'Misma medición que DolarAPI, por otra vía.',
+      detalle: 'De respaldo: sale porque la página del BCV no respondió.',
       rate: cotizave?.oficial?.mid ?? null,
       date: soloFecha(cotizave?.oficial?.updated_at),
       motivo: motivoCotizave,
@@ -322,20 +341,22 @@ export async function onRequestGet(context) {
       date: soloFecha(puente?.updated_at),
       motivo: motivoPuente ?? sinEsaCifra(puente),
     },
-    {
+    fallaNuestroP2p && {
       id: 'consenso',
       grupo: 'paralelo',
       nombre: 'Consenso p2p',
-      detalle: cotizave?.mercados ? `Mediana de ${cotizave.mercados} casas de cambio.` : 'Mediana de varias casas p2p.',
+      detalle: cotizave?.mercados
+        ? `De respaldo, porque Binance no respondió. Mediana de ${cotizave.mercados} casas de cambio.`
+        : 'De respaldo, porque Binance no respondió. Mediana de varias casas p2p.',
       rate: cotizave?.consenso ?? null,
       date: null,
       motivo: motivoCotizave ?? sinEsaCifra(cotizave),
     },
-    {
+    fallaNuestroP2p && {
       id: 'cotizave-binance',
       grupo: 'paralelo',
       nombre: 'Binance vía Cotizave',
-      detalle: 'Lo que Cotizave reporta del mercado de Binance.',
+      detalle: 'De respaldo: lo que Cotizave reporta del mercado de Binance.',
       rate: cotizave?.binance?.mid ?? null,
       date: soloFecha(cotizave?.binance?.updated_at),
       motivo: motivoCotizave ?? sinEsaCifra(cotizave),
