@@ -877,9 +877,41 @@ body {
 .muestra-halloween span:nth-child(3) { background: #c084fc; }
 .muestra-halloween span:nth-child(4) { background: #8ee05a; }
 
-/* ---------- Detalles del tema navideño ---------- */
+/* ---------- Detalles del tema navideño ----------
 
-/* Nieve: solo existe en navidad y solo si el sistema no pide quietud */
+   Como en Halloween, cada adorno va donde no estorba a ningún número:
+
+     la esquina de arriba  una ramita de acebo y tres bolas colgando de sus
+                           cintas, cada una meciéndose a su ritmo
+     el título             lleva el gorro de Papá Noel puesto en la C
+     las tarjetas          con la nieve que se les ha ido posando encima,
+                           y un par de gotas que se escurren por el borde
+     el panel              una guirnalda de verdad: el cable cuelga entre
+                           bombilla y bombilla, y las luces van en dos
+                           circuitos que se turnan, como las de casa
+     el pie                un bosque nevado al final de la página
+     la nieve              en tres distancias: copos lejanos, pequeños y
+                           desenfocados; los de en medio; y unos pocos
+                           cristales de seis brazos cerca, que giran al caer
+
+   La nieve va por delante del contenido: un copo que pasa por encima de una
+   cifra no la tapa. El bosque y las bolas, por detrás. */
+
+.adornos,
+.paisaje,
+.guirnalda { display: none; }
+
+/* El contenido por encima del bosque. Sin z-index a propósito: así .calc no
+   se vuelve un contexto de apilamiento y la nieve, con el suyo, sigue
+   pasando por delante de todo. */
+:root[data-tema="navidad"] .calc { position: relative; }
+
+/* ---------- Nieve ----------
+   Cada copo son dos piezas que no se pisan: la caja cae (translate del span)
+   y dentro el copo se mece de lado a lado (translate del ::before), que la
+   nieve de verdad no baja en línea recta. Los cristales además giran, que es
+   otra propiedad. La espera va en negativo: al abrir la app ya está nevando,
+   en vez de empezar a caer todo desde arriba a la vez. */
 .nieve { display: none; }
 
 :root[data-tema="navidad"] .nieve {
@@ -888,71 +920,143 @@ body {
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 0;
+  z-index: 1;
 }
 
 .nieve span {
+  --brillo: 0.8;
   position: absolute;
-  top: -12px;
+  top: 0;
   width: var(--tam);
   height: var(--tam);
-  border-radius: 50%;
-  background: #ffffff;
   opacity: 0;
-  filter: blur(0.4px);
   animation: caer var(--dur) linear var(--espera) infinite;
 }
 
-@keyframes caer {
-  0% { transform: translate(0, -12px); opacity: 0; }
-  8% { opacity: 0.75; }
-  92% { opacity: 0.4; }
-  100% { transform: translate(var(--giro), 105vh); opacity: 0; }
-}
-
-/* Guirnalda de luces sobre el panel */
-:root[data-tema="navidad"] .calc-panel { position: relative; }
-
-:root[data-tema="navidad"] .calc-panel::before {
+.nieve span::before {
   content: '';
   position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #fff;
+  animation: vaiven var(--ritmo) ease-in-out var(--espera) infinite alternate;
+}
+
+/* Lejos: pequeños, tenues y desenfocados, y caen más despacio */
+.nieve .lejos { --brillo: 0.4; }
+.nieve .lejos::before { filter: blur(0.8px); }
+
+/* Cerca: cristales */
+.nieve .cristal { --brillo: 0.85; }
+
+.nieve .cristal::before {
+  border-radius: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24'%3E%3Cg id='b' fill='none' stroke='%23fff' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M0 0V-10.5M0 -6.2L-2.9 -8.8M0 -6.2L2.9 -8.8M0 -3.2L-1.7 -4.8M0 -3.2L1.7 -4.8'/%3E%3C/g%3E%3Cuse href='%23b' transform='rotate(60)'/%3E%3Cuse href='%23b' transform='rotate(120)'/%3E%3Cuse href='%23b' transform='rotate(180)'/%3E%3Cuse href='%23b' transform='rotate(240)'/%3E%3Cuse href='%23b' transform='rotate(300)'/%3E%3C/svg%3E") center / contain no-repeat;
+  animation:
+    vaiven var(--ritmo) ease-in-out var(--espera) infinite alternate,
+    girar 11s linear infinite;
+}
+
+@keyframes caer {
+  0% { translate: 0 -4vh; opacity: 0; }
+  6% { opacity: var(--brillo); }
+  88% { opacity: calc(var(--brillo) * 0.7); }
+  100% { translate: var(--giro) 104vh; opacity: 0; }
+}
+
+@keyframes vaiven {
+  from { translate: calc(var(--vaiven) * -1) 0; }
+  to { translate: var(--vaiven) 0; }
+}
+
+@keyframes girar {
+  to { rotate: 360deg; }
+}
+
+/* ---------- La esquina: acebo y bolas ----------
+   En absolute, como la telaraña: se queda arriba con el título y se va al
+   desplazar. Cada bola se mece desde el punto donde está atada, como un
+   péndulo, y con duraciones distintas nunca van a la par. Las cintas salen
+   de debajo del acebo, que es de donde cuelgan. */
+:root[data-tema="navidad"] body { position: relative; }
+
+:root[data-tema="navidad"] .adornos {
+  display: block;
+  position: absolute;
   top: 0;
-  left: 14px;
-  right: 14px;
-  height: 14px;
-
-  /* Un cable y, colgando, bombillas de 7px cada 14px. En pixeles y no en
-     porcentaje: el radio porcentual se calcula sobre la baldosa y las dejaba
-     pegadas, con aspecto de cinta en vez de guirnalda. */
-  background-image:
-    linear-gradient(rgba(232, 185, 58, 0.3), rgba(232, 185, 58, 0.3)),
-    radial-gradient(circle 3.5px at 7px 9px, #e5484d 97%, transparent 100%),
-    radial-gradient(circle 3.5px at 7px 9px, #e8b93a 97%, transparent 100%),
-    radial-gradient(circle 3.5px at 7px 9px, #3fbf71 97%, transparent 100%);
-  background-size:
-    100% 1px,
-    42px 14px,
-    42px 14px,
-    42px 14px;
-  background-position:
-    0 0,
-    0 0,
-    14px 0,
-    28px 0;
-  background-repeat: repeat-x;
-  animation: guirnalda 3.5s ease-in-out infinite;
+  right: 0;
+  width: 110px;
+  height: 120px;
+  pointer-events: none;
 }
 
-@keyframes guirnalda {
-  0%, 100% { opacity: 0.6; filter: none; }
-  50% { opacity: 1; filter: drop-shadow(0 0 5px rgba(232, 185, 58, 0.75)); }
+.adornos .bola {
+  position: absolute;
+  top: 0;
+  right: var(--x);
+  width: var(--bola);
+  height: calc(var(--hilo) + var(--bola));
+  transform-origin: 50% 0;
+  animation: balanceo var(--ritmo) ease-in-out var(--espera) infinite alternate;
 }
 
-/* Un poco de aire para que las bombillas no toquen las pestañas */
-:root[data-tema="navidad"] .calc-panel { padding-top: 1.6rem; }
+/* La cinta y, al final, el casquillo dorado. Por encima de la bola, que el
+   casquillo va encajado en ella y no detrás. */
+.adornos .bola::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  width: 6px;
+  margin-left: -3px;
+  height: calc(var(--hilo) + 3px);
+  background:
+    linear-gradient(#f0d47a, #a37e22) bottom / 6px 4px no-repeat,
+    linear-gradient(rgba(232, 185, 58, 0.7), rgba(232, 185, 58, 0.7)) top / 1px calc(100% - 4px) no-repeat;
+}
 
-/* El título respira, como una vela */
+/* La bola: el color, su sombra y el reflejo de la luz arriba a la izquierda */
+.adornos .bola::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--hilo) + 1px);
+  left: 0;
+  width: var(--bola);
+  height: var(--bola);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 33% 28%, rgba(255, 255, 255, 0.9) 0 6%, transparent 17%),
+    radial-gradient(circle at 38% 34%, var(--claro), var(--color) 48%, var(--oscuro));
+  box-shadow: 0 0 16px -3px var(--color);
+}
+
+.bola-roja { --claro: #ff9a9d; --color: #e5484d; --oscuro: #7d1a20; }
+.bola-dorada { --claro: #ffe7a3; --color: #e8b93a; --oscuro: #7a560c; }
+.bola-verde { --claro: #9cf0bb; --color: #3fbf71; --oscuro: #155530; }
+
+@keyframes balanceo {
+  from { rotate: -6deg; }
+  to { rotate: 6deg; }
+}
+
+/* El acebo, después de las bolas para quedar encima de las cintas */
+:root[data-tema="navidad"] .adornos::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  width: 72px;
+  aspect-ratio: 64 / 48;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48'%3E%3Cdefs%3E%3CradialGradient id='baya' cx='0.35' cy='0.3' r='0.8'%3E%3Cstop offset='0' stop-color='%23ff8f92'/%3E%3Cstop offset='0.55' stop-color='%23e5484d'/%3E%3Cstop offset='1' stop-color='%238f1d23'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg transform='translate(50 10) rotate(168)'%3E%3Cpath d='M0 0Q5 -1 6 -5Q8 -1.5 12 -4.6Q14 -0.8 18 -4.2Q19.5 -0.5 24 -3.2Q25.2 -0.3 30 0Q25.2 0.3 24 3.2Q19.5 0.5 18 4.2Q14 0.8 12 4.6Q8 1.5 6 5Q5 1 0 0Z' fill='%232c8a52'/%3E%3Cpath d='M1 0H28' stroke='%236cc58f' stroke-width='0.7' opacity='0.7'/%3E%3C/g%3E%3Cg transform='translate(50 10) rotate(118)'%3E%3Cpath d='M0 0Q5 -1 6 -5Q8 -1.5 12 -4.6Q14 -0.8 18 -4.2Q19.5 -0.5 24 -3.2Q25.2 -0.3 30 0Q25.2 0.3 24 3.2Q19.5 0.5 18 4.2Q14 0.8 12 4.6Q8 1.5 6 5Q5 1 0 0Z' fill='%2325774a'/%3E%3Cpath d='M1 0H28' stroke='%236cc58f' stroke-width='0.7' opacity='0.7'/%3E%3C/g%3E%3Cg transform='translate(50 10) rotate(143) scale(0.8)'%3E%3Cpath d='M0 0Q5 -1 6 -5Q8 -1.5 12 -4.6Q14 -0.8 18 -4.2Q19.5 -0.5 24 -3.2Q25.2 -0.3 30 0Q25.2 0.3 24 3.2Q19.5 0.5 18 4.2Q14 0.8 12 4.6Q8 1.5 6 5Q5 1 0 0Z' fill='%23339a5d'/%3E%3Cpath d='M1 0H28' stroke='%236cc58f' stroke-width='0.7' opacity='0.7'/%3E%3C/g%3E%3Ccircle cx='49' cy='12' r='3.6' fill='url(%23baya)'/%3E%3Ccircle cx='47.9' cy='10.8' r='0.9' fill='%23fff' opacity='0.7'/%3E%3Ccircle cx='44.5' cy='14.5' r='3.6' fill='url(%23baya)'/%3E%3Ccircle cx='43.4' cy='13.3' r='0.9' fill='%23fff' opacity='0.7'/%3E%3Ccircle cx='51.5' cy='17' r='3.6' fill='url(%23baya)'/%3E%3Ccircle cx='50.4' cy='15.8' r='0.9' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+}
+
+/* ---------- El título ----------
+   Con su brillo que va de rojo a verde, y el gorro de Papá Noel ladeado
+   sobre la C. En em: crece y encoge con la letra. */
 :root[data-tema="navidad"] .calc-head h1 {
+  position: relative;
   background-size: 200% auto;
   animation: brilloNavideno 7s ease-in-out infinite;
 }
@@ -962,23 +1066,128 @@ body {
   50% { background-position: 100% center; }
 }
 
-/* Las tasas, con un halo cálido */
+:root[data-tema="navidad"] .calc-head h1::before {
+  content: '';
+  position: absolute;
+  top: -0.47em;
+  left: -0.24em;
+  width: 1.15em;
+  aspect-ratio: 40 / 34;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff6b70'/%3E%3Cstop offset='0.55' stop-color='%23e5484d'/%3E%3Cstop offset='1' stop-color='%23a8262c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M5 26C7 15.5 13 6.5 23 4.3C29 3 34.2 6 36.8 12.6L33 14C31 10.4 28.6 9.2 26.2 10.2C27.6 15.2 29.6 20.4 31 26Z' fill='url(%23g)'/%3E%3Crect x='2' y='23' width='31' height='8.5' rx='4.25' fill='%23f4ede0'/%3E%3Ccircle cx='35.4' cy='14.6' r='4.3' fill='%23f4ede0'/%3E%3Cpath d='M5 27.5Q17 25.5 30 27.5' stroke='%23d9cfbf' stroke-width='1' fill='none' opacity='0.8'/%3E%3C/svg%3E") center / contain no-repeat;
+  rotate: -16deg;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+}
+
+/* ---------- Las tarjetas ----------
+   Un halo cálido, y la nieve que se ha ido posando arriba. La tarjeta
+   recorta lo que se sale (overflow: hidden), así que la nieve va por dentro
+   del borde, siguiendo la curva de las esquinas. Es una tira que se repite
+   sin estirarse —estirada, las gotas se volvían óvalos en las tarjetas
+   anchas—, y cada tarjeta la empieza en otro punto: la misma nevada en
+   todas se notaría enseguida. */
 :root[data-tema="navidad"] .tasa {
+  padding-top: 0.95rem;
   box-shadow: 0 0 24px -14px rgba(232, 185, 58, 0.9);
 }
+
+:root[data-tema="navidad"] .tasa::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 13px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 13'%3E%3Cdefs%3E%3ClinearGradient id='n' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0.35' stop-color='%23fff'/%3E%3Cstop offset='1' stop-color='%23d5e1ec'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 0H160V6.8L160 6.8L158 6.7L156 6.3L154 5.7L152 4.9L150 4.2L148 3.7L146 3.4L144 3.5L142 3.7L140 4.1L139.8 4.5C139.8 7.8 139.4 10 138 10C136.6 10 136.2 7.8 136.2 4.5L136 4.8L134 5L132 4.9L130 4.8L128 4.7L126 4.6L124 4.8L122 5.2L120 5.7L118 6.3L116 6.9L114 7.2L112 7.3L110 7L108 6.6L106 5.9L104 5.3L102 4.8L101.8 4.4C101.8 6.3 101.4 7.6 100 7.6C98.6 7.6 98.2 6.3 98.2 4.4L98 4.4L96 4.5L94 4.6L92 4.8L90 4.8L88 4.7L86 4.4L84 4L82 3.7L80 3.6L78 3.7L76 4.1L74 4.7L72 5.5L70 6.2L68 6.7L66 7L64 6.9L62 6.7L60 6.3L58 5.9L56 5.6L54 5.4L52 5.5L50 5.6L48 5.7L46 5.8L44 5.6L42 5.2L40 4.7L38 4.1L37.8 3.5C37.8 6.2 37.4 8 36 8C34.6 8 34.2 6.2 34.2 3.5L34 3.2L32 3.1L30 3.4L28 3.8L26 4.5L24 5.1L22 5.6L20 6L18 6L16 5.9L14 5.8L12 5.6L10 5.6L8 5.7L6 6L4 6.4L2 6.7L0 6.8Z' fill='url(%23n)'/%3E%3C/svg%3E") var(--nieve-x, 0px) 0 / 160px 13px repeat-x;
+  filter: drop-shadow(0 1px 0 rgba(150, 180, 210, 0.45));
+  pointer-events: none;
+}
+
+:root[data-tema="navidad"] .calc-tasas .tasa:nth-child(2) { --nieve-x: -57px; }
+:root[data-tema="navidad"] .calc-tasas .tasa:nth-child(3) { --nieve-x: -103px; }
+:root[data-tema="navidad"] .calc-tasas .tasa:nth-child(4) { --nieve-x: -31px; }
+:root[data-tema="navidad"] .calc-tasas .tasa:nth-child(5) { --nieve-x: -82px; }
+:root[data-tema="navidad"] .calc-tasas .tasa:nth-child(6) { --nieve-x: -128px; }
+:root[data-tema="navidad"] .calc-tasas .tasa:nth-child(7) { --nieve-x: -14px; }
 
 /* El punto del p2p late como una lucecita */
 :root[data-tema="navidad"] .tasa-viva .tasa-nombre::after {
   box-shadow: 0 0 6px 1px rgba(63, 191, 113, 0.8);
 }
 
+/* ---------- La guirnalda ----------
+   El cable cuelga en ondas y cada bombilla, con su casquillo, del punto más
+   bajo de la suya. Van en dos circuitos que se turnan —uno se apaga cuando
+   el otro se enciende—, repartidos para que cada uno lleve los tres colores.
+
+   El ancho se redondea a ondas enteras: así el cable termina siempre en un
+   punto de enganche y no con media onda cortada. Sin round() (navegadores
+   viejos) queda al ancho del panel, que también sirve. */
+:root[data-tema="navidad"] .calc-panel {
+  position: relative;
+  padding-top: 1.6rem;
+}
+
+:root[data-tema="navidad"] .guirnalda {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: calc(100% - 28px);
+  width: round(down, 100% - 28px, 26px);
+  height: 22px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 156 22'%3E%3Cpath d='M0 1.5Q13 11 26 1.5M26 1.5Q39 11 52 1.5M52 1.5Q65 11 78 1.5M78 1.5Q91 11 104 1.5M104 1.5Q117 11 130 1.5M130 1.5Q143 11 156 1.5' fill='none' stroke='%233d7352' stroke-width='1.2'/%3E%3C/svg%3E") 0 0 / 156px 22px repeat-x;
+  pointer-events: none;
+}
+
+.guirnalda i {
+  position: absolute;
+  inset: 0;
+  background-position: 0 0;
+  background-size: 156px 22px;
+  background-repeat: repeat-x;
+  animation: titilar 3.2s ease-in-out infinite;
+}
+
+.guirnalda i:first-child { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 156 22'%3E%3Cdefs%3E%3CradialGradient id='hr'%3E%3Cstop offset='0' stop-color='%23e5484d' stop-opacity='0.55'/%3E%3Cstop offset='1' stop-color='%23e5484d' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='br' cx='0.35' cy='0.3' r='0.8'%3E%3Cstop offset='0' stop-color='%23ff8f92'/%3E%3Cstop offset='0.5' stop-color='%23e5484d'/%3E%3Cstop offset='1' stop-color='%239b1f25'/%3E%3C/radialGradient%3E%3CradialGradient id='hy'%3E%3Cstop offset='0' stop-color='%23e8b93a' stop-opacity='0.55'/%3E%3Cstop offset='1' stop-color='%23e8b93a' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='by' cx='0.35' cy='0.3' r='0.8'%3E%3Cstop offset='0' stop-color='%23ffe7a3'/%3E%3Cstop offset='0.5' stop-color='%23e8b93a'/%3E%3Cstop offset='1' stop-color='%23946a10'/%3E%3C/radialGradient%3E%3CradialGradient id='hg'%3E%3Cstop offset='0' stop-color='%233fbf71' stop-opacity='0.55'/%3E%3Cstop offset='1' stop-color='%233fbf71' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='bg' cx='0.35' cy='0.3' r='0.8'%3E%3Cstop offset='0' stop-color='%239cf0bb'/%3E%3Cstop offset='0.5' stop-color='%233fbf71'/%3E%3Cstop offset='1' stop-color='%231b6a3b'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='13' cy='13.5' r='8' fill='url(%23hr)'/%3E%3Crect x='11.3' y='5.2' width='3.4' height='3.6' rx='0.7' fill='%2324452f'/%3E%3Cpath d='M10.7 8.4C9.5 11 10.2 15 13 16.6C15.8 15 16.5 11 15.3 8.4Z' fill='url(%23br)'/%3E%3Cellipse cx='12.1' cy='11' rx='0.6' ry='1.4' fill='%23fff' opacity='0.65'/%3E%3Ccircle cx='65' cy='13.5' r='8' fill='url(%23hg)'/%3E%3Crect x='63.3' y='5.2' width='3.4' height='3.6' rx='0.7' fill='%2324452f'/%3E%3Cpath d='M62.7 8.4C61.5 11 62.2 15 65 16.6C67.8 15 68.5 11 67.3 8.4Z' fill='url(%23bg)'/%3E%3Cellipse cx='64.1' cy='11' rx='0.6' ry='1.4' fill='%23fff' opacity='0.65'/%3E%3Ccircle cx='117' cy='13.5' r='8' fill='url(%23hy)'/%3E%3Crect x='115.3' y='5.2' width='3.4' height='3.6' rx='0.7' fill='%2324452f'/%3E%3Cpath d='M114.7 8.4C113.5 11 114.2 15 117 16.6C119.8 15 120.5 11 119.3 8.4Z' fill='url(%23by)'/%3E%3Cellipse cx='116.1' cy='11' rx='0.6' ry='1.4' fill='%23fff' opacity='0.65'/%3E%3C/svg%3E"); }
+
+.guirnalda i:last-child {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 156 22'%3E%3Cdefs%3E%3CradialGradient id='hr'%3E%3Cstop offset='0' stop-color='%23e5484d' stop-opacity='0.55'/%3E%3Cstop offset='1' stop-color='%23e5484d' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='br' cx='0.35' cy='0.3' r='0.8'%3E%3Cstop offset='0' stop-color='%23ff8f92'/%3E%3Cstop offset='0.5' stop-color='%23e5484d'/%3E%3Cstop offset='1' stop-color='%239b1f25'/%3E%3C/radialGradient%3E%3CradialGradient id='hy'%3E%3Cstop offset='0' stop-color='%23e8b93a' stop-opacity='0.55'/%3E%3Cstop offset='1' stop-color='%23e8b93a' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='by' cx='0.35' cy='0.3' r='0.8'%3E%3Cstop offset='0' stop-color='%23ffe7a3'/%3E%3Cstop offset='0.5' stop-color='%23e8b93a'/%3E%3Cstop offset='1' stop-color='%23946a10'/%3E%3C/radialGradient%3E%3CradialGradient id='hg'%3E%3Cstop offset='0' stop-color='%233fbf71' stop-opacity='0.55'/%3E%3Cstop offset='1' stop-color='%233fbf71' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='bg' cx='0.35' cy='0.3' r='0.8'%3E%3Cstop offset='0' stop-color='%239cf0bb'/%3E%3Cstop offset='0.5' stop-color='%233fbf71'/%3E%3Cstop offset='1' stop-color='%231b6a3b'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='39' cy='13.5' r='8' fill='url(%23hy)'/%3E%3Crect x='37.3' y='5.2' width='3.4' height='3.6' rx='0.7' fill='%2324452f'/%3E%3Cpath d='M36.7 8.4C35.5 11 36.2 15 39 16.6C41.8 15 42.5 11 41.3 8.4Z' fill='url(%23by)'/%3E%3Cellipse cx='38.1' cy='11' rx='0.6' ry='1.4' fill='%23fff' opacity='0.65'/%3E%3Ccircle cx='91' cy='13.5' r='8' fill='url(%23hr)'/%3E%3Crect x='89.3' y='5.2' width='3.4' height='3.6' rx='0.7' fill='%2324452f'/%3E%3Cpath d='M88.7 8.4C87.5 11 88.2 15 91 16.6C93.8 15 94.5 11 93.3 8.4Z' fill='url(%23br)'/%3E%3Cellipse cx='90.1' cy='11' rx='0.6' ry='1.4' fill='%23fff' opacity='0.65'/%3E%3Ccircle cx='143' cy='13.5' r='8' fill='url(%23hg)'/%3E%3Crect x='141.3' y='5.2' width='3.4' height='3.6' rx='0.7' fill='%2324452f'/%3E%3Cpath d='M140.7 8.4C139.5 11 140.2 15 143 16.6C145.8 15 146.5 11 145.3 8.4Z' fill='url(%23bg)'/%3E%3Cellipse cx='142.1' cy='11' rx='0.6' ry='1.4' fill='%23fff' opacity='0.65'/%3E%3C/svg%3E");
+  animation-delay: -1.6s;
+}
+
+@keyframes titilar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.28; }
+}
+
+/* ---------- El bosque ----------
+   Al pie de la página y no fijo abajo: se ve al llegar al final, en vez de
+   estar siempre detrás de los resultados. El contenido deja sitio debajo
+   para que ningún árbol quede detrás de un botón. */
+:root[data-tema="navidad"] .calc {
+  padding-bottom: max(7.5rem, calc(env(safe-area-inset-bottom) + 6.5rem));
+}
+
+:root[data-tema="navidad"] .paisaje {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(84px, 18vw, 150px);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 120' preserveAspectRatio='xMidYMax slice'%3E%3Cpath d='M14.2 96.6L27.5 73.7L40.8 96.6ZM17.2 84.4L27.5 62.1L37.9 84.4ZM20.2 73.8L27.5 57.2L34.8 73.8ZM26.3 95.7h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M23 81.5L27.5 73.7L32 81.5L30 80.3L28.4 82.3L26.2 80.5ZM24 69.7L27.5 62.1L31 69.7L29.4 68.5L28.2 70.5L26.5 68.7ZM25 62.8L27.5 57.2L30 62.8L28.9 61.6L28 63.6L26.8 61.8Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M494.2 96.6L507.5 73.7L520.8 96.6ZM497.2 84.4L507.5 62.1L517.9 84.4ZM500.2 73.8L507.5 57.2L514.8 73.8ZM506.3 95.7h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M503 81.5L507.5 73.7L512 81.5L510 80.3L508.4 82.3L506.2 80.5ZM504 69.7L507.5 62.1L511 69.7L509.4 68.5L508.2 70.5L506.5 68.7ZM505 62.8L507.5 57.2L510 62.8L508.9 61.6L508 63.6L506.8 61.8Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M67 96.6L80 74.2L93 96.6ZM69.8 84.6L80 62.7L90.2 84.6ZM72.8 74.2L80 57.9L87.2 74.2ZM78.8 95.8h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M75.6 81.8L80 74.2L84.4 81.8L82.4 80.6L80.9 82.6L78.7 80.8ZM76.5 70.2L80 62.7L83.5 70.2L81.9 69L80.7 71L79 69.2ZM77.6 63.5L80 57.9L82.4 63.5L81.3 62.3L80.5 64.3L79.3 62.5Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M118.1 95.9L134.1 68.3L150.2 95.9ZM121.6 81.1L134.1 54.2L146.6 81.1ZM125.3 68.3L134.1 48.3L142.9 68.3ZM132.9 94.8h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M128.7 77.6L134.1 68.3L139.6 77.6L137.1 76.4L135.2 78.4L132.5 76.6ZM129.9 63.4L134.1 54.2L138.4 63.4L136.5 62.2L135 64.2L132.8 62.4ZM131.1 55.1L134.1 48.3L137.1 55.1L135.8 53.9L134.7 55.9L133.2 54.1Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M166.3 97.6L175.7 81.4L185.1 97.6ZM168.4 88.9L175.7 73.1L183.1 88.9ZM170.5 81.4L175.7 69.6L180.9 81.4ZM174.5 97h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M172.5 86.9L175.7 81.4L178.9 86.9L177.5 85.7L176.4 87.7L174.8 85.9ZM173.2 78.5L175.7 73.1L178.2 78.5L177.1 77.3L176.2 79.3L175 77.5ZM174 73.6L175.7 69.6L177.5 73.6L176.7 72.4L176.1 74.4L175.2 72.6Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M238.5 96.9L250.4 76.5L262.3 96.9ZM241.1 86L250.4 66.1L259.6 86ZM243.8 76.5L250.4 61.7L256.9 76.5ZM249.2 96.2h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M246.3 83.4L250.4 76.5L254.4 83.4L252.6 82.2L251.2 84.2L249.2 82.4ZM247.2 72.8L250.4 66.1L253.5 72.8L252.1 71.6L251 73.6L249.4 71.8ZM248.2 66.7L250.4 61.7L252.6 66.7L251.6 65.5L250.8 67.5L249.7 65.7Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M291.5 96.7L304.2 74.7L317 96.7ZM294.3 85L304.2 63.6L314.2 85ZM297.2 74.8L304.2 58.8L311.3 74.8ZM303 95.9h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M299.9 82.2L304.2 74.7L308.6 82.2L306.6 81L305.1 83L302.9 81.2ZM300.9 70.8L304.2 63.6L307.6 70.8L306.1 69.6L304.9 71.6L303.2 69.8ZM301.9 64.3L304.2 58.8L306.6 64.3L305.6 63.1L304.7 65.1L303.5 63.3Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M348.4 95.9L364.2 68.8L379.9 95.9ZM351.9 81.5L364.2 55L376.5 81.5ZM355.5 68.9L364.2 49.2L372.9 68.9ZM363 94.9h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M358.8 78.1L364.2 68.8L369.5 78.1L367.1 76.9L365.3 78.9L362.6 77.1ZM360 64L364.2 55L368.4 64L366.5 62.8L365 64.8L362.9 63ZM361.2 55.9L364.2 49.2L367.1 55.9L365.8 54.7L364.8 56.7L363.3 54.9Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M370.4 97.1L381.5 78.1L392.5 97.1ZM372.9 87L381.5 68.4L390.1 87ZM375.4 78.2L381.5 64.3L387.6 78.2ZM380.3 96.4h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M377.7 84.6L381.5 78.1L385.2 84.6L383.6 83.4L382.2 85.4L380.4 83.6ZM378.6 74.7L381.5 68.4L384.4 74.7L383.1 73.5L382.1 75.5L380.6 73.7ZM379.4 69L381.5 64.3L383.6 69L382.6 67.8L381.9 69.8L380.9 68Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M-37.2 97.2L-26.3 78.5L-15.5 97.2ZM-34.8 87.2L-26.3 69L-17.8 87.2ZM-32.3 78.6L-26.3 65L-20.3 78.6ZM-27.5 96.5h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M-30 84.9L-26.3 78.5L-22.6 84.9L-24.3 83.7L-25.6 85.7L-27.4 83.9ZM-29.2 75.2L-26.3 69L-23.4 75.2L-24.7 74L-25.7 76L-27.2 74.2ZM-28.3 69.6L-26.3 65L-24.3 69.6L-25.2 68.4L-25.9 70.4L-26.9 68.6Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M442.8 97.2L453.7 78.5L464.5 97.2ZM445.2 87.2L453.7 69L462.2 87.2ZM447.7 78.6L453.7 65L459.7 78.6ZM452.5 96.5h2.4V100h-2.4Z' fill='%2311241b'/%3E%3Cpath d='M450 84.9L453.7 78.5L457.4 84.9L455.7 83.7L454.4 85.7L452.6 83.9ZM450.8 75.2L453.7 69L456.6 75.2L455.3 74L454.3 76L452.8 74.2ZM451.7 69.6L453.7 65L455.7 69.6L454.8 68.4L454.1 70.4L453.1 68.6Z' fill='rgba(220,234,244,0.14)'/%3E%3Cpath d='M0 120L0 99.7L8 100.2L16 100.6L24 100.8L32 101L40 101L48 100.9L56 100.6L64 100.3L72 99.8L80 99.3L88 98.7L96 98.1L104 97.5L112 96.9L120 96.3L128 95.8L136 95.4L144 95.2L152 95L160 95L168 95.1L176 95.4L184 95.7L192 96.2L200 96.7L208 97.3L216 97.9L224 98.5L232 99.1L240 99.7L248 100.2L256 100.6L264 100.8L272 101L280 101L288 100.9L296 100.6L304 100.3L312 99.8L320 99.3L328 98.7L336 98.1L344 97.5L352 96.9L360 96.3L368 95.8L376 95.4L384 95.2L392 95L400 95L408 95.1L416 95.4L424 95.7L432 96.2L440 96.7L448 97.3L456 97.9L464 98.5L472 99.1L480 99.7L480 120Z' fill='%23152820'/%3E%3Cpath d='M-7.2 107L12.1 73.7L31.4 107ZM-3 89.2L12.1 56.8L27.2 89.2ZM1.5 73.8L12.1 49.7L22.7 73.8ZM10.9 105.8h2.4V112h-2.4Z' fill='%23163123'/%3E%3Cpath d='M5.5 85.1L12.1 73.7L18.7 85.1L15.7 83.9L13.4 85.9L10.1 84.1ZM7 67.8L12.1 56.8L17.2 67.8L14.9 66.6L13.1 68.6L10.6 66.8ZM8.5 57.9L12.1 49.7L15.7 57.9L14.1 56.7L12.8 58.7L11 56.9Z' fill='rgba(232,242,250,0.3)'/%3E%3Cpath d='M472.8 107L492.1 73.7L511.4 107ZM477 89.2L492.1 56.8L507.2 89.2ZM481.5 73.8L492.1 49.7L502.7 73.8ZM490.9 105.8h2.4V112h-2.4Z' fill='%23163123'/%3E%3Cpath d='M485.5 85.1L492.1 73.7L498.7 85.1L495.7 83.9L493.4 85.9L490.1 84.1ZM487 67.8L492.1 56.8L497.2 67.8L494.9 66.6L493.1 68.6L490.6 66.8ZM488.5 57.9L492.1 49.7L495.7 57.9L494.1 56.7L492.8 58.7L491 56.9Z' fill='rgba(232,242,250,0.3)'/%3E%3Cpath d='M112.3 106.8L132.4 72.4L152.4 106.8ZM116.7 88.4L132.4 54.8L148 88.4ZM121.4 72.5L132.4 47.4L143.4 72.5ZM131.2 105.5h2.4V112h-2.4Z' fill='%23163123'/%3E%3Cpath d='M125.6 84.1L132.4 72.4L139.2 84.1L136.1 82.9L133.7 84.9L130.3 83.1ZM127.1 66.2L132.4 54.8L137.7 66.2L135.3 65L133.4 67L130.8 65.2ZM128.6 55.9L132.4 47.4L136.1 55.9L134.4 54.7L133.1 56.7L131.2 54.9Z' fill='rgba(232,242,250,0.3)'/%3E%3Cpath d='M156.8 106.5L177.9 70.1L199.1 106.5ZM161.4 87.1L177.9 51.5L194.4 87.1ZM166.3 70.2L177.9 43.7L189.6 70.2ZM176.7 105.2h2.4V112h-2.4Z' fill='%23163123'/%3E%3Cpath d='M170.7 82.5L177.9 70.1L185.1 82.5L181.9 81.3L179.4 83.3L175.8 81.5ZM172.3 63.6L177.9 51.5L183.5 63.6L181 62.4L179 64.4L176.2 62.6ZM174 52.7L177.9 43.7L181.9 52.7L180.1 51.5L178.7 53.5L176.7 51.7Z' fill='rgba(232,242,250,0.3)'/%3E%3Cpath d='M262.3 106.9L282.1 72.8L301.9 106.9ZM266.7 88.7L282.1 55.4L297.6 88.7ZM271.2 72.9L282.1 48.2L293 72.9ZM280.9 105.6h2.4V112h-2.4Z' fill='%23163123'/%3E%3Cpath d='M275.4 84.4L282.1 72.8L288.9 84.4L285.8 83.2L283.5 85.2L280.1 83.4ZM276.9 66.8L282.1 55.4L287.4 66.8L285 65.6L283.2 67.6L280.5 65.8ZM278.4 56.6L282.1 48.2L285.8 56.6L284.2 55.4L282.9 57.4L281 55.6Z' fill='rgba(232,242,250,0.3)'/%3E%3Cpath d='M340 107L359.3 73.8L378.6 107ZM344.2 89.3L359.3 56.9L374.3 89.3ZM348.7 73.9L359.3 49.7L369.9 73.9ZM358.1 105.8h2.4V112h-2.4Z' fill='%23163123'/%3E%3Cpath d='M352.7 85.1L359.3 73.8L365.9 85.1L362.9 83.9L360.6 85.9L357.3 84.1ZM354.2 67.9L359.3 56.9L364.4 67.9L362.1 66.7L360.3 68.7L357.8 66.9ZM355.7 58L359.3 49.7L362.9 58L361.3 56.8L360 58.8L358.2 57Z' fill='rgba(232,242,250,0.3)'/%3E%3Cpath d='M397.7 106.4L419.4 69L441.1 106.4ZM402.4 86.4L419.4 49.9L436.3 86.4ZM407.4 69.1L419.4 41.9L431.3 69.1ZM418.2 105h2.4V112h-2.4Z' fill='%23163123'/%3E%3Cpath d='M412 81.7L419.4 69L426.8 81.7L423.5 80.5L420.9 82.5L417.2 80.7ZM413.6 62.3L419.4 49.9L425.2 62.3L422.6 61.1L420.5 63.1L417.7 61.3ZM415.3 51.1L419.4 41.9L423.5 51.1L421.6 49.9L420.2 51.9L418.2 50.1Z' fill='rgba(232,242,250,0.3)'/%3E%3Cpath d='M0 120L0 111.3L8 110.8L16 110.2L24 109.5L32 108.7L40 108L48 107.3L56 106.8L64 106.5L72 106.5L80 106.7L88 107.2L96 107.8L104 108.5L112 109.3L120 110L128 110.7L136 111.2L144 111.5L152 111.5L160 111.3L168 110.8L176 110.2L184 109.5L192 108.7L200 108L208 107.3L216 106.8L224 106.5L232 106.5L240 106.7L248 107.2L256 107.8L264 108.5L272 109.3L280 110L288 110.7L296 111.2L304 111.5L312 111.5L320 111.3L328 110.8L336 110.2L344 109.5L352 108.7L360 108L368 107.3L376 106.8L384 106.5L392 106.5L400 106.7L408 107.2L416 107.8L424 108.5L432 109.3L440 110L448 110.7L456 111.2L464 111.5L472 111.5L480 111.3L480 120Z' fill='%23c9d8e3' opacity='0.13'/%3E%3Cpath d='M0 120L0 111.5L8 111.4L16 111.2L24 111.2L32 111.1L40 111L48 111L56 111L64 111L72 111.1L80 111.1L88 111.2L96 111.3L104 111.4L112 111.5L120 111.7L128 111.9L136 112L144 112.2L152 112.4L160 112.6L168 112.8L176 113L184 113.3L192 113.5L200 113.7L208 113.9L216 114L224 114.2L232 114.4L240 114.5L248 114.6L256 114.8L264 114.8L272 114.9L280 115L288 115L296 115L304 115L312 114.9L320 114.9L328 114.8L336 114.7L344 114.6L352 114.5L360 114.3L368 114.1L376 114L384 113.8L392 113.6L400 113.4L408 113.2L416 113L424 112.7L432 112.5L440 112.3L448 112.1L456 112L464 111.8L472 111.6L480 111.5L480 120Z' fill='%23dde8f0' opacity='0.17'/%3E%3C/svg%3E") 50% 100% / auto 100% repeat-x;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .nieve span,
-  :root[data-tema="navidad"] .calc-panel::before,
-  :root[data-tema="navidad"] .calc-head h1 {
-    animation: none;
-  }
-  .nieve span { opacity: 0.5; }
+  /* Copos quietos en el aire parecen polvo en la pantalla: fuera. Lo demás
+     se queda, pero quieto: las luces encendidas y las bolas colgando. */
+  :root[data-tema="navidad"] .nieve { display: none; }
+  .guirnalda i,
+  .adornos .bola,
+  :root[data-tema="navidad"] .calc-head h1 { animation: none; }
 }
 
 /* ============================================================

@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=66">
-  <link rel="stylesheet" href="/css/calculadora.css?r=66">
+  <link rel="stylesheet" href="/css/variables.css?r=67">
+  <link rel="stylesheet" href="/css/calculadora.css?r=67">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -75,30 +75,44 @@
 </head>
 <body>
 
+<!-- Navidad: la nieve en tres distancias (lejos, en medio y cristales cerca),
+     el acebo con sus bolas en la esquina y el bosque nevado al pie. -->
 <div class="nieve" aria-hidden="true">
-    <span style="left:32.4%;--tam:3.6px;--dur:16.2s;--espera:1.0s;--giro:3px"></span>
-    <span style="left:36.6%;--tam:3.2px;--dur:14.6s;--espera:0.5s;--giro:-5px"></span>
-    <span style="left:7.0%;--tam:3.4px;--dur:13.7s;--espera:11.6s;--giro:-30px"></span>
-    <span style="left:22.3%;--tam:5.5px;--dur:19.4s;--espera:8.1s;--giro:-8px"></span>
-    <span style="left:97.6%;--tam:3.2px;--dur:18.4s;--espera:4.1s;--giro:-28px"></span>
-    <span style="left:11.8%;--tam:4.2px;--dur:18.0s;--espera:2.5s;--giro:7px"></span>
-    <span style="left:63.9%;--tam:4.5px;--dur:15.0s;--espera:0.9s;--giro:-35px"></span>
-    <span style="left:20.6%;--tam:5.7px;--dur:13.7s;--espera:4.4s;--giro:7px"></span>
-    <span style="left:45.3%;--tam:4.2px;--dur:17.7s;--espera:9.8s;--giro:-20px"></span>
-    <span style="left:57.4%;--tam:5.1px;--dur:18.6s;--espera:10.2s;--giro:-17px"></span>
-    <span style="left:98.0%;--tam:3.5px;--dur:13.6s;--espera:10.6s;--giro:-28px"></span>
-    <span style="left:48.9%;--tam:3.2px;--dur:16.4s;--espera:10.7s;--giro:6px"></span>
-    <span style="left:87.5%;--tam:4.3px;--dur:16.6s;--espera:8.3s;--giro:6px"></span>
-    <span style="left:45.6%;--tam:6.4px;--dur:19.4s;--espera:6.6s;--giro:13px"></span>
-    <span style="left:6.1%;--tam:5.8px;--dur:16.1s;--espera:13.9s;--giro:26px"></span>
-    <span style="left:28.5%;--tam:4.5px;--dur:16.4s;--espera:0.3s;--giro:-3px"></span>
-    <span style="left:16.8%;--tam:3.5px;--dur:9.6s;--espera:10.8s;--giro:-30px"></span>
-    <span style="left:24.8%;--tam:4.6px;--dur:18.6s;--espera:1.1s;--giro:-4px"></span>
-    <span style="left:54.9%;--tam:6.5px;--dur:18.0s;--espera:12.1s;--giro:-18px"></span>
-    <span style="left:41.5%;--tam:4.4px;--dur:18.7s;--espera:13.4s;--giro:-28px"></span>
-    <span style="left:17.6%;--tam:3.9px;--dur:11.6s;--espera:6.8s;--giro:7px"></span>
-    <span style="left:26.3%;--tam:3.0px;--dur:13.6s;--espera:5.2s;--giro:5px"></span>
+    <span class="lejos" style="left:88.8%;--tam:1.9px;--dur:26.6s;--espera:-18.5s;--giro:-24px;--vaiven:8px;--ritmo:3.4s"></span>
+    <span class="lejos" style="left:67.9%;--tam:2.5px;--dur:27.1s;--espera:-3.6s;--giro:1px;--vaiven:7px;--ritmo:6.5s"></span>
+    <span class="lejos" style="left:19.7%;--tam:2.6px;--dur:25.4s;--espera:-10.2s;--giro:9px;--vaiven:9px;--ritmo:5.6s"></span>
+    <span class="lejos" style="left:57.7%;--tam:2.3px;--dur:24.1s;--espera:-18.5s;--giro:17px;--vaiven:9px;--ritmo:6.2s"></span>
+    <span class="lejos" style="left:50%;--tam:1.8px;--dur:20s;--espera:-10.8s;--giro:-10px;--vaiven:6px;--ritmo:5s"></span>
+    <span class="lejos" style="left:82.3%;--tam:2.1px;--dur:21.8s;--espera:-8s;--giro:-20px;--vaiven:6px;--ritmo:5.7s"></span>
+    <span class="lejos" style="left:86.9%;--tam:2.1px;--dur:21.6s;--espera:-0.5s;--giro:39px;--vaiven:9px;--ritmo:5.4s"></span>
+    <span class="lejos" style="left:73.3%;--tam:2.4px;--dur:22.6s;--espera:-14.7s;--giro:33px;--vaiven:5px;--ritmo:6.1s"></span>
+    <span class="lejos" style="left:1.6%;--tam:2.6px;--dur:25.4s;--espera:-8.3s;--giro:8px;--vaiven:8px;--ritmo:5.8s"></span>
+    <span style="left:84%;--tam:5px;--dur:16.6s;--espera:-4.2s;--giro:31px;--vaiven:7px;--ritmo:4.6s"></span>
+    <span style="left:65.6%;--tam:4.4px;--dur:18.6s;--espera:-17.8s;--giro:-4px;--vaiven:15px;--ritmo:4.8s"></span>
+    <span style="left:24.8%;--tam:4.5px;--dur:18.5s;--espera:-13.1s;--giro:15px;--vaiven:12px;--ritmo:5.4s"></span>
+    <span style="left:98.2%;--tam:4px;--dur:13.3s;--espera:-2.7s;--giro:23px;--vaiven:6px;--ritmo:3s"></span>
+    <span style="left:64.5%;--tam:3.5px;--dur:16.2s;--espera:-9.7s;--giro:-3px;--vaiven:9px;--ritmo:3.2s"></span>
+    <span style="left:83.8%;--tam:3.8px;--dur:17.7s;--espera:-13.8s;--giro:39px;--vaiven:10px;--ritmo:5.4s"></span>
+    <span style="left:13.9%;--tam:4.6px;--dur:17.2s;--espera:-0.9s;--giro:-31px;--vaiven:14px;--ritmo:4.5s"></span>
+    <span style="left:51.6%;--tam:3.5px;--dur:16s;--espera:-7.6s;--giro:-26px;--vaiven:11px;--ritmo:4.2s"></span>
+    <span style="left:22.5%;--tam:4.8px;--dur:14.6s;--espera:-8.6s;--giro:-32px;--vaiven:15px;--ritmo:4.5s"></span>
+    <span style="left:79.1%;--tam:3.9px;--dur:15.9s;--espera:-9.2s;--giro:-36px;--vaiven:13px;--ritmo:4.1s"></span>
+    <span style="left:19.3%;--tam:4.1px;--dur:16.7s;--espera:-14.2s;--giro:-15px;--vaiven:9px;--ritmo:6.3s"></span>
+    <span style="left:9.7%;--tam:3.1px;--dur:13.5s;--espera:-13.1s;--giro:-13px;--vaiven:7px;--ritmo:6.1s"></span>
+    <span style="left:17.4%;--tam:4.5px;--dur:16.1s;--espera:-14.6s;--giro:16px;--vaiven:8px;--ritmo:5.2s"></span>
+    <span class="cristal" style="left:52.4%;--tam:10.4px;--dur:11.6s;--espera:-2.2s;--giro:10px;--vaiven:14px;--ritmo:5.4s"></span>
+    <span class="cristal" style="left:18.5%;--tam:10.2px;--dur:14.2s;--espera:-1.4s;--giro:28px;--vaiven:17px;--ritmo:5.4s"></span>
+    <span class="cristal" style="left:94.4%;--tam:10.3px;--dur:14.1s;--espera:-8.4s;--giro:-21px;--vaiven:14px;--ritmo:4.1s"></span>
+    <span class="cristal" style="left:14.8%;--tam:8.8px;--dur:13.1s;--espera:-1s;--giro:30px;--vaiven:10px;--ritmo:5.3s"></span>
+    <span class="cristal" style="left:78.6%;--tam:8.8px;--dur:14.4s;--espera:-0.3s;--giro:-31px;--vaiven:13px;--ritmo:3.7s"></span>
+    <span class="cristal" style="left:14%;--tam:9.5px;--dur:12.5s;--espera:-11.7s;--giro:-16px;--vaiven:16px;--ritmo:6.1s"></span>
   </div>
+<div class="adornos" aria-hidden="true">
+    <span class="bola bola-roja" style="--x:20px;--hilo:30px;--bola:19px;--ritmo:3.4s;--espera:-0.8s"></span>
+    <span class="bola bola-dorada" style="--x:46px;--hilo:56px;--bola:15px;--ritmo:4.1s;--espera:-2.3s"></span>
+    <span class="bola bola-verde" style="--x:72px;--hilo:38px;--bola:17px;--ritmo:3.7s;--espera:-1.5s"></span>
+  </div>
+<div class="paisaje" aria-hidden="true"></div>
 
 <!-- Halloween: murciélagos que cruzan de vez en cuando, y una araña colgada
      de su tela en la esquina. Como la nieve, no existen en los demás temas. -->
@@ -158,6 +172,9 @@
 
   <!-- Qué se quiere calcular -->
   <section class="calc-panel">
+    <!-- Navidad: el cable y los dos circuitos de luces, que se turnan -->
+    <div class="guirnalda" aria-hidden="true"><i></i><i></i></div>
+
     <div class="calc-modos" id="calcModos" role="tablist" aria-label="Qué quieres calcular">
       <button type="button" class="calc-modo is-active" data-modo="divisa" role="tab" aria-selected="true" aria-controls="calcResultados">Divisas</button>
       <button type="button" class="calc-modo" data-modo="bs" role="tab" aria-selected="false" aria-controls="calcResultados" tabindex="-1">Bolívares</button>
@@ -207,7 +224,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v66</span>
+    <span class="calc-version" title="Versión de la app instalada">v67</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -391,7 +408,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=66" defer></script>
+<script src="/js/calculadora.js?r=67" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
