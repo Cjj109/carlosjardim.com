@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=63">
-  <link rel="stylesheet" href="/css/calculadora.css?r=63">
+  <link rel="stylesheet" href="/css/variables.css?r=64">
+  <link rel="stylesheet" href="/css/calculadora.css?r=64">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -57,7 +57,7 @@
     //    hasta que el HTML está parseado; lanzándola aquí se adelanta y para
     //    cuando el código la necesita suele estar ya en camino.
     (function () {
-      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910' };
+      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910', halloween: '#0c0912' };
       var tema = 'oscuro';
       try { tema = localStorage.getItem('calc-tema') || 'oscuro'; } catch (e) {}
       if (!COLORES[tema]) tema = 'oscuro';
@@ -100,6 +100,17 @@
     <span style="left:26.3%;--tam:3.0px;--dur:13.6s;--espera:5.2s;--giro:5px"></span>
   </div>
 
+<!-- Halloween: murciélagos que cruzan de vez en cuando, y una araña colgada
+     de su tela en la esquina. Como la nieve, no existen en los demás temas. -->
+<div class="murcielagos" aria-hidden="true">
+    <span style="top:12%;--tam:30px;--dur:21s;--espera:1s"></span>
+    <span style="top:34%;--tam:20px;--dur:26s;--espera:7s;animation-direction:reverse"></span>
+    <span style="top:6%;--tam:16px;--dur:30s;--espera:13s"></span>
+    <span style="top:61%;--tam:24px;--dur:24s;--espera:17s;animation-direction:reverse"></span>
+    <span style="top:82%;--tam:18px;--dur:28s;--espera:4s"></span>
+  </div>
+<div class="telarana" aria-hidden="true"><span class="arana"></span></div>
+
 <main class="calc">
   <header class="calc-head">
     <a class="calc-volver" href="/">← carlosjardim.com</a>
@@ -114,11 +125,11 @@
   <!-- Tasas del momento -->
   <section class="calc-tasas" aria-label="Tasas actuales">
     <article class="tasa">
-      <span class="tasa-nombre">Dólar BCV</span>
+      <span class="tasa-nombre" id="nombreUsd">Dólar BCV</span>
       <span class="tasa-valor" id="tasaUsd">—</span>
     </article>
     <article class="tasa">
-      <span class="tasa-nombre">Euro BCV</span>
+      <span class="tasa-nombre" id="nombreEur">Euro BCV</span>
       <span class="tasa-valor" id="tasaEur">—</span>
     </article>
     <article class="tasa tasa-viva">
@@ -182,7 +193,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v63</span>
+    <span class="calc-version" title="Versión de la app instalada">v64</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -267,6 +278,10 @@
         <span class="tema-muestra muestra-miguel" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         Miguel
       </button>
+      <button type="button" class="tema" data-tema="halloween" role="radio" aria-checked="false">
+        <span class="tema-muestra muestra-halloween" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Halloween
+      </button>
     </div>
   </section>
 
@@ -325,7 +340,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=63" defer></script>
+<script src="/js/calculadora.js?r=64" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

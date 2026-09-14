@@ -22,6 +22,7 @@
  */
 import { DatabaseSync } from 'node:sqlite';
 import { onRequestGet } from '../functions/api/bcv.js';
+import { onRequestGet as onRequestGetFuentes } from '../functions/api/fuentes.js';
 import { desdeCuandoSeAplica } from '../functions/api/_vigencia.js';
 
 const ESQUEMA = `
@@ -209,6 +210,68 @@ console.log('\nLA PRÓXIMA SE ANUNCIA CON EL DÍA EN QUE ENTRA');
   const r = await momento(db, '2026-09-11T16:00:00', 830, 910, '2026-09-14');
   comprobar('viernes: se cobra 820', r.usd, 820);
   comprobar('  y se anuncia 830 para el 12, no el 14', `${r.proxima?.rate}@${r.proxima?.date}`, '830@2026-09-12');
+}
+
+/** El panel de fuentes en un instante: la ficha del BCV y la de Farmatodo */
+async function fichas(db, ahora, usd, eur, fechaValor) {
+  reloj(`${ahora}-04:00`);
+  red(usd == null ? null : htmlBCV(usd, eur, fechaValor));
+  const res = await onRequestGetFuentes({
+    request: new Request('https://carlosjardim.com/api/fuentes'),
+    env: { MONTOS: db },
+  });
+  const { fuentes } = await res.json();
+  const ficha = (id) => fuentes.find((f) => f.id === id);
+  return { bcv: ficha('bcv'), farmatodo: ficha('bcv-farmatodo') };
+}
+
+console.log('\nFARMATODO: LA NUEVA NO ENTRA HASTA SU DÍA HÁBIL');
+{
+  const db = nuevaD1();
+  await momento(db, '2026-09-10T09:00:00', 820, 900, '2026-09-10');
+  const viernes = await fichas(db, '2026-09-11T16:30:00', 830, 910, '2026-09-14');
+  comprobar('viernes tarde: Farmatodo cobra 820', viernes.farmatodo.rate, 820);
+  comprobar('  y anuncia 830 para el lunes 14, no el 12', `${viernes.farmatodo.proxima?.rate}@${viernes.farmatodo.proxima?.date}`, '830@2026-09-14');
+
+  const sabado = await fichas(db, '2026-09-12T10:00:00', 830, 910, '2026-09-14');
+  comprobar('sábado: el BCV ya cobra 830', sabado.bcv.rate, 830);
+  comprobar('  pero Farmatodo sigue en 820', sabado.farmatodo.rate, 820);
+  comprobar('  y el euro se queda atrás con él', sabado.farmatodo.eur, 900);
+  comprobar('  con la fecha de la tasa que cobra', sabado.farmatodo.date, '2026-09-10');
+  comprobar('  y no dice que coincide', /coincide/.test(sabado.farmatodo.detalle), false);
+
+  comprobar('domingo: sigue en 820', (await fichas(db, '2026-09-13T10:00:00', 830, 910, '2026-09-14')).farmatodo.rate, 820);
+
+  const lunes = await fichas(db, '2026-09-14T09:00:00', 830, 910, '2026-09-14');
+  comprobar('lunes 14: entra en Farmatodo', lunes.farmatodo.rate, 830);
+  comprobar('  y dice que coincide con el BCV', /coincide/.test(lunes.farmatodo.detalle), true);
+  comprobar('  sin próxima que anunciar', lunes.farmatodo.proxima, null);
+}
+
+console.log('\nFARMATODO CON EL LUNES FERIADO');
+{
+  const db = nuevaD1();
+  await momento(db, '2026-09-10T09:00:00', 820, 900, '2026-09-10');
+  await momento(db, '2026-09-11T16:30:00', 830, 910, '2026-09-15');
+  comprobar('lunes feriado: sigue en 820', (await fichas(db, '2026-09-14T10:00:00', 830, 910, '2026-09-15')).farmatodo.rate, 820);
+  comprobar('martes 15: entra', (await fichas(db, '2026-09-15T10:00:00', 830, 910, '2026-09-15')).farmatodo.rate, 830);
+}
+
+console.log('\nFARMATODO ENTRE SEMANA ES LA MISMA DEL BCV');
+{
+  const db = nuevaD1();
+  await momento(db, '2026-09-15T09:00:00', 830, 910, '2026-09-15');
+  const tarde = await fichas(db, '2026-09-15T16:30:00', 840, 920, '2026-09-16');
+  comprobar('martes tarde, ya publicada la del miércoles', `${tarde.bcv.rate}/${tarde.farmatodo.rate}`, '830/830');
+  const miercoles = await fichas(db, '2026-09-16T09:00:00', 840, 920, '2026-09-16');
+  comprobar('miércoles: entra en los dos', `${miercoles.bcv.rate}/${miercoles.farmatodo.rate}`, '840/840');
+}
+
+console.log('\nFARMATODO SIN MEMORIA');
+{
+  const r = await fichas(null, '2026-09-12T10:00:00', 830, 910, '2026-09-14');
+  comprobar('sin base: la ficha no inventa', r.farmatodo.rate, null);
+  comprobar('  y dice por qué', r.farmatodo.motivo, 'sin memoria de tasas');
 }
 
 globalThis.Date = DateReal;

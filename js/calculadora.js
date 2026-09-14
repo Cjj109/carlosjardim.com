@@ -23,6 +23,7 @@ const TEMAS = {
   claro: '#e6ebf3',
   navidad: '#0b1410',
   miguel: '#0b0910',
+  halloween: '#0c0912',
 };
 
 /* ---------- Utilidades ---------- */
@@ -281,6 +282,14 @@ const COLORES = {
   bs: 'var(--calc-texto)',
 };
 
+/* El nombre de la tasa oficial en todo lo que se lee.
+   Las fichas que dan OTRA cifra que la del día —la que viene, la de
+   Farmatodo— cambian también el nombre: "Dólar BCV" con el número de
+   Farmatodo debajo sería decir una cosa y enseñar otra. Va por moneda porque
+   el euro solo cambia de fuente si la elegida lo trae. */
+const NOMBRE_OFICIAL = { 'bcv-farmatodo': 'Farmatodo', 'bcv-proxima': 'BCV que viene' };
+const nombreOficial = (moneda = 'usd') => NOMBRE_OFICIAL[tasas?.[moneda]?.id] || 'BCV';
+
 /* ---------- Montos rápidos ----------
 
    Los cinco botones eran fijos y los mismos para los cuatro modos. En tres de
@@ -524,8 +533,23 @@ async function cargarTasas({ forzar = false, primera = false } = {}) {
 
        Ahora solo se sustituye si de verdad hay algo que sustituir —una
        elección que se aparta de lo que /api/bcv ya trae— y en ese caso se
-       vuelven a pedir las fuentes, que si no se congelarían igual. */
-    if (fuentes && hayEleccionPropia()) {
+       vuelven a pedir las fuentes, que si no se congelarían igual.
+
+       Y también en la PRIMERA carga, que es donde se escapaba. Con
+       `fuentes && …` la elección solo volvía si en esta visita ya se había
+       abierto el panel: al reabrir la app se calculaba con la de siempre sin
+       decir nada. Con la de Farmatodo eso pasaba justo el sábado, que es
+       para lo que se elige.
+
+       Mientras llegan se pinta lo de /api/bcv, que no engaña: la tarjeta y
+       las filas llevan el nombre de su tasa, y al llegar cambian número y
+       nombre a la vez. En los refrescos ya hay fuentes y no se pinta nada de
+       más, que si no la de siempre parpadearía cada minuto. */
+    if (hayEleccionPropia()) {
+      if (!fuentes) {
+        pintarTasas();
+        calcular();
+      }
       cargarFuentes();
     } else {
       pintarTasas();
@@ -574,6 +598,12 @@ function pintarTasas({ falloDeRed = false } = {}) {
     valor.textContent = tasa ? num(tasa) : '—';
   }
 
+  // El nombre va con la fuente elegida, igual que en las filas
+  const nombreUsd = $('nombreUsd');
+  if (nombreUsd) nombreUsd.textContent = `Dólar ${nombreOficial()}`;
+  const nombreEur = $('nombreEur');
+  if (nombreEur) nombreEur.textContent = `Euro ${nombreOficial('eur')}`;
+
   const aviso = $('calcActualizado');
   if (!aviso) return;
 
@@ -608,7 +638,7 @@ function pintarTasas({ falloDeRed = false } = {}) {
   const bcv = tasas?.usd;
   // "desde el" y no "del": la fecha es desde cuándo se aplica, que un fin de
   // semana no coincide con la fecha valor que enseña el BCV.
-  const vigencia = bcv?.date ? ` · BCV desde el ${fecha(bcv.date)}` : '';
+  const vigencia = bcv?.date ? ` · ${nombreOficial()} desde el ${fecha(bcv.date)}` : '';
   const proxima = bcv?.proxima?.rate
     ? ` · luego ${num(Number(bcv.proxima.rate))} el ${fecha(bcv.proxima.date)}`
     : '';
@@ -866,13 +896,15 @@ function aplicarEleccion() {
       date: oficial.date,
       symbol: '$',
       fuente: oficial.nombre,
+      // De aquí sale el nombre que se enseña: ver NOMBRE_OFICIAL
+      id: oficial.id,
       proxima: oficial.proxima ?? null,
     };
     // El euro va con el dólar. Antes se quedaba siempre con el de /api/bcv, y
     // eso se notaba al elegir "la que viene": el dólar cambiaba y el euro no,
     // enseñando dos tasas de días distintos una al lado de la otra.
     if (oficial.eur) {
-      tasas.eur = { rate: oficial.eur, date: oficial.date, symbol: '€', fuente: oficial.nombre };
+      tasas.eur = { rate: oficial.eur, date: oficial.date, symbol: '€', fuente: oficial.nombre, id: oficial.id };
     }
   }
   if (paralelo) {
@@ -911,19 +943,19 @@ function filasDelModo(monto, { usd, eur, usdt, zelle }) {
   if (modo === 'divisa') {
     // El euro va último en los dos modos: es el que menos se usa
     return [
-      usd && { nombre: 'Dólar BCV', tasa: usd, valor: monto * usd, unidad: 'Bs.', color: COLORES.usd },
+      usd && { nombre: `Dólar ${nombreOficial()}`, tasa: usd, valor: monto * usd, unidad: 'Bs.', color: COLORES.usd },
       usdt && { nombre: 'USDT p2p', tasa: usdt, valor: monto * usdt, unidad: 'Bs.', color: COLORES.usdt },
       zelle && { nombre: 'Zelle', tasa: zelle, valor: monto * zelle, unidad: 'Bs.', color: COLORES.zelle },
-      eur && { nombre: 'Euro BCV', tasa: eur, valor: monto * eur, unidad: 'Bs.', color: COLORES.eur },
+      eur && { nombre: `Euro ${nombreOficial('eur')}`, tasa: eur, valor: monto * eur, unidad: 'Bs.', color: COLORES.eur },
     ];
   }
 
   if (modo === 'bs') {
     return [
-      usd && { nombre: 'En dólares BCV', tasa: usd, valor: monto / usd, unidad: '$', color: COLORES.usd },
+      usd && { nombre: `En dólares ${nombreOficial()}`, tasa: usd, valor: monto / usd, unidad: '$', color: COLORES.usd },
       usdt && { nombre: 'En USDT', tasa: usdt, valor: monto / usdt, unidad: '₮', color: COLORES.usdt },
       zelle && { nombre: 'En Zelle', tasa: zelle, valor: monto / zelle, unidad: '$', color: COLORES.zelle },
-      eur && { nombre: 'En euros BCV', tasa: eur, valor: monto / eur, unidad: '€', color: COLORES.eur },
+      eur && { nombre: `En euros ${nombreOficial('eur')}`, tasa: eur, valor: monto / eur, unidad: '€', color: COLORES.eur },
     ];
   }
 
@@ -943,7 +975,7 @@ function filasDelModo(monto, { usd, eur, usdt, zelle }) {
     // Vendiendo el USDT y cobrando por Zelle salen mas dolares, porque el
     // Zelle vale menos: es el mismo dinero contado en otra moneda.
     zelle && { nombre: 'Equivalen en Zelle', tasa: zelle, valor: enBs / zelle, unidad: '$', color: COLORES.zelle },
-    usd && { nombre: 'Equivalen a BCV', tasa: usd, valor: enBs / usd, unidad: '$', color: COLORES.usd },
+    usd && { nombre: `Equivalen a ${nombreOficial()}`, tasa: usd, valor: enBs / usd, unidad: '$', color: COLORES.usd },
   ];
 }
 

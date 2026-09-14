@@ -8,7 +8,15 @@
  * enterarse el mismo día.
  */
 
-import { hoyCaracas, guardarVigencia, vigenteEn, proximaTras, snapshotEstatico } from './_vigencia.js';
+import {
+  hoyCaracas,
+  guardarVigencia,
+  vigenteEn,
+  proximaTras,
+  vigenteSegunFechaValor,
+  proximaSegunFechaValor,
+  snapshotEstatico,
+} from './_vigencia.js';
 
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 const PUENTE_BCV = 'https://bcv-puente.vercel.app/api/bcv';
@@ -163,6 +171,10 @@ export async function onRequestGet(context) {
     (await snapshotEstatico(context.request.url, hoy));
   const siguiente = await proximaTras(context.env?.MONTOS, hoy);
 
+  // Lo mismo por fecha valor, para la ficha de Farmatodo
+  const farmatodo = await vigenteSegunFechaValor(context.env?.MONTOS, hoy);
+  const siguienteFarmatodo = await proximaSegunFechaValor(context.env?.MONTOS, hoy);
+
   /**
    * Cambia la lectura por la que ya se aplica.
    *
@@ -228,6 +240,31 @@ export async function onRequestGet(context) {
       eur: siguiente.eur ?? null,
       date: siguiente.desde ?? siguiente.fecha,
       motivo: null,
+    },
+    /* La de Farmatodo: la que viene, pero al revés.
+       Aquella se adelanta a lo que rige; esta se queda atrás, porque hay
+       comercios que no cobran la tasa nueva hasta su día hábil. La regla está
+       en _vigencia.js.
+
+       Al contrario que "la que viene", esta ficha está SIEMPRE, también entre
+       semana cuando da la misma cifra que la del BCV. Es una costumbre de
+       cobro y no una tasa pasajera: quien la elige para comprar en Farmatodo
+       la quiere puesta el sábado sin tener que volver a buscarla. */
+    {
+      id: 'bcv-farmatodo',
+      grupo: 'bcv',
+      nombre: 'BCV · Farmatodo',
+      detalle:
+        farmatodo && aplicando && farmatodo.usd === aplicando.usd
+          ? 'Como cobran Farmatodo y otros comercios: la tasa nueva no entra hasta su día hábil. Hoy coincide con la del BCV.'
+          : 'Como cobran Farmatodo y otros comercios: la tasa nueva no entra hasta su día hábil, aunque el BCV ya la haya movido.',
+      rate: farmatodo?.usd ?? null,
+      eur: farmatodo?.eur ?? null,
+      date: farmatodo?.fecha ?? null,
+      proxima: siguienteFarmatodo
+        ? { rate: siguienteFarmatodo.usd, eur: siguienteFarmatodo.eur, date: siguienteFarmatodo.fecha }
+        : null,
+      motivo: farmatodo ? null : 'sin memoria de tasas',
     },
     {
       id: 'dolarapi',

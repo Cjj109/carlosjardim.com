@@ -872,6 +872,11 @@ body {
 }
 .muestra-miguel span { background: none; }
 
+.muestra-halloween span:nth-child(1) { background: #0c0912; }
+.muestra-halloween span:nth-child(2) { background: #ff8a2a; }
+.muestra-halloween span:nth-child(3) { background: #c084fc; }
+.muestra-halloween span:nth-child(4) { background: #8ee05a; }
+
 /* ---------- Detalles del tema navideño ---------- */
 
 /* Nieve: solo existe en navidad y solo si el sistema no pide quietud */
@@ -1119,6 +1124,7 @@ body {
 :root[data-tema="claro"] { --calc-zelle: #7e22ce; }
 :root[data-tema="navidad"] { --calc-zelle: #d98cff; }
 :root[data-tema="miguel"] { --calc-zelle: #b57bff; }
+:root[data-tema="halloween"] { --calc-zelle: #c084fc; }
 
 /* ---------- Interruptor de aportar montos ---------- */
 
@@ -1596,6 +1602,223 @@ body { overscroll-behavior-y: contain; }
 
 @media (prefers-reduced-motion: reduce) {
   :root[data-tema="miguel"] .calc-head h1 { animation: none; }
+}
+
+/* ============================================================
+   HALLOWEEN
+   ============================================================
+
+   Como en navidad, los colores de las tasas se cambian por los de la
+   fecha y cada uno sigue significando lo mismo: el dólar calabaza, el euro
+   vela, el USDT verde baba y el Zelle violeta de bruja.
+
+   La decoración va donde no estorba a ningún número:
+
+     la esquina de arriba  una tela de araña con su araña colgando, que
+                           baja y sube despacio al lado del título
+     el fondo              una luna naranja detrás de la tela, niebla
+                           violeta abajo, y murciélagos que cruzan de vez
+                           en cuando POR DETRÁS de las tarjetas
+     el título             parpadea como una vela dentro de una calabaza
+
+   Los murciélagos van detrás del contenido y no delante como la nieve: un
+   copo que pasa por encima de una cifra no la tapa, una silueta negra sí. */
+
+:root[data-tema="halloween"] {
+  --calc-fondo: #0c0912;
+  --calc-superficie: #16111e;
+  --calc-superficie-alta: #1e1728;
+  --calc-borde: rgba(255, 138, 42, 0.13);
+  --calc-borde-fuerte: rgba(255, 138, 42, 0.38);
+  --calc-texto: #f3ece2;
+  --calc-texto-suave: #bcb0c8;
+  --calc-texto-tenue: #8c7f9d;
+
+  --calc-usd: #ff8a2a;
+  --calc-eur: #ffd166;
+  --calc-usdt: #8ee05a;
+}
+
+:root[data-tema="halloween"] body {
+  background:
+    /* La luna, justo detrás de la telaraña: así la araña se ve a contraluz */
+    radial-gradient(circle at 100% 0%, rgba(255, 176, 84, 0.22) 0, rgba(255, 138, 42, 0.08) 11rem, transparent 22rem),
+    radial-gradient(ellipse 80% 45% at 60% 108%, rgba(192, 132, 252, 0.15), transparent 70%),
+    radial-gradient(ellipse 60% 35% at 5% 105%, rgba(142, 224, 90, 0.07), transparent 70%),
+    var(--calc-fondo);
+}
+
+/* Todo el contenido por encima de los murciélagos y la tela */
+:root[data-tema="halloween"] .calc {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-tema="halloween"] .calc-head h1 {
+  background: linear-gradient(100deg, #ff7a1a 0%, #ffb347 55%, #ff8a2a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 10px rgba(255, 122, 26, 0.45));
+  animation: vela 6s linear infinite;
+}
+
+/* Casi siempre quieta, y de vez en cuando dos titileos seguidos: una llama
+   que parpadea sin parar cansa, una que tiembla de tanto en tanto se mira */
+@keyframes vela {
+  0%, 38%, 46%, 71%, 100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(255, 122, 26, 0.45)); }
+  40% { opacity: 0.78; filter: drop-shadow(0 0 4px rgba(255, 122, 26, 0.25)); }
+  42% { opacity: 1; filter: drop-shadow(0 0 14px rgba(255, 122, 26, 0.6)); }
+  44% { opacity: 0.86; filter: drop-shadow(0 0 6px rgba(255, 122, 26, 0.3)); }
+  69% { opacity: 0.9; filter: drop-shadow(0 0 7px rgba(255, 122, 26, 0.35)); }
+}
+
+:root[data-tema="halloween"] .calc-panel {
+  border-color: rgba(255, 138, 42, 0.2);
+  box-shadow: 0 0 44px -22px rgba(255, 138, 42, 0.55);
+}
+
+:root[data-tema="halloween"] .tasa {
+  box-shadow: 0 0 24px -14px rgba(192, 132, 252, 0.85);
+}
+
+:root[data-tema="halloween"] .tasa-viva .tasa-nombre::after {
+  box-shadow: 0 0 6px 1px rgba(142, 224, 90, 0.8);
+}
+
+/* ---------- La tela y la araña ----------
+   En absolute y no en fixed: se queda arriba con el título y se va al
+   desplazar, en vez de perseguir a quien baja a leer los resultados. */
+.telarana,
+.murcielagos { display: none; }
+
+:root[data-tema="halloween"] .telarana {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: clamp(92px, 24vw, 170px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M100 0L-21.8 28.1M100 0L-2.4 71.7M100 0L31.9 104.8M100 0L71.9 121.8M84 0Q86 1.6 83.6 3.8Q87.4 5.6 87.6 8.7Q90.7 9.6 91.3 13.4Q94.5 13 96.2 16.4Q98.4 13.7 100 15.2M65 0Q71.5 3.2 69 7.2Q74.8 11.2 73.6 18.5Q79.9 20.8 81 29.3Q88.8 26.4 92.9 30.9Q96.9 27.4 100 32.3M49.8 0Q57.7 4.8 52.4 11Q59.6 18 55.8 31Q68.9 32.2 72.7 42.1Q83.4 39.2 89 47.6Q95 43.9 100 54M33.9 0Q40.4 6.8 28.5 16.5Q43.5 25.2 42.2 40.5Q59.2 42.3 64 55.5Q76.6 55.2 83.5 71.5Q93 61.4 100 70.5M7.3 0Q20.8 9 9.7 20.9Q30.4 31 30.7 48.5Q47 54.9 49.5 77.8Q68.9 73.4 79.2 90.3Q91.4 75.7 100 84.6' fill='none' stroke='rgba(236,226,248,0.34)' stroke-width='0.7' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Cuelga de un hilo que sale de la tela. El hilo y la araña se animan por
+   separado pero con el mismo reloj: el hilo se estira desde arriba y la
+   araña baja lo mismo, así que siempre están unidos. Y el conjunto se mece
+   un poco, como un péndulo. */
+:root[data-tema="halloween"] .arana {
+  position: absolute;
+  top: 34%;
+  right: 40%;
+  width: 22px;
+  height: 90px;
+  transform-origin: 50% 0;
+  animation: mecerse 5.5s ease-in-out infinite alternate;
+}
+
+:root[data-tema="halloween"] .arana::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(236, 226, 248, 0.5);
+  transform-origin: 50% 0;
+  animation: hilo 9s ease-in-out infinite;
+}
+
+:root[data-tema="halloween"] .arana::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -17px;
+  width: 22px;
+  height: 22px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.5 10.5L5 6.5L3 9M9 12.5L3.5 10.5L1 14M9 14.5L4 15.5L2 20M10 16.5L6.5 19.5L5.5 23.5M14.5 10.5L19 6.5L21 9M15 12.5L20.5 10.5L23 14M15 14.5L20 15.5L22 20M14 16.5L17.5 19.5L18.5 23.5' fill='none' stroke='%23776392' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cellipse cx='12' cy='15' rx='4' ry='5' fill='%23776392'/%3E%3Ccircle cx='12' cy='8.6' r='2.7' fill='%23776392'/%3E%3Ccircle cx='11' cy='8.2' r='0.75' fill='%23ff8a2a'/%3E%3Ccircle cx='13' cy='8.2' r='0.75' fill='%23ff8a2a'/%3E%3C/svg%3E") center / contain no-repeat;
+  /* Cabeza abajo, como cuelgan de verdad */
+  rotate: 180deg;
+  animation: bajar 9s ease-in-out infinite;
+}
+
+@keyframes mecerse {
+  from { rotate: -4deg; }
+  to { rotate: 4deg; }
+}
+
+/* 90 px de hilo: arriba se queda en 40 y baja hasta los 90 */
+@keyframes hilo {
+  0%, 100% { scale: 1 0.45; }
+  45%, 60% { scale: 1 1; }
+}
+
+@keyframes bajar {
+  0%, 100% { translate: 0 -49.5px; }
+  45%, 60% { translate: 0 0; }
+}
+
+/* ---------- Murciélagos ----------
+   Cruzan la pantalla de lado a lado, cada uno a su altura y su ritmo, y
+   pasan la mayor parte del tiempo fuera: son una sorpresa, no un salvapan-
+   tallas. Tres animaciones que no se pisan porque cada una mueve una
+   propiedad distinta: el vuelo desplaza la caja (translate), y dentro el
+   murciélago planea arriba y abajo (también translate, pero en el
+   pseudoelemento) mientras aletea (scale). */
+:root[data-tema="halloween"] .murcielagos {
+  display: block;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.murcielagos span {
+  position: absolute;
+  left: 0;
+  width: var(--tam);
+  height: calc(var(--tam) * 0.41);
+  /* backwards: durante la espera se queda fuera de la pantalla, en el punto
+     de salida, en vez de esperar quieto a la vista en el borde */
+  animation: vuelo var(--dur) linear var(--espera) infinite backwards;
+}
+
+.murcielagos span::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #4a3862;
+  opacity: 0.85;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 26'%3E%3Cpath d='M32 9L34.5 4L36 10C40 8 46 6 52 6C56 6 60 7 64 9C60 11 58 14 58 18C55 15 51 15 49 18C46 15 42 16 40 20C38 18 36 18 34.5 21L32 24L29.5 21C28 18 26 18 24 20C22 16 18 15 15 18C13 15 9 15 6 18C6 14 4 11 0 9C4 7 8 6 12 6C18 6 24 8 28 10L29.5 4Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 26'%3E%3Cpath d='M32 9L34.5 4L36 10C40 8 46 6 52 6C56 6 60 7 64 9C60 11 58 14 58 18C55 15 51 15 49 18C46 15 42 16 40 20C38 18 36 18 34.5 21L32 24L29.5 21C28 18 26 18 24 20C22 16 18 15 15 18C13 15 9 15 6 18C6 14 4 11 0 9C4 7 8 6 12 6C18 6 24 8 28 10L29.5 4Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  animation:
+    aleteo 0.28s ease-in-out infinite alternate,
+    planeo 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes vuelo {
+  from { translate: -15vw 0; }
+  to { translate: 115vw 0; }
+}
+
+@keyframes aleteo {
+  from { scale: 1 1; }
+  to { scale: 0.92 0.35; }
+}
+
+@keyframes planeo {
+  from { translate: 0 -14px; }
+  to { translate: 0 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Un murciélago quieto no es un murciélago, es una mancha: fuera */
+  :root[data-tema="halloween"] .murcielagos { display: none; }
+  :root[data-tema="halloween"] .calc-head h1,
+  :root[data-tema="halloween"] .arana,
+  :root[data-tema="halloween"] .arana::before,
+  :root[data-tema="halloween"] .arana::after { animation: none; }
 }
 
 /* ============================================================

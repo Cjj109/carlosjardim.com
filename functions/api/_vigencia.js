@@ -149,6 +149,63 @@ export async function proximaTras(db, hoy) {
   }
 }
 
+/* LA REGLA DE FARMATODO
+
+   Lo mismo al revés que "la que viene". Hay comercios —Farmatodo es el que
+   se nota— que no adelantan nada: la tasa nueva no la cobran hasta que llega
+   su fecha valor, su día hábil. Lo publicado el viernes con fecha valor del
+   lunes, para ellos no existe ni el sábado ni el domingo; entra el lunes, o
+   el martes si el lunes es feriado.
+
+   Así que aquí no se mira `desde` sino `fecha`, que es exactamente eso. Entre
+   semana las dos coinciden y esto da la misma cifra que la del BCV; solo se
+   separan los fines de semana y los feriados, que es justo cuando hace falta.
+
+   Sin respaldo en snapshotEstatico, a propósito: esa foto guarda la tasa con
+   la fecha DESDE la que se aplica, así que un sábado traería la nueva con
+   fecha de sábado y aquí pasaría por buena. Sin memoria, mejor una ficha que
+   diga que no sabe que una que se equivoque justo el fin de semana. */
+
+/** La tasa según su fecha valor: la que cobra quien no adelanta nada */
+export async function vigenteSegunFechaValor(db, hoy) {
+  if (!db) return null;
+
+  try {
+    const fila = await db
+      .prepare(
+        `SELECT fecha, usd, eur FROM bcv_vigencias
+         WHERE fecha <= ? ORDER BY fecha DESC LIMIT 1`
+      )
+      .bind(hoy)
+      .first();
+
+    return fila && (usable(fila.usd) || usable(fila.eur)) ? fila : null;
+  } catch (e) {
+    console.warn('[bcv] no se pudo leer la tasa por fecha valor:', e.message);
+    return null;
+  }
+}
+
+/** La siguiente según su fecha valor, que es el día en que ellos la cobran */
+export async function proximaSegunFechaValor(db, hoy) {
+  if (!db) return null;
+
+  try {
+    const fila = await db
+      .prepare(
+        `SELECT fecha, usd, eur FROM bcv_vigencias
+         WHERE fecha > ? ORDER BY fecha ASC LIMIT 1`
+      )
+      .bind(hoy)
+      .first();
+
+    return fila && (usable(fila.usd) || usable(fila.eur)) ? fila : null;
+  } catch (e) {
+    console.warn('[bcv] no se pudo leer la próxima por fecha valor:', e.message);
+    return null;
+  }
+}
+
 /** La fecha valor más alta apuntada, incluidas las que aún no han entrado */
 export async function ultimaFechaValor(db) {
   if (!db) return null;
