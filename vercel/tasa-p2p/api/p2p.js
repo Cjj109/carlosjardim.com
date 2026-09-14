@@ -149,14 +149,28 @@ async function leerDolaresPor(metodo) {
   // Con respaldo de host, igual que el libro principal. Solo miraba HOSTS[0],
   // así que si ese era justo el bloqueado —la razón misma de tener dos— el
   // Zelle desaparecía entero mientras el resto de tasas se veían sanas.
-  let precios = [];
+  //
+  // Y los dos lados, no el primero que conteste. Se conformaba con seis
+  // precios de donde fuera, y si un lado se caía se quedaba con el otro: en
+  // el Zelle un lado va a 1,06-1,10 y el otro a 1,015-1,03, así que la cifra
+  // se desviaba un par de puntos sin avisar. Ahora al segundo host se le pide
+  // solo el lado que falta.
+  const lados = { SELL: [], BUY: [] };
   for (const url of HOSTS) {
+    const faltan = ['SELL', 'BUY'].filter((tradeType) => !lados[tradeType].length);
+    if (!faltan.length) break;
     const respuestas = await Promise.allSettled(
-      ['SELL', 'BUY'].map((tradeType) => leerPagina(url, tradeType, 1, 'USD', [metodo]))
+      faltan.map((tradeType) =>
+        leerPagina(url, tradeType, 1, 'USD', [metodo]).then((p) => [tradeType, p])
+      )
     );
-    precios = respuestas.filter((r) => r.status === 'fulfilled').flatMap((r) => r.value);
-    if (precios.length >= 6) break;
+    for (const r of respuestas) {
+      if (r.status === 'fulfilled') lados[r.value[0]].push(...r.value[1]);
+    }
   }
+  // Si aun así solo hay un lado, se usa: es lo que se hacía siempre, y una
+  // cifra algo desviada sirve más que una tarjeta vacía
+  const precios = [...lados.SELL, ...lados.BUY];
 
   if (precios.length < 6) return null;
 
@@ -167,16 +181,37 @@ async function leerDolaresPor(metodo) {
   return { ratio: Math.round(ratio * 10000) / 10000, ads: precios.length };
 }
 
+/* Los medios de pago en dólares que se venden en p2p, con su nombre en
+   Binance. La clave es el id que usa la calculadora. */
+const METODOS = { zelle: 'Zelle', facebank: 'Facebank', wally: 'WallyTech', zinli: 'Zinli' };
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   // Un minuto en el borde de Vercel: el p2p se mueve, pero no tanto como
   // para pedirle el libro a Binance en cada visita.
   res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
-  // Zelle y Facebank no dependen del libro, asi que se piden a la vez y no
-  // despues: cada uno por su lado, para que si uno falla no se lleve al otro
-  const zelleEnVuelo = leerDolaresPor('Zelle').catch(() => null);
-  const facebankEnVuelo = leerDolaresPor('Facebank').catch(() => null);
+  // Los dolares de cada medio no dependen del libro, asi que se piden a la
+  // vez que el y no despues, cada uno por su lado para que si uno falla no
+  // se lleve a los demas.
+  //
+  // Pero de dos en dos, no los cuatro juntos. Con los cuatro eran doce
+  // peticiones simultaneas contando las del libro, y Binance dejaba de
+  // contestar a la mitad: medido, seis de ocho se quedaban sin respuesta. De
+  // dos en dos son como mucho ocho a la vez, que es lo que ya aguantaba con
+  // el Zelle y Facebank.
+  const metodosEnVuelo = (async () => {
+    const pares = Object.entries(METODOS);
+    const leidos = [];
+    for (let i = 0; i < pares.length; i += 2) {
+      leidos.push(
+        ...(await Promise.all(
+          pares.slice(i, i + 2).map(async ([id, enBinance]) => [id, await leerDolaresPor(enBinance).catch(() => null)])
+        ))
+      );
+    }
+    return leidos;
+  })();
 
   let lados = { SELL: [], BUY: [] };
   let fallos = [];
@@ -220,8 +255,9 @@ export default async function handler(req, res) {
   const ordenados = [...todos].sort((a, b) => a - b);
   // Ya lanzado arriba, en paralelo con el libro: esperarlo en serie sumaba su
   // latencia entera a la de la lectura principal sin ninguna necesidad.
-  const zelle = await zelleEnVuelo;
-  const facebank = await facebankEnVuelo;
+  const metodos = Object.fromEntries(await metodosEnVuelo);
+  const zelle = metodos.zelle;
+  const facebank = metodos.facebank;
 
   return res.status(200).json({
     // `rate` sigue siendo la media, que es lo que devolvia antes: hay clientes
@@ -245,6 +281,11 @@ export default async function handler(req, res) {
     // Lo mismo para Facebank
     facebank_por_usdt: facebank?.ratio ?? null,
     facebank_ads: facebank?.ads ?? 0,
+    // Todos los medios en dólares con la misma forma, Wally y Zinli
+    // incluidos. Los dos de arriba se quedan por los clientes que ya los leen.
+    metodos: Object.fromEntries(
+      Object.entries(metodos).map(([id, m]) => [id, { por_usdt: m?.ratio ?? null, ads: m?.ads ?? 0 }])
+    ),
     source: 'binance-p2p',
     updated_at: new Date().toISOString(),
   });

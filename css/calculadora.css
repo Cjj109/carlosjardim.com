@@ -1137,6 +1137,18 @@ body {
 
 .calc-tasas .tasa:nth-child(5)::before { background: var(--calc-facebank); }
 
+/* Wally y Zinli, con los dos huecos que quedaban: rosa y naranja. En
+   Navidad y Halloween el naranja ya está tomado, así que Zinli va en azul
+   claro; en Miguel, el rojo de la bandera —el último que faltaba— y un rosa. */
+:root { --calc-wally: #f472b6; --calc-zinli: #fb923c; }
+:root[data-tema="claro"] { --calc-wally: #be185d; --calc-zinli: #c2410c; }
+:root[data-tema="navidad"] { --calc-wally: #f9a8d4; --calc-zinli: #7dd3fc; }
+:root[data-tema="miguel"] { --calc-wally: #ff5a67; --calc-zinli: #ff6fb5; }
+:root[data-tema="halloween"] { --calc-wally: #f472b6; --calc-zinli: #93c5fd; }
+
+.calc-tasas .tasa[data-tasa="wally"]::before { background: var(--calc-wally); }
+.calc-tasas .tasa[data-tasa="zinli"]::before { background: var(--calc-zinli); }
+
 /* ---------- Interruptor de aportar montos ---------- */
 
 .calc-aportar { margin-top: 1.4rem; }
@@ -1965,28 +1977,37 @@ body { overscroll-behavior-y: contain; }
    display pisaba al del atributo: se escondían en el HTML y seguían ahí. */
 [hidden] { display: none !important; }
 
-/* Las tarjetas, según cuántas quedan. Con cuatro sigue el 2x2 de siempre, y
-   por eso no hace falta regla. */
-.calc-tasas[data-cuantas="1"] { grid-template-columns: 1fr; }
-.calc-tasas[data-cuantas="2"] { grid-template-columns: repeat(2, 1fr); }
-.calc-tasas[data-cuantas="3"] { grid-template-columns: repeat(3, 1fr); }
-
-/* Cinco no caben en una fila hasta que hay sitio de verdad; antes, tres
-   arriba y dos abajo, sin la quinta sola y descolgada. Con las cinco a la
-   vista son las cinco del HTML, así que el orden por posición vale. */
-.calc-tasas[data-cuantas="5"] { grid-template-columns: repeat(6, 1fr); }
-.calc-tasas[data-cuantas="5"] .tasa { grid-column: span 2; }
-.calc-tasas[data-cuantas="5"] .tasa:nth-child(n+4) { grid-column: span 3; }
-
-@media (min-width: 900px) {
-  .calc-tasas[data-cuantas="5"] { grid-template-columns: repeat(5, 1fr); }
-  .calc-tasas[data-cuantas="5"] .tasa,
-  .calc-tasas[data-cuantas="5"] .tasa:nth-child(n+4) { grid-column: auto; }
+/* Las tarjetas, en filas lo más parejas posible.
+   Cuántas van en cada fila lo decide repartirTarjetas() en el JavaScript y lo
+   deja en --por-fila; aquí solo se reparte el ancho. Con siete tasas
+   posibles, una regla por cada número de tarjetas ya no se sostenía. Antes
+   de que llegue el JavaScript, dos por fila en el teléfono y cuatro con
+   sitio, que es como estaba siempre. */
+.calc-tasas {
+  display: flex;
+  flex-wrap: wrap;
+  --por-fila-inicial: 2;
 }
 
-/* En el teléfono, tres por fila van justas con cifras de cuatro dígitos */
+.calc-tasas .tasa {
+  flex: 0 0 calc(
+    (100% - (var(--por-fila, var(--por-fila-inicial)) - 1) * 0.6rem) / var(--por-fila, var(--por-fila-inicial))
+  );
+  min-width: 0;
+}
+
+@media (min-width: 560px) {
+  .calc-tasas { --por-fila-inicial: 4; }
+}
+
+/* Tres por fila en el teléfono, o cinco en grande, van justas con cifras de
+   cuatro dígitos */
 @media (max-width: 559px) {
-  .calc-tasas:is([data-cuantas="3"], [data-cuantas="5"]) .tasa-valor { font-size: 0.95rem; }
+  .calc-tasas .tasa[data-por-fila="3"] .tasa-valor { font-size: 0.95rem; }
+}
+
+@media (min-width: 900px) {
+  .calc-tasas .tasa[data-por-fila="5"] .tasa-valor { font-size: 1.15rem; }
 }
 
 /* Las pestañas se reparten el ancho entre las que quedan */

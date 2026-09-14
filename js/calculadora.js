@@ -233,12 +233,21 @@ function temaGuardado() {
 // La venta y no la media: es lo que te pagan de verdad al vender, que es para
 // lo que casi siempre se abre esta calculadora. Quien tenga guardada la vieja
 // 'binance' cae en la primera del grupo, que es justo la venta.
-const POR_DEFECTO = { bcv: 'bcv', paralelo: 'binance-venta', zelle: 'zelle', facebank: 'facebank' };
+const POR_DEFECTO = {
+  bcv: 'bcv',
+  paralelo: 'binance-venta',
+  zelle: 'zelle',
+  facebank: 'facebank',
+  wally: 'wally',
+  zinli: 'zinli',
+};
 const GRUPOS = [
   ['bcv', 'fuentesBcv'],
   ['paralelo', 'fuentesParalelo'],
   ['zelle', 'fuentesZelle'],
   ['facebank', 'fuentesFacebank'],
+  ['wally', 'fuentesWally'],
+  ['zinli', 'fuentesZinli'],
 ];
 
 function fuentesElegidas() {
@@ -275,12 +284,25 @@ function guardarEleccion(grupo, id) {
 let modo = 'divisa';
 let refresco = null;
 
+/* Los dólares que se venden en p2p —Zelle, Facebank, Wally, Zinli— son la
+   misma cuenta con distinto nombre: la venta del USDT entre cuántos de esos
+   dólares cuesta un USDT. Van en una lista para que las filas, las tarjetas
+   y el 60 IQ los traten igual, y el siguiente que llegue sea una línea. */
+const METODOS = [
+  { id: 'zelle', nombre: 'Zelle' },
+  { id: 'facebank', nombre: 'Facebank' },
+  { id: 'wally', nombre: 'Wally' },
+  { id: 'zinli', nombre: 'Zinli' },
+];
+
 const COLORES = {
   usd: 'var(--calc-usd)',
   eur: 'var(--calc-eur)',
   usdt: 'var(--calc-usdt)',
   zelle: 'var(--calc-zelle)',
   facebank: 'var(--calc-facebank)',
+  wally: 'var(--calc-wally)',
+  zinli: 'var(--calc-zinli)',
   bs: 'var(--calc-texto)',
 };
 
@@ -302,7 +324,7 @@ const nombreOficial = (moneda = 'usd') => NOMBRE_OFICIAL[tasas?.[moneda]?.id] ||
    metería una tarjeta y una fila más en cada cuenta sin haberla pedido. */
 
 const VER = 'calc-ver';
-const TODAS = ['usd', 'eur', 'usdt', 'zelle', 'facebank'];
+const TODAS = ['usd', 'eur', 'usdt', ...METODOS.map((m) => m.id)];
 const VER_POR_DEFECTO = ['usd', 'eur', 'usdt', 'zelle'];
 
 // Los modos que se hacen sobre una tasa concreta. Sin ella, la pregunta de
@@ -335,17 +357,37 @@ function guardarVisibles(lista) {
 
 const modoDisponible = (m) => !!MODOS[m] && (!MODO_NECESITA[m] || visibles.includes(MODO_NECESITA[m]));
 
+/* Cuántas tarjetas van en cada fila.
+   Con siete tasas posibles ya no vale una regla por cada número. Se reparten
+   en filas lo más parejas que se pueda, con las más llenas arriba —siete en
+   el teléfono son 3, 2 y 2— y nunca una sola descolgada al final. El máximo
+   por fila depende del ancho: 3 en el teléfono, 4 con sitio, 5 en grande. */
+const ANCHO_MEDIO = window.matchMedia('(min-width: 560px)');
+const ANCHO_GRANDE = window.matchMedia('(min-width: 900px)');
+
+function repartirTarjetas() {
+  const tarjetas = [...document.querySelectorAll('.calc-tasas .tasa')].filter((t) => !t.hidden);
+  const maximo = ANCHO_GRANDE.matches ? 5 : ANCHO_MEDIO.matches ? 4 : 3;
+  const n = tarjetas.length;
+  const filas = Math.max(1, Math.ceil(n / maximo));
+
+  let i = 0;
+  for (let f = 0; f < filas; f++) {
+    // Las primeras filas se llevan el sobrante: 7 entre 3 filas son 3, 2, 2
+    const enEsta = Math.floor(n / filas) + (f < n % filas ? 1 : 0);
+    for (let k = 0; k < enEsta; k++, i++) {
+      tarjetas[i].style.setProperty('--por-fila', enEsta);
+      tarjetas[i].dataset.porFila = String(enEsta);
+    }
+  }
+}
+
 /** Enseña lo elegido y esconde lo demás, en toda la página */
 function aplicarVisibles() {
-  let cuantas = 0;
   document.querySelectorAll('.calc-tasas .tasa').forEach((tarjeta) => {
-    const ver = visibles.includes(tarjeta.dataset.tasa);
-    tarjeta.hidden = !ver;
-    if (ver) cuantas += 1;
+    tarjeta.hidden = !visibles.includes(tarjeta.dataset.tasa);
   });
-  // La rejilla se reparte según cuántas quedan: ver "Qué tasas ver" en el CSS
-  const caja = document.querySelector('.calc-tasas');
-  if (caja) caja.dataset.cuantas = String(cuantas);
+  repartirTarjetas();
 
   document.querySelectorAll('#calcModos .calc-modo').forEach((boton) => {
     boton.hidden = !modoDisponible(boton.dataset.modo);
@@ -667,6 +709,8 @@ function pintarTasas({ falloDeRed = false } = {}) {
     ['tasaUsdt', 'usdt'],
     ['tasaZelle', 'zelle'],
     ['tasaFacebank', 'facebank'],
+    ['tasaWally', 'wally'],
+    ['tasaZinli', 'zinli'],
   ];
 
   for (const [idValor, id] of campos) {
@@ -964,8 +1008,6 @@ function aplicarEleccion() {
   const elegidas = fuentesElegidas();
   const oficial = fuenteActiva('bcv', elegidas);
   const paralelo = fuenteActiva('paralelo', elegidas);
-  const zelle = fuenteActiva('zelle', elegidas);
-  const facebank = fuenteActiva('facebank', elegidas);
 
   if (oficial) {
     // `proxima` viaja con la tasa: sin esto, elegir una fuente a mano borraba
@@ -993,11 +1035,10 @@ function aplicarEleccion() {
   // así que elegirlo ahí reemplazaba la tasa del USDT por la del Zelle: las
   // filas seguían diciendo "USDT p2p" mientras mostraban otra cosa, y salía
   // dos veces el mismo número.
-  if (zelle) {
-    tasas.zelle = { rate: zelle.rate, date: zelle.date, symbol: 'Z', fuente: zelle.nombre };
-  }
-  if (facebank) {
-    tasas.facebank = { rate: facebank.rate, date: facebank.date, symbol: 'F', fuente: facebank.nombre };
+  // Lo mismo con Facebank, Wally y Zinli, cada uno en su grupo
+  for (const { id } of METODOS) {
+    const elegida = fuenteActiva(id, elegidas);
+    if (elegida) tasas[id] = { rate: elegida.rate, date: elegida.date, fuente: elegida.nombre };
   }
 
   pintarTasas();
@@ -1021,14 +1062,17 @@ function filaHTML({ nombre, tasa, valor, unidad, color }) {
 }
 
 /** Las filas que tocan según el modo, o un texto si falta alguna tasa */
-function filasDelModo(monto, { usd, eur, usdt, zelle, facebank }) {
+function filasDelModo(monto, { usd, eur, usdt, ...dolares }) {
+  // Una fila por cada medio en dólares que tenga tasa, en el orden de METODOS
+  const porMetodo = (fila) =>
+    METODOS.filter(({ id }) => dolares[id]).map(({ id, nombre }) => fila(id, nombre, dolares[id]));
+
   if (modo === 'divisa') {
     // El euro va último en los dos modos: es el que menos se usa
     return [
       usd && { nombre: `Dólar ${nombreOficial()}`, tasa: usd, valor: monto * usd, unidad: 'Bs.', color: COLORES.usd },
       usdt && { nombre: 'USDT p2p', tasa: usdt, valor: monto * usdt, unidad: 'Bs.', color: COLORES.usdt },
-      zelle && { nombre: 'Zelle', tasa: zelle, valor: monto * zelle, unidad: 'Bs.', color: COLORES.zelle },
-      facebank && { nombre: 'Facebank', tasa: facebank, valor: monto * facebank, unidad: 'Bs.', color: COLORES.facebank },
+      ...porMetodo((id, nombre, v) => ({ nombre, tasa: v, valor: monto * v, unidad: 'Bs.', color: COLORES[id] })),
       eur && { nombre: `Euro ${nombreOficial('eur')}`, tasa: eur, valor: monto * eur, unidad: 'Bs.', color: COLORES.eur },
     ];
   }
@@ -1037,8 +1081,7 @@ function filasDelModo(monto, { usd, eur, usdt, zelle, facebank }) {
     return [
       usd && { nombre: `En dólares ${nombreOficial()}`, tasa: usd, valor: monto / usd, unidad: '$', color: COLORES.usd },
       usdt && { nombre: 'En USDT', tasa: usdt, valor: monto / usdt, unidad: '₮', color: COLORES.usdt },
-      zelle && { nombre: 'En Zelle', tasa: zelle, valor: monto / zelle, unidad: '$', color: COLORES.zelle },
-      facebank && { nombre: 'En Facebank', tasa: facebank, valor: monto / facebank, unidad: '$', color: COLORES.facebank },
+      ...porMetodo((id, nombre, v) => ({ nombre: `En ${nombre}`, tasa: v, valor: monto / v, unidad: '$', color: COLORES[id] })),
       eur && { nombre: `En euros ${nombreOficial('eur')}`, tasa: eur, valor: monto / eur, unidad: '€', color: COLORES.eur },
     ];
   }
@@ -1049,8 +1092,7 @@ function filasDelModo(monto, { usd, eur, usdt, zelle, facebank }) {
     return [
       { nombre: 'Son en bolívares', tasa: usd, valor: enBs, unidad: 'Bs.', color: COLORES.bs },
       usdt && { nombre: 'USDT a vender', tasa: usdt, valor: enBs / usdt, unidad: '₮', color: COLORES.usdt },
-      zelle && { nombre: 'Zelle a vender', tasa: zelle, valor: enBs / zelle, unidad: '$', color: COLORES.zelle },
-      facebank && { nombre: 'Facebank a vender', tasa: facebank, valor: enBs / facebank, unidad: '$', color: COLORES.facebank },
+      ...porMetodo((id, nombre, v) => ({ nombre: `${nombre} a vender`, tasa: v, valor: enBs / v, unidad: '$', color: COLORES[id] })),
     ];
   }
 
@@ -1059,8 +1101,7 @@ function filasDelModo(monto, { usd, eur, usdt, zelle, facebank }) {
     { nombre: 'Son en bolívares', tasa: usdt, valor: enBs, unidad: 'Bs.', color: COLORES.usdt },
     // Vendiendo el USDT y cobrando por Zelle salen mas dolares, porque el
     // Zelle vale menos: es el mismo dinero contado en otra moneda.
-    zelle && { nombre: 'Equivalen en Zelle', tasa: zelle, valor: enBs / zelle, unidad: '$', color: COLORES.zelle },
-    facebank && { nombre: 'Equivalen en Facebank', tasa: facebank, valor: enBs / facebank, unidad: '$', color: COLORES.facebank },
+    ...porMetodo((id, nombre, v) => ({ nombre: `Equivalen en ${nombre}`, tasa: v, valor: enBs / v, unidad: '$', color: COLORES[id] })),
     usd && { nombre: `Equivalen a ${nombreOficial()}`, tasa: usd, valor: enBs / usd, unidad: '$', color: COLORES.usd },
   ];
 }
@@ -1114,7 +1155,6 @@ function calcular() {
   // precio fijado a esa tasa, sin ella no hay nada que calcular.
   const eur = tasaDe('eur');
   const zelle = tasaDe('zelle');
-  const facebank = tasaDe('facebank');
   // Con que quede UNA tasa hay algo que enseñar. Mirar solo usd y usdt
   // repetía un nivel más abajo el mismo error: una fuente frágil llevándose
   // la pantalla entera por delante.
@@ -1133,8 +1173,7 @@ function calcular() {
     usd: ver('usd', usd),
     eur: ver('eur', eur),
     usdt: ver('usdt', usdt),
-    zelle: ver('zelle', zelle),
-    facebank: ver('facebank', facebank),
+    ...Object.fromEntries(METODOS.map(({ id }) => [id, ver(id, tasaDe(id))])),
   });
 
   const buenas = filas.filter(Boolean).filter((f) => Number.isFinite(f.valor));
@@ -1262,12 +1301,10 @@ async function preguntarAl60IQ(pregunta) {
       body: JSON.stringify({
         pregunta,
         // Solo las cifras: es lo único que necesita para calcular
-        tasas: {
-          usd: tasaDe('usd'),
-          eur: tasaDe('eur'),
-          usdt: tasaDe('usdt'),
-          zelle: tasaDe('zelle'),
-        },
+        tasas: Object.fromEntries(TODAS.map((id) => [id, tasaDe(id)])),
+        // Las que tiene a la vista: "a todas las tasas" son esas. Las demás
+        // van igual en `tasas`, por si las nombra.
+        visibles,
         // Lo que la persona tiene delante. Sin esto, "cuánto son 15000" no
         // tenía respuesta posible —15000 de qué— y la respuesta estaba en la
         // pantalla: el modo abierto dice la moneda.
@@ -1466,6 +1503,9 @@ function programarRefresco() {
 document.addEventListener('DOMContentLoaded', () => {
   aplicarTema(temaGuardado());
   aplicarVisibles();
+  // Al girar el teléfono o cambiar el tamaño de la ventana, las filas cambian
+  ANCHO_MEDIO.addEventListener('change', repartirTarjetas);
+  ANCHO_GRANDE.addEventListener('change', repartirTarjetas);
   pintarRapidos(modo);
   cargarMontosGlobales();
   cargarTasas({ primera: true });

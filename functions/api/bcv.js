@@ -70,6 +70,34 @@ const CACHE_MAX_AGE = 300;
 // alli 82 anuncios.
 const PUENTE_P2P = 'https://tasa-p2p.vercel.app/api/p2p';
 
+/* Los dólares que se venden en p2p: Zelle, Facebank, Wally y Zinli. Todos
+   salen igual —la venta del USDT entre cuántos de esos dólares cuesta un
+   USDT—, así que van en una lista y no uno por uno. */
+const METODOS = ['zelle', 'facebank', 'wally', 'zinli'];
+const SIMBOLO_METODO = { zelle: 'Z', facebank: 'F', wally: 'W', zinli: 'Zi' };
+
+/** La tasa de cada medio en dólares, o null si el libro no la trae */
+function tasasDeMetodos(binance) {
+  return Object.fromEntries(
+    METODOS.map((id) => {
+      const m = binance?.metodos?.[id];
+      return [
+        id,
+        m?.porUsdt
+          ? {
+              rate: Math.round((binance.rate / m.porUsdt) * 100) / 100,
+              date: binance.date,
+              symbol: SIMBOLO_METODO[id],
+              live: true,
+              por_usdt: m.porUsdt,
+              anuncios: m.anuncios,
+            }
+          : null,
+      ];
+    })
+  );
+}
+
 // El mismo BCV, leído desde Vercel completando a mano la cadena de
 // certificados. Va de RESPALDO, no de principal, y esto está medido: leerlo
 // desde aquí tarda ~555 ms haciendo además otras cuatro consultas en
@@ -150,12 +178,17 @@ async function leerUsdtBinance() {
     anuncios: datos.ads,
     anunciosVenta: datos.ads_venta ?? null,
     anunciosCompra: datos.ads_compra ?? null,
-    // Cuantos dolares Zelle cuesta un USDT: de ahi sale la tasa del Zelle
-    zellePorUsdt: datos.zelle_por_usdt || null,
-    zelleAnuncios: datos.zelle_ads || 0,
-    // Lo mismo para Facebank, que se vende en p2p igual que el Zelle
-    facebankPorUsdt: datos.facebank_por_usdt || null,
-    facebankAnuncios: datos.facebank_ads || 0,
+    // Cuántos dólares de cada medio cuesta un USDT: de ahí sale su tasa. Del
+    // campo `metodos` del puente, o de los sueltos del puente viejo.
+    metodos: Object.fromEntries(
+      METODOS.map((id) => [
+        id,
+        {
+          porUsdt: datos.metodos?.[id]?.por_usdt ?? datos[`${id}_por_usdt`] ?? null,
+          anuncios: datos.metodos?.[id]?.ads ?? datos[`${id}_ads`] ?? 0,
+        },
+      ])
+    ),
   };
 }
 
@@ -427,29 +460,10 @@ export async function onRequestGet(context) {
             proxima: usdBcv.proxima,
           }
         : null,
-      // El Zelle vale menos que el USDT porque quien lo recibe asume mas
-      // riesgo. El sobreprecio se lee del libro de Binance, no se inventa.
-      zelle: binanceValido && binance.zellePorUsdt
-        ? {
-            rate: Math.round((binance.rate / binance.zellePorUsdt) * 100) / 100,
-            date: binance.date,
-            symbol: 'Z',
-            live: true,
-            por_usdt: binance.zellePorUsdt,
-            anuncios: binance.zelleAnuncios,
-          }
-        : null,
-      // Facebank, con la misma cuenta que el Zelle y del mismo libro
-      facebank: binanceValido && binance.facebankPorUsdt
-        ? {
-            rate: Math.round((binance.rate / binance.facebankPorUsdt) * 100) / 100,
-            date: binance.date,
-            symbol: 'F',
-            live: true,
-            por_usdt: binance.facebankPorUsdt,
-            anuncios: binance.facebankAnuncios,
-          }
-        : null,
+      // Zelle, Facebank, Wally y Zinli valen menos que el USDT porque quien
+      // los recibe asume más riesgo. El sobreprecio de cada uno se lee del
+      // libro de Binance, no se inventa.
+      ...tasasDeMetodos(binanceValido ? binance : null),
       usdt: binanceValido
         ? {
             rate: binance.rate,

@@ -44,6 +44,13 @@ const MAX_TURNOS = 6;
 // existe para acotar un disparate, no para apretar.
 const MAX_RESPUESTA = 700;
 
+/* Las tasas que conoce, en una sola lista.
+   Facebank, Wally y Zinli entraron los últimos: bancos y billeteras en
+   dólares que se venden en p2p, igual que el Zelle. Estaban escritas a mano
+   en cuatro sitios del esquema, y añadir una tasa a tres de los cuatro deja
+   al modelo eligiendo una que la app no sabe resolver. */
+const TASAS = ['usd', 'eur', 'usdt', 'zelle', 'facebank', 'wally', 'zinli'];
+
 // Es un endpoint público que gasta dinero de verdad, así que se pone freno.
 // El contador vive en la caché del centro de datos: no es exacto entre
 // regiones, pero corta en seco al que se sienta a darle en bucle.
@@ -78,7 +85,7 @@ aplicación. Tu trabajo es rellenar la decisión:
 
 - monto: la cantidad que dice la persona, como número a secas (15000, no
   "15.000" ni "15 mil"). Si dice "15000 mil" quiere decir 15000.
-- tasa: cuál de las cuatro se usa.
+- tasa: cuál de las tasas se usa.
 - operacion: "multiplicar" si el monto está en divisas y se quiere en
   bolívares; "dividir" si el monto está en bolívares y se quieren divisas.
 - unidad_entrada y unidad_salida: los símbolos ($, €, ₮, Bs.).
@@ -93,6 +100,9 @@ dólares" es venderlos en el mercado p2p, y eso es la tasa usdt.
 - Solo usa usd cuando la pregunta hable de algo oficial: un precio "a tasa
   BCV", una factura, un trámite, o si nombra el BCV.
 - Si dice Zelle → zelle. Si dice euros → eur.
+- Si dice Facebank → facebank. Si dice Wally → wally. Si dice Zinli → zinli.
+  Son dólares en esas cuentas que se venden en p2p, como el Zelle: "vendo 100
+  de Zinli" es zinli, no usdt.
 
 - Si pide "a todas", "en todas las tasas", "comparar" o algo así → tasa
   "todas". La app las calcula todas y las pone en lista.
@@ -184,7 +194,7 @@ tipo:
 - "calculo" cuando puedas rellenar la decisión. Es lo normal; agota esta vía
   antes que ninguna otra.
 - "falta_tasa" SOLO si la tasa que hace falta aparece arriba como "sin dato".
-  Ponla en tasa_que_falta. Si están las cuatro, esto no es una salida: no
+  Ponla en tasa_que_falta. Si están todas, esto no es una salida: no
   digas que falta una tasa cuando las tienes delante, porque es mentira y se
   nota. Si dudas de cuál usar, elige con las reglas de arriba.
 - "fuera_de_tema" si la pregunta no va de tasas, cambio ni dinero.
@@ -219,24 +229,24 @@ const ESQUEMA = {
              quince mil dólares y salían doce millones. El veredicto acertaba
              de casualidad y las cifras eran un disparate. */
           moneda: { type: 'string', enum: ['divisa', 'bs'] },
-          tasa: { type: 'string', enum: ['usd', 'eur', 'usdt', 'zelle'] },
+          tasa: { type: 'string', enum: TASAS },
           etiqueta: { type: 'string' },
         },
       },
     },
     // Cual falta, en vez de un "falta la tasa" a secas. Si resulta que esa si
     // esta, el servidor lo detecta y no deja pasar la excusa.
-    tasa_que_falta: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', null] },
+    tasa_que_falta: { type: ['string', 'null'], enum: [...TASAS, null] },
     pulla: { type: 'string' },
     monto: { type: ['number', 'null'] },
     // "todas" es una respuesta legitima y antes no habia forma de decirla:
     // preguntar "¿a cuanto sale a todas las tasas?" es de lo mas normal.
-    tasa: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', 'todas', null] },
+    tasa: { type: ['string', 'null'], enum: [...TASAS, 'todas', null] },
     // El segundo paso. "130 dolares a BCV, cuantos USDT vendo" son DOS
     // cuentas encadenadas y el esquema solo sabia expresar una: contestaba el
     // primer paso —los bolivares— y se quedaba ahi, dejando sin responder
     // justo lo que se preguntaba.
-    tasa_destino: { type: ['string', 'null'], enum: ['usd', 'eur', 'usdt', 'zelle', 'todas', null] },
+    tasa_destino: { type: ['string', 'null'], enum: [...TASAS, 'todas', null] },
     operacion: { type: ['string', 'null'], enum: ['multiplicar', 'dividir', null] },
     /* Una observación duradera sobre quien pregunta, o null.
        No es un resumen de la charla: es lo que seguirá siendo verdad dentro de
@@ -254,6 +264,9 @@ const NOMBRE_TASA = {
   eur: 'euro BCV',
   usdt: 'USDT p2p',
   zelle: 'Zelle',
+  facebank: 'Facebank',
+  wally: 'Wally',
+  zinli: 'Zinli',
 };
 
 // "USDT" y no "₮": el símbolo de Tether no lo reconoce nadie de un vistazo,
@@ -265,7 +278,16 @@ const NOMBRE_TASA = {
 // pero cuando la respuesta es una sola cifra grande no hay etiqueta ninguna
 // —"441,86 $" a secas— y son dos tasas con casi cuarenta bolívares de
 // diferencia entre ellas.
-const SIMBOLO = { usd: '$', eur: '€', usdt: 'USDT', zelle: 'Zelle' };
+// Facebank, Wally y Zinli, por lo mismo que el Zelle: también son dólares.
+const SIMBOLO = {
+  usd: '$',
+  eur: '€',
+  usdt: 'USDT',
+  zelle: 'Zelle',
+  facebank: 'Facebank',
+  wally: 'Wally',
+  zinli: 'Zinli',
+};
 
 const cifra = (n, dec = 2) =>
   new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: dec }).format(n);
@@ -302,9 +324,16 @@ function lineaResultado(monto, tasa, valor, operacion) {
  * decide el modelo es QUÉ cuenta hacer, y la cuenta la hace esto. Poder
  * comprobarla a solas es lo que permitió cazar que una comparación con un
  * precio en bolívares salía por doce millones.
+ *
+ * @param visibles  las tasas que la persona tiene a la vista en la
+ *   calculadora. "A todas las tasas" son esas y no otras: quien escondió el
+ *   euro no lo quiere en la lista, y quien encendió Facebank sí. Una tasa
+ *   escondida se sigue calculando si se nombra —esconderla es cosa de la
+ *   pantalla, no una prohibición—, por eso el filtro va solo en las listas.
  */
-export function resolver(decision, tasas) {
+export function resolver(decision, tasas, visibles = TASAS) {
   const { tipo, monto, tasa, operacion } = decision;
+  const seVe = (id) => visibles.includes(id);
 
   if (tipo === 'fuera_de_tema') return { texto: decision.pulla };
 
@@ -403,7 +432,7 @@ export function resolver(decision, tasas) {
     // cuadrado. Es el único sitio del archivo que no la miraba.
     const enBs = operacion === 'dividir' ? monto : monto * origen;
     const destinos = decision.tasa_destino === 'todas'
-      ? ['usdt', 'zelle', 'usd', 'eur'].filter((id) => id !== tasa && hay(tasas, id))
+      ? ['usdt', 'zelle', 'facebank', 'wally', 'zinli', 'usd', 'eur'].filter((id) => id !== tasa && seVe(id) && hay(tasas, id))
       : [decision.tasa_destino].filter((id) => hay(tasas, id));
 
     if (!destinos.length) {
@@ -439,7 +468,8 @@ export function resolver(decision, tasas) {
 
   // Todas las tasas a la vez, que es una pregunta de lo más normal
   if (tasa === 'todas') {
-    const lineas = ['usd', 'usdt', 'zelle', 'eur']
+    const lineas = ['usd', 'usdt', 'zelle', 'facebank', 'wally', 'zinli', 'eur']
+      .filter(seVe)
       .map((id) => [id, hay(tasas, id)])
       .filter(([, v]) => v)
       .map(([id, v]) => {
@@ -580,6 +610,9 @@ function contextoDeTasas(tasas) {
     eur: 'Euro BCV (oficial)',
     usdt: 'USDT p2p',
     zelle: 'Zelle',
+    facebank: 'Facebank',
+    wally: 'Wally',
+    zinli: 'Zinli',
   };
 
   const lineas = Object.entries(nombres)
@@ -831,7 +864,14 @@ export async function onRequestPost(context) {
       return json({ error: 'El 60 IQ se enredó. Intenta de nuevo.' }, 502);
     }
 
-    const resuelto = resolver(decision, cuerpo?.tasas);
+    // Las que tiene a la vista. Viene del cliente, así que solo se aceptan
+    // ids conocidos; y si no llega nada útil —una app instalada de antes de
+    // esto—, todas, que es como funcionaba.
+    const visibles = Array.isArray(cuerpo?.visibles) && cuerpo.visibles.some((id) => TASAS.includes(id))
+      ? cuerpo.visibles.filter((id) => TASAS.includes(id))
+      : TASAS;
+
+    const resuelto = resolver(decision, cuerpo?.tasas, visibles);
 
     /* Se apunta después de contestar y sin esperar a que termine: guardar la
        memoria no puede retrasar la respuesta, y si falla tampoco puede

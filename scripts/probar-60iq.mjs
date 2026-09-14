@@ -68,5 +68,25 @@ console.log('\nDOS PRECIOS LOS DOS EN BOLÍVARES');
   ok('gana el más barato, sin convertir nada', r.partes.operacion, 'Te ahorras 1.000,00 Bs.');
 }
 
+console.log('\nLAS TASAS QUE SE VEN, Y FACEBANK, WALLY Y ZINLI');
+{
+  const t = { ...tasas, facebank: 894, wally: 900, zinli: 910 };
+  const nombres = (r) => r.partes.lineas.map((l) => l.detalle.split(' a ')[0]);
+  const todas = { tipo: 'calculo', pulla: 'x', monto: 10, tasa: 'todas', operacion: 'multiplicar' };
+
+  ok('"a todas" son solo las que tiene a la vista', nombres(resolver(todas, t, ['usd', 'usdt', 'facebank'])), ['dólar BCV', 'USDT p2p', 'Facebank']);
+  ok('sin lista (una app instalada vieja), todas', resolver(todas, t).partes.lineas.length, 7);
+
+  const zinli = resolver({ tipo: 'calculo', pulla: 'x', monto: 100, tasa: 'zinli', operacion: 'multiplicar' }, t, ['usd']);
+  ok('una escondida se calcula igual si la nombra', zinli.partes.resultado, '91.000,00 Bs.');
+  ok('  y dice con cuál', zinli.partes.operacion.endsWith('· Zinli'), true);
+
+  const pasos = resolver({ tipo: 'calculo', pulla: 'x', monto: 20, tasa: 'usd', tasa_destino: 'todas', operacion: 'multiplicar' }, t, ['usd', 'usdt', 'wally']);
+  ok('dos pasos "a todas": solo las visibles', nombres(pasos), ['USDT p2p', 'Wally']);
+
+  const wally = resolver({ tipo: 'calculo', pulla: 'x', monto: 18000, tasa: 'wally', operacion: 'dividir' }, t);
+  ok('bolívares a Wally, con su nombre y no con $', wally.partes.resultado, '20,00 Wally');
+}
+
 console.log(fallos ? `\n${fallos} FALLIDAS\n` : '\nTodo correcto\n');
 process.exit(fallos ? 1 : 0);

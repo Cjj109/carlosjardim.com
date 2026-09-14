@@ -27,6 +27,12 @@ buena; lo que está en Vercel es el resultado de desplegarla.
       "zelle_ads": 40,
       "facebank_por_usdt": 1.0612, // lo mismo, con Facebank
       "facebank_ads": 40,
+      "metodos": {           // todos los medios en dólares, con la misma forma
+        "zelle":    { "por_usdt": 1.0346, "ads": 40 },
+        "facebank": { "por_usdt": 1.0612, "ads": 40 },
+        "wally":    { "por_usdt": 1.0500, "ads": 40 },
+        "zinli":    { "por_usdt": 1.0400, "ads": 40 }
+      },
       "source": "binance-p2p",
       "updated_at": "2026-09-06T11:00:28.043Z"
     }

@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=65">
-  <link rel="stylesheet" href="/css/calculadora.css?r=65">
+  <link rel="stylesheet" href="/css/variables.css?r=66">
+  <link rel="stylesheet" href="/css/calculadora.css?r=66">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -146,6 +146,14 @@
       <span class="tasa-nombre">Facebank</span>
       <span class="tasa-valor" id="tasaFacebank">—</span>
     </article>
+    <article class="tasa" data-tasa="wally" hidden>
+      <span class="tasa-nombre">Wally</span>
+      <span class="tasa-valor" id="tasaWally">—</span>
+    </article>
+    <article class="tasa" data-tasa="zinli" hidden>
+      <span class="tasa-nombre">Zinli</span>
+      <span class="tasa-valor" id="tasaZinli">—</span>
+    </article>
   </section>
 
   <!-- Qué se quiere calcular -->
@@ -199,7 +207,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v65</span>
+    <span class="calc-version" title="Versión de la app instalada">v66</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -321,6 +329,8 @@
         <label class="ver" style="--color-ver: var(--calc-usdt)"><input type="checkbox" value="usdt"><span>USDT</span></label>
         <label class="ver" style="--color-ver: var(--calc-zelle)"><input type="checkbox" value="zelle"><span>Zelle</span></label>
         <label class="ver" style="--color-ver: var(--calc-facebank)"><input type="checkbox" value="facebank"><span>Facebank</span></label>
+        <label class="ver" style="--color-ver: var(--calc-wally)"><input type="checkbox" value="wally"><span>Wally</span></label>
+        <label class="ver" style="--color-ver: var(--calc-zinli)"><input type="checkbox" value="zinli"><span>Zinli</span></label>
       </div>
       <p class="calc-ver-nota">Sin el dólar BCV se va la pestaña Precio BCV, y sin el USDT la suya.</p>
     </div>
@@ -353,6 +363,16 @@
       <div class="calc-fuentes" id="fuentesFacebank" role="radiogroup" aria-label="Fuente de la tasa Facebank"></div>
     </div>
 
+    <div class="calc-grupo" data-tasas="wally">
+      <h3>Tasa Wally</h3>
+      <div class="calc-fuentes" id="fuentesWally" role="radiogroup" aria-label="Fuente de la tasa Wally"></div>
+    </div>
+
+    <div class="calc-grupo" data-tasas="zinli">
+      <h3>Tasa Zinli</h3>
+      <div class="calc-fuentes" id="fuentesZinli" role="radiogroup" aria-label="Fuente de la tasa Zinli"></div>
+    </div>
+
     <button type="button" id="calcRestablecer" class="calc-restablecer">Volver a las de siempre</button>
 
     <!-- Los botones de atajo aprenden de lo que se usa. Lo que sale de aquí
@@ -371,7 +391,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=65" defer></script>
+<script src="/js/calculadora.js?r=66" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

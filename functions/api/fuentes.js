@@ -27,6 +27,14 @@ const BCV_URL = 'https://www.bcv.org.ve/';
 
 const CACHE = 120;
 
+// Los dólares que se venden en p2p, cada uno con su ficha y su grupo
+const METODOS = [
+  ['zelle', 'Zelle'],
+  ['facebank', 'Facebank'],
+  ['wally', 'Wally'],
+  ['zinli', 'Zinli'],
+];
+
 // Mas generoso que el de /api/bcv (6 s): este endpoint solo se pide al abrir
 // el panel, y ahi esperar medio segundo mas es preferible a informar de que
 // una fuente esta caida cuando lo unico que pasaba es que iba lenta. El panel
@@ -361,38 +369,29 @@ export async function onRequestGet(context) {
       date: soloFecha(cotizave?.binance?.updated_at),
       motivo: motivoCotizave ?? sinEsaCifra(cotizave),
     },
-    {
-      // Grupo propio y no 'paralelo': es una tasa distinta, no otra medición
-      // de la misma. Puesta entre las paralelas, elegirla reemplazaba la del
-      // USDT y la calculadora mostraba el mismo número dos veces.
-      id: 'zelle',
-      grupo: 'zelle',
-      nombre: 'Zelle',
-      detalle: puente?.zelle_por_usdt
-        ? `Un USDT cuesta ${puente.zelle_por_usdt} en Zelle, de ${puente.zelle_ads} anuncios.`
-        : 'Calculado desde el libro de Binance.',
-      // Del lado de venta, no de la media: es la misma razón que en el USDT
-      // —lo que importa es a cuánto cobras, no el punto medio del spread.
-      rate: (puente?.venta ?? puente?.rate) && puente?.zelle_por_usdt
-        ? Math.round(((puente.venta ?? puente.rate) / puente.zelle_por_usdt) * 100) / 100
-        : null,
-      date: soloFecha(puente?.updated_at),
-      motivo: motivoPuente ?? sinEsaCifra(puente),
-    },
-    {
-      // Grupo propio por lo mismo que el Zelle: es otra tasa, no otra medición
-      id: 'facebank',
-      grupo: 'facebank',
-      nombre: 'Facebank',
-      detalle: puente?.facebank_por_usdt
-        ? `Un USDT cuesta ${puente.facebank_por_usdt} en Facebank, de ${puente.facebank_ads} anuncios.`
-        : 'Calculado desde el libro de Binance.',
-      rate: (puente?.venta ?? puente?.rate) && puente?.facebank_por_usdt
-        ? Math.round(((puente.venta ?? puente.rate) / puente.facebank_por_usdt) * 100) / 100
-        : null,
-      date: soloFecha(puente?.updated_at),
-      motivo: motivoPuente ?? sinEsaCifra(puente),
-    },
+    /* Zelle, Facebank, Wally y Zinli: cada uno en su grupo y no entre las
+       paralelas, porque son tasas distintas y no otras mediciones de la
+       misma. Puesto el Zelle entre las paralelas, elegirlo reemplazaba la del
+       USDT y la calculadora mostraba el mismo número dos veces. */
+    ...METODOS.map(([id, nombre]) => {
+      const porUsdt = puente?.metodos?.[id]?.por_usdt ?? puente?.[`${id}_por_usdt`] ?? null;
+      const anuncios = puente?.metodos?.[id]?.ads ?? puente?.[`${id}_ads`] ?? 0;
+      return {
+        id,
+        grupo: id,
+        nombre,
+        detalle: porUsdt
+          ? `Un USDT cuesta ${porUsdt} en ${nombre}, de ${anuncios} anuncios.`
+          : 'Calculado desde el libro de Binance.',
+        // Del lado de venta, no de la media: es la misma razón que en el USDT
+        // —lo que importa es a cuánto cobras, no el punto medio del spread.
+        rate: (puente?.venta ?? puente?.rate) && porUsdt
+          ? Math.round(((puente.venta ?? puente.rate) / porUsdt) * 100) / 100
+          : null,
+        date: soloFecha(puente?.updated_at),
+        motivo: motivoPuente ?? sinEsaCifra(puente),
+      };
+    }),
     {
       id: 'dolarapi-paralelo',
       grupo: 'paralelo',
