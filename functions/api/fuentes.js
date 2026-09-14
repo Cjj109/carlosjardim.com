@@ -380,6 +380,20 @@ export async function onRequestGet(context) {
       motivo: motivoPuente ?? sinEsaCifra(puente),
     },
     {
+      // Grupo propio por lo mismo que el Zelle: es otra tasa, no otra medición
+      id: 'facebank',
+      grupo: 'facebank',
+      nombre: 'Facebank',
+      detalle: puente?.facebank_por_usdt
+        ? `Un USDT cuesta ${puente.facebank_por_usdt} en Facebank, de ${puente.facebank_ads} anuncios.`
+        : 'Calculado desde el libro de Binance.',
+      rate: (puente?.venta ?? puente?.rate) && puente?.facebank_por_usdt
+        ? Math.round(((puente.venta ?? puente.rate) / puente.facebank_por_usdt) * 100) / 100
+        : null,
+      date: soloFecha(puente?.updated_at),
+      motivo: motivoPuente ?? sinEsaCifra(puente),
+    },
+    {
       id: 'dolarapi-paralelo',
       grupo: 'paralelo',
       nombre: 'DolarAPI · mercado',

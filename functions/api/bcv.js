@@ -153,6 +153,9 @@ async function leerUsdtBinance() {
     // Cuantos dolares Zelle cuesta un USDT: de ahi sale la tasa del Zelle
     zellePorUsdt: datos.zelle_por_usdt || null,
     zelleAnuncios: datos.zelle_ads || 0,
+    // Lo mismo para Facebank, que se vende en p2p igual que el Zelle
+    facebankPorUsdt: datos.facebank_por_usdt || null,
+    facebankAnuncios: datos.facebank_ads || 0,
   };
 }
 
@@ -434,6 +437,17 @@ export async function onRequestGet(context) {
             live: true,
             por_usdt: binance.zellePorUsdt,
             anuncios: binance.zelleAnuncios,
+          }
+        : null,
+      // Facebank, con la misma cuenta que el Zelle y del mismo libro
+      facebank: binanceValido && binance.facebankPorUsdt
+        ? {
+            rate: Math.round((binance.rate / binance.facebankPorUsdt) * 100) / 100,
+            date: binance.date,
+            symbol: 'F',
+            live: true,
+            por_usdt: binance.facebankPorUsdt,
+            anuncios: binance.facebankAnuncios,
           }
         : null,
       usdt: binanceValido

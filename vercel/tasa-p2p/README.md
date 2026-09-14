@@ -25,6 +25,8 @@ buena; lo que está en Vercel es el resultado de desplegarla.
       "max": 1006.69,
       "zelle_por_usdt": 1.0346,
       "zelle_ads": 40,
+      "facebank_por_usdt": 1.0612, // lo mismo, con Facebank
+      "facebank_ads": 40,
       "source": "binance-p2p",
       "updated_at": "2026-09-06T11:00:28.043Z"
     }

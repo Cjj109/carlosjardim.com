@@ -131,25 +131,28 @@ async function leerLibro(url) {
 }
 
 /**
- * Cuantos dolares Zelle cuesta un USDT.
+ * Cuantos dolares de un medio de pago —Zelle, Facebank— cuesta un USDT.
  *
- * El Zelle no se cambia uno a uno con el USDT: quien recibe Zelle asume mas
- * riesgo y cobra por ello, asi que hace falta algo mas de un dolar Zelle para
- * comprar un USDT. Ese sobreprecio se lee del mismo libro de Binance, en el
- * mercado de USDT contra dolares con Zelle como metodo de pago.
+ * Esos dolares no se cambian uno a uno con el USDT: quien los recibe asume
+ * mas riesgo y cobra por ello, asi que hace falta algo mas de un dolar Zelle
+ * para comprar un USDT. Ese sobreprecio se lee del mismo libro de Binance, en
+ * el mercado de USDT contra dolares con ese metodo de pago. Facebank se mide
+ * igual y por la misma razon: es otro banco en dolares que se vende en p2p.
  *
  * Aqui si se mezclan los dos lados a proposito: es un factor de correccion
  * pequeño, no un precio de ejecucion, y la muestra por lado es demasiado
  * corta para partirla en dos.
+ *
+ * @param metodo  el identificador de Binance: 'Zelle', 'Facebank'
  */
-async function leerZelle() {
+async function leerDolaresPor(metodo) {
   // Con respaldo de host, igual que el libro principal. Solo miraba HOSTS[0],
   // así que si ese era justo el bloqueado —la razón misma de tener dos— el
   // Zelle desaparecía entero mientras el resto de tasas se veían sanas.
   let precios = [];
   for (const url of HOSTS) {
     const respuestas = await Promise.allSettled(
-      ['SELL', 'BUY'].map((tradeType) => leerPagina(url, tradeType, 1, 'USD', ['Zelle']))
+      ['SELL', 'BUY'].map((tradeType) => leerPagina(url, tradeType, 1, 'USD', [metodo]))
     );
     precios = respuestas.filter((r) => r.status === 'fulfilled').flatMap((r) => r.value);
     if (precios.length >= 6) break;
@@ -170,8 +173,10 @@ export default async function handler(req, res) {
   // para pedirle el libro a Binance en cada visita.
   res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
-  // El Zelle no depende del libro, asi que se pide a la vez y no despues
-  const zelleEnVuelo = leerZelle().catch(() => null);
+  // Zelle y Facebank no dependen del libro, asi que se piden a la vez y no
+  // despues: cada uno por su lado, para que si uno falla no se lleve al otro
+  const zelleEnVuelo = leerDolaresPor('Zelle').catch(() => null);
+  const facebankEnVuelo = leerDolaresPor('Facebank').catch(() => null);
 
   let lados = { SELL: [], BUY: [] };
   let fallos = [];
@@ -216,6 +221,7 @@ export default async function handler(req, res) {
   // Ya lanzado arriba, en paralelo con el libro: esperarlo en serie sumaba su
   // latencia entera a la de la lectura principal sin ninguna necesidad.
   const zelle = await zelleEnVuelo;
+  const facebank = await facebankEnVuelo;
 
   return res.status(200).json({
     // `rate` sigue siendo la media, que es lo que devolvia antes: hay clientes
@@ -236,6 +242,9 @@ export default async function handler(req, res) {
     // Cuantos dolares Zelle vale un USDT: sirve para sacar la tasa del Zelle
     zelle_por_usdt: zelle?.ratio ?? null,
     zelle_ads: zelle?.ads ?? 0,
+    // Lo mismo para Facebank
+    facebank_por_usdt: facebank?.ratio ?? null,
+    facebank_ads: facebank?.ads ?? 0,
     source: 'binance-p2p',
     updated_at: new Date().toISOString(),
   });

@@ -45,8 +45,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=64">
-  <link rel="stylesheet" href="/css/calculadora.css?r=64">
+  <link rel="stylesheet" href="/css/variables.css?r=65">
+  <link rel="stylesheet" href="/css/calculadora.css?r=65">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -124,21 +124,27 @@
 
   <!-- Tasas del momento -->
   <section class="calc-tasas" aria-label="Tasas actuales">
-    <article class="tasa">
+    <!-- data-tasa dice cuál es cada una: quien elige no verla la esconde, y
+         el orden en el HTML es el orden en pantalla -->
+    <article class="tasa" data-tasa="usd">
       <span class="tasa-nombre" id="nombreUsd">Dólar BCV</span>
       <span class="tasa-valor" id="tasaUsd">—</span>
     </article>
-    <article class="tasa">
+    <article class="tasa" data-tasa="eur">
       <span class="tasa-nombre" id="nombreEur">Euro BCV</span>
       <span class="tasa-valor" id="tasaEur">—</span>
     </article>
-    <article class="tasa tasa-viva">
+    <article class="tasa tasa-viva" data-tasa="usdt">
       <span class="tasa-nombre">USDT p2p</span>
       <span class="tasa-valor" id="tasaUsdt">—</span>
     </article>
-    <article class="tasa tasa-zelle">
+    <article class="tasa tasa-zelle" data-tasa="zelle">
       <span class="tasa-nombre">Zelle</span>
       <span class="tasa-valor" id="tasaZelle">—</span>
+    </article>
+    <article class="tasa tasa-facebank" data-tasa="facebank" hidden>
+      <span class="tasa-nombre">Facebank</span>
+      <span class="tasa-valor" id="tasaFacebank">—</span>
     </article>
   </section>
 
@@ -193,7 +199,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v64</span>
+    <span class="calc-version" title="Versión de la app instalada">v65</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -205,7 +211,7 @@
         Historial
       </button>
       <button type="button" id="calcAjustes" class="calc-refrescar" aria-expanded="false" aria-controls="calcPanelAjustes">
-        Fuentes
+        Ajustes
       </button>
       <button type="button" id="calcRefrescar" class="calc-refrescar">Actualizar</button>
     </div>
@@ -300,16 +306,36 @@
   <!-- Elegir de dónde sale cada tasa -->
   <section class="calc-ajustes" id="calcPanelAjustes" hidden>
     <div class="calc-ajustes-cabecera">
+      <h2>Ajustes</h2>
+      <p>Se guardan en este dispositivo, para ti.</p>
+    </div>
+
+    <!-- Cada quien ve las que usa. Quien no toca euros no tiene por qué verlos
+         en cada cuenta, y quien cobra por Facebank la quiere al lado de las
+         demás. La página entera se adapta: tarjetas, filas y pestañas. -->
+    <div class="calc-grupo">
+      <h3>Qué tasas ver</h3>
+      <div class="calc-ver" id="calcVer" role="group" aria-label="Qué tasas ver">
+        <label class="ver" style="--color-ver: var(--calc-usd)"><input type="checkbox" value="usd"><span>Dólar BCV</span></label>
+        <label class="ver" style="--color-ver: var(--calc-eur)"><input type="checkbox" value="eur"><span>Euro BCV</span></label>
+        <label class="ver" style="--color-ver: var(--calc-usdt)"><input type="checkbox" value="usdt"><span>USDT</span></label>
+        <label class="ver" style="--color-ver: var(--calc-zelle)"><input type="checkbox" value="zelle"><span>Zelle</span></label>
+        <label class="ver" style="--color-ver: var(--calc-facebank)"><input type="checkbox" value="facebank"><span>Facebank</span></label>
+      </div>
+      <p class="calc-ver-nota">Sin el dólar BCV se va la pestaña Precio BCV, y sin el USDT la suya.</p>
+    </div>
+
+    <div class="calc-ajustes-seccion">
       <h2>De dónde sale cada tasa</h2>
       <p>Así están ahora mismo. Toca una para usarla.</p>
     </div>
 
-    <div class="calc-grupo">
+    <div class="calc-grupo" data-tasas="usd eur">
       <h3>Tasa oficial</h3>
       <div class="calc-fuentes" id="fuentesBcv" role="radiogroup" aria-label="Fuente de la tasa oficial"></div>
     </div>
 
-    <div class="calc-grupo">
+    <div class="calc-grupo" data-tasas="usdt">
       <h3>Tasa del USDT</h3>
       <div class="calc-fuentes" id="fuentesParalelo" role="radiogroup" aria-label="Fuente de la tasa del USDT"></div>
     </div>
@@ -317,9 +343,14 @@
     <!-- El Zelle tiene grupo propio. Estaba entre las paralelas, y elegirlo
          allí sustituía la tasa del USDT por la suya: las filas seguían
          diciendo "USDT p2p" con el número del Zelle debajo. -->
-    <div class="calc-grupo">
+    <div class="calc-grupo" data-tasas="zelle">
       <h3>Tasa Zelle</h3>
       <div class="calc-fuentes" id="fuentesZelle" role="radiogroup" aria-label="Fuente de la tasa Zelle"></div>
+    </div>
+
+    <div class="calc-grupo" data-tasas="facebank">
+      <h3>Tasa Facebank</h3>
+      <div class="calc-fuentes" id="fuentesFacebank" role="radiogroup" aria-label="Fuente de la tasa Facebank"></div>
     </div>
 
     <button type="button" id="calcRestablecer" class="calc-restablecer">Volver a las de siempre</button>
@@ -340,7 +371,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=64" defer></script>
+<script src="/js/calculadora.js?r=65" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

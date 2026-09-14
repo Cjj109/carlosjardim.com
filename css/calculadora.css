@@ -1126,6 +1126,17 @@ body {
 :root[data-tema="miguel"] { --calc-zelle: #b57bff; }
 :root[data-tema="halloween"] { --calc-zelle: #c084fc; }
 
+/* Facebank, en turquesa: el único hueco que quedaba libre en la rueda de
+   color de las cuatro de siempre. En Miguel es el naranja de la bandera, que
+   era uno de los dos que faltaban. */
+:root { --calc-facebank: #2dd4bf; }
+:root[data-tema="claro"] { --calc-facebank: #0f766e; }
+:root[data-tema="navidad"] { --calc-facebank: #5fd4d0; }
+:root[data-tema="miguel"] { --calc-facebank: #ff8c42; }
+:root[data-tema="halloween"] { --calc-facebank: #5eead4; }
+
+.calc-tasas .tasa:nth-child(5)::before { background: var(--calc-facebank); }
+
 /* ---------- Interruptor de aportar montos ---------- */
 
 .calc-aportar { margin-top: 1.4rem; }
@@ -1940,4 +1951,118 @@ body { overscroll-behavior-y: contain; }
 
 @media (prefers-reduced-motion: reduce) {
   .calc { transition: none; }
+}
+
+/* ============================================================
+   QUÉ TASAS VER
+   ============================================================
+
+   Cada quien esconde las que no usa, y la página se reparte con lo que
+   queda: sin huecos donde estaba la tarjeta que se fue, ni una pestaña para
+   una tasa que no se ve. */
+
+/* `hidden` tiene que ganar siempre. Las tarjetas son display:flex y ese
+   display pisaba al del atributo: se escondían en el HTML y seguían ahí. */
+[hidden] { display: none !important; }
+
+/* Las tarjetas, según cuántas quedan. Con cuatro sigue el 2x2 de siempre, y
+   por eso no hace falta regla. */
+.calc-tasas[data-cuantas="1"] { grid-template-columns: 1fr; }
+.calc-tasas[data-cuantas="2"] { grid-template-columns: repeat(2, 1fr); }
+.calc-tasas[data-cuantas="3"] { grid-template-columns: repeat(3, 1fr); }
+
+/* Cinco no caben en una fila hasta que hay sitio de verdad; antes, tres
+   arriba y dos abajo, sin la quinta sola y descolgada. Con las cinco a la
+   vista son las cinco del HTML, así que el orden por posición vale. */
+.calc-tasas[data-cuantas="5"] { grid-template-columns: repeat(6, 1fr); }
+.calc-tasas[data-cuantas="5"] .tasa { grid-column: span 2; }
+.calc-tasas[data-cuantas="5"] .tasa:nth-child(n+4) { grid-column: span 3; }
+
+@media (min-width: 900px) {
+  .calc-tasas[data-cuantas="5"] { grid-template-columns: repeat(5, 1fr); }
+  .calc-tasas[data-cuantas="5"] .tasa,
+  .calc-tasas[data-cuantas="5"] .tasa:nth-child(n+4) { grid-column: auto; }
+}
+
+/* En el teléfono, tres por fila van justas con cifras de cuatro dígitos */
+@media (max-width: 559px) {
+  .calc-tasas:is([data-cuantas="3"], [data-cuantas="5"]) .tasa-valor { font-size: 0.95rem; }
+}
+
+/* Las pestañas se reparten el ancho entre las que quedan */
+.calc-modos {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+/* Las casillas, como fichas: se tocan con el pulgar y se leen de un vistazo,
+   cada una con el color de su tasa cuando está encendida */
+.calc-ver {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--calc-borde);
+  background: var(--calc-superficie-alta);
+  color: var(--calc-texto-tenue);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.ver input {
+  width: 0.95rem;
+  height: 0.95rem;
+  margin: 0;
+  accent-color: var(--color-ver);
+  cursor: pointer;
+}
+
+.ver:has(input:checked) {
+  border-color: var(--color-ver);
+  color: var(--calc-texto);
+}
+
+.ver:hover { border-color: var(--calc-borde-fuerte); }
+.ver:has(input:checked):hover { border-color: var(--color-ver); }
+.ver:has(input:disabled),
+.ver input:disabled { cursor: not-allowed; }
+
+.calc-ver-nota {
+  margin: 0.55rem 0 0;
+  font-size: 0.66rem;
+  line-height: 1.4;
+  color: var(--calc-texto-tenue);
+}
+
+/* La segunda parte del panel: lo de antes, de dónde sale cada tasa */
+.calc-ajustes-seccion {
+  margin-top: 1.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--calc-borde);
+}
+
+.calc-ajustes-seccion h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.calc-ajustes-seccion p {
+  margin: 0.25rem 0 1rem;
+  font-size: 0.78rem;
+  color: var(--calc-texto-tenue);
+}
+
+@media (pointer: coarse) {
+  .ver { min-height: 40px; }
 }
