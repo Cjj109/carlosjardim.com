@@ -758,6 +758,9 @@ function pintarTasas({ falloDeRed = false } = {}) {
   if (nombreEur) nombreEur.textContent = `Euro ${nombreOficial('eur')}`;
 
   const aviso = $('calcActualizado');
+  // La tira sobre la caja subida, al día con las tarjetas
+  if (document.querySelector('.calc-panel.is-subida')) pintarTira();
+
   if (!aviso) return;
 
   if (falloDeRed) {
@@ -797,6 +800,34 @@ function pintarTasas({ falloDeRed = false } = {}) {
     : '';
 
   aviso.textContent = `${hora} · ${origen}${vigencia}${proxima}`;
+}
+
+/* La tira de tasas que acompaña a la caja del monto cuando sube en el
+   teléfono (ver subirCaja). Sale de las tarjetas visibles, leídas tal cual:
+   así lleva el mismo formato y el nombre de la fuente elegida, y las que se
+   escondieron no están. Van como tarjetas en miniatura: todas en una fila
+   si son cuatro o menos, y si no en dos filas lo más parejas posible
+   (--cols), que una sola descolgada al final se ve rota. Con nombres
+   cortos, que cada una tiene poco más de un dedo de ancho. */
+const NOMBRE_EN_TIRA = { eur: 'Euro', usdt: 'USDT' };
+
+function pintarTira() {
+  const tira = $('calcTira');
+  if (!tira) return;
+
+  const tarjetas = [...document.querySelectorAll('.calc-tasas .tasa:not([hidden])')];
+  tira.style.setProperty('--cols', tarjetas.length <= 4 ? tarjetas.length : Math.ceil(tarjetas.length / 2));
+
+  tira.innerHTML = tarjetas
+    .map((tarjeta) => {
+      const id = tarjeta.dataset.tasa;
+      const nombre = id === 'usd'
+        ? nombreOficial()
+        : NOMBRE_EN_TIRA[id] || tarjeta.querySelector('.tasa-nombre')?.textContent.trim();
+      const valor = tarjeta.querySelector('.tasa-valor')?.textContent.trim() || '—';
+      return `<span class="tira-tasa" data-tasa="${esc(id)}"><b>${esc(nombre)}</b><span class="tira-valor">${esc(valor)}</span></span>`;
+    })
+    .join('');
 }
 
 /** Lo que el 60 IQ ha aprendido de quien mira */
@@ -1578,7 +1609,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
      Así que al tocar la caja la página sube hasta dejarla arriba, y entre
      ella y el teclado caben los resultados: se ven cambiar mientras se
-     escribe, y el Enter ya solo baja el teclado. En el iPhone, cuyo
+     escribe, y el Enter ya solo baja el teclado. Las tarjetas de las tasas
+     se quedan fuera de la pantalla, así que encima de la caja sale una tira
+     con ellas (pintarTira), en el sitio de la pregunta. En el iPhone, cuyo
      teclado numérico ni siquiera tiene Enter, era además la única manera
      de verlos sin tener que tocar fuera.
 
@@ -1596,8 +1629,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const subirCaja = () => {
     if (!TACTIL.matches || ANCHO_MEDIO.matches) return;
 
+    // Primero la tira, en el sitio de la pregunta: se sube hasta dejarla a
+    // ella arriba, y así las tasas siguen a la vista encima de la caja
+    pintarTira();
+    monto.closest('.calc-panel').classList.add('is-subida');
+
     const raiz = document.documentElement;
-    const arriba = monto.closest('.calc-monto').getBoundingClientRect().top + window.scrollY - MARGEN_ARRIBA;
+    const tope = $('calcTira') || monto.closest('.calc-monto');
+    const arriba = tope.getBoundingClientRect().top + window.scrollY - MARGEN_ARRIBA;
     const huecoPuesto = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
     // Lo que le falta a la página para poder desplazarse hasta `arriba`
     const falta = arriba + window.innerHeight - (raiz.scrollHeight - huecoPuesto);
@@ -1612,6 +1651,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const soltarHueco = () => {
     if (monto.value || document.activeElement === monto) return;
     document.documentElement.style.removeProperty('--hueco-teclado');
+    // La tira se va con el hueco, y vuelve la pregunta
+    monto.closest('.calc-panel')?.classList.remove('is-subida');
+  };
+
+  /* Al bajar el teclado —Enter, o tocar fuera— con una cantidad puesta, el
+     panel se centra en la pantalla. La caja arriba del todo sirve para
+     escribir, pero lo que se hace después casi siempre es cambiar de pestaña
+     —Divisas, Bolívares, Precio BCV, USDT— con la misma cantidad, y las
+     pestañas se habían quedado fuera. Centrado se ven ellas, la caja y los
+     resultados, y asoman las tarjetas por encima: por eso la tira se va, que
+     ya no hace falta. Si el panel no cabe entero, arriba con su margen.
+
+     El hueco se queda (se va al vaciar la caja), así que siempre hay página
+     para llegar a donde se desplaza y nada da un salto. */
+  const centrarPanel = () => {
+    const panel = monto.closest('.calc-panel');
+    if (!panel.classList.contains('is-subida')) return;
+    panel.classList.remove('is-subida');
+
+    // En el fotograma siguiente, con la pregunta ya en el sitio de la tira
+    requestAnimationFrame(() => {
+      const caja = panel.getBoundingClientRect();
+      const margen = Math.max(MARGEN_ARRIBA, (window.innerHeight - caja.height) / 2);
+      window.scrollTo({ top: caja.top + window.scrollY - margen, behavior: 'smooth' });
+    });
   };
 
   if (monto) {
@@ -1628,7 +1692,8 @@ document.addEventListener('DOMContentLoaded', () => {
     monto.addEventListener('blur', apuntarCalculoActual);
 
     monto.addEventListener('focus', subirCaja);
-    monto.addEventListener('blur', soltarHueco);
+    // Con cantidad, el panel se centra; vacía, la página vuelve a su alto
+    monto.addEventListener('blur', () => (monto.value ? centrarPanel() : soltarHueco()));
     monto.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();

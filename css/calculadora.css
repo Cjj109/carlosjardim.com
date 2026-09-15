@@ -180,6 +180,79 @@ body {
   text-align: center;
 }
 
+/* La tira de tasas. Mientras la caja del monto está subida en el teléfono
+   (.is-subida, que pone subirCaja() en calculadora.js), las tarjetas quedan
+   fuera de la pantalla y la tira las trae en una o dos líneas, en el sitio
+   de la pregunta: mientras se escribe la pregunta ya no hace falta, y como
+   ocupa lo mismo la caja apenas se mueve al aparecer. */
+.calc-tira { display: none; }
+
+.calc-panel.is-subida .calc-pregunta { display: none; }
+
+/* Tarjetas en miniatura: la misma franja de color y el mismo orden que las
+   de arriba, para reconocerlas sin leer. En una fila si son cuatro o menos
+   y, si no, en dos lo más parejas posible; cuántas columnas lo decide
+   pintarTira() en --cols. */
+.calc-panel.is-subida .calc-tira {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+  gap: 0.3rem;
+  margin: 0.75rem 0 0.65rem;
+}
+
+.tira-tasa {
+  --c: var(--calc-usd);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+  padding: 0.3rem 0.25rem 0.32rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--calc-borde);
+  background: var(--calc-superficie-alta);
+  overflow: hidden;
+}
+
+/* La franja, como la de la tarjeta grande */
+.tira-tasa::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--c);
+}
+
+.tira-tasa b,
+.tira-valor {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tira-tasa b {
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--calc-texto-tenue);
+}
+
+.tira-valor {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--calc-texto);
+}
+
+.tira-tasa[data-tasa="eur"] { --c: var(--calc-eur); }
+.tira-tasa[data-tasa="usdt"] { --c: var(--calc-usdt); }
+.tira-tasa[data-tasa="zelle"] { --c: var(--calc-zelle); }
+.tira-tasa[data-tasa="facebank"] { --c: var(--calc-facebank); }
+.tira-tasa[data-tasa="wally"] { --c: var(--calc-wally); }
+.tira-tasa[data-tasa="zinli"] { --c: var(--calc-zinli); }
+
 /* Monto */
 .calc-monto {
   display: flex;
