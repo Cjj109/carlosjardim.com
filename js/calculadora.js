@@ -834,15 +834,31 @@ function apuntarEnHistorial(entrada) {
   pintarRapidos(modo);
 }
 
-function cuando(iso) {
+function horaDe(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+}
+
+/** El día de un apunte, para agrupar: "Hoy", "Ayer" o "Martes 8 de septiembre" */
+function diaDe(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
 
   const hoy = new Date();
-  const hora = d.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
-  if (d.toDateString() === hoy.toDateString()) return hora;
+  const ayer = new Date(hoy);
+  ayer.setDate(hoy.getDate() - 1);
+  if (d.toDateString() === hoy.toDateString()) return 'Hoy';
+  if (d.toDateString() === ayer.toDateString()) return 'Ayer';
 
-  return `${d.toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit' })} · ${hora}`;
+  // El año solo si no es este, que casi nunca hace falta
+  const texto = d.toLocaleDateString('es-VE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    ...(d.getFullYear() !== hoy.getFullYear() && { year: 'numeric' }),
+  });
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
 let apunteEnCurso = null;
@@ -892,17 +908,29 @@ function pintarHistorial() {
     return;
   }
 
-  caja.innerHTML = lista.map((h) => `
-    <button type="button" class="hist" data-monto="${esc(h.monto)}" data-modo="${esc(h.modo)}">
+  /* Agrupado por día: la fecha una vez, arriba de su grupo, y en cada línea
+     solo la hora. Con la fecha repetida en todas, "8/9 · 07:01 p. m." cinco
+     veces seguidas era ruido que había que leer para saber que no decía nada.
+     El color va en la línea entera y no solo en la cifra: de ahí sale
+     también la franja de la izquierda, como en los resultados. */
+  let diaAnterior = null;
+  caja.innerHTML = lista.map((h) => {
+    const dia = diaDe(h.fecha);
+    const cabecera = dia && dia !== diaAnterior ? `<p class="hist-dia">${esc(dia)}</p>` : '';
+    diaAnterior = dia;
+
+    return `${cabecera}
+    <button type="button" class="hist" data-monto="${esc(h.monto)}" data-modo="${esc(h.modo)}"${h.color ? ` style="--color-res:${esc(h.color)}"` : ''}>
       <span class="hist-izq">
-        <span class="hist-operacion">${esc(num(Number(h.monto)))} ${esc(h.origen)} → ${esc(h.destino)}</span>
-        <span class="hist-cuando">${esc(cuando(h.fecha))}</span>
+        <span class="hist-operacion"><b>${esc(num(Number(h.monto)))} ${esc(h.origen)}</b> <span class="hist-destino">→ ${esc(h.destino)}</span></span>
+        <span class="hist-cuando">${esc(horaDe(h.fecha))}</span>
       </span>
-      <span class="hist-der"${h.color ? ` style="--color-res:${esc(h.color)}"` : ''}>
+      <span class="hist-der">
         <span class="hist-valor">${esc(h.resultado)}</span>
         ${h.tasa > 0 ? `<span class="hist-tasa">a ${esc(num(Number(h.tasa)))} Bs.</span>` : ''}
       </span>
-    </button>`).join('');
+    </button>`;
+  }).join('');
 }
 
 /* ---------- Fuentes ---------- */

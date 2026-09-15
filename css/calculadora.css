@@ -590,7 +590,10 @@ body {
   color: var(--calc-texto);
 }
 
-/* ---------- Historial ---------- */
+/* ---------- Historial ----------
+   Agrupado por día, con la fecha una sola vez arriba de cada grupo y en cada
+   línea solo la hora. Cada línea lleva la franja del color de su tasa, como
+   las filas de resultados, para reconocerla sin tener que leerla. */
 
 .calc-historial {
   display: flex;
@@ -598,15 +601,43 @@ body {
   gap: 0.4rem;
   max-height: 22rem;
   overflow-y: auto;
+  scrollbar-width: thin;
 }
 
+/* Nada de la lista se encoge. La lista tiene alto máximo y desplaza lo que
+   sobra, pero sus líneas son elementos flexibles y, al pasarse, el navegador
+   las aplastaba todas por igual para que cupieran. Lo normal es que no bajen
+   de lo que ocupa su contenido, pero el min-height de 36 px de las pantallas
+   táctiles le quitaba ese freno: todas medían lo mismo y las de dos
+   renglones se salían de su recuadro y se montaban sobre la siguiente. */
+.calc-historial > * { flex-shrink: 0; }
+
+/* El día se queda pegado arriba mientras se desplaza su grupo, y el fondo
+   tapa las líneas que pasan por debajo */
+.hist-dia {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0.55rem 0.2rem 0.25rem;
+  background: var(--calc-superficie);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--calc-texto-tenue);
+}
+
+.hist-dia:first-child { padding-top: 0; }
+
 .hist {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.65rem 0.85rem;
+  padding: 0.7rem 0.9rem 0.7rem 1.05rem;
   border-radius: var(--calc-radio-sm);
   border: 1px solid var(--calc-borde);
   background: var(--calc-superficie-alta);
@@ -614,7 +645,16 @@ body {
   font-family: inherit;
   text-align: left;
   cursor: pointer;
+  overflow: hidden;
   transition: border-color 0.18s ease;
+}
+
+.hist::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-res, var(--calc-texto-tenue));
 }
 
 .hist:hover { border-color: var(--calc-borde-fuerte); }
@@ -622,17 +662,32 @@ body {
 .hist-izq {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
   min-width: 0;
 }
 
+/* En la letra de siempre y no en la mono: con la mono, a lo ancho que es,
+   cualquier destino largo ("En dólares BCV") partía la línea en dos. La
+   cantidad va fuerte y entera —nunca partida— y el destino más suave. */
 .hist-operacion {
-  font-family: var(--mono, monospace);
-  font-size: 0.82rem;
+  font-size: 0.84rem;
+  line-height: 1.3;
+  color: var(--calc-texto-suave);
+  text-wrap: pretty;
 }
 
+.hist-operacion b {
+  font-weight: 700;
+  color: var(--calc-texto);
+  white-space: nowrap;
+}
+
+/* La flecha y el destino pasan juntos al renglón siguiente si no caben, en
+   vez de partirse con "→ Son" arriba y "en bolívares" abajo */
+.hist-destino { display: inline-block; }
+
 .hist-cuando {
-  font-size: 0.62rem;
+  font-size: 0.66rem;
   color: var(--calc-texto-tenue);
 }
 
@@ -644,14 +699,15 @@ body {
 .hist-valor {
   display: block;
   font-family: var(--mono, monospace);
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-res, var(--calc-texto));
 }
 
 .hist-tasa {
   display: block;
-  font-size: 0.6rem;
+  margin-top: 0.1rem;
+  font-size: 0.62rem;
   color: var(--calc-texto-tenue);
 }
 
@@ -1702,7 +1758,7 @@ body { overscroll-behavior-y: contain; }
    bandera plana pegada en el mismo borde es una pegatina encima de una
    interfaz que no la pidió.
 
-   Así que aquí no hay ninguna pieza decorativa. El color sale de lo que la
+   Así que la bandera no va pegada en ningún sitio. El color sale de lo que la
    calculadora YA tiene, que resulta que llevaba media bandera puesta desde el
    principio: el dólar azul, el euro amarillo, el USDT verde y el Zelle
    violeta. Cuatro de los seis, cada uno donde significa algo.
@@ -1711,12 +1767,19 @@ body { overscroll-behavior-y: contain; }
 
      el título          recorre los seis, despacio
      la caja del monto  al escribir en ella, el borde se vuelve la bandera
+                        y se enciende por fuera, como un letrero
      la pestaña activa  lleva debajo el trozo de bandera que le toca
+     las tarjetas       cada una brilla con su color, y juntas la forman
 
    La idea de la caja es la que sostiene el tema: el color no está puesto ahí
    esperando, aparece cuando tocas. Y las pestañas reparten los seis colores
    entre las cuatro, así que la bandera se completa usando la app, no
-   mirándola.                                                                */
+   mirándola.
+
+   Las piezas que sí hay son objetos con su sitio, como la telaraña o el
+   acebo, y no la bandera recortada: una pala de pádel en la esquina, con el
+   puño forrado de los seis colores, que de vez en cuando le da a la pelota;
+   y pompas de jabón, que ya traen el arcoíris en su película.              */
 
 :root[data-tema="miguel"] {
   --calc-fondo: #0b0910;
@@ -1827,13 +1890,249 @@ body { overscroll-behavior-y: contain; }
 
 :root[data-tema="miguel"] .calc-modo.is-active::after { opacity: 1; }
 
-/* Un halo frío en las tarjetas, como el cálido de navidad */
+/* ---------- Las tarjetas ----------
+   Cada una brilla con su color. Como sus colores son los de la bandera,
+   juntas la forman: con las siete a la vista están los seis, y el rosa de
+   Zinli de propina. */
 :root[data-tema="miguel"] .tasa {
-  box-shadow: 0 0 24px -14px rgba(181, 123, 255, 0.9);
+  --halo: var(--calc-zelle);
+  box-shadow: 0 0 26px -13px var(--halo);
+}
+
+:root[data-tema="miguel"] .tasa[data-tasa="usd"] { --halo: var(--calc-usd); }
+:root[data-tema="miguel"] .tasa[data-tasa="eur"] { --halo: var(--calc-eur); }
+:root[data-tema="miguel"] .tasa[data-tasa="usdt"] { --halo: var(--calc-usdt); }
+:root[data-tema="miguel"] .tasa[data-tasa="facebank"] { --halo: var(--calc-facebank); }
+:root[data-tema="miguel"] .tasa[data-tasa="wally"] { --halo: var(--calc-wally); }
+:root[data-tema="miguel"] .tasa[data-tasa="zinli"] { --halo: var(--calc-zinli); }
+
+/* ---------- La caja del monto, encendida ----------
+   Además del borde, la bandera se enciende por fuera, como la luz de un
+   letrero. Va detrás de la caja: el panel se aísla para que el resplandor
+   quede entre su fondo y el de la caja —ni debajo del panel, donde no se
+   vería, ni encima de la cifra—. La caja ya es opaca en este tema, así que
+   por dentro no se transparenta. */
+:root[data-tema="miguel"] .calc-panel {
+  position: relative;
+  isolation: isolate;
+}
+
+:root[data-tema="miguel"] .calc-monto { position: relative; }
+
+:root[data-tema="miguel"] .calc-monto::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  /* Un poco más grande que la caja: lo que se ve es lo que asoma por fuera,
+     y con el resplandor metido dentro apenas se notaba */
+  inset: -3px;
+  border-radius: inherit;
+  background: var(--bandera);
+  filter: blur(16px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+:root[data-tema="miguel"] .calc-monto:focus-within::before,
+:root[data-tema="miguel"] .calc-monto:has(input:not(:placeholder-shown))::before {
+  opacity: 0.5;
+}
+
+/* ---------- El pádel ----------
+   Una pala de pádel en la esquina, donde Halloween tiene su telaraña y
+   Navidad su acebo: el guiño que el dueño quiso para este tema. Lleva el
+   puño forrado con los seis colores, y de vez en cuando le da a la pelota,
+   que cruza la pantalla por detrás de todo dejando la estela de la bandera.
+
+   La pala y la pelota van con el mismo reloj —misma duración, mismo
+   retraso— para que el golpe y la salida coincidan. La pelota son tres
+   movimientos que no se pisan: la caja avanza de lado (translate), la pieza
+   de dentro sube y baja en parábola (su translate) y la pelota gira sobre sí
+   misma (rotate) sin arrastrar la estela.
+
+   La capa mide una pantalla y recorta lo que se sale: sin recortar, la
+   pelota al cruzar el borde ensancharía la página. */
+.padel { display: none; }
+
+:root[data-tema="miguel"] .padel {
+  --golpe: 10s;
+  /* Negativo: el primer golpe llega a los cuatro segundos de abrir */
+  --reloj: -4.6s;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.padel .pala {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 50px;
+  aspect-ratio: 60 / 116;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 116'%3E%3Cdefs%3E%3ClinearGradient id='c' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233a3052'/%3E%3Cstop offset='1' stop-color='%23191325'/%3E%3C/linearGradient%3E%3CclipPath id='m'%3E%3Crect x='25' y='73' width='10' height='31' rx='3'/%3E%3C/clipPath%3E%3C/defs%3E%3Cpath d='M30 2C47 2 57 14 57 32C57 50 46 63 37 69L35 75H25L23 69C14 63 3 50 3 32C3 14 13 2 30 2Z' fill='url(%23c)' stroke='%23efeaf7' stroke-width='2.2'/%3E%3Cg fill='%230b0910' stroke='%23fff' stroke-opacity='0.12' stroke-width='0.4'%3E%3Ccircle cx='25.4' cy='12' r='1.25'/%3E%3Ccircle cx='31.2' cy='12' r='1.25'/%3E%3Ccircle cx='22.5' cy='17.6' r='1.25'/%3E%3Ccircle cx='28.3' cy='17.6' r='1.25'/%3E%3Ccircle cx='34.1' cy='17.6' r='1.25'/%3E%3Ccircle cx='39.9' cy='17.6' r='1.25'/%3E%3Ccircle cx='13.8' cy='23.2' r='1.25'/%3E%3Ccircle cx='19.6' cy='23.2' r='1.25'/%3E%3Ccircle cx='25.4' cy='23.2' r='1.25'/%3E%3Ccircle cx='31.2' cy='23.2' r='1.25'/%3E%3Ccircle cx='37' cy='23.2' r='1.25'/%3E%3Ccircle cx='42.8' cy='23.2' r='1.25'/%3E%3Ccircle cx='16.7' cy='28.8' r='1.25'/%3E%3Ccircle cx='22.5' cy='28.8' r='1.25'/%3E%3Ccircle cx='28.3' cy='28.8' r='1.25'/%3E%3Ccircle cx='34.1' cy='28.8' r='1.25'/%3E%3Ccircle cx='39.9' cy='28.8' r='1.25'/%3E%3Ccircle cx='45.7' cy='28.8' r='1.25'/%3E%3Ccircle cx='13.8' cy='34.4' r='1.25'/%3E%3Ccircle cx='19.6' cy='34.4' r='1.25'/%3E%3Ccircle cx='25.4' cy='34.4' r='1.25'/%3E%3Ccircle cx='31.2' cy='34.4' r='1.25'/%3E%3Ccircle cx='37' cy='34.4' r='1.25'/%3E%3Ccircle cx='42.8' cy='34.4' r='1.25'/%3E%3Ccircle cx='16.7' cy='40' r='1.25'/%3E%3Ccircle cx='22.5' cy='40' r='1.25'/%3E%3Ccircle cx='28.3' cy='40' r='1.25'/%3E%3Ccircle cx='34.1' cy='40' r='1.25'/%3E%3Ccircle cx='39.9' cy='40' r='1.25'/%3E%3Ccircle cx='45.7' cy='40' r='1.25'/%3E%3Ccircle cx='19.6' cy='45.6' r='1.25'/%3E%3Ccircle cx='25.4' cy='45.6' r='1.25'/%3E%3Ccircle cx='31.2' cy='45.6' r='1.25'/%3E%3Ccircle cx='37' cy='45.6' r='1.25'/%3E%3Ccircle cx='42.8' cy='45.6' r='1.25'/%3E%3Ccircle cx='22.5' cy='51.2' r='1.25'/%3E%3Ccircle cx='28.3' cy='51.2' r='1.25'/%3E%3Ccircle cx='34.1' cy='51.2' r='1.25'/%3E%3Ccircle cx='39.9' cy='51.2' r='1.25'/%3E%3C/g%3E%3Cpath d='M30 58.5L26.2 67H33.8Z' fill='%230b0910'/%3E%3Cpath d='M13 16Q20 8 30 7' stroke='%23fff' stroke-opacity='0.35' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3Cg clip-path='url(%23m)'%3E%3Cg transform='skewY(-14) translate(0 8)'%3E%3Crect x='20' y='70' width='20' height='5.6' fill='%23e63946'/%3E%3Crect x='20' y='75.4' width='20' height='5.6' fill='%23ff8c42'/%3E%3Crect x='20' y='80.8' width='20' height='5.6' fill='%23ffd23f'/%3E%3Crect x='20' y='86.2' width='20' height='5.6' fill='%233ddc84'/%3E%3Crect x='20' y='91.6' width='20' height='5.6' fill='%234a9eff'/%3E%3Crect x='20' y='97' width='20' height='5.6' fill='%23b57bff'/%3E%3C/g%3E%3C/g%3E%3Crect x='24.5' y='102' width='11' height='3.5' rx='1.2' fill='%23241d33'/%3E%3Cpath d='M30 105.5C23 108 22.5 114 28 114.5' stroke='%23cfc6de' stroke-width='1' fill='none'/%3E%3C/svg%3E") center / contain no-repeat;
+  /* Inclinada como en la mano, y el golpe gira desde la muñeca */
+  transform: rotate(-32deg);
+  transform-origin: 50% 92%;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+  animation: raquetazo var(--golpe) ease-in-out var(--reloj) infinite;
+}
+
+/* Quieta casi todo el rato; se echa atrás, golpea y vuelve */
+@keyframes raquetazo {
+  0%, 78%, 96%, 100% { rotate: 0deg; }
+  83% { rotate: 20deg; }
+  87% { rotate: -24deg; }
+  92% { rotate: 3deg; }
+}
+
+.padel .pelota {
+  position: absolute;
+  top: 58px;
+  right: 86px;
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  animation: vuelo-pelota var(--golpe) linear var(--reloj) infinite;
+}
+
+.padel .pelota i {
+  position: absolute;
+  inset: 0;
+  animation: parabola var(--golpe) var(--reloj) infinite;
+}
+
+/* La estela: las seis franjas estiradas detrás de la pelota, apagándose */
+.padel .pelota i::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 12px;
+  translate: 0 -50%;
+  border-radius: 6px;
+  background: linear-gradient(
+    #e63946 0 16.66%, #ff8c42 16.66% 33.33%, #ffd23f 33.33% 50%,
+    #3ddc84 50% 66.66%, #4a9eff 66.66% 83.33%, #b57bff 83.33% 100%
+  );
+  -webkit-mask: linear-gradient(to right, #000, transparent);
+  mask: linear-gradient(to right, #000, transparent);
+  opacity: 0.85;
+  transform-origin: 0 50%;
+  animation: estela var(--golpe) var(--reloj) infinite;
+}
+
+/* La estela nace en el golpe y se alarga en la primera parte del vuelo: si
+   ya estuviera entera al salir, parecería que la pelota venía de la derecha */
+@keyframes estela {
+  0%, 86.4% { scale: 0 1; }
+  91%, 100% { scale: 1 1; }
+}
+
+.padel .pelota i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -10 20 20'%3E%3Cdefs%3E%3CradialGradient id='p' cx='0.35' cy='0.3' r='0.85'%3E%3Cstop offset='0' stop-color='%23f4ff8a'/%3E%3Cstop offset='0.55' stop-color='%23d4ea3a'/%3E%3Cstop offset='1' stop-color='%2396aa16'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle r='9.5' fill='url(%23p)'/%3E%3Cpath d='M-6.8 -6.6C-2.6 -3 -2.6 3 -6.8 6.6M6.8 -6.6C2.6 -3 2.6 3 6.8 6.6' stroke='%23fff' stroke-opacity='0.9' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  animation: girar 0.5s linear infinite;
+}
+
+/* Sale en el momento del golpe (87 %) y cruza hasta perderse por la izquierda */
+@keyframes vuelo-pelota {
+  0%, 86% { translate: 0 0; opacity: 0; }
+  86.4% { translate: 0 0; opacity: 1; }
+  100% { translate: calc(-100vw - 180px) 0; opacity: 1; }
+}
+
+/* Sube frenando y cae acelerando, que es lo que hace una parábola */
+@keyframes parabola {
+  0%, 86% { translate: 0 0; animation-timing-function: ease-out; }
+  93% { translate: 0 -46px; animation-timing-function: ease-in; }
+  100% { translate: 0 34px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* La pala se queda colgada en su esquina; la pelota no sale */
+  .padel .pala { animation: none; }
+  .padel .pelota { display: none; }
+}
+
+/* ---------- Pompas de jabón ----------
+   Suben despacio por detrás de las tarjetas y cada una revienta a su
+   altura. El arcoíris no va pintado: es el de la película de jabón, un aro que cambia de color al girar, con el brillo de una ventana
+   arriba. Tres movimientos que no se pisan: la caja sube (translate del
+   span), dentro la pompa se mece (translate de los dos pseudoelementos, con
+   el mismo reloj para que el aro y el brillo no se separen) y el aro gira
+   (rotate). El vaivén y el giro son los mismos de la nieve. */
+.pompas { display: none; }
+
+/* El contenido por encima de las pompas, igual que del bosque en navidad */
+:root[data-tema="miguel"] .calc { position: relative; }
+
+:root[data-tema="miguel"] .pompas {
+  display: block;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.pompas span {
+  position: absolute;
+  top: 0;
+  width: var(--tam);
+  height: var(--tam);
+  opacity: 0;
+  animation: subir var(--dur) linear var(--espera) infinite;
+}
+
+.pompas span::before,
+.pompas span::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: vaiven var(--ritmo) ease-in-out var(--espera) infinite alternate;
+}
+
+/* El aro: la película, con todo el color en el borde */
+.pompas span::before {
+  background: conic-gradient(from 20deg, #ff6b7a, #ffb86b, #ffe36e, #6ef0a8, #6ab8ff, #c08cff, #ff6b7a);
+  -webkit-mask: radial-gradient(closest-side, transparent 72%, #000 90%, #000 97%, transparent 100%);
+  mask: radial-gradient(closest-side, transparent 72%, #000 90%, #000 97%, transparent 100%);
+  opacity: 0.75;
+  animation:
+    vaiven var(--ritmo) ease-in-out var(--espera) infinite alternate,
+    girar 6s linear infinite;
+}
+
+/* El brillo de la ventana, otro más pequeño enfrente y un velo por dentro */
+.pompas span::after {
+  background:
+    radial-gradient(circle at 32% 27%, rgba(255, 255, 255, 0.85) 0 5%, transparent 13%),
+    radial-gradient(circle at 70% 76%, rgba(255, 255, 255, 0.35) 0 3%, transparent 8%),
+    radial-gradient(closest-side, transparent 60%, rgba(200, 170, 255, 0.14));
+}
+
+/* Sube, y al llegar a su altura se abre de golpe y desaparece */
+@keyframes subir {
+  0% { translate: 0 105vh; opacity: 0; scale: 1; }
+  6% { opacity: 1; }
+  90% { translate: 0 var(--revienta); opacity: 1; scale: 1; }
+  91%, 100% { translate: 0 var(--revienta); opacity: 0; scale: 1.5; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root[data-tema="miguel"] .calc-head h1 { animation: none; }
+  /* Una pompa quieta en el aire no es una pompa: fuera */
+  :root[data-tema="miguel"] .pompas { display: none; }
 }
 
 /* ============================================================
