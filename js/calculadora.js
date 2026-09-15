@@ -25,6 +25,7 @@ const TEMAS = {
   miguel: '#0b0910',
   halloween: '#0c0912',
   zachiro: '#ebe7dc',
+  sasha: '#f3e8d9',
 };
 
 /* ---------- Utilidades ---------- */
@@ -252,6 +253,8 @@ function darALaPelota() {
 
   const { duration, delay } = animaciones[0].effect.getTiming();
   const ahora = animaciones[0].currentTime;
+  // Sin reloj que leer no hay golpe: poner NaN en currentTime lanza un error
+  if (!Number.isFinite(ahora) || !(duration > 0)) return;
   // Lo que lleva de la vuelta actual, contando el retraso negativo del CSS
   const dentro = (((ahora - delay) % duration) + duration) % duration;
   if (dentro >= ECHARSE_ATRAS * duration) return;
@@ -556,9 +559,20 @@ async function cargarMontosGlobales() {
     if (fueraDeSesion(respuesta) || !respuesta.ok) return;
 
     const datos = await respuesta.json();
-    if (!datos || typeof datos.montos !== 'object') return;
+    const montos = datos?.montos;
+    if (!montos || typeof montos !== 'object') return;
 
-    montosGlobales = datos.montos;
+    /* Solo listas de montos válidos, y solo de los modos que existen. Con
+       cualquier otra cosa —un null, que para typeof también es un objeto, o
+       un número suelto donde iba una lista— pintarRapidos reventaba en cada
+       cambio de pestaña: ya no sería una estadística que falta, sino la
+       calculadora rota. */
+    montosGlobales = Object.fromEntries(
+      Object.keys(MONTOS_BASE).map((m) => [
+        m,
+        Array.isArray(montos[m]) ? montos[m].map(Number).filter((n) => Number.isFinite(n) && n > 0) : [],
+      ])
+    );
     pintarRapidos(modo);
   } catch {
     // Sin contador global no pasa nada: quedan los tuyos y los de siempre
@@ -932,7 +946,22 @@ async function pintarMemoria() {
  */
 async function olvidarMemoria() {
   if (!confirm('¿Que olvide todo lo que sabe de ti? Esto no se puede deshacer.')) return;
-  await fetch('/api/iq-memoria', { method: 'DELETE' });
+
+  /* Con su try, como pintarMemoria. Sin él, sin señal el fetch rechazaba y
+     el error se quedaba sin atender: el botón no hacía nada y nadie decía
+     por qué. Y un borrado que el servidor no hizo no se da por hecho: la
+     charla de esta pestaña solo se olvida si de verdad se borró. */
+  const caja = $('iqNotas');
+  try {
+    const respuesta = await fetch('/api/iq-memoria', { method: 'DELETE' });
+    if (fueraDeSesion(respuesta)) return;
+    if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+  } catch (error) {
+    console.warn('No se pudo borrar la memoria del 60 IQ:', error);
+    if (caja) caja.textContent = navigator.onLine ? 'No se pudo borrar. Intenta de nuevo.' : 'Sin conexión: no se pudo borrar.';
+    return;
+  }
+
   iqCharlaPrevia.length = 0;
   await pintarMemoria();
 }
@@ -1118,8 +1147,8 @@ function fichaFuente(f, elegida) {
   // de la ficha es la que rige —es la que se usará si se elige— y la que ya
   // viene se cuenta aquí, que es una línea de texto y no una columna estrecha.
   const detalle = f.proxima?.rate
-    ? `${f.detalle} Ya publicó ${num(Number(f.proxima.rate))}, que entra el ${fecha(f.proxima.date)}.`
-    : f.detalle;
+    ? `${f.detalle || ''} Ya publicó ${num(Number(f.proxima.rate))}, que entra el ${fecha(f.proxima.date)}.`.trim()
+    : f.detalle || '';
 
   return `
     <button type="button" role="radio" aria-checked="${elegida}" tabindex="${elegida ? 0 : -1}"
@@ -1722,6 +1751,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const panel = monto.closest('.calc-panel');
     const { pregunta, tira } = plegables(panel);
+    // Sin los plegables (un HTML de otra versión) no hay nada que subir
+    if (!pregunta || !tira) return;
     pintarTira();
 
     // Adónde se va: el borde de arriba del plegable de la pregunta, que es
@@ -1775,6 +1806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // antes de cambiarlas: el destino se sabe desde el primer fotograma y la
     // página no tiene que corregir el rumbo a mitad de camino
     const { pregunta, tira } = plegables(panel);
+    if (!pregunta || !tira) return;
     const marco = panel.getBoundingClientRect();
     const cambio = altoAbierto(pregunta) - altoAbierto(tira);
     const margen = Math.max(MARGEN_ARRIBA, (window.innerHeight - (marco.height + cambio)) / 2);
@@ -2000,6 +2032,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Miguel: tocar la pala la hace golpear (ver darALaPelota)
   document.querySelector('.pala-toque')?.addEventListener('click', darALaPelota);
+
+  /* Sasha: tocarla hace que se relama, como en la foto, y le sale un
+     corazón. Quitar y volver a poner la clase reinicia la animación si se la
+     toca seguido; al acabar la lengua, se quita sola. */
+  const sasha = document.querySelector('.sasha');
+  sasha?.addEventListener('click', () => {
+    sasha.classList.remove('lame');
+    void sasha.offsetWidth;
+    sasha.classList.add('lame');
+  });
+  sasha?.addEventListener('animationend', (e) => {
+    if (e.animationName === 'lamer') sasha.classList.remove('lame');
+  });
 
   const panelHist = $('calcPanelHistorial');
   $('calcHistorial')?.addEventListener('click', () => {

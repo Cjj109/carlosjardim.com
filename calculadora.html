@@ -50,8 +50,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=73">
-  <link rel="stylesheet" href="/css/calculadora.css?r=73">
+  <link rel="stylesheet" href="/css/variables.css?r=74">
+  <link rel="stylesheet" href="/css/calculadora.css?r=74">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -62,7 +62,7 @@
     //    hasta que el HTML está parseado; lanzándola aquí se adelanta y para
     //    cuando el código la necesita suele estar ya en camino.
     (function () {
-      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910', halloween: '#0c0912', zachiro: '#ebe7dc' };
+      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910', halloween: '#0c0912', zachiro: '#ebe7dc', sasha: '#f3e8d9' };
       var tema = 'oscuro';
       try { tema = localStorage.getItem('calc-tema') || 'oscuro'; } catch (e) {}
       if (!COLORES[tema]) tema = 'oscuro';
@@ -125,6 +125,47 @@
 
 <!-- Zachiro: el sello del mangaka, 印鑑, con su nombre en katakana -->
 <div class="hanko" aria-hidden="true">ザチロ</div>
+
+<!-- Sasha: ella, asomándose por la esquina —se relame si la tocas—, y sus
+     huellitas cruzando la página de vez en cuando -->
+<div class="sasha" aria-hidden="true">
+  <svg viewBox="0 0 120 124">
+    <path d="M48 40C40 26 32 16 24 12C18 9 12 14 8 22C14 22 20 24 24 28C26 38 27 46 28 54Z" fill="#b97d47"/>
+    <path d="M44 40C38 30 32 22 26 18C23 26 25 38 30 48Z" fill="#efc6a4"/>
+    <g class="oreja-der">
+      <path d="M72 40C80 22 88 10 99 5C103 3 104 8 103 12C101 28 97 42 92 54Z" fill="#b97d47"/>
+      <path d="M77 40C83 27 89 17 97 12C99 24 96 36 91 47Z" fill="#efc6a4"/>
+    </g>
+    <path d="M34 104C46 112 74 112 86 104L90 120C74 126 46 126 30 120Z" fill="#f0a3b5"/>
+    <path d="M60 30C80 30 94 42 94 60C94 74 86 84 78 92C72 99 66 104 60 104C54 104 48 99 42 92C34 84 26 74 26 60C26 42 40 30 60 30Z" fill="#c68a52"/>
+    <path d="M57 52C58 62 53 71 48 80C44 88 48 100 60 103C72 100 76 88 72 80C67 71 62 62 63 52C61 50.5 59 50.5 57 52Z" fill="#f3e2c7"/>
+    <g class="ojo"><ellipse cx="45" cy="63" rx="6.4" ry="6.8" fill="#7a4a2a"/><ellipse cx="45" cy="63" rx="5" ry="5.6" fill="#2b1a12"/><circle cx="43.3" cy="61.2" r="1.6" fill="#fff"/></g>
+    <g class="ojo"><ellipse cx="75" cy="63" rx="6.4" ry="6.8" fill="#7a4a2a"/><ellipse cx="75" cy="63" rx="5" ry="5.6" fill="#2b1a12"/><circle cx="73.3" cy="61.2" r="1.6" fill="#fff"/></g>
+    <path d="M53 86C53 82 67 82 67 86C67 91 62 94 60 94C58 94 53 91 53 86Z" fill="#2b201a"/>
+    <ellipse cx="57.5" cy="85.2" rx="2.2" ry="1.1" fill="#fff" opacity=".35"/>
+    <path d="M60 94V98M54 99C57 101.5 63 101.5 66 99" stroke="#7a4a2a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path class="lengua" d="M61 98C58 92 64 86 69 88C73 90 71 97 66 100C64 101 62 100 61 98Z" fill="#ec7f95"/>
+  </svg>
+</div>
+<div class="huellas" aria-hidden="true">
+    <span style="left:4.8%;top:90.9%;--r:44deg;--d:0s"></span>
+    <span style="left:11.9%;top:88.1%;--r:44deg;--d:0.5s"></span>
+    <span style="left:14.3%;top:80.9%;--r:44deg;--d:0.9s"></span>
+    <span style="left:21.4%;top:78.1%;--r:44deg;--d:1.4s"></span>
+    <span style="left:23.8%;top:70.9%;--r:44deg;--d:1.8s"></span>
+    <span style="left:30.9%;top:68.1%;--r:44deg;--d:2.3s"></span>
+    <span style="left:33.3%;top:60.9%;--r:44deg;--d:2.7s"></span>
+    <span style="left:40.4%;top:58.1%;--r:44deg;--d:3.2s"></span>
+    <span style="left:42.8%;top:50.9%;--r:44deg;--d:3.6s"></span>
+    <span style="left:94.9%;top:41.1%;--r:-45deg;--d:7s"></span>
+    <span style="left:92.3%;top:34%;--r:-45deg;--d:7.5s"></span>
+    <span style="left:85.2%;top:31.4%;--r:-45deg;--d:7.9s"></span>
+    <span style="left:82.6%;top:24.3%;--r:-45deg;--d:8.4s"></span>
+    <span style="left:75.4%;top:21.7%;--r:-45deg;--d:8.8s"></span>
+    <span style="left:72.8%;top:14.6%;--r:-45deg;--d:9.3s"></span>
+    <span style="left:65.7%;top:12%;--r:-45deg;--d:9.7s"></span>
+    <span style="left:63.1%;top:4.9%;--r:-45deg;--d:10.2s"></span>
+  </div>
 
 <!-- Halloween: murciélagos que cruzan de vez en cuando, y una araña colgada
      de su tela en la esquina. Como la nieve, no existen en los demás temas. -->
@@ -242,7 +283,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v73</span>
+    <span class="calc-version" title="Versión de la app instalada">v74</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -334,6 +375,10 @@
       <button type="button" class="tema" data-tema="zachiro" role="radio" aria-checked="false">
         <span class="tema-muestra muestra-zachiro" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         Zachiro
+      </button>
+      <button type="button" class="tema" data-tema="sasha" role="radio" aria-checked="false">
+        <span class="tema-muestra muestra-sasha" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Sasha
       </button>
     </div>
   </section>
@@ -430,7 +475,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=73" defer></script>
+<script src="/js/calculadora.js?r=74" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de
