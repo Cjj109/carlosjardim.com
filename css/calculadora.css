@@ -1766,20 +1766,20 @@ body { overscroll-behavior-y: contain; }
    Lo que se añade son los dos que faltaban, y solo donde hay una razón:
 
      el título          recorre los seis, despacio
-     la caja del monto  al escribir en ella, el borde se vuelve la bandera
-                        y se enciende por fuera, como un letrero
      la pestaña activa  lleva debajo el trozo de bandera que le toca
      las tarjetas       cada una brilla con su color, y juntas la forman
 
-   La idea de la caja es la que sostiene el tema: el color no está puesto ahí
-   esperando, aparece cuando tocas. Y las pestañas reparten los seis colores
-   entre las cuatro, así que la bandera se completa usando la app, no
-   mirándola.
+   Las pestañas reparten los seis colores entre las cuatro, así que la
+   bandera se completa usando la app, no mirándola.
 
-   Las piezas que sí hay son objetos con su sitio, como la telaraña o el
+   La pieza que sí hay es un objeto con su sitio, como la telaraña o el
    acebo, y no la bandera recortada: una pala de pádel en la esquina, con el
-   puño forrado de los seis colores, que de vez en cuando le da a la pelota;
-   y pompas de jabón, que ya traen el arcoíris en su película.              */
+   puño forrado de los seis colores, que de vez en cuando —o al tocarla— le
+   da a la pelota.
+
+   Hubo más: la caja del monto con el borde de bandera y un resplandor al
+   escribir, y pompas de jabón subiendo por detrás. Con la pala ya era
+   bastante, y el dueño prefirió quitarlos.                                 */
 
 :root[data-tema="miguel"] {
   --calc-fondo: #0b0910;
@@ -1801,11 +1801,6 @@ body { overscroll-behavior-y: contain; }
     #e63946 0 16.66%, #ff8c42 16.66% 33.33%, #ffd23f 33.33% 50%,
     #3ddc84 50% 66.66%, #4a9eff 66.66% 83.33%, #b57bff 83.33% 100%
   );
-  /* El fondo de la caja del monto, opaco. Hace falta opaco porque debajo va
-     el degradado del borde: con el rgba de siempre se transparentaba y la
-     bandera se veía por el medio de la cifra. Es el mismo color que resulta
-     de poner ese negro al 28% sobre la superficie. */
-  --monto-fondo: #100e16;
 }
 
 :root[data-tema="miguel"] body {
@@ -1833,32 +1828,6 @@ body { overscroll-behavior-y: contain; }
 @keyframes brilloMiguel {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
-}
-
-/* La caja del monto: en reposo es la de siempre; al escribir, el borde se
-   vuelve la bandera. Dos capas de fondo —el relleno por dentro y el degradado
-   por fuera— que es como se hace un borde en degradado sin pintar un div
-   extra debajo. */
-:root[data-tema="miguel"] .calc-monto {
-  border-color: transparent;
-  background:
-    linear-gradient(var(--monto-fondo), var(--monto-fondo)) padding-box,
-    linear-gradient(var(--calc-borde), var(--calc-borde)) border-box;
-  transition: background 0.22s ease;
-}
-
-/* Mientras se escribe, y mientras quede algo escrito.
-   Solo con :focus-within, el Enter la borraba: ese Enter llama a blur() a
-   propósito —en el teléfono es lo que baja el teclado— así que la bandera se
-   apagaba justo en el momento de ponerse a leer el resultado, que es cuando
-   más rato pasa uno mirando la caja. Con una cantidad puesta la caja sigue
-   estando en uso aunque el cursor ya no esté dentro. */
-:root[data-tema="miguel"] .calc-monto:focus-within,
-:root[data-tema="miguel"] .calc-monto:has(input:not(:placeholder-shown)) {
-  border-color: transparent;
-  background:
-    linear-gradient(var(--monto-fondo), var(--monto-fondo)) padding-box,
-    var(--bandera) border-box;
 }
 
 /* Las pestañas se reparten la bandera: cada una lleva debajo su trozo, y solo
@@ -1906,39 +1875,6 @@ body { overscroll-behavior-y: contain; }
 :root[data-tema="miguel"] .tasa[data-tasa="wally"] { --halo: var(--calc-wally); }
 :root[data-tema="miguel"] .tasa[data-tasa="zinli"] { --halo: var(--calc-zinli); }
 
-/* ---------- La caja del monto, encendida ----------
-   Además del borde, la bandera se enciende por fuera, como la luz de un
-   letrero. Va detrás de la caja: el panel se aísla para que el resplandor
-   quede entre su fondo y el de la caja —ni debajo del panel, donde no se
-   vería, ni encima de la cifra—. La caja ya es opaca en este tema, así que
-   por dentro no se transparenta. */
-:root[data-tema="miguel"] .calc-panel {
-  position: relative;
-  isolation: isolate;
-}
-
-:root[data-tema="miguel"] .calc-monto { position: relative; }
-
-:root[data-tema="miguel"] .calc-monto::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  /* Un poco más grande que la caja: lo que se ve es lo que asoma por fuera,
-     y con el resplandor metido dentro apenas se notaba */
-  inset: -3px;
-  border-radius: inherit;
-  background: var(--bandera);
-  filter: blur(16px);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-:root[data-tema="miguel"] .calc-monto:focus-within::before,
-:root[data-tema="miguel"] .calc-monto:has(input:not(:placeholder-shown))::before {
-  opacity: 0.5;
-}
-
 /* ---------- El pádel ----------
    Una pala de pádel en la esquina, donde Halloween tiene su telaraña y
    Navidad su acebo: el guiño que el dueño quiso para este tema. Lleva el
@@ -1954,6 +1890,9 @@ body { overscroll-behavior-y: contain; }
    La capa mide una pantalla y recorta lo que se sale: sin recortar, la
    pelota al cruzar el borde ensancharía la página. */
 .padel { display: none; }
+
+/* El contenido por encima de la pala, igual que del bosque en navidad */
+:root[data-tema="miguel"] .calc { position: relative; }
 
 :root[data-tema="miguel"] .padel {
   --golpe: 10s;
@@ -2086,76 +2025,8 @@ body { overscroll-behavior-y: contain; }
   .padel .pala-toque { display: none; }
 }
 
-/* ---------- Pompas de jabón ----------
-   Suben despacio por detrás de las tarjetas y cada una revienta a su
-   altura. El arcoíris no va pintado: es el de la película de jabón, un aro que cambia de color al girar, con el brillo de una ventana
-   arriba. Tres movimientos que no se pisan: la caja sube (translate del
-   span), dentro la pompa se mece (translate de los dos pseudoelementos, con
-   el mismo reloj para que el aro y el brillo no se separen) y el aro gira
-   (rotate). El vaivén y el giro son los mismos de la nieve. */
-.pompas { display: none; }
-
-/* El contenido por encima de las pompas, igual que del bosque en navidad */
-:root[data-tema="miguel"] .calc { position: relative; }
-
-:root[data-tema="miguel"] .pompas {
-  display: block;
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.pompas span {
-  position: absolute;
-  top: 0;
-  width: var(--tam);
-  height: var(--tam);
-  opacity: 0;
-  animation: subir var(--dur) linear var(--espera) infinite;
-}
-
-.pompas span::before,
-.pompas span::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  animation: vaiven var(--ritmo) ease-in-out var(--espera) infinite alternate;
-}
-
-/* El aro: la película, con todo el color en el borde */
-.pompas span::before {
-  background: conic-gradient(from 20deg, #ff6b7a, #ffb86b, #ffe36e, #6ef0a8, #6ab8ff, #c08cff, #ff6b7a);
-  -webkit-mask: radial-gradient(closest-side, transparent 72%, #000 90%, #000 97%, transparent 100%);
-  mask: radial-gradient(closest-side, transparent 72%, #000 90%, #000 97%, transparent 100%);
-  opacity: 0.75;
-  animation:
-    vaiven var(--ritmo) ease-in-out var(--espera) infinite alternate,
-    girar 6s linear infinite;
-}
-
-/* El brillo de la ventana, otro más pequeño enfrente y un velo por dentro */
-.pompas span::after {
-  background:
-    radial-gradient(circle at 32% 27%, rgba(255, 255, 255, 0.85) 0 5%, transparent 13%),
-    radial-gradient(circle at 70% 76%, rgba(255, 255, 255, 0.35) 0 3%, transparent 8%),
-    radial-gradient(closest-side, transparent 60%, rgba(200, 170, 255, 0.14));
-}
-
-/* Sube, y al llegar a su altura se abre de golpe y desaparece */
-@keyframes subir {
-  0% { translate: 0 105vh; opacity: 0; scale: 1; }
-  6% { opacity: 1; }
-  90% { translate: 0 var(--revienta); opacity: 1; scale: 1; }
-  91%, 100% { translate: 0 var(--revienta); opacity: 0; scale: 1.5; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   :root[data-tema="miguel"] .calc-head h1 { animation: none; }
-  /* Una pompa quieta en el aire no es una pompa: fuera */
-  :root[data-tema="miguel"] .pompas { display: none; }
 }
 
 /* ============================================================
