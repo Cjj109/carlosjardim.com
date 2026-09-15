@@ -16,6 +16,27 @@ const PRIMARY_MODEL = 'google/gemini-3.5-flash-lite';
 const FALLBACK_MODEL = 'deepseek/deepseek-chat';
 const MAX_TOKENS = 300;
 
+/* El freno. Este chat es público —la portada no pide entrar— y cada mensaje
+   gasta de la clave de OpenRouter, así que lleva tres topes:
+
+     por IP        LIMITE mensajes por hora. De sobra para una conversación
+                   de verdad —la abuela da su veredicto al quinto—, y corta
+                   en seco al que se ponga a darle en bucle. El contador vive
+                   en la caché del centro de datos: no es exacto entre
+                   regiones, pero no hace falta que lo sea.
+     por mensaje   MAX_MENSAJE caracteres, y solo los papeles de usuario y
+                   asistente. Un mensaje enorme también cuesta, porque el
+                   modelo cobra lo que lee; y un "system" colado desde el
+                   navegador le cambiaría las instrucciones.
+     por sitio     solo desde la propia web, como los montos.
+
+   Nadie ha abusado hasta ahora, pero no se sabe. El 60 IQ no lo lleva: está
+   detrás de la puerta. */
+const LIMITE = 30;
+const VENTANA = 3600;
+const MAX_MENSAJE = 600;
+const MAX_MENSAJES = 10;
+
 const SYSTEM_PROMPTS = {
   assistant: `Eres Clippy, el famoso asistente de Microsoft Office, pero ahora trabajas para Carlos Jardim, economista venezolano. Carlos te paga (poco, pero te paga) para que hables bien de él, y tú lo haces con gusto... aunque a veces se te escapan comentarios que dejan claro que es un trabajo remunerado.
 
@@ -99,6 +120,51 @@ const CORS_HEADERS = {
   'Cache-Control': 'private, no-cache'
 };
 
+const responder = (datos, status = 200) =>
+  new Response(JSON.stringify(datos), { status, headers: CORS_HEADERS });
+
+/**
+ * ¿La petición viene de la propia web?
+ * Sin Origin (una petición del mismo sitio en algunos navegadores) se deja
+ * pasar; con uno opaco o de otro sitio, no. Como en montos.js, con su try:
+ * new URL('null') revienta.
+ */
+function mismoSitio(peticion) {
+  const origen = peticion.headers.get('Origin');
+  if (!origen) return true;
+  try {
+    return new URL(origen).host === new URL(peticion.url).host;
+  } catch {
+    return false;
+  }
+}
+
+/** Cuenta este mensaje para su IP; false si ya pasó del tope de la hora */
+async function pasaElFreno(peticion) {
+  const ip = peticion.headers.get('CF-Connecting-IP') || 'desconocida';
+  const clave = new Request(`https://freno.local/chat/${encodeURIComponent(ip)}`);
+  const cache = caches.default;
+
+  let usados = 0;
+  try {
+    const guardado = await cache.match(clave);
+    if (guardado) usados = Number(await guardado.text()) || 0;
+  } catch {
+    return true; // sin caché no se puede contar: mejor dejar pasar que romper
+  }
+
+  if (usados >= LIMITE) return false;
+
+  try {
+    await cache.put(clave, new Response(String(usados + 1), {
+      headers: { 'Cache-Control': `max-age=${VENTANA}` },
+    }));
+  } catch {
+    // idem
+  }
+  return true;
+}
+
 async function callOpenRouter(apiKey, model, messages) {
   const res = await fetch(OPENROUTER_URL, {
     method: 'POST',
@@ -135,6 +201,10 @@ export async function onRequestPost(context) {
     );
   }
 
+  if (!mismoSitio(request)) {
+    return responder({ error: 'Petición de otro sitio.' }, 403);
+  }
+
   let body;
   try {
     body = await request.json();
@@ -161,8 +231,19 @@ export async function onRequestPost(context) {
     );
   }
 
-  // Build messages with system prompt, limit to last 10 user messages
-  const trimmed = messages.slice(-10);
+  // Solo los papeles de una conversación, con su largo tope y los últimos
+  // MAX_MENSAJES: lo que llega del navegador no es de fiar (ver el freno)
+  const trimmed = messages
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .slice(-MAX_MENSAJES)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_MENSAJE) }));
+  if (!trimmed.length) return responder({ error: 'Missing messages or persona' }, 400);
+
+  // El freno va después de validar: una petición mal formada no gasta cupo
+  if (!(await pasaElFreno(request))) {
+    return responder({ error: 'Demasiados mensajes por ahora. Vuelve en un rato.', limite: true }, 429);
+  }
+
   const fullMessages = [
     { role: 'system', content: systemPrompt },
     ...trimmed

@@ -284,7 +284,17 @@ function initChat(containerId, persona) {
       const data = await res.json();
       typingEl.remove();
 
-      if (data.error) {
+      if (res.status === 429) {
+        // Se pasó del freno del servidor: no es un fallo, es que hay que
+        // esperar. Ese mensaje no tuvo respuesta, así que no cuenta: ni se
+        // manda otra vez en la conversación ni adelanta el veredicto.
+        history.pop();
+        userMsgCount--;
+        addBubble(persona === 'abuela'
+          ? 'Ai filha, ya hablamos bastante por hoy. Vuelve en un rato, que tengo el bacalhau en el fuego.'
+          : '¡Parece que estás intentando hablar mucho conmigo! Hasta Clippy necesita un descanso. Vuelve en un rato.',
+          'ai');
+      } else if (data.error) {
         addBubble(persona === 'abuela'
           ? 'Ai meu Deus... nao consigo falar agora, filha.'
           : 'Parece que estas intentando hablar conmigo pero algo fallo! Intenta de nuevo.',

@@ -51,11 +51,10 @@ const MAX_RESPUESTA = 700;
    al modelo eligiendo una que la app no sabe resolver. */
 const TASAS = ['usd', 'eur', 'usdt', 'zelle', 'facebank', 'wally', 'zinli'];
 
-// Es un endpoint público que gasta dinero de verdad, así que se pone freno.
-// El contador vive en la caché del centro de datos: no es exacto entre
-// regiones, pero corta en seco al que se sienta a darle en bucle.
-const LIMITE = 20;
-const VENTANA = 3600;
+// Sin freno por IP. Al principio lo tenía, cuando era público; ahora está
+// detrás de la puerta de acceso y solo lo usan quienes tienen llave, así que
+// un límite solo estorbaba a los de casa. El chat público de la portada sí
+// lo tiene: ver chat.js.
 
 /**
  * El modelo NO hace la cuenta. Solo decide qué cuenta hay que hacer.
@@ -544,32 +543,6 @@ const json = (datos, status = 200) =>
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
 
-/** Cuántas veces ha preguntado ya esta IP en la última hora */
-async function pasaElFreno(peticion) {
-  const ip = peticion.headers.get('CF-Connecting-IP') || 'desconocida';
-  const clave = new Request(`https://freno.local/60iq/${encodeURIComponent(ip)}`);
-  const cache = caches.default;
-
-  let usadas = 0;
-  try {
-    const guardado = await cache.match(clave);
-    if (guardado) usadas = Number(await guardado.text()) || 0;
-  } catch {
-    // Sin caché no se puede contar; se deja pasar antes que romper
-  }
-
-  if (usadas >= LIMITE) return false;
-
-  try {
-    await cache.put(clave, new Response(String(usadas + 1), {
-      headers: { 'Cache-Control': `max-age=${VENTANA}` },
-    }));
-  } catch {
-    // idem
-  }
-
-  return true;
-}
 
 const NOMBRE_MODO = {
   divisa: 'Divisas — el campo son divisas y se quiere saber cuantos bolivares son',
@@ -784,10 +757,6 @@ export async function onRequestPost(context) {
         .filter((m) => m && (m.rol === 'user' || m.rol === 'assistant') && typeof m.texto === 'string')
         .map((m) => ({ role: m.rol, content: m.texto.slice(0, MAX_PREGUNTA) }))
     : [];
-
-  if (!(await pasaElFreno(request))) {
-    return json({ error: 'Ya preguntaste bastante por hoy. Usa la calculadora.' }, 429);
-  }
 
   /* Quién pregunta y qué se sabe de esa persona.
      Este endpoint está detrás del acceso, así que siempre hay sesión; se

@@ -1389,7 +1389,7 @@ function calcular() {
  *
  * Le pasamos las tasas que hay en pantalla en ese momento, para que no se las
  * invente: el modelo pone la conversación, los números los pone la app. La
- * clave de OpenAI no vive aquí sino en /api/60iq, porque cualquier cosa que
+ * clave de OpenRouter no vive aquí sino en /api/60iq, porque cualquier cosa que
  * esté en este archivo la puede leer quien abra el código fuente.
  */
 let iqPreguntando = false;
