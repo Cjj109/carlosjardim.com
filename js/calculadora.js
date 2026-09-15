@@ -2033,18 +2033,79 @@ document.addEventListener('DOMContentLoaded', () => {
   // Miguel: tocar la pala la hace golpear (ver darALaPelota)
   document.querySelector('.pala-toque')?.addEventListener('click', darALaPelota);
 
-  /* Sasha: tocarla hace que se relama, como en la foto, y le sale un
-     corazón. Quitar y volver a poner la clase reinicia la animación si se la
-     toca seguido; al acabar la lengua, se quita sola. */
+  /* Sasha y sus ánimos, que su dueño y su hermana conocen de memoria: la
+     tranquila, la curiosa con la cabeza ladeada, la de los ojitos de
+     pedir, la feliz con la lengua fuera y la dormida. El JS solo dice cuál
+     (data-animo); cómo se ve cada uno lo dice el CSS.
+
+     De día va pasando de uno a otro sola. De noche —de diez a seis, por la
+     hora del teléfono— duerme; si se la toca se despierta curiosa un rato y
+     vuelve a dormirse. Despierta, tocarla la alegra o hace que se relama, y
+     le sale un corazón. Mientras se escribe un monto mira la caja: eso es
+     solo CSS (:has). Sin movimiento si el sistema lo pide: se queda
+     tranquila, o dormida de noche. */
   const sasha = document.querySelector('.sasha');
-  sasha?.addEventListener('click', () => {
-    sasha.classList.remove('lame');
-    void sasha.offsetWidth;
-    sasha.classList.add('lame');
-  });
-  sasha?.addEventListener('animationend', (e) => {
-    if (e.animationName === 'lamer') sasha.classList.remove('lame');
-  });
+  if (sasha) {
+    const DE_DIA = ['tranquila', 'curiosa', 'tranquila', 'ojitos', 'tranquila', 'feliz'];
+    let vuelta = 0;
+    let despiertaHasta = 0;
+    let reloj = null;
+
+    const esDeNoche = () => {
+      const hora = new Date().getHours();
+      return hora >= 22 || hora < 6;
+    };
+    const ponerAnimo = (animo) => { sasha.dataset.animo = animo; };
+
+    // Reinicia una animación de clase aunque se toque seguido
+    const repetir = (clase) => {
+      sasha.classList.remove(clase);
+      void sasha.offsetWidth;
+      sasha.classList.add(clase);
+    };
+
+    const siguiente = () => {
+      // Fuera de su tema o con la app de fondo no hay nadie mirando
+      if (document.documentElement.dataset.tema !== 'sasha' || document.hidden) return;
+      if (esDeNoche() && Date.now() > despiertaHasta) return ponerAnimo('dormida');
+      if (SIN_MOVIMIENTO.matches) return ponerAnimo('tranquila');
+      vuelta = (vuelta + 1) % DE_DIA.length;
+      ponerAnimo(DE_DIA[vuelta]);
+    };
+
+    const programar = (ms = 6500) => {
+      clearTimeout(reloj);
+      reloj = setTimeout(() => { siguiente(); programar(); }, ms);
+    };
+
+    ponerAnimo(esDeNoche() ? 'dormida' : 'tranquila');
+    programar();
+
+    sasha.addEventListener('click', () => {
+      if (sasha.dataset.animo === 'dormida') {
+        despiertaHasta = Date.now() + 20000;
+        ponerAnimo('curiosa');
+      } else if (Math.random() < 0.5) {
+        // Un gesto a la vez: tocándola seguido, la lengua de relamerse se
+        // quedaba puesta sobre la boca abierta
+        sasha.classList.remove('lame');
+        ponerAnimo('feliz');
+        repetir('mimo');
+      } else {
+        // Con la boca cerrada, que la lengua de relamerse sale de ahí
+        sasha.classList.remove('mimo');
+        ponerAnimo('tranquila');
+        repetir('lame');
+      }
+      // Lo que se provocó tocándola dura un poco más antes del siguiente
+      programar(8000);
+    });
+
+    sasha.addEventListener('animationend', (e) => {
+      if (e.animationName === 'lamer') sasha.classList.remove('lame');
+      if (e.animationName === 'corazon') sasha.classList.remove('mimo');
+    });
+  }
 
   const panelHist = $('calcPanelHistorial');
   $('calcHistorial')?.addEventListener('click', () => {

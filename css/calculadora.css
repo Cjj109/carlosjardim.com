@@ -2755,12 +2755,14 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    pelaje, el crema de su hocico y su pecho, el marrón oscuro de su nariz y
    el rosa de su arnés.
 
-     la esquina    ella, asomándose por el borde con sus orejotas —la
-                   izquierda caída, como la lleva a veces—. Parpadea, mueve
-                   una oreja de vez en cuando y, si se la toca, se relama
-                   como en la foto y le sale un corazón
+     las tarjetas  ella, asomada por encima con las patitas en el borde y
+                   sus orejotas —la izquierda caída, como la lleva a veces—,
+                   con sus ánimos: tranquila, curiosa, con ojitos de pedir,
+                   feliz con la lengua fuera y, de noche, dormida. Parpadea,
+                   mira la caja mientras se escribe y, si se la toca, se
+                   alegra o se relame, y le sale un corazón
      la página     sus huellitas, que cruzan de vez en cuando por detrás
-     el título     en bronce, con una huella rosa al final
+     el título     en su bronce
 
    Todo redondeado y blandito, que es lo que es ella. */
 
@@ -2824,53 +2826,50 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   color: var(--calc-texto);
 }
 
-/* El título en su bronce, con una huella rosa al final */
+/* El título en su bronce. Llevaba una huella rosa al final, pero Sasha se
+   asoma ahora justo a su lado y la pisaba: con ella al lado, sobraba. */
 :root[data-tema="sasha"] .calc-head h1 { color: var(--calc-usd); }
 
-:root[data-tema="sasha"] .calc-head h1::after {
-  content: '';
-  display: inline-block;
-  width: 0.62em;
-  height: 0.62em;
-  margin-left: 0.3em;
-  vertical-align: 0.05em;
-  background: var(--calc-eur);
-  -webkit-mask: var(--huella) center / contain no-repeat;
-  mask: var(--huella) center / contain no-repeat;
-  rotate: 18deg;
-}
+/* ---------- Sasha, asomada a las tarjetas ----------
+   Por encima de la fila de tarjetas, a la derecha, con las patitas en su
+   borde, como quien se asoma a un muro. Antes estaba en la esquina de la
+   pantalla, recortada por el borde: se veía media y, en el escritorio,
+   lejísimos de todo. Aquí se ve entera y junto a las tasas.
 
-/* ---------- Sasha, asomándose ----------
-   Por el borde derecho, arriba, donde Halloween tiene su telaraña. Va por
-   encima del contenido para poder tocarla, así que la caja se queda por
-   encima del título: en el teléfono el título empieza a los 80 px. La caja
-   recorta lo que asoma por fuera de la pantalla, que si no ensancharía la
-   página (el acebo de Navidad lo hacía). */
+   Va dentro de .calc-tasas, la última para no mover los nth-child de las
+   tarjetas. Un poco por fuera de la fila, hacia el margen, y con un ancho
+   que sigue al de la pantalla: así empieza siempre a la derecha del final
+   del título, también en un teléfono de 360. */
 .sasha,
 .huellas { display: none; }
+
+:root[data-tema="sasha"] .calc-tasas { position: relative; }
 
 :root[data-tema="sasha"] .sasha {
   display: block;
   position: absolute;
-  z-index: 1;
-  top: 0;
-  right: 0;
-  width: 96px;
-  /* 78 y no 80: el título empieza a los 79 px en el teléfono */
-  height: 78px;
-  overflow: hidden;
-  overflow: clip;
+  right: -6px;
+  /* Las patas montan unos píxeles sobre el borde de la tarjeta */
+  bottom: calc(100% - 6px);
+  width: clamp(60px, 18vw, 92px);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 :root[data-tema="sasha"] .sasha svg {
-  position: absolute;
-  top: 2px;
-  right: -12px;
-  width: 80px;
-  rotate: -12deg;
-  filter: drop-shadow(0 4px 6px rgba(80, 45, 20, 0.22));
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 3px 5px rgba(80, 45, 20, 0.2));
+}
+
+/* La cabeza se ladea desde el cuello; las patas se quedan apoyadas */
+.sasha .cabeza {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+  rotate: -6deg;
+  transition: rotate 0.45s ease;
 }
 
 /* Parpadea de vez en cuando, y la oreja buena se mueve sola */
@@ -2903,6 +2902,129 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   70% { rotate: 4deg; }
 }
 
+/* ---------- Sus ánimos ----------
+   El JS pone data-animo y aquí cada uno mueve lo suyo: cuánto ladea la
+   cabeza, las orejas, las cejas, hacia dónde mira y la boca. Con
+   transición, para que pase de uno a otro como un gesto y no como un
+   cambio de foto. */
+.sasha .pupila,
+.sasha .ceja,
+.sasha .oreja-izq { transform-box: fill-box; }
+
+.sasha .pupila { transition: translate 0.35s ease; }
+
+.sasha .ceja {
+  transform-origin: center;
+  transition: transform 0.35s ease;
+}
+
+.sasha .oreja-izq {
+  transform-origin: 85% 90%;
+  transition: transform 0.45s ease;
+}
+
+.sasha .oreja-der { transition: transform 0.45s ease; }
+.sasha .ojo { transition: transform 0.3s ease, opacity 0.25s ease; }
+.sasha .boca { transition: opacity 0.2s ease; }
+
+.sasha .cerrado,
+.sasha .boca-abierta,
+.sasha .lengua-fuera {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* Curiosa: la cabeza más ladeada, las orejas arriba, una ceja levantada y
+   mirando a un lado */
+.sasha[data-animo="curiosa"] .cabeza { rotate: -18deg; }
+.sasha[data-animo="curiosa"] .oreja-izq { transform: rotate(18deg); }
+.sasha[data-animo="curiosa"] .pupila { translate: 1.4px -0.6px; }
+.sasha[data-animo="curiosa"] .ceja-der { transform: translateY(-1.8px); }
+
+/* Ojitos: los de pedir, mirando hacia arriba con las cejas levantadas por
+   dentro y las orejas un poco hacia atrás */
+.sasha[data-animo="ojitos"] .cabeza { rotate: -3deg; }
+.sasha[data-animo="ojitos"] .pupila { translate: 0 -1.4px; }
+.sasha[data-animo="ojitos"] .ojo { transform: scale(1.1); }
+.sasha[data-animo="ojitos"] .ceja-izq { transform: translateY(-2.5px) rotate(-12deg); }
+.sasha[data-animo="ojitos"] .ceja-der { transform: translateY(-2.5px) rotate(12deg); }
+.sasha[data-animo="ojitos"] .oreja-izq { transform: rotate(-10deg); }
+.sasha[data-animo="ojitos"] .oreja-der { transform: rotate(12deg); }
+
+/* Feliz: la boca abierta, la lengua fuera jadeando y los ojos risueños */
+.sasha[data-animo="feliz"] .cabeza { rotate: -8deg; }
+.sasha[data-animo="feliz"] .boca { opacity: 0; }
+
+.sasha[data-animo="feliz"] .boca-abierta,
+.sasha[data-animo="feliz"] .lengua-fuera { opacity: 1; }
+
+.sasha[data-animo="feliz"] .lengua-fuera {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: jadeo 0.36s ease-in-out infinite alternate;
+}
+
+.sasha[data-animo="feliz"] .ojo { transform: scale(1, 0.8); }
+.sasha[data-animo="feliz"] .oreja-izq { transform: rotate(-8deg); }
+.sasha[data-animo="feliz"] .oreja-der { transform: rotate(8deg); }
+
+@keyframes jadeo {
+  from { scale: 1 0.88; }
+  to { scale: 1 1.06; }
+}
+
+/* Dormida: los ojos cerrados, las orejas caídas, respira despacio y le
+   salen las zetas */
+.sasha[data-animo="dormida"] .cabeza {
+  rotate: -2deg;
+  animation: respira 3.4s ease-in-out infinite;
+}
+
+.sasha[data-animo="dormida"] .ojo {
+  opacity: 0;
+  animation: none;
+}
+
+.sasha[data-animo="dormida"] .cerrado { opacity: 1; }
+.sasha[data-animo="dormida"] .oreja-izq { transform: rotate(-16deg); }
+
+.sasha[data-animo="dormida"] .oreja-der {
+  transform: rotate(20deg);
+  animation: none;
+}
+
+@keyframes respira {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.02 1.035; }
+}
+
+:root[data-tema="sasha"] .sasha::before {
+  content: 'z';
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  color: var(--calc-usd);
+  font: 800 12px/1 var(--font-sans, 'Inter', system-ui, sans-serif);
+  opacity: 0;
+  pointer-events: none;
+}
+
+:root[data-tema="sasha"] .sasha[data-animo="dormida"]::before {
+  animation: sueno 2.8s ease-out infinite;
+}
+
+@keyframes sueno {
+  0% { opacity: 0; translate: 6px 10px; scale: 0.7; }
+  30% { opacity: 0.8; }
+  100% { opacity: 0; translate: -8px -8px; scale: 1.25; }
+}
+
+/* Mientras se escribe un monto, mira la caja: hacia abajo y a la izquierda,
+   que es donde queda desde su sitio. Dormida no se entera. */
+:root:has(#calcMonto:focus) .sasha:not([data-animo="dormida"]) .pupila {
+  translate: -1.5px 1.6px;
+}
+
 /* Al tocarla: se relame, entrecierra los ojos y le sale un corazón */
 .sasha.lame .lengua { animation: lamer 0.9s ease-out; }
 
@@ -2920,8 +3042,8 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root[data-tema="sasha"] .sasha::after {
   content: '';
   position: absolute;
-  top: 6px;
-  left: 14px;
+  top: 0;
+  left: 2px;
   width: 16px;
   height: 16px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21C6 16 2 12.5 2 8.5 2 5.5 4.5 3 7.5 3c2 0 3.5 1 4.5 2.5C13 4 14.5 3 16.5 3 19.5 3 22 5.5 22 8.5c0 4-4 7.5-10 12.5z' fill='%23ec7f95'/%3E%3C/svg%3E") center / contain no-repeat;
@@ -2929,7 +3051,8 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   pointer-events: none;
 }
 
-:root[data-tema="sasha"] .sasha.lame::after { animation: corazon 1s ease-out; }
+:root[data-tema="sasha"] .sasha.lame::after,
+:root[data-tema="sasha"] .sasha.mimo::after { animation: corazon 1s ease-out; }
 
 @keyframes corazon {
   0% { opacity: 0; scale: 0.6; translate: 0 6px; }
@@ -2973,7 +3096,15 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   /* Quieta: sin parpadeos, sin oreja y sin huellas que aparecen solas. Si
      se la toca, se relame igual, que eso lo pide quien la toca. */
   .sasha .ojo,
-  .sasha .oreja-der { animation: none; }
+  .sasha .oreja-der,
+  .sasha[data-animo] .cabeza,
+  .sasha[data-animo] .lengua-fuera,
+  :root[data-tema="sasha"] .sasha::before { animation: none; }
+  .sasha .cabeza,
+  .sasha .pupila,
+  .sasha .ceja,
+  .sasha .oreja-izq,
+  .sasha .oreja-der { transition: none; }
   :root[data-tema="sasha"] .huellas { display: none; }
 }
 
