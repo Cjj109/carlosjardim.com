@@ -2,7 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- interactive-widget=resizes-visual: el teclado del teléfono tapa la
+       parte de abajo sin encoger la página. Si la encogiera, al abrirlo y al
+       cerrarlo todo se recolocaría —la página daba un salto al darle a Enter—
+       y las capas del tamaño de la pantalla (la nieve, los murciélagos) se
+       reacomodaban de golpe, que es por lo que en esos temas se notaba más. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-visual">
   <title>Calculadora de Tasas | Carlos Jardim</title>
   <meta name="description" content="Calculadora de tasas de cambio en Venezuela: dólar BCV, euro BCV, USDT y Zelle. Compara cuánto vale un monto según cada tasa y cuánto vender para pagar un precio fijado a BCV.">
   <meta name="theme-color" content="#0a0b0f">
@@ -45,8 +50,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=70">
-  <link rel="stylesheet" href="/css/calculadora.css?r=70">
+  <link rel="stylesheet" href="/css/variables.css?r=71">
+  <link rel="stylesheet" href="/css/calculadora.css?r=71">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -228,7 +233,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v70</span>
+    <span class="calc-version" title="Versión de la app instalada">v71</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -412,7 +417,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=70" defer></script>
+<script src="/js/calculadora.js?r=71" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

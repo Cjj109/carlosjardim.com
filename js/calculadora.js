@@ -1570,6 +1570,50 @@ document.addEventListener('DOMContentLoaded', () => {
   cargarTasas({ primera: true });
 
   const monto = $('calcMonto');
+
+  /* En el teléfono, el teclado tapaba los resultados mientras se escribía.
+     La caja quedaba justo encima de él y las filas, que se recalculan con
+     cada tecla, debajo: no se veía ninguna hasta darle a Enter. Medido en
+     360×780 y 412×915, cero de cuatro a la vista con el teclado abierto.
+
+     Así que al tocar la caja la página sube hasta dejarla arriba, y entre
+     ella y el teclado caben los resultados: se ven cambiar mientras se
+     escribe, y el Enter ya solo baja el teclado. En el iPhone, cuyo
+     teclado numérico ni siquiera tiene Enter, era además la única manera
+     de verlos sin tener que tocar fuera.
+
+     La página no siempre es tan alta como para subir tanto, así que se le
+     añade abajo el hueco que falte (--hueco-teclado, en el body). Se queda
+     mientras haya una cantidad: quitarlo al bajar el teclado encogería la
+     página de golpe y todo daría un salto justo cuando uno se pone a leer.
+     Se va al vaciar la caja.
+
+     Solo en pantallas táctiles estrechas. En el escritorio no hay teclado
+     que tape nada, y en una tableta el panel cabe entero. */
+  const MARGEN_ARRIBA = 12;
+  const TACTIL = window.matchMedia('(pointer: coarse)');
+
+  const subirCaja = () => {
+    if (!TACTIL.matches || ANCHO_MEDIO.matches) return;
+
+    const raiz = document.documentElement;
+    const arriba = monto.closest('.calc-monto').getBoundingClientRect().top + window.scrollY - MARGEN_ARRIBA;
+    const huecoPuesto = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+    // Lo que le falta a la página para poder desplazarse hasta `arriba`
+    const falta = arriba + window.innerHeight - (raiz.scrollHeight - huecoPuesto);
+    raiz.style.setProperty('--hueco-teclado', `${Math.max(0, Math.ceil(falta))}px`);
+
+    // Cuando el teclado ya ha subido: mientras sube, el navegador hace su
+    // propio desplazamiento para enseñar el campo y pisaría este. Los mismos
+    // 320 ms que espera el campo del 60 IQ.
+    setTimeout(() => window.scrollTo({ top: arriba, behavior: 'smooth' }), 320);
+  };
+
+  const soltarHueco = () => {
+    if (monto.value || document.activeElement === monto) return;
+    document.documentElement.style.removeProperty('--hueco-teclado');
+  };
+
   if (monto) {
     monto.addEventListener('input', (e) => {
       // Lo pegado no se ha escrito tecla a tecla, así que ahí sí toca
@@ -1582,6 +1626,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // En el teléfono no hay Enter, así que no se puede esperar a que se
     // confirme nada: se apunta cuando dejas de escribir.
     monto.addEventListener('blur', apuntarCalculoActual);
+
+    monto.addEventListener('focus', subirCaja);
+    monto.addEventListener('blur', soltarHueco);
     monto.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -1628,6 +1675,8 @@ document.addEventListener('DOMContentLoaded', () => {
     else monto.blur();
 
     escribiendoAlBorrar = false;
+    // Vacía y sin teclado: el hueco de subir la caja ya no hace falta
+    soltarHueco();
   });
 
   const panelPrincipal = document.querySelector('.calc-panel');

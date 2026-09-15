@@ -434,6 +434,13 @@ body {
   border-radius: 6px;
 }
 
+/* Menos en el campo del monto. Un campo de texto cuenta como :focus-visible
+   también cuando se toca con el dedo, así que en el teléfono salía un
+   segundo recuadro por dentro de la caja, que ya enciende su borde al
+   enfocarla (.calc-monto:focus-within). Ese borde basta para saber dónde
+   está el foco, también con teclado. */
+.calc-monto input:focus-visible { outline: none; }
+
 @media (max-width: 380px) {
   .calc-modo { font-size: 0.65rem; }
   .calc-monto input { font-size: 1.7rem; }
@@ -1605,6 +1612,12 @@ body {
 
 /* Que arrastrar dentro de una lista no arrastre la página entera */
 body { overscroll-behavior-y: contain; }
+
+/* El hueco que deja subir la caja del monto hasta arriba con el teclado
+   abierto, para que los resultados se vean mientras se escribe. Lo pone
+   subirCaja() y lo quita soltarHueco(), en calculadora.js; el resto del
+   tiempo no existe. */
+body { padding-bottom: var(--hueco-teclado, 0px); }
 .calc-historial,
 .calc-iq-charla { overscroll-behavior: contain; }
 
