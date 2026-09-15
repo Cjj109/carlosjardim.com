@@ -225,27 +225,25 @@ async function fichas(db, ahora, usd, eur, fechaValor) {
   return { bcv: ficha('bcv'), farmatodo: ficha('bcv-farmatodo') };
 }
 
-console.log('\nFARMATODO: LA NUEVA NO ENTRA HASTA SU DÍA HÁBIL');
+console.log('\nFARMATODO: SOLO CUANDO COBRA OTRA CIFRA');
 {
   const db = nuevaD1();
   await momento(db, '2026-09-10T09:00:00', 820, 900, '2026-09-10');
   const viernes = await fichas(db, '2026-09-11T16:30:00', 830, 910, '2026-09-14');
-  comprobar('viernes tarde: Farmatodo cobra 820', viernes.farmatodo.rate, 820);
-  comprobar('  y anuncia 830 para el lunes 14, no el 12', `${viernes.farmatodo.proxima?.rate}@${viernes.farmatodo.proxima?.date}`, '830@2026-09-14');
+  comprobar('viernes tarde: todavía coincide, no hay ficha', viernes.farmatodo ?? null, null);
 
   const sabado = await fichas(db, '2026-09-12T10:00:00', 830, 910, '2026-09-14');
   comprobar('sábado: el BCV ya cobra 830', sabado.bcv.rate, 830);
-  comprobar('  pero Farmatodo sigue en 820', sabado.farmatodo.rate, 820);
-  comprobar('  y el euro se queda atrás con él', sabado.farmatodo.eur, 900);
-  comprobar('  con la fecha de la tasa que cobra', sabado.farmatodo.date, '2026-09-10');
-  comprobar('  y no dice que coincide', /coincide/.test(sabado.farmatodo.detalle), false);
+  comprobar('  y sale Farmatodo, que sigue en 820', sabado.farmatodo?.rate, 820);
+  comprobar('  el euro se queda atrás con él', sabado.farmatodo?.eur, 900);
+  comprobar('  con la fecha de la tasa que cobra', sabado.farmatodo?.date, '2026-09-10');
+  comprobar('  y anuncia 830 para el lunes 14, no el 12', `${sabado.farmatodo?.proxima?.rate}@${sabado.farmatodo?.proxima?.date}`, '830@2026-09-14');
 
-  comprobar('domingo: sigue en 820', (await fichas(db, '2026-09-13T10:00:00', 830, 910, '2026-09-14')).farmatodo.rate, 820);
+  comprobar('domingo: sigue, en 820', (await fichas(db, '2026-09-13T10:00:00', 830, 910, '2026-09-14')).farmatodo?.rate, 820);
 
   const lunes = await fichas(db, '2026-09-14T09:00:00', 830, 910, '2026-09-14');
-  comprobar('lunes 14: entra en Farmatodo', lunes.farmatodo.rate, 830);
-  comprobar('  y dice que coincide con el BCV', /coincide/.test(lunes.farmatodo.detalle), true);
-  comprobar('  sin próxima que anunciar', lunes.farmatodo.proxima, null);
+  comprobar('lunes 14: entra en Farmatodo y ya coincide, se va', lunes.farmatodo ?? null, null);
+  comprobar('  y el BCV sigue en 830', lunes.bcv.rate, 830);
 }
 
 console.log('\nFARMATODO CON EL LUNES FERIADO');
@@ -253,25 +251,24 @@ console.log('\nFARMATODO CON EL LUNES FERIADO');
   const db = nuevaD1();
   await momento(db, '2026-09-10T09:00:00', 820, 900, '2026-09-10');
   await momento(db, '2026-09-11T16:30:00', 830, 910, '2026-09-15');
-  comprobar('lunes feriado: sigue en 820', (await fichas(db, '2026-09-14T10:00:00', 830, 910, '2026-09-15')).farmatodo.rate, 820);
-  comprobar('martes 15: entra', (await fichas(db, '2026-09-15T10:00:00', 830, 910, '2026-09-15')).farmatodo.rate, 830);
+  comprobar('lunes feriado: sale, en 820', (await fichas(db, '2026-09-14T10:00:00', 830, 910, '2026-09-15')).farmatodo?.rate, 820);
+  comprobar('martes 15: entra y se va', (await fichas(db, '2026-09-15T10:00:00', 830, 910, '2026-09-15')).farmatodo ?? null, null);
 }
 
-console.log('\nFARMATODO ENTRE SEMANA ES LA MISMA DEL BCV');
+console.log('\nFARMATODO ENTRE SEMANA NO SALE');
 {
   const db = nuevaD1();
   await momento(db, '2026-09-15T09:00:00', 830, 910, '2026-09-15');
   const tarde = await fichas(db, '2026-09-15T16:30:00', 840, 920, '2026-09-16');
-  comprobar('martes tarde, ya publicada la del miércoles', `${tarde.bcv.rate}/${tarde.farmatodo.rate}`, '830/830');
+  comprobar('martes tarde, ya publicada la del miércoles', `${tarde.bcv.rate}/${tarde.farmatodo?.rate ?? 'sin ficha'}`, '830/sin ficha');
   const miercoles = await fichas(db, '2026-09-16T09:00:00', 840, 920, '2026-09-16');
-  comprobar('miércoles: entra en los dos', `${miercoles.bcv.rate}/${miercoles.farmatodo.rate}`, '840/840');
+  comprobar('miércoles: entra en los dos, sin ficha', `${miercoles.bcv.rate}/${miercoles.farmatodo?.rate ?? 'sin ficha'}`, '840/sin ficha');
 }
 
 console.log('\nFARMATODO SIN MEMORIA');
 {
   const r = await fichas(null, '2026-09-12T10:00:00', 830, 910, '2026-09-14');
-  comprobar('sin base: la ficha no inventa', r.farmatodo.rate, null);
-  comprobar('  y dice por qué', r.farmatodo.motivo, 'sin memoria de tasas');
+  comprobar('sin base no se sabe si difiere: no sale', r.farmatodo ?? null, null);
 }
 
 globalThis.Date = DateReal;

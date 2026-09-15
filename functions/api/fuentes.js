@@ -201,6 +201,13 @@ export async function onRequestGet(context) {
   const farmatodo = await vigenteSegunFechaValor(context.env?.MONTOS, hoy);
   const siguienteFarmatodo = await proximaSegunFechaValor(context.env?.MONTOS, hoy);
 
+  // Si Farmatodo cobra hoy otra cifra que la nuestra: solo entonces tiene
+  // ficha (ver abajo). Con las dos cifras delante; si falta una, no se sabe.
+  const distinta = (a, b) => a != null && b != null && a !== b;
+  const farmatodoDifiere =
+    !!farmatodo && !!aplicando &&
+    (distinta(farmatodo.usd, aplicando.usd) || distinta(farmatodo.eur, aplicando.eur));
+
   /**
    * Cambia la lectura por la que ya se aplica.
    *
@@ -272,25 +279,30 @@ export async function onRequestGet(context) {
        comercios que no cobran la tasa nueva hasta su día hábil. La regla está
        en _vigencia.js.
 
-       Al contrario que "la que viene", esta ficha está SIEMPRE, también entre
-       semana cuando da la misma cifra que la del BCV. Es una costumbre de
-       cobro y no una tasa pasajera: quien la elige para comprar en Farmatodo
-       la quiere puesta el sábado sin tener que volver a buscarla. */
-    {
+       Solo sale cuando cobra OTRA cifra que la nuestra: el fin de semana o
+       el feriado en que nuestra tasa ya entró y la de ellos todavía no.
+       Nosotros aplicamos la última publicada desde el día siguiente; ellos,
+       desde su fecha valor. Entre semana es la misma, y una ficha que repite
+       el número del BCV es ruido en el panel —así lo pidió el dueño—. Antes
+       estaba siempre, con un "hoy coincide con la del BCV".
+
+       Quien la tenga elegida no la pierde: la elección vive en su navegador.
+       Entre semana cae en la primera del grupo, la del BCV, que es la misma
+       cifra; y en cuanto la ficha vuelve, el sábado, vuelve a mandar ella sin
+       tocar nada. Sin memoria de tasas no se puede saber si difiere, así que
+       tampoco sale. */
+    farmatodoDifiere && {
       id: 'bcv-farmatodo',
       grupo: 'bcv',
       nombre: 'BCV · Farmatodo',
-      detalle:
-        farmatodo && aplicando && farmatodo.usd === aplicando.usd
-          ? 'Como cobran Farmatodo y otros comercios: la tasa nueva no entra hasta su día hábil. Hoy coincide con la del BCV.'
-          : 'Como cobran Farmatodo y otros comercios: la tasa nueva no entra hasta su día hábil, aunque el BCV ya la haya movido.',
-      rate: farmatodo?.usd ?? null,
-      eur: farmatodo?.eur ?? null,
-      date: farmatodo?.fecha ?? null,
+      detalle: 'Como cobran Farmatodo y otros comercios: la tasa nueva no entra hasta su día hábil, aunque el BCV ya la haya movido.',
+      rate: farmatodo.usd ?? null,
+      eur: farmatodo.eur ?? null,
+      date: farmatodo.fecha ?? null,
       proxima: siguienteFarmatodo
         ? { rate: siguienteFarmatodo.usd, eur: siguienteFarmatodo.eur, date: siguienteFarmatodo.fecha }
         : null,
-      motivo: farmatodo ? null : 'sin memoria de tasas',
+      motivo: null,
     },
     {
       id: 'dolarapi',
