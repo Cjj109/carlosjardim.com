@@ -50,8 +50,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=72">
-  <link rel="stylesheet" href="/css/calculadora.css?r=72">
+  <link rel="stylesheet" href="/css/variables.css?r=73">
+  <link rel="stylesheet" href="/css/calculadora.css?r=73">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -62,7 +62,7 @@
     //    hasta que el HTML está parseado; lanzándola aquí se adelanta y para
     //    cuando el código la necesita suele estar ya en camino.
     (function () {
-      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910', halloween: '#0c0912' };
+      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910', halloween: '#0c0912', zachiro: '#ebe7dc' };
       var tema = 'oscuro';
       try { tema = localStorage.getItem('calc-tema') || 'oscuro'; } catch (e) {}
       if (!COLORES[tema]) tema = 'oscuro';
@@ -122,6 +122,9 @@
 <!-- Miguel: la pala de pádel en la esquina, que de vez en cuando le da a la
      pelota, o cuando se la toca -->
 <div class="padel" aria-hidden="true"><span class="pala"></span><span class="pelota"><i></i></span><span class="pala-toque"></span></div>
+
+<!-- Zachiro: el sello del mangaka, 印鑑, con su nombre en katakana -->
+<div class="hanko" aria-hidden="true">ザチロ</div>
 
 <!-- Halloween: murciélagos que cruzan de vez en cuando, y una araña colgada
      de su tela en la esquina. Como la nieve, no existen en los demás temas. -->
@@ -191,11 +194,13 @@
       <button type="button" class="calc-modo" data-modo="usdt" role="tab" aria-selected="false" aria-controls="calcResultados" tabindex="-1">USDT</button>
     </div>
 
-    <p class="calc-pregunta" id="calcPregunta">¿Cuántos bolívares son, según cada tasa?</p>
-    <!-- Las tasas en una línea, mientras la caja está subida en el teléfono
-         (ver subirCaja). Repite lo de las tarjetas, así que el lector de
-         pantalla no la lee. -->
-    <p class="calc-tira" id="calcTira" aria-hidden="true"></p>
+    <!-- La pregunta y la tira de tasas se turnan el sitio: mientras la caja
+         está subida en el teléfono (ver subirCaja) la pregunta se pliega y la
+         tira se despliega. Cada una va en su plegable para que el cambio se
+         anime en vez de saltar. La tira repite lo de las tarjetas, así que el
+         lector de pantalla no la lee. -->
+    <div class="plegable plegable-pregunta"><div><p class="calc-pregunta" id="calcPregunta">¿Cuántos bolívares son, según cada tasa?</p></div></div>
+    <div class="plegable plegable-tira"><div><p class="calc-tira" id="calcTira" aria-hidden="true"></p></div></div>
 
     <div class="calc-monto">
       <span class="calc-monto-signo" id="calcSigno">$</span>
@@ -237,7 +242,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v72</span>
+    <span class="calc-version" title="Versión de la app instalada">v73</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -325,6 +330,10 @@
       <button type="button" class="tema" data-tema="halloween" role="radio" aria-checked="false">
         <span class="tema-muestra muestra-halloween" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         Halloween
+      </button>
+      <button type="button" class="tema" data-tema="zachiro" role="radio" aria-checked="false">
+        <span class="tema-muestra muestra-zachiro" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Zachiro
       </button>
     </div>
   </section>
@@ -421,7 +430,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=72" defer></script>
+<script src="/js/calculadora.js?r=73" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

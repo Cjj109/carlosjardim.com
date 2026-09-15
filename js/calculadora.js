@@ -24,6 +24,7 @@ const TEMAS = {
   navidad: '#0b1410',
   miguel: '#0b0910',
   halloween: '#0c0912',
+  zachiro: '#ebe7dc',
 };
 
 /* ---------- Utilidades ---------- */
@@ -801,6 +802,85 @@ function pintarTasas({ falloDeRed = false } = {}) {
 
   aviso.textContent = `${hora} · ${origen}${vigencia}${proxima}`;
 }
+
+/* El desplazamiento de la página cuando la caja del monto sube o el panel
+   se centra. Con la misma curva y la misma duración que los pliegues de la
+   pregunta y la tira (--curva-caja y --tiempo-caja en el CSS, la de
+   easeOutQuart: arranca con el toque y se posa despacio), para que la
+   página, la caja y la tira se muevan como una sola cosa. El smooth del
+   navegador tiene su propia curva y su propia duración, distintas en cada
+   uno, y no se puede acompasar con nada.
+
+   Con un ancla, manda ella. El desplazamiento no sigue entonces una curva
+   propia: en cada fotograma se pone la página donde haga falta para que el
+   ancla —la caja del monto— esté donde le toca en SU curva. Lo que hay
+   encima de la caja se pliega a la vez con transiciones del CSS, que nunca
+   van exactamente al paso del JS (en un teléfono basta un fotograma
+   perdido), y con la página siguiendo su propia curva la caja iba y volvía
+   unos píxeles: hasta 10, medido con siete tasas. Midiendo la caja en cada
+   fotograma, se mueve siempre en un solo sentido, pase lo que pase
+   alrededor.
+
+   Se corta en cuanto el dedo toca la pantalla: una animación que pelea con
+   quien está desplazando es peor que ninguna. Y sin movimiento si el
+   sistema lo pide. */
+const TIEMPO_CAJA = 380;
+const SIN_MOVIMIENTO = window.matchMedia('(prefers-reduced-motion: reduce)');
+let desplazando = 0;
+
+function animarScroll(destino, { ancla = null, anclaFinal = null } = {}) {
+  cancelAnimationFrame(desplazando);
+  const desde = window.scrollY;
+  const distancia = destino - desde;
+  if (!ancla && Math.abs(distancia) < 1) return;
+  if (SIN_MOVIMIENTO.matches) {
+    window.scrollTo(0, destino);
+    return;
+  }
+
+  // Dónde se ve el ancla ahora y dónde se tiene que ver al final
+  const vistaDesde = ancla?.getBoundingClientRect().top ?? 0;
+  const vistaHasta = ancla ? anclaFinal - destino : 0;
+  let anterior = null;
+  let quietos = 0;
+
+  /* El reloj arranca en el primer fotograma y no al llamar: las transiciones
+     del CSS que acompañan al desplazamiento también empiezan a contar en ese
+     fotograma. Contando desde la llamada, el desplazamiento iba un fotograma
+     por delante de los pliegues, y cuando se movían en sentidos contrarios
+     la caja daba un vaivén de unos píxeles. */
+  let inicio = null;
+  const paso = (ahora) => {
+    inicio ??= ahora;
+    const t = Math.min(1, (ahora - inicio) / TIEMPO_CAJA);
+    const e = 1 - (1 - t) ** 4;
+
+    if (!ancla) {
+      window.scrollTo(0, desde + distancia * e);
+      if (t < 1) desplazando = requestAnimationFrame(paso);
+      return;
+    }
+
+    // Dónde está el ancla en la página en este fotograma, se haya plegado
+    // lo que se haya plegado encima, y la página donde toque para verla en
+    // su sitio de la curva
+    const enPagina = ancla.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, enPagina - (vistaDesde + (vistaHasta - vistaDesde) * e));
+
+    // Pasada la curva, unos fotogramas más mientras lo de encima termina de
+    // plegarse, para que la caja acabe exactamente en su sitio
+    quietos = anterior !== null && Math.abs(enPagina - anterior) < 0.5 ? quietos + 1 : 0;
+    anterior = enPagina;
+    if (t < 1 || (quietos < 2 && ahora - inicio < TIEMPO_CAJA * 2)) {
+      desplazando = requestAnimationFrame(paso);
+    }
+  };
+  desplazando = requestAnimationFrame(paso);
+}
+
+const cortarScroll = () => cancelAnimationFrame(desplazando);
+window.addEventListener('touchstart', cortarScroll, { passive: true });
+window.addEventListener('wheel', cortarScroll, { passive: true });
 
 /* La tira de tasas que acompaña a la caja del monto cuando sube en el
    teléfono (ver subirCaja). Sale de las tarjetas visibles, leídas tal cual:
@@ -1626,26 +1706,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const MARGEN_ARRIBA = 12;
   const TACTIL = window.matchMedia('(pointer: coarse)');
 
+  /* Se miden los plegables y no la pregunta o la tira: el alto que ocupan
+     incluye los márgenes de dentro, y el scrollHeight de un párrafo no. Con
+     el del párrafo, el centrado se quedaba 27 px corto y al final corregía. */
+  const plegables = (panel) => ({
+    pregunta: panel.querySelector('.plegable-pregunta'),
+    tira: panel.querySelector('.plegable-tira'),
+  });
+  // Lo que mide abierto, esté como esté: el div de dentro nunca se recorta
+  // a sí mismo, solo lo recorta la fila del plegable
+  const altoAbierto = (plegable) => plegable.firstElementChild.scrollHeight;
+
   const subirCaja = () => {
     if (!TACTIL.matches || ANCHO_MEDIO.matches) return;
 
-    // Primero la tira, en el sitio de la pregunta: se sube hasta dejarla a
-    // ella arriba, y así las tasas siguen a la vista encima de la caja
+    const panel = monto.closest('.calc-panel');
+    const { pregunta, tira } = plegables(panel);
     pintarTira();
-    monto.closest('.calc-panel').classList.add('is-subida');
 
+    // Adónde se va: el borde de arriba del plegable de la pregunta, que es
+    // donde queda la tira cuando la pregunta se pliega. Se mide antes de
+    // plegar nada, y así se sabe el destino desde el primer fotograma.
     const raiz = document.documentElement;
-    const tope = $('calcTira') || monto.closest('.calc-monto');
-    const arriba = tope.getBoundingClientRect().top + window.scrollY - MARGEN_ARRIBA;
+    const arriba = pregunta.getBoundingClientRect().top + window.scrollY - MARGEN_ARRIBA;
+    // Lo que cambia el alto al cambiar la pregunta por la tira
+    const crece = altoAbierto(tira) - altoAbierto(pregunta);
     const huecoPuesto = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
     // Lo que le falta a la página para poder desplazarse hasta `arriba`
-    const falta = arriba + window.innerHeight - (raiz.scrollHeight - huecoPuesto);
+    const falta = arriba + window.innerHeight - (raiz.scrollHeight - huecoPuesto + crece);
     raiz.style.setProperty('--hueco-teclado', `${Math.max(0, Math.ceil(falta))}px`);
 
-    // Cuando el teclado ya ha subido: mientras sube, el navegador hace su
-    // propio desplazamiento para enseñar el campo y pisaría este. Los mismos
-    // 320 ms que espera el campo del 60 IQ.
-    setTimeout(() => window.scrollTo({ top: arriba, behavior: 'smooth' }), 320);
+    /* La pregunta se pliega, la tira se despliega y la página sube: las tres
+       a la vez y con la misma curva, mientras sube el teclado. Antes se
+       esperaban 320 ms a que terminara de subir, por miedo a que el
+       navegador desplazara por su cuenta; esa pausa era lo que se notaba. Si
+       el navegador empuja a mitad de camino, el fotograma siguiente vuelve a
+       poner la página donde toca. */
+    // El ancla es la caja: acaba `crece` más abajo en la página, lo que
+    // cambia el alto al cambiar la pregunta por la tira
+    const caja = monto.closest('.calc-monto');
+    const cajaEnPagina = caja.getBoundingClientRect().top + window.scrollY;
+    panel.classList.add('is-subida');
+    animarScroll(arriba, { ancla: caja, anclaFinal: cajaEnPagina + crece });
   };
 
   const soltarHueco = () => {
@@ -1668,14 +1770,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const centrarPanel = () => {
     const panel = monto.closest('.calc-panel');
     if (!panel.classList.contains('is-subida')) return;
-    panel.classList.remove('is-subida');
 
-    // En el fotograma siguiente, con la pregunta ya en el sitio de la tira
-    requestAnimationFrame(() => {
-      const caja = panel.getBoundingClientRect();
-      const margen = Math.max(MARGEN_ARRIBA, (window.innerHeight - caja.height) / 2);
-      window.scrollTo({ top: caja.top + window.scrollY - margen, behavior: 'smooth' });
-    });
+    // El alto que tendrá el panel con la pregunta en vez de la tira, medido
+    // antes de cambiarlas: el destino se sabe desde el primer fotograma y la
+    // página no tiene que corregir el rumbo a mitad de camino
+    const { pregunta, tira } = plegables(panel);
+    const marco = panel.getBoundingClientRect();
+    const cambio = altoAbierto(pregunta) - altoAbierto(tira);
+    const margen = Math.max(MARGEN_ARRIBA, (window.innerHeight - (marco.height + cambio)) / 2);
+
+    // La tira se pliega y la página baja a la vez, como al subir pero al
+    // revés, con la caja otra vez de ancla
+    const caja = monto.closest('.calc-monto');
+    const cajaEnPagina = caja.getBoundingClientRect().top + window.scrollY;
+    panel.classList.remove('is-subida');
+    animarScroll(marco.top + window.scrollY - margen, { ancla: caja, anclaFinal: cajaEnPagina + cambio });
   };
 
   if (monto) {
