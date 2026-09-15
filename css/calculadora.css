@@ -1983,7 +1983,27 @@ body { overscroll-behavior-y: contain; }
   animation: raquetazo var(--golpe) ease-in-out var(--reloj) infinite;
 }
 
-/* Quieta casi todo el rato; se echa atrás, golpea y vuelve */
+/* Donde se toca la pala. Invisible y aparte de la pala: la pala va por
+   detrás del contenido y la caja de .calc, aunque ahí no pinte nada, se
+   quedaría con el toque. Esta va por encima (z-index 1), del tamaño de la
+   pala en reposo y algo más, que un dedo no apunta fino. En esa esquina no
+   hay nada del contenido que pueda tapar. Lo que hace el toque está en
+   darALaPelota(), en calculadora.js. */
+.padel .pala-toque {
+  position: absolute;
+  z-index: 1;
+  top: 4px;
+  right: 4px;
+  width: 76px;
+  height: 116px;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Quieta casi todo el rato; se echa atrás, golpea y vuelve. El 78 % en que
+   empieza a echarse atrás lo usa también darALaPelota(): no cambiar uno sin
+   el otro. */
 @keyframes raquetazo {
   0%, 78%, 96%, 100% { rotate: 0deg; }
   83% { rotate: 20deg; }
@@ -2058,9 +2078,12 @@ body { overscroll-behavior-y: contain; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* La pala se queda colgada en su esquina; la pelota no sale */
+  /* La pala se queda colgada en su esquina; la pelota no sale. Y tampoco se
+     puede tocar: sin golpe que dar, la mano del cursor prometería algo que
+     no pasa. */
   .padel .pala { animation: none; }
-  .padel .pelota { display: none; }
+  .padel .pelota,
+  .padel .pala-toque { display: none; }
 }
 
 /* ---------- Pompas de jabón ----------

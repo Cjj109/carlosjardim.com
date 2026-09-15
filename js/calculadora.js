@@ -228,6 +228,37 @@ function temaGuardado() {
   }
 }
 
+/* ---------- Miguel: la pala ----------
+   Tocar la pala hace que golpee en ese momento en vez de esperar al
+   siguiente de sus diez segundos. El golpe es CSS (@keyframes raquetazo,
+   vuelo-pelota, parabola y estela), así que aquí no se dispara nada: se
+   adelanta el reloj de las cuatro animaciones al punto en que la pala
+   empieza a echarse atrás. Las cuatro al mismo punto, que es lo que las
+   mantiene a la par, y el bucle sigue solo desde ahí.
+
+   Si ya está golpeando o la pelota va por el aire, el toque no hace nada:
+   devolver el reloj la haría desaparecer a medio vuelo. */
+const GOLPE = ['raquetazo', 'vuelo-pelota', 'parabola', 'estela'];
+// El punto de @keyframes raquetazo donde empieza a echarse atrás
+const ECHARSE_ATRAS = 0.78;
+
+function darALaPelota() {
+  // Sin las cuatro (otro tema, o movimiento reducido) no hay golpe que dar
+  const animaciones = document.querySelector('.padel')
+    ?.getAnimations({ subtree: true })
+    .filter((a) => GOLPE.includes(a.animationName)) || [];
+  if (animaciones.length !== GOLPE.length) return;
+
+  const { duration, delay } = animaciones[0].effect.getTiming();
+  const ahora = animaciones[0].currentTime;
+  // Lo que lleva de la vuelta actual, contando el retraso negativo del CSS
+  const dentro = (((ahora - delay) % duration) + duration) % duration;
+  if (dentro >= ECHARSE_ATRAS * duration) return;
+
+  const golpe = ahora - dentro + ECHARSE_ATRAS * duration;
+  animaciones.forEach((a) => { a.currentTime = golpe; });
+}
+
 /* ---------- Elección de fuentes ---------- */
 
 // La venta y no la media: es lo que te pagan de verdad al vender, que es para
@@ -1743,6 +1774,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const listaTemas = $('listaTemas');
   if (listaTemas) navegarConFlechas(listaTemas, '.tema', (b) => { aplicarTema(b.dataset.tema); b.focus(); });
+
+  // Miguel: tocar la pala la hace golpear (ver darALaPelota)
+  document.querySelector('.pala-toque')?.addEventListener('click', darALaPelota);
 
   const panelHist = $('calcPanelHistorial');
   $('calcHistorial')?.addEventListener('click', () => {
