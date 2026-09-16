@@ -1819,6 +1819,62 @@ document.addEventListener('DOMContentLoaded', () => {
     animarScroll(marco.top + window.scrollY - margen, { ancla: caja, anclaFinal: cajaEnPagina + cambio });
   };
 
+  /* Lo mismo, pero en el escritorio, donde la caja nunca sube porque no hay
+     teclado que tape nada y por tanto no había nada que bajar al soltarla.
+
+     El problema ahí es otro: el panel mide 537 px y arranca en el 251, así
+     que en la ventana de un portátil —1280×680 con la barra del navegador
+     puesta— la última tasa y el pie quedan 89 px por debajo del borde.
+     Escribías la cantidad, soltabas el campo y tenías que desplazarte a mano
+     para ver justo lo que venías a ver.
+
+     Así que al soltar la caja con una cantidad puesta, el panel se centra.
+     Sin plegar nada, que aquí no hay tira ni pregunta que turnar: solo el
+     desplazamiento, con la misma curva que en el teléfono.
+
+     Solo si hace falta, y midiendo lo escondido, no el salto. En una pantalla
+     de 900 px el panel entra entero y moverlo sería quitarle la página de
+     debajo a quien no ha pedido nada. Y por un pelo tampoco: en 1366×768
+     sobraba 1 px y la primera versión de esto daba un viaje de 135 para
+     recuperarlo, que se lee como un tirón sin motivo. Por debajo de este
+     margen, lo cortado no molesta tanto como molestaría el movimiento. */
+  const MINIMO_ESCONDIDO = 24;
+
+  /* Si sueltas la caja para tocar los botones del pie —Ajustes, Historial,
+     60 IQ, Tema— quien manda es el panel que se abre: crearPaneles ya lo trae
+     a la vista él solo, y centrar a la vez serían dos animaciones peleándose
+     por la misma página. Se mira el pointerdown porque para cuando llega el
+     blur el foco ya cambió de sitio y no se sabe quién se lo llevó. */
+  let ultimoToque = { nodo: null, cuando: 0 };
+  document.addEventListener(
+    'pointerdown',
+    (e) => { ultimoToque = { nodo: e.target, cuando: performance.now() }; },
+    true,
+  );
+  // Con tiempo: un toque de hace un minuto no explica este blur, que entonces
+  // vino del teclado (Tab, Enter) y ahí sí toca centrar.
+  const vaAOtraCosa = () =>
+    performance.now() - ultimoToque.cuando < 1000 &&
+    !!ultimoToque.nodo?.closest?.('.calc-pie, .calc-ajustes');
+
+  const centrarEnEscritorio = () => {
+    const panel = monto.closest('.calc-panel');
+    // Del teléfono se encarga centrarPanel, que además pliega la tira
+    if (!panel || panel.classList.contains('is-subida') || vaAOtraCosa()) return;
+
+    const marco = panel.getBoundingClientRect();
+    // El resumen va fuera del panel y es lo último que se lee
+    const resumen = $('calcResumen');
+    const abajo = Math.max(marco.bottom, resumen?.getBoundingClientRect().bottom ?? 0);
+    // Lo que se queda fuera, por abajo o por arriba, lo que sea peor
+    const escondido = Math.max(abajo - window.innerHeight, MARGEN_ARRIBA - marco.top);
+    if (escondido < MINIMO_ESCONDIDO) return;
+
+    const margen = Math.max(MARGEN_ARRIBA, (window.innerHeight - marco.height) / 2);
+    const destino = Math.max(0, marco.top + window.scrollY - margen);
+    animarScroll(destino);
+  };
+
   if (monto) {
     monto.addEventListener('input', (e) => {
       // Lo pegado no se ha escrito tecla a tecla, así que ahí sí toca
@@ -1833,8 +1889,13 @@ document.addEventListener('DOMContentLoaded', () => {
     monto.addEventListener('blur', apuntarCalculoActual);
 
     monto.addEventListener('focus', subirCaja);
-    // Con cantidad, el panel se centra; vacía, la página vuelve a su alto
-    monto.addEventListener('blur', () => (monto.value ? centrarPanel() : soltarHueco()));
+    // Con cantidad, el panel se centra —de una manera en el teléfono y de
+    // otra en el escritorio—; vacía, la página vuelve a su alto
+    monto.addEventListener('blur', () => {
+      if (!monto.value) return soltarHueco();
+      centrarPanel();
+      centrarEnEscritorio();
+    });
     monto.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
