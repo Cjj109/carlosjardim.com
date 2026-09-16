@@ -37,6 +37,19 @@ for r in "/api/inventada" "/api/acceso" "/api/admin/quien-sea" "/api/60iq/otra";
   else echo "  ✗ $r debería dar 401 y da $code"; FALLOS=$((FALLOS+1)); fi
 done
 
+# Los apuntes del repo. Aquí no vale mirar si vienen tasas dentro: son texto,
+# y el filtro de arriba los daría por buenos. Lo que se mira es el tipo de
+# contenido, que es lo que delata que Pages está sirviendo el archivo tal cual.
+echo ""
+for r in "/DEPLOYMENT.md" "/README.md" "/ESTETICA_ANALISIS.md" "/deployment.md" \
+         "/vercel/tasa-p2p/README.md"; do
+  tipo=$(curl -s -o /dev/null -w "%{content_type}" --max-time 20 --path-as-is "$BASE$r")
+  case "$tipo" in
+    *markdown*) echo "  ✗ $r SE SIRVE ($tipo)"; FALLOS=$((FALLOS+1)) ;;
+    *) echo "  ✓ $r cerrado ($tipo)" ;;
+  esac
+done
+
 # Estas SÍ deben seguir públicas
 echo ""
 for r in "/" "/acceso" "/data/bcv-liquidity.json" "/api/acceso/reto"; do

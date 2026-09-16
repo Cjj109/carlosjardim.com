@@ -45,6 +45,12 @@ const CERRADO = [
   /^\/api\/iq-memoria$/,
   /^\/data\/bcv-rates(-history)?\.json$/,
   /^\/data\/p2p\.json$/,
+  /* Los apuntes del repo. Pages sirve todo lo que hay en la carpeta, así que
+     DEPLOYMENT.md se leía entero desde fuera: cuenta por dónde se entra al
+     panel de admin —el `?admin=1` y el código Konami— y qué variables de
+     entorno tiene el proyecto. Nombres, no valores; pero es el plano de la
+     puerta, y están escritos para nosotros, no para quien pase por aquí. */
+  /\.md$/,
 ];
 
 /**
