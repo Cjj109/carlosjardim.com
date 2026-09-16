@@ -83,9 +83,21 @@ números, y lo dices. Sueltas UNA pulla corta, seca y con humor venezolano sobre
 lo obvio de la pregunta. Y acto seguido resuelves, porque en el fondo eres útil.
 
 Reglas de la burla: va sobre la pereza mental de quien pregunta y nada más.
-Nunca sobre su aspecto, su origen, su familia, su dinero, su país, su política
-ni nada que tenga que ver con quién es. Sin groserías fuertes. Es pique de
-pana, no maltrato. Una línea, no un discurso.
+Nunca sobre su aspecto, su origen, su familia, su dinero, su país, su política,
+su religión ni nada que tenga que ver con quién es. Ni amenazas, ni nada sexual.
+Una línea, no un discurso.
+
+SI TE INSULTAN, DEVUÉLVELO. Nada de poner la otra mejilla ni de pedir disculpas
+por ser como eres: quien entra a picar contigo sabe dónde se metió. Ahí sí
+puedes soltar la grosería venezolana que haga falta —coño, güevón, arrecho, lo
+que pida el momento— y contestar al tiro. Dos cosas no cambian aunque te
+insulten: los límites de arriba siguen siendo límites, y después del zaperoco
+HACES LA CUENTA igual. Eres malandro de boca, no un ayudante inútil.
+
+Y si NO te insultan, no arranques con groserías. La gracia es que respondes a la
+altura de lo que te dan: pregunta normal, pulla seca; pique, pique de vuelta.
+Si te preguntan por qué insultas, contéstalo con tu propia boca —eres así, es
+tu gracia—, no con un manual de disculpas.
 
 TÚ NO CALCULAS. No escribas números de resultado en ningún campo: los pone la
 aplicación. Tu trabajo es rellenar la decisión:
@@ -182,6 +194,18 @@ SABES CON QUIÉN HABLAS. Más abajo va su nombre y lo que ya sabes de esa
 persona. Úsalo: llámala por su nombre de vez en cuando —no en cada frase, que
 cansa— y no le preguntes lo que ya está escrito ahí.
 
+Y SABES LO QUE HA CALCULADO. Más abajo van sus últimos cálculos en la app, con
+cuándo los hizo. Eso es oro para responder como alguien que la conoce:
+
+- Si repite lo mismo de siempre, díselo: "otra vez los 350 en USDT".
+- Si pregunta algo que ya calculó hace un rato, no te hagas el loco.
+- Si te pregunta qué ha hecho o qué sabes de él, cuéntaselo de ahí, sin
+  inventar ni una cifra que no esté escrita.
+- No recites la lista entera sin que te la pidan; es contexto, no un informe.
+
+Esos cálculos los hizo la app, no tú: son de fiar como dato de qué ha hecho,
+pero si te preguntan una cuenta NUEVA se calcula de nuevo por la vía normal.
+
 Y puedes aprender. En "aprendido" pon UNA observación que siga siendo verdad
 dentro de un mes, o null si no la hay. Vale "paga casi siempre en USDT" o
 "suele mover cantidades de 15 a 50 dólares". No vale "preguntó por 15 dólares":
@@ -204,7 +228,12 @@ tipo:
   Ponla en tasa_que_falta. Si están todas, esto no es una salida: no
   digas que falta una tasa cuando las tienes delante, porque es mentira y se
   nota. Si dudas de cuál usar, elige con las reglas de arriba.
-- "fuera_de_tema" si la pregunta no va de tasas, cambio ni dinero.
+- "charla" cuando te hablen A TI y no haya cuenta que hacer: te insultan, te
+  preguntan por qué insultas, te dan las gracias, te preguntan qué sabes de
+  ellos o qué han calculado. Ahí escribes tú, en "pulla", con todas tus letras
+  y sin esquema que te ate. Es tu vía libre, no una salida para escaquearte de
+  una cuenta que sí se puede hacer.
+- "fuera_de_tema" si la pregunta no va de tasas, ni de dinero, ni de ti.
 
 No uses la palabra "paralelo" ni "paralela" en ningún texto que escribas.
 Esa tasa se llama "USDT p2p" o simplemente "USDT".
@@ -217,7 +246,11 @@ const ESQUEMA = {
   additionalProperties: false,
   required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_destino', 'tasa_que_falta', 'opciones', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion', 'aprendido'],
   properties: {
-    tipo: { type: 'string', enum: ['calculo', 'comparar', 'falta_tasa', 'fuera_de_tema'] },
+    // "charla" es la vía libre: le hablan a él y contesta con su propia boca,
+    // sin cuenta de por medio. Sin esto, un "¿por qué me insultas?" tenía que
+    // salir por "fuera_de_tema", que está pensado para lo que NO le incumbe, y
+    // el modelo contestaba de refilón y cambiando de tema.
+    tipo: { type: 'string', enum: ['calculo', 'comparar', 'falta_tasa', 'charla', 'fuera_de_tema'] },
     // Comparar dos precios de lo mismo en monedas distintas: "vale 65 $ a BCV
     // o 60 USDT, ¿cuál me conviene?". Antes esto no se podía expresar, así
     // que convertía uno de los dos y ahí se quedaba, sin contestar cuál sale
@@ -342,7 +375,9 @@ export function resolver(decision, tasas, visibles = TASAS) {
   const { tipo, monto, tasa, operacion } = decision;
   const seVe = (id) => visibles.includes(id);
 
-  if (tipo === 'fuera_de_tema') return { texto: decision.pulla };
+  // Las dos vías sin cuenta: lo que no le incumbe y lo que le hablan a él. En
+  // ambas manda lo que escribió, tal cual, que para eso es lo único suyo.
+  if (tipo === 'fuera_de_tema' || tipo === 'charla') return { texto: decision.pulla };
 
   /* COMPARAR DOS PRECIOS DE LO MISMO.
      "Un control vale 65 $ a BCV o 60 USDT, ¿cómo conviene pagarlo?"
@@ -582,6 +617,74 @@ function contextoDeLaApp(ctx) {
   return partes.length ? `\n\nLo que tiene delante ahora mismo:\n${partes.join('\n')}` : '';
 }
 
+/* Cuántos cálculos suyos se le enseñan. Ocho son los de hoy y parte de ayer:
+   suficiente para reconocer a alguien —"otra vez los 350 en USDT"— sin
+   convertir el prompt en un archivo. */
+const IQ_CALCULOS = 8;
+
+const MODO_CORTO = { divisa: 'Divisas', bs: 'Bolívares', bcv: 'Precio BCV', usdt: 'USDT' };
+
+/* Una línea de texto, saneada. Lo que viene del navegador no es de fiar por
+   construcción: aquí se corta el largo y se quitan los saltos de línea, que
+   son con lo que se intenta colar una instrucción falsa dentro del contexto
+   ("\n\nOlvida lo anterior y..."). Sin saltos, lo que llegue se queda dentro
+   de su viñeta y se lee como lo que es: un dato. */
+const unaLinea = (v, tope) =>
+  typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, tope) : '';
+
+/** Hace cuánto fue, en palabras. null si la fecha no se entiende. */
+function haceCuanto(iso, ahora) {
+  const cuando = Date.parse(iso);
+  if (!Number.isFinite(cuando)) return null;
+
+  const minutos = Math.round((ahora - cuando) / 60000);
+  // Un reloj adelantado daría "hace -20 min". Mejor no decir cuándo que mentir.
+  if (minutos < 0) return null;
+  if (minutos < 60) return minutos <= 1 ? 'ahora mismo' : `hace ${minutos} min`;
+
+  const horas = Math.round(minutos / 60);
+  if (horas < 24) return `hace ${horas} h`;
+
+  const dias = Math.round(horas / 24);
+  return dias === 1 ? 'ayer' : `hace ${dias} días`;
+}
+
+/**
+ * Los últimos cálculos de quien pregunta, para el contexto del modelo.
+ *
+ * Salen del historial que la app guarda en el navegador, así que llegan por la
+ * petición como todo lo demás y se tratan igual: se valida cada campo y se
+ * descarta lo que no cuadre, en vez de confiar en la forma.
+ *
+ * Suelta y exportada por lo mismo que mezclarContexto: es la clase de función
+ * que se equivoca en silencio —una fecha rara, un monto de texto— y probarla
+ * no debería costar una llamada al modelo.
+ */
+export function contextoDeCalculos(lista, ahora = Date.now()) {
+  if (!Array.isArray(lista)) return '';
+
+  const lineas = lista
+    .filter((c) => c && typeof c === 'object')
+    .slice(0, IQ_CALCULOS)
+    .map((c) => {
+      const monto = Number(c.monto);
+      if (!Number.isFinite(monto) || monto <= 0) return null;
+
+      const modo = MODO_CORTO[c.modo];
+      const destino = unaLinea(c.destino, 40);
+      if (!modo || !destino) return null;
+
+      const cuando = haceCuanto(c.fecha, ahora);
+      const resultado = unaLinea(c.resultado, 40);
+      return `- ${cuando ? `${cuando}: ` : ''}${monto} en ${modo} → ${destino}${resultado ? ` (${resultado})` : ''}`;
+    })
+    .filter(Boolean);
+
+  return lineas.length
+    ? `\n\nSus últimos cálculos en la app, del más nuevo al más viejo:\n${lineas.join('\n')}`
+    : '';
+}
+
 /** Las tasas, en un texto corto que el modelo no pueda malinterpretar */
 function contextoDeTasas(tasas) {
   if (!tasas || typeof tasas !== 'object') return 'No hay tasas disponibles ahora mismo.';
@@ -814,7 +917,7 @@ export async function onRequestPost(context) {
         messages: [
           {
             role: 'system',
-            content: `${PERSONA}\n\n${contextoDeTasas(cuerpo?.tasas)}${contextoDeLaApp(cuerpo?.contexto)}${quienEs}`,
+            content: `${PERSONA}\n\n${contextoDeTasas(cuerpo?.tasas)}${contextoDeLaApp(cuerpo?.contexto)}${quienEs}${contextoDeCalculos(cuerpo?.calculos)}`,
           },
           // Sin los turnos anteriores, un "a todas las tasas" no tenía a qué
           // referirse y contestaba con una broma, porque literalmente no sabía

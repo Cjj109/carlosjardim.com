@@ -88,5 +88,16 @@ console.log('\nLAS TASAS QUE SE VEN, Y FACEBANK, WALLY Y ZINLI');
   ok('bolívares a Wally, con su nombre y no con $', wally.partes.resultado, '20,00 Wally');
 }
 
+console.log('\nCUANDO LE HABLAN A ÉL, NO A LA CALCULADORA');
+{
+  const suyo = 'El inservible que no sabe dividir eres tú. Dale, suelta el monto.';
+
+  // "charla" es la vía libre: lo que escribe sale tal cual, sin que la app le
+  // monte una lista de tasas encima ni le recorte la respuesta.
+  ok('en "charla" manda lo suyo, tal cual', resolver({ tipo: 'charla', pulla: suyo }, tasas).texto, suyo);
+  ok('  y no monta ninguna lista', resolver({ tipo: 'charla', pulla: suyo }, tasas).partes, undefined);
+  ok('"fuera_de_tema" sigue como estaba', resolver({ tipo: 'fuera_de_tema', pulla: 'x' }, tasas).texto, 'x');
+}
+
 console.log(fallos ? `\n${fallos} FALLIDAS\n` : '\nTodo correcto\n');
 process.exit(fallos ? 1 : 0);

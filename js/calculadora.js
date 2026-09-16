@@ -1398,6 +1398,9 @@ let iqPreguntando = false;
 // Vive en memoria y se va con la pestaña: es una charla, no un archivo.
 const iqCharlaPrevia = [];
 const IQ_MAX_TURNOS = 6;
+// Cuántos cálculos suyos viajan con la pregunta. Ocho son los de hoy y parte
+// de ayer: bastan para que sepa con quién habla sin mandarle el archivo entero.
+const IQ_CALCULOS = 8;
 
 /* Los ejemplos de inicio, guardados tal cual antes de que la primera pregunta
    los quite. Al borrar la conversación se devuelven: dejar el hueco en blanco
@@ -1509,6 +1512,20 @@ async function preguntarAl60IQ(pregunta) {
         // pantalla: el modo abierto dice la moneda.
         contexto: { modo, monto: montoActual() || null },
         historial: iqCharlaPrevia.slice(-IQ_MAX_TURNOS),
+        /* Lo que ha calculado últimamente, del propio panel Historial. Es lo
+           que le permite hablar como alguien que te conoce —"otra vez los 350
+           en USDT"— en vez de tratarte como a un desconocido cada vez.
+           Solo lo que hace falta para reconocer un cálculo: ni el color de la
+           fila ni la tasa exacta, que eso ya lo tiene aparte y más fresco. */
+        calculos: leerHistorial()
+          .slice(0, IQ_CALCULOS)
+          .map((h) => ({
+            fecha: h.fecha,
+            modo: h.modo,
+            monto: h.monto,
+            destino: h.destino,
+            resultado: h.resultado,
+          })),
       }),
     });
 
