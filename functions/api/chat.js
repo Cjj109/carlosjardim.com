@@ -8,7 +8,11 @@
  * El principal era google/gemini-2.0-flash-001, que OpenRouter ya retiró: el
  * catalogo no lo lista y todas las peticiones caian al respaldo sin avisar,
  * pagando 0,32/0,89 por millon en vez de 0,10/0,40.
- * Set OPENROUTER_API_KEY in Cloudflare Dashboard > Pages > Settings > Environment variables
+ * La clave va en Cloudflare Dashboard > Pages > Settings > Environment variables:
+ *
+ *   OPENROUTER_API_KEY_PORTADA   la de este chat, el público
+ *   OPENROUTER_API_KEY           la de siempre, que usa el 60 IQ (y esta de
+ *                                reserva, si la de arriba no está puesta)
  */
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -193,7 +197,14 @@ async function callOpenRouter(apiKey, model, messages) {
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  const apiKey = env.OPENROUTER_API_KEY;
+  /* Su propia clave, separada de la del 60 IQ.
+     Este endpoint es el único con IA que se puede tocar sin entrar, así que
+     es el que se lleva los sustos: con una clave aparte —y su límite de
+     crédito puesto en OpenRouter— un abuso aquí se queda aquí, y la
+     calculadora y el 60 IQ siguen funcionando con la suya.
+     Si no está puesta, usa la de siempre: así nada se rompe mientras la
+     clave nueva no exista. */
+  const apiKey = env.OPENROUTER_API_KEY_PORTADA || env.OPENROUTER_API_KEY;
   if (!apiKey) {
     return new Response(
       JSON.stringify({ error: 'Chat not configured' }),

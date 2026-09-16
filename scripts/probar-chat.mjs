@@ -25,10 +25,13 @@ globalThis.caches = {
   },
 };
 
-// OpenRouter: contesta siempre y apunta lo último que se le mandó
+// OpenRouter: contesta siempre y apunta lo último que se le mandó, con qué
+// clave incluida
 let enviado = null;
+let conQueClave = null;
 globalThis.fetch = async (_url, opciones) => {
   enviado = JSON.parse(opciones.body);
+  conQueClave = String(opciones.headers.Authorization || '').replace('Bearer ', '');
   return new Response(JSON.stringify({ choices: [{ message: { content: 'hola' } }] }), { status: 200 });
 };
 
@@ -41,7 +44,9 @@ function comprobar(titulo, real, esperado) {
   console.log(`  ${bien ? '✓' : '✗'} ${titulo.padEnd(50)} ${JSON.stringify(real)}${bien ? '' : `   (se esperaba ${JSON.stringify(esperado)})`}`);
 }
 
-const pedir = (cuerpo, { ip = '1.1.1.1', origen = 'https://carlosjardim.com' } = {}) => {
+const CLAVES = { OPENROUTER_API_KEY: 'la-de-siempre' };
+
+const pedir = (cuerpo, { ip = '1.1.1.1', origen = 'https://carlosjardim.com', env = CLAVES } = {}) => {
   const headers = { 'Content-Type': 'application/json', 'CF-Connecting-IP': ip };
   if (origen) headers.Origin = origen;
   return onRequestPost({
@@ -50,7 +55,7 @@ const pedir = (cuerpo, { ip = '1.1.1.1', origen = 'https://carlosjardim.com' } =
       headers,
       body: typeof cuerpo === 'string' ? cuerpo : JSON.stringify(cuerpo),
     }),
-    env: { OPENROUTER_API_KEY: 'clave-de-prueba' },
+    env,
   });
 };
 
@@ -100,6 +105,22 @@ console.log('\nDE DÓNDE VIENE');
   comprobar('desde otra web: 403', (await pedir(normal, { origen: 'https://otra.com' })).status, 403);
   comprobar('con un Origin opaco (null): 403', (await pedir(normal, { origen: 'null' })).status, 403);
   comprobar('sin Origin: pasa', (await pedir(normal, { origen: null })).status, 200);
+}
+
+console.log('\nCADA CHAT CON SU CLAVE');
+{
+  guardado.clear();
+  await pedir(normal, { ip: '5.5.5.5' });
+  comprobar('sin la de la portada, tira de la de siempre', conQueClave, 'la-de-siempre');
+
+  await pedir(normal, {
+    ip: '6.6.6.6',
+    env: { OPENROUTER_API_KEY: 'la-de-siempre', OPENROUTER_API_KEY_PORTADA: 'la-del-publico' },
+  });
+  comprobar('con las dos puestas, manda la de la portada', conQueClave, 'la-del-publico');
+
+  const sinNada = await pedir(normal, { ip: '7.7.7.7', env: {} });
+  comprobar('sin ninguna de las dos: 500, no se llama a nadie', sinNada.status, 500);
 }
 
 console.log('\nSIN CACHÉ');

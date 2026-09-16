@@ -139,6 +139,25 @@ Para el **panel admin** (temáticas), configura en Cloudflare Dashboard:
    - `ADMIN_USER` — Usuario para acceder al admin
    - `ADMIN_PASS` — Contraseña del admin
 
+**Las dos claves de OpenRouter**, una por cada sitio con IA, para que un abuso
+en el público no toque el crédito del privado:
+
+| Variable | La usa | Por qué |
+|---|---|---|
+| `OPENROUTER_API_KEY_PORTADA` | el chat de la portada (`api/chat.js`) | Es el único abierto sin entrar. Ponle un límite de crédito bajo en OpenRouter: si alguien abusa, se queda sin saldo esa clave y nada más. |
+| `OPENROUTER_API_KEY_CALCULADORA` | el 60 IQ (`api/60iq.js`) | Está detrás de la puerta de acceso, solo lo usa quien tiene llave. |
+| `OPENROUTER_API_KEY` | ninguno, si las dos de arriba están puestas | La vieja, compartida. Queda de reserva: cada función tira de ella si le falta la suya, así que nada se rompe a medio camino. |
+
+Se ponen por consola, que así no se pegan en ningún sitio donde queden escritas:
+
+```bash
+npx wrangler pages secret put OPENROUTER_API_KEY_CALCULADORA
+npx wrangler pages secret put OPENROUTER_API_KEY_PORTADA
+```
+
+Una clave que se haya llegado a pegar en un chat, un correo o un mensaje deja
+de ser secreta: hay que crear otra en OpenRouter y borrar la vieja.
+
 **Acceso al admin:**
 - URL: `?admin=1` (ej: `https://carlosjardim.com/?admin=1`)
 - Código Konami: ↑↑↓↓←→←→

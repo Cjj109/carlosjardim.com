@@ -23,7 +23,15 @@ import { sesionDe } from '../_acceso.js';
  * estuviera en el JavaScript de la página, cualquiera que abriera el código
  * fuente podría leerla y gastarla.
  *
- *   npx wrangler pages secret put OPENROUTER_API_KEY
+ *   npx wrangler pages secret put OPENROUTER_API_KEY_CALCULADORA
+ *
+ * Hay una clave por cada sitio con IA, para que el gasto de cada uno se vea
+ * aparte y un abuso en uno no se lleve el crédito del otro:
+ *
+ *   OPENROUTER_API_KEY_CALCULADORA   esta, la del lado privado
+ *   OPENROUTER_API_KEY_PORTADA       la del chat público (ver chat.js)
+ *   OPENROUTER_API_KEY               la vieja, compartida, que queda de
+ *                                    reserva por si alguna de las dos falta
  */
 
 const OPENROUTER = 'https://openrouter.ai/api/v1/chat/completions';
@@ -727,7 +735,9 @@ async function guardarMemoria(db, personaId, pregunta, respuesta, aprendido) {
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  const clave = env?.OPENROUTER_API_KEY;
+  // La suya, con la de siempre de reserva: mientras la propia no esté puesta,
+  // esto sigue funcionando con la compartida (ver la cabecera)
+  const clave = env?.OPENROUTER_API_KEY_CALCULADORA || env?.OPENROUTER_API_KEY;
   if (!clave) {
     return json({ error: 'El 60 IQ está sin configurar en el servidor.' }, 503);
   }
