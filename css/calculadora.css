@@ -2010,7 +2010,18 @@ body { overscroll-behavior-y: contain; }
    tiempo no existe. */
 body { padding-bottom: var(--hueco-teclado, 0px); }
 .calc-historial,
-.calc-iq-charla { overscroll-behavior: contain; }
+/* La charla NO corta el desplazamiento de la página.
+
+   Tenía overscroll-behavior: contain, que impide que el gesto se encadene al
+   documento cuando este cajón llega a su tope o a su fondo. Con la charla
+   ocupando media pantalla del panel, eso se sentía como zonas muertas:
+   arrastrabas sobre la respuesta del 60 IQ y la página entera se negaba a
+   moverse.
+
+   Contain servía cuando esto era lo único desplazable; hoy estorba. Con `auto`
+   la charla se desplaza mientras tenga recorrido y, cuando se acaba, el gesto
+   sigue hacia la página, que es lo que el dedo espera. */
+.calc-iq-charla { overscroll-behavior: auto; }
 
 /* Con el dedo, 44 píxeles de alto como mínimo.
    Medido antes de tocar nada: pestañas 33, atajos 32, botones del pie 30.

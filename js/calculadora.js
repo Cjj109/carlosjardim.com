@@ -2241,6 +2241,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const TIRON_MINIMO = 64;
   const barraTiron = $('calcTiron');
   let tirandoDesde = null;
+  // Dónde empezó en horizontal, para distinguir un tirón de un deslizamiento
+  // entre pestañas, que baja unos píxeles de propina
+  let tirandoEnX = 0;
   let tironListo = false;
 
   /* Lo que se desplaza por dentro: la charla del 60 IQ y el historial tienen
@@ -2254,18 +2257,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const cajonPropio = (nodo) => nodo?.closest?.('.calc-iq-charla, .calc-historial, .calc-ajustes');
 
   document.addEventListener('touchstart', (e) => {
-    // Un solo dedo y desde el tope: con dos es un pellizco, y a medio
-    // desplazar es lectura
-    const dentro = cajonPropio(e.target);
-    const suyo = dentro && dentro.scrollTop > 0;
+    /* Un solo dedo y desde el tope: con dos es un pellizco, y a medio
+       desplazar es lectura.
 
+       Y nunca dentro de un panel. Antes solo me apartaba si el cajón tenía
+       recorrido, así que con la charla en su tope —que es como está recién
+       abierta— el tirón se activaba justo encima de la respuesta y esa zona
+       se sentía muerta: ni la charla se movía ni la página. Dentro de un
+       panel el gesto no es mío ni cuando el cajón está quieto; para actualizar
+       está el botón, que además queda a la vista. */
     tirandoDesde =
-      !suyo && window.scrollY <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null;
+      !cajonPropio(e.target) && window.scrollY <= 0 && e.touches.length === 1
+        ? e.touches[0].clientY
+        : null;
+    tirandoEnX = e.touches[0]?.clientX ?? 0;
     tironListo = false;
   }, { passive: true });
 
   document.addEventListener('touchmove', (e) => {
     if (tirandoDesde === null || !barraTiron) return;
+
+    /* Y que el gesto sea vertical de verdad. Deslizando entre pestañas el dedo
+       baja unos píxeles de propina, y con eso la barra asomaba un poco en cada
+       cambio de pestaña: un parpadeo sin sentido que ensucia un gesto que ya
+       funcionaba. Si lo horizontal manda, esto no es un tirón. */
+    if (Math.abs(e.touches[0].clientX - tirandoEnX) > Math.abs(e.touches[0].clientY - tirandoDesde)) {
+      tirandoDesde = null;
+      barraTiron.style.opacity = '';
+      barraTiron.classList.remove('es-listo');
+      return;
+    }
 
     const recorrido = e.touches[0].clientY - tirandoDesde;
     // Hacia arriba es desplazarse normal: el gesto se cancela y no vuelve
