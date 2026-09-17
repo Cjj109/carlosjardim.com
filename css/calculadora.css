@@ -1701,6 +1701,53 @@ html { overflow-anchor: none; }
 
 .iq-pulla { font-size: 0.82rem; line-height: 1.45; }
 
+/* LAS ACCIONES DEBAJO DE UNA RESPUESTA
+
+   Hasta ahora la respuesta era un callejón sin salida: no se podía copiar, ni
+   pedirla con otra tasa, ni decir que se equivocó. Si elegía la tasa que no
+   era había que reescribir la pregunta entera.
+
+   Van apagadas y pequeñas, debajo del todo: son para cuando hacen falta, no
+   para competir con el número, que es a lo que se viene. */
+.iq-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+}
+
+.iq-acciones button {
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--calc-borde);
+  background: transparent;
+  color: var(--calc-texto-tenue);
+  font-family: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.iq-acciones button:hover {
+  color: var(--calc-texto-suave);
+  border-color: var(--calc-borde-fuerte);
+}
+
+/* Votado: el botón que se tocó se queda dicho y el otro se va. Que sigan los
+   dos invita a votar otra vez, y el segundo voto no añade nada. */
+.iq-acciones.es-votado button:not(.es-elegido) { display: none; }
+
+.iq-acciones button.es-elegido {
+  color: var(--calc-usdt);
+  border-color: var(--calc-usdt);
+  cursor: default;
+}
+
+.iq-acciones button.es-elegido.es-fallo {
+  color: #e05c5c;
+  border-color: #e05c5c;
+}
+
 /* El número, que es a lo que se viene */
 .iq-resultado {
   font-family: var(--mono, monospace);

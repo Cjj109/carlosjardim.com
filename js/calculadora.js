@@ -349,6 +349,17 @@ const COLORES = {
 const NOMBRE_OFICIAL = { 'bcv-farmatodo': 'Farmatodo', 'bcv-proxima': 'BCV que viene' };
 const nombreOficial = (moneda = 'usd') => NOMBRE_OFICIAL[tasas?.[moneda]?.id] || 'BCV';
 
+/* Cómo se llama cada tasa cuando hay que escribirla en una frase.
+   No hay tabla nueva a propósito: los métodos ya traen su nombre en METODOS y
+   el oficial cambia según la ficha elegida, así que una tabla aparte se
+   quedaría diciendo "Dólar BCV" el día que alguien elija Farmatodo. */
+const nombreDeTasa = (id) => {
+  if (id === 'usd') return `dólar ${nombreOficial()}`;
+  if (id === 'eur') return 'euro BCV';
+  if (id === 'usdt') return 'USDT';
+  return METODOS.find((m) => m.id === id)?.nombre || id;
+};
+
 /* ---------- Qué tasas se ven ----------
 
    Cada quien elige las suyas en Ajustes. Quien no toca euros no tiene por
@@ -1594,6 +1605,96 @@ function respuestaHTML(p) {
   return trozos.join('');
 }
 
+/**
+ * Las tres cosas que se pueden hacer con una respuesta del 60 IQ.
+ *
+ * Antes, ninguna: la respuesta se leía y ahí se acababa. Si elegía la tasa que
+ * no era —el error más común— había que reescribir la pregunta entera, y si
+ * acertaba no había forma de decírselo.
+ *
+ *   Copiar        el resultado, igual que se copia una fila de la calculadora.
+ *   Con otra tasa repite LA MISMA pregunta nombrando otra, que es justo lo que
+ *                 uno reescribe a mano cuando se equivoca de mercado.
+ *   ✓ / ✗         si sirvió. Cada ✗ es un caso de prueba real, con las
+ *                 palabras de quien preguntó, para el banco de preguntas.
+ */
+function ponerAcciones(nodo, pregunta, respuesta) {
+  if (!nodo || !pregunta) return;
+
+  const acciones = document.createElement('span');
+  acciones.className = 'iq-acciones';
+
+  const boton = (texto, titulo) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = texto;
+    if (titulo) b.title = titulo;
+    acciones.appendChild(b);
+    return b;
+  };
+
+  /* Copiar: solo la cifra si la hay, y si no, lo que dijo. Copiar la pulla
+     cuando lo que se quiere es el número obliga a limpiarla a mano en la otra
+     app, que es donde se va a pegar. */
+  const cifra = nodo.querySelector('.iq-resultado')?.textContent.trim();
+  boton('Copiar', 'Copiar la respuesta').addEventListener('click', async (e) => {
+    if (!navigator.clipboard?.writeText) return;
+    try {
+      await navigator.clipboard.writeText(cifra || respuesta);
+      e.currentTarget.textContent = 'Copiado';
+      toque(8);
+      setTimeout(() => { e.currentTarget.textContent = 'Copiar'; }, 1400);
+    } catch (error) {
+      console.warn('No se pudo copiar la respuesta:', error);
+    }
+  });
+
+  /* Con otra tasa: se ofrecen las que tiene a la vista menos la que ya usó,
+     leída de la propia respuesta. Sin esto habría que adivinar cuál propuso. */
+  const usada = TODAS.find((id) => (nodo.textContent || '').includes(nombreDeTasa(id)));
+
+  /* UNA sola sugerencia, no una lista.
+     Con las tres visibles salían seis botones debajo de la respuesta, y en el
+     ancho de un teléfono eso compite con el número, que es a lo que se viene.
+     Además el error de verdad va casi siempre en el mismo sentido: eligió el
+     oficial cuando se quería vender en el mercado, o al revés. Ofrecer justo
+     esa es útil; ofrecer cuatro es un menú. */
+  const contraria = usada === 'usdt' ? 'usd' : 'usdt';
+  const otras = contraria !== usada && visibles.includes(contraria)
+    ? [contraria]
+    : visibles.filter((id) => id !== usada).slice(0, 1);
+
+  for (const id of otras) {
+    const nombre = nombreDeTasa(id);
+    boton(`En ${nombre}`, `Repetir la pregunta en ${nombre}`).addEventListener('click', () => {
+      // La misma pregunta nombrando la tasa: es lo que se escribiría a mano
+      preguntarAl60IQ(`${pregunta} en ${nombre}`);
+    });
+  }
+
+  // El voto, al final: es lo menos urgente de los tres
+  const votar = (b, acerto) => {
+    b.addEventListener('click', () => {
+      acciones.classList.add('es-votado');
+      b.classList.add('es-elegido');
+      if (!acerto) b.classList.add('es-fallo');
+      toque(8);
+      // Sin esperar y sin avisar si falla: el voto es un extra, y molestar a
+      // quien acaba de ayudar sería el peor pago posible
+      fetch('/api/iq-voto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pregunta, respuesta, acerto }),
+      }).catch(() => {});
+    });
+  };
+
+  votar(boton('✓', 'Me sirvió'), true);
+  votar(boton('✗', 'No era esto'), false);
+
+  nodo.appendChild(acciones);
+}
+
 async function preguntarAl60IQ(pregunta) {
   if (iqPreguntando || !pregunta) return;
 
@@ -1646,7 +1747,8 @@ async function preguntarAl60IQ(pregunta) {
       return;
     }
 
-    burbuja('iq', datos.respuesta, { partes: datos.partes });
+    const dicho = burbuja('iq', datos.respuesta, { partes: datos.partes });
+    ponerAcciones(dicho, pregunta, datos.respuesta);
     iqCharlaPrevia.push({ rol: 'user', texto: pregunta }, { rol: 'assistant', texto: datos.respuesta });
     // Sin dejar que crezca sin freno: son turnos, no un historial
     if (iqCharlaPrevia.length > IQ_MAX_TURNOS * 2) iqCharlaPrevia.splice(0, 2);

@@ -203,6 +203,8 @@ export async function onRequestDelete(context) {
       // También los cálculos guardados: olvidar dejando apuntado que mueves
       // 350 dólares los viernes no es olvidar.
       db.prepare('DELETE FROM calculos WHERE persona_id = ?').bind(sesion.id),
+      // Y sus votos, que llevan sus preguntas dentro
+      db.prepare('DELETE FROM iq_votos WHERE persona_id = ?').bind(sesion.id),
     ]);
   } catch (e) {
     // Decir "listo, olvidado" cuando no se borró nada sería mentir en lo único
