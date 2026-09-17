@@ -40,6 +40,14 @@ const OPENROUTER = 'https://openrouter.ai/api/v1/chat/completions';
 // y admite structured_outputs, que aquí no es opcional.
 export const MODELO_POR_DEFECTO = 'google/gemini-3.5-flash-lite';
 
+/* El de repuesto, para cuando el barato se atasca dos veces seguidas.
+   No se usa por defecto a propósito: cuesta más y para una regla de tres el
+   lite sobra. Pero una pregunta que el lite no sabe contestar no la arregla
+   repetirla una tercera vez, y quedarse callado por ahorrar medio céntimo es
+   un mal negocio en una calculadora que se usa para decidir dinero.
+   Se puede cambiar con IQ_MODELO_BUENO sin tocar código, como el otro. */
+const MODELO_BUENO = 'google/gemini-3.5-flash';
+
 const MAX_PREGUNTA = 400;
 
 // Cuantos turnos anteriores se le pasan. Sin esto cada pregunta iba suelta y
@@ -1074,6 +1082,75 @@ export function armarMensajes({
   ];
 }
 
+/**
+ * Una pasada por el modelo: devuelve la decisión o dice por qué no la hay.
+ *
+ * No lanza y no contesta al navegador: solo informa. Antes cada tropiezo
+ * —una caída de red, un 502 de OpenRouter, un JSON cortado— era un `return`
+ * inmediato con su mensaje de error, así que un hipo de un segundo se le
+ * enseñaba a la persona como "el 60 IQ se enredó" y ahí se acababa. Separando
+ * el intento de la respuesta, quien llama puede volver a intentarlo.
+ */
+async function pedirDecision({ clave, env, modelo, mensajes }) {
+  let respuesta;
+  try {
+    /* La dirección se puede sustituir por una variable, como ya se hace con el
+       modelo. Es lo que permite probar qué se le manda y qué se guarda sin
+       gastar llamadas de verdad: la petición la hace el servidor, así que
+       desde el navegador no hay forma de interceptarla. */
+    respuesta = await fetch(env.IQ_URL || OPENROUTER, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${clave}`,
+        'Content-Type': 'application/json',
+        // OpenRouter los usa para las estadísticas de la cuenta
+        'HTTP-Referer': 'https://carlosjardim.com/calculadora',
+        // Solo ASCII: la raya em de antes hacía que la cabecera se enviara
+        // como UTF-8 crudo, y en un navegador eso es un TypeError.
+        'X-Title': 'Calculadora de Tasas - 60 IQ',
+      },
+      body: JSON.stringify({
+        model: modelo,
+        max_tokens: MAX_RESPUESTA,
+        // Baja a propósito: con 0.8 la misma pregunta elegía unas veces el
+        // USDT y otras el BCV, y eso en una calculadora es una respuesta
+        // distinta cada vez. La pulla pierde algo de chispa; la tasa se acierta.
+        temperature: 0.3,
+        // El esquema obliga a devolver la decisión y solo la decisión: así no
+        // hay manera de que se cuele una cifra calculada por el modelo.
+        response_format: {
+          type: 'json_schema',
+          json_schema: { name: 'decision', strict: true, schema: ESQUEMA },
+        },
+        messages: mensajes,
+      }),
+    });
+  } catch (e) {
+    return { fallo: `no se pudo llamar: ${e?.message}` };
+  }
+
+  if (!respuesta.ok) {
+    const detalle = await respuesta.text().catch(() => '');
+    return { fallo: `HTTP ${respuesta.status} ${detalle.slice(0, 200)}` };
+  }
+
+  let datos;
+  try {
+    datos = await respuesta.json();
+  } catch {
+    return { fallo: 'la respuesta no era JSON' };
+  }
+
+  const crudo = datos?.choices?.[0]?.message?.content;
+  if (!crudo) return { fallo: 'se quedó callado' };
+
+  try {
+    return { decision: JSON.parse(crudo) };
+  } catch {
+    return { fallo: `no devolvió JSON: ${String(crudo).slice(0, 120)}` };
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -1131,63 +1208,51 @@ export async function onRequestPost(context) {
     : '';
 
   try {
-    /* La dirección se puede sustituir por una variable, como ya se hace con el
-       modelo. Es lo que permite probar qué se le manda y qué se guarda sin
-       gastar llamadas de verdad: la petición la hace el servidor, así que
-       desde el navegador no hay forma de interceptarla. */
-    const respuesta = await fetch(env.IQ_URL || OPENROUTER, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${clave}`,
-        'Content-Type': 'application/json',
-        // OpenRouter los usa para las estadísticas de la cuenta
-        'HTTP-Referer': 'https://carlosjardim.com/calculadora',
-        // Solo ASCII: la raya em de antes hacía que la cabecera se enviara
-        // como UTF-8 crudo, y en un navegador eso es un TypeError.
-        'X-Title': 'Calculadora de Tasas - 60 IQ',
-      },
-      body: JSON.stringify({
-        model: env.IQ_MODELO || MODELO_POR_DEFECTO,
-        max_tokens: MAX_RESPUESTA,
-        // Baja a propósito: con 0.8 la misma pregunta elegía unas veces el
-        // USDT y otras el BCV, y eso en una calculadora es una respuesta
-        // distinta cada vez. La pulla pierde algo de chispa; la tasa se acierta.
-        temperature: 0.3,
-        // El esquema obliga a devolver la decisión y solo la decisión: así no
-        // hay manera de que se cuele una cifra calculada por el modelo.
-        response_format: {
-          type: 'json_schema',
-          json_schema: { name: 'decision', strict: true, schema: ESQUEMA },
-        },
-        messages: armarMensajes({
-          pregunta,
-          tasas: cuerpo?.tasas,
-          contexto: cuerpo?.contexto,
-          quienEs,
-          calculos: cuerpo?.calculos,
-          turnos: contexto,
-          tono,
-          historico,
-        }),
-      }),
+    const mensajes = armarMensajes({
+      pregunta,
+      tasas: cuerpo?.tasas,
+      contexto: cuerpo?.contexto,
+      quienEs,
+      calculos: cuerpo?.calculos,
+      turnos: contexto,
+      tono,
+      historico,
     });
 
-    if (!respuesta.ok) {
-      const detalle = await respuesta.text();
-      console.error('OpenRouter respondió', respuesta.status, detalle.slice(0, 300));
-      return json({ error: 'El 60 IQ se quedó pensando. Intenta de nuevo.' }, 502);
+    /* TRES INTENTOS, Y NO SON EL MISMO TRES VECES.
+
+       Antes había uno solo: cualquier tropiezo —un 502 de OpenRouter, un JSON
+       cortado, el modelo quedándose callado— salía en la pantalla como "el 60
+       IQ se enredó" y ahí se acababa la conversación. La persona volvía a
+       escribir lo mismo a mano, que es exactamente lo que se puede hacer aquí
+       sin molestarla.
+
+       El segundo intento es idéntico: la mayoría de los tropiezos son de un
+       segundo y se curan repitiendo. El tercero ya cambia de modelo, porque si
+       ha fallado dos veces seguidas no es mala suerte: es que esa pregunta le
+       queda grande al barato. Cuesta más, pero pasa una vez de cada muchas, y
+       quedarse callado por ahorrar medio céntimo es mal negocio cuando alguien
+       está decidiendo con cuánto dinero se queda.
+
+       Se apunta en el registro cada vez que hace falta repetir o escalar: es
+       la única forma de saber si el modelo barato se está quedando corto. */
+    const modeloBase = env.IQ_MODELO || MODELO_POR_DEFECTO;
+    let { decision, fallo } = await pedirDecision({ clave, env, modelo: modeloBase, mensajes });
+
+    if (!decision) {
+      console.warn('[60iq] primer intento fallido:', fallo);
+      ({ decision, fallo } = await pedirDecision({ clave, env, modelo: modeloBase, mensajes }));
     }
 
-    const datos = await respuesta.json();
-    const crudo = datos?.choices?.[0]?.message?.content;
-    if (!crudo) return json({ error: 'El 60 IQ se quedó callado.' }, 502);
+    if (!decision) {
+      const mejor = env.IQ_MODELO_BUENO || MODELO_BUENO;
+      console.warn('[60iq] dos fallos seguidos, escalando a', mejor, '·', fallo);
+      ({ decision, fallo } = await pedirDecision({ clave, env, modelo: mejor, mensajes }));
+    }
 
-    let decision;
-    try {
-      decision = JSON.parse(crudo);
-    } catch {
-      console.error('El 60 IQ no devolvió JSON:', String(crudo).slice(0, 200));
-      return json({ error: 'El 60 IQ se enredó. Intenta de nuevo.' }, 502);
+    if (!decision) {
+      console.error('[60iq] los tres intentos fallaron:', fallo);
+      return json({ error: 'El 60 IQ se quedó pensando. Intenta de nuevo.' }, 502);
     }
 
     // Las que tiene a la vista. Viene del cliente, así que solo se aceptan
