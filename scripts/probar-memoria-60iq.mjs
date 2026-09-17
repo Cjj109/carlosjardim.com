@@ -8,7 +8,7 @@
  *
  *   node scripts/probar-memoria-60iq.mjs
  */
-import { mezclarContexto, anadirNota, contextoDeCalculos } from '../functions/api/60iq.js';
+import { mezclarContexto, anadirNota, quitarNota, contextoDeCalculos } from '../functions/api/60iq.js';
 
 let fallos = 0;
 const ok = (t, real, esp) => {
@@ -60,6 +60,30 @@ console.log('\nCÓMO SE ACUMULAN LAS NOTAS');
   ok('cae la más vieja', recortada.includes('aaa'), false);
   ok('y se queda la nueva', recortada.includes('ddd'), true);
   ok('nunca deja menos de una línea', anadirNota('', 'x'.repeat(300), 20).split('\n').length, 1);
+}
+
+console.log('\nTACHAR UNA NOTA SUELTA');
+{
+  const tres = '- paga en USDT\n- mueve de 15 a 50\n- cobra por Zelle';
+
+  ok('se va la del medio', quitarNota(tres, 1), '- paga en USDT\n- cobra por Zelle');
+  ok('la primera', quitarNota(tres, 0), '- mueve de 15 a 50\n- cobra por Zelle');
+  ok('la última', quitarNota(tres, 2), '- paga en USDT\n- mueve de 15 a 50');
+  ok('la única que hay', quitarNota('- paga en USDT', 0), '');
+
+  /* Un índice que no existe no puede llevarse otra nota por delante: el
+     borrado viene del navegador, y entre que se pinta la lista y se toca la
+     ✕ la memoria puede haber cambiado. Ante la duda, no se borra nada. */
+  ok('un índice de más no borra nada', quitarNota(tres, 9), tres);
+  ok('uno negativo tampoco', quitarNota(tres, -1), tres);
+  ok('ni algo que no es número', quitarNota(tres, '1'), tres);
+  ok('ni un decimal', quitarNota(tres, 1.5), tres);
+
+  ok('sin notas, nada que quitar', quitarNota('', 0), '');
+  ok('null tampoco revienta', quitarNota(null, 0), '');
+  // Las líneas en blanco no cuentan como nota: si contaran, la ✕ de la
+  // tercera borraría la cuarta
+  ok('los huecos no cuentan como línea', quitarNota('- una\n\n- dos', 1), '- una');
 }
 
 console.log('\nSUS ÚLTIMOS CÁLCULOS, QUE VAN EN EL CONTEXTO');

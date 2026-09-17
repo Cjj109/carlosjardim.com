@@ -50,8 +50,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=77">
-  <link rel="stylesheet" href="/css/calculadora.css?r=77">
+  <link rel="stylesheet" href="/css/variables.css?r=78">
+  <link rel="stylesheet" href="/css/calculadora.css?r=78">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -312,7 +312,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v77</span>
+    <span class="calc-version" title="Versión de la app instalada">v78</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -368,7 +368,31 @@
          cosas de alguien, ese alguien tiene que poder verlas sin preguntar. -->
     <details class="calc-iq-memoria" id="iqMemoria">
       <summary>Lo que sabe de ti</summary>
-      <p class="calc-iq-notas" id="iqNotas">Todavía nada.</p>
+
+      <!-- Cada nota con su ✕. Una nota equivocada se le cuela en todas las
+           respuestas siguientes, y antes la única cura era la amnesia
+           completa: perder también lo que sí estaba bien. -->
+      <ul class="calc-iq-notas" id="iqNotas"><li class="calc-iq-vacio">Todavía nada.</li></ul>
+
+      <!-- Y decírselo tú, sin esperar a que lo deduzca -->
+      <form class="calc-iq-anadir" id="iqAnadirNota">
+        <input type="text" id="iqNotaNueva" maxlength="200" autocomplete="off"
+               placeholder="Recuérdame que…" aria-label="Algo que quieras que recuerde">
+        <button type="submit">Apuntar</button>
+      </form>
+
+      <!-- El tono lo elige cada quien: el mismo asistente no le sirve igual a
+           todo el mundo, ni a la misma persona a las siete de la mañana. -->
+      <p class="calc-iq-tono-titulo">Cómo quieres que te hable</p>
+      <div class="calc-iq-tonos" id="iqTonos" role="radiogroup" aria-label="Cómo quieres que te hable">
+        <button type="button" data-tono="suave" role="radio" aria-checked="false" tabindex="-1">Sin pulla</button>
+        <button type="button" data-tono="normal" role="radio" aria-checked="false" tabindex="-1">Con pulla</button>
+        <!-- Marcado ya en el HTML: el resaltado lo pone marcarTono() al leer del
+             servidor, y hasta que esa respuesta llega —o si no llega— los tres
+             botones se veían igual, como si no hubiera ninguno elegido. -->
+        <button type="button" data-tono="sin_freno" role="radio" aria-checked="true" class="is-activo">Sin freno</button>
+      </div>
+
       <button type="button" id="iqOlvidar" class="calc-iq-borrar">Que lo olvide</button>
     </details>
   </section>
@@ -504,7 +528,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=77" defer></script>
+<script src="/js/calculadora.js?r=78" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

@@ -213,7 +213,12 @@ cuándo los hizo. Eso es oro para responder como alguien que la conoce:
 Esos cálculos los hizo la app, no tú: son de fiar como dato de qué ha hecho,
 pero si te preguntan una cuenta NUEVA se calcula de nuevo por la vía normal.
 
-Y puedes aprender. En "aprendido" pon UNA observación que siga siendo verdad
+Y SI TE PIDEN QUE RECUERDES ALGO, LO RECUERDAS. "Recuérdame que cobro por
+Zelle", "apunta que siempre muevo cincuenta": eso va tal cual en "aprendido",
+sin discutirlo y sin esperar a deducirlo. Es lo que te están diciendo de sí
+mismos, que es justo lo que vale la pena guardar.
+
+Y puedes aprender por tu cuenta. En "aprendido" pon UNA observación que siga siendo verdad
 dentro de un mes, o null si no la hay. Vale "paga casi siempre en USDT" o
 "suele mover cantidades de 15 a 50 dólares". No vale "preguntó por 15 dólares":
 eso es lo que pasó hoy, no cómo es. Llenar esto de sucesos lo vuelve inútil, y
@@ -801,6 +806,74 @@ export function anadirNota(previas, nota, tope = IQ_NOTAS_MAX) {
   return lineas.join('\n');
 }
 
+/**
+ * Quita una nota, la que sea, por su número de línea.
+ *
+ * Hasta ahora lo aprendido solo se podía borrar entero. Una nota equivocada
+ * —"paga siempre en Zelle" cuando ya no— envenena todas las respuestas
+ * siguientes, y la única cura era la amnesia completa: perder también lo que
+ * sí estaba bien. Poder tachar una línea es la diferencia entre corregirle y
+ * empezar de cero.
+ *
+ * Pura y exportada por lo mismo que anadirNota: es donde se puede perder una
+ * nota que no tocaba, y eso no se descubre mirando la pantalla.
+ */
+export function quitarNota(previas, indice) {
+  const lineas = String(previas || '').split('\n').filter((l) => l.trim());
+  if (!Number.isInteger(indice) || indice < 0 || indice >= lineas.length) return lineas.join('\n');
+  lineas.splice(indice, 1);
+  return lineas.join('\n');
+}
+
+/* Cómo quiere cada quien que le hablen.
+   El tono era uno solo para todos: el que pidió el dueño, que devuelve el
+   insulto con todas sus letras. Eso está bien para quien lo pidió y no para su
+   hermana un martes a las siete. Un asistente que es "de cada usuario" no
+   puede tener una sola boca.
+
+   Va al final del prompt, después de todas las reglas, porque lo último que se
+   lee es lo que más pesa cuando se contradice con algo de arriba. */
+const TONOS = {
+  suave: `
+
+CON ESTA PERSONA, SIN PULLA. Te pidió que le hables normal: haz la cuenta y ya.
+Puedes ser seco o simpático, pero no te burlas, no la picas y no devuelves
+insultos aunque te los den. Si te insultan, lo dejas pasar y haces la cuenta.
+La "pulla" del esquema la rellenas igual, pero con una frase normal: un "ahí va"
+o un "listo". Nunca vacía.`,
+
+  normal: `
+
+CON ESTA PERSONA, PULLA PERO SIN GROSERÍAS. Una línea seca sobre lo obvio de la
+pregunta, como siempre, pero sin palabrotas. Si te insultan, respondes con
+ironía, no con la misma moneda.`,
+
+  sin_freno: '',
+};
+
+const instruccionesDeTono = (tono) => TONOS[tono] ?? TONOS.sin_freno;
+
+/** Los tonos que existen. Vive aquí, y no en iq-memoria.js, para que la
+    importación vaya en un solo sentido y no se crucen los dos archivos. */
+export const TONOS_VALIDOS = Object.keys(TONOS);
+
+/**
+ * El tono de esta persona, con "sin_freno" de reserva.
+ *
+ * Con su try porque la tabla puede no existir todavía: esto se despliega antes
+ * de correr la migración 0009, y un asistente que deja de contestar porque
+ * falta una preferencia sería peor que uno que habla como siempre.
+ */
+export async function tonoDe(db, personaId) {
+  if (!db || !personaId) return 'sin_freno';
+  try {
+    const fila = await db.prepare('SELECT tono FROM iq_ajustes WHERE persona_id = ?').bind(personaId).first();
+    return TONOS_VALIDOS.includes(fila?.tono) ? fila.tono : 'sin_freno';
+  } catch {
+    return 'sin_freno';
+  }
+}
+
 /** Lo que se sabe de quien pregunta: sus notas y por dónde iba la charla */
 async function memoriaDe(db, personaId) {
   if (!db || !personaId) return { notas: '', turnos: [] };
@@ -872,11 +945,11 @@ async function guardarMemoria(db, personaId, pregunta, respuesta, aprendido) {
  * que armaran su propio prompt habrían seguido dando el visto bueno a un texto
  * que ya no existe.
  */
-export function armarMensajes({ pregunta, tasas, contexto = '', quienEs = '', calculos = null, turnos = [] }) {
+export function armarMensajes({ pregunta, tasas, contexto = '', quienEs = '', calculos = null, turnos = [], tono = 'sin_freno' }) {
   return [
     {
       role: 'system',
-      content: `${PERSONA}\n\n${contextoDeTasas(tasas)}${contextoDeLaApp(contexto)}${quienEs}${contextoDeCalculos(calculos)}`,
+      content: `${PERSONA}${instruccionesDeTono(tono)}\n\n${contextoDeTasas(tasas)}${contextoDeLaApp(contexto)}${quienEs}${contextoDeCalculos(calculos)}`,
     },
     // Sin los turnos anteriores, un "a todas las tasas" no tenía a qué
     // referirse y contestaba con una broma, porque literalmente no sabía
@@ -929,6 +1002,9 @@ export async function onRequestPost(context) {
   const db = env.MONTOS;
   const sesion = await sesionDe(db, request);
   const { notas, turnos: turnosGuardados } = await memoriaDe(db, sesion?.id);
+  // Cómo quiere esta persona que le hablen. Va en la misma ida a la base que
+  // la memoria, no después: son dos consultas que no se estorban.
+  const tono = await tonoDe(db, sesion?.id);
 
   const contexto = mezclarContexto(turnosGuardados, turnos);
 
@@ -972,6 +1048,7 @@ export async function onRequestPost(context) {
           quienEs,
           calculos: cuerpo?.calculos,
           turnos: contexto,
+          tono,
         }),
       }),
     });

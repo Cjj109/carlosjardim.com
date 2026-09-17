@@ -924,16 +924,50 @@ function pintarTira() {
     .join('');
 }
 
-/** Lo que el 60 IQ ha aprendido de quien mira */
+/** Lo que el 60 IQ ha aprendido de quien mira, y cómo quiere que le hable */
 async function pintarMemoria() {
   const caja = $('iqNotas');
   if (!caja) return;
   try {
     const r = await fetch('/api/iq-memoria', { credentials: 'same-origin' });
     const d = await r.json();
-    caja.textContent = d.notas?.trim() || 'Todavía nada.';
+    // `lineas` es lo nuevo; `notas` cubre una app instalada de antes de esto
+    pintarNotas(d.lineas ?? (d.notas?.trim() ? d.notas.trim().split('\n') : []));
+    marcarTono(d.tono);
   } catch {
-    caja.textContent = 'No se pudo consultar.';
+    caja.innerHTML = '<li class="calc-iq-vacio">No se pudo consultar.</li>';
+  }
+}
+
+/** Cada nota en su línea, con la ✕ que la tacha */
+function pintarNotas(lineas) {
+  const caja = $('iqNotas');
+  if (!caja) return;
+
+  caja.innerHTML = lineas.length
+    ? lineas
+        .map((l) => String(l).replace(/^-\s*/, '').trim())
+        .filter(Boolean)
+        .map(
+          (l, i) =>
+            `<li class="calc-iq-nota"><span>${esc(l)}</span>` +
+            `<button type="button" class="calc-iq-quitar" data-linea="${i}" aria-label="Que olvide: ${esc(l)}">×</button></li>`
+        )
+        .join('')
+    : '<li class="calc-iq-vacio">Todavía nada.</li>';
+}
+
+/** Deja marcado el tono que tiene puesto */
+function marcarTono(tono) {
+  const grupo = $('iqTonos');
+  if (!grupo) return;
+
+  for (const boton of grupo.querySelectorAll('button[data-tono]')) {
+    const suyo = boton.dataset.tono === (tono || 'sin_freno');
+    boton.setAttribute('aria-checked', String(suyo));
+    boton.classList.toggle('is-activo', suyo);
+    // Un radiogroup se recorre con flechas, así que solo el elegido entra con Tab
+    boton.tabIndex = suyo ? 0 : -1;
   }
 }
 
@@ -2055,6 +2089,90 @@ document.addEventListener('DOMContentLoaded', () => {
   // Se consulta al desplegarlo, no al cargar: casi nadie lo abre y sería una
   // petición de más en cada apertura de la app.
   $('iqMemoria')?.addEventListener('toggle', (e) => { if (e.target.open) pintarMemoria(); });
+
+  /* Tachar una nota suelta. El índice se manda tal como se pintó: si la
+     memoria cambió por detrás, el servidor comprueba que exista y ante la duda
+     no borra nada, que es mejor que llevarse la de al lado. */
+  $('iqNotas')?.addEventListener('click', async (e) => {
+    const boton = e.target.closest('.calc-iq-quitar');
+    if (!boton) return;
+
+    boton.disabled = true;
+    try {
+      const r = await fetch('/api/iq-memoria', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ linea: Number(boton.dataset.linea) }),
+      });
+      if (fueraDeSesion(r)) return;
+      const d = await r.json();
+      if (d.ok) pintarNotas(d.lineas || []);
+      else boton.disabled = false;
+    } catch (error) {
+      console.warn('No se pudo tachar la nota:', error);
+      boton.disabled = false;
+    }
+  });
+
+  // Decirle a mano lo que tiene que saber, sin esperar a que lo deduzca
+  $('iqAnadirNota')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const campo = $('iqNotaNueva');
+    const nota = campo?.value.trim();
+    if (!nota) return;
+
+    campo.disabled = true;
+    try {
+      const r = await fetch('/api/iq-memoria', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nota }),
+      });
+      if (fueraDeSesion(r)) return;
+      const d = await r.json();
+      // Solo se vacía la caja si de verdad se guardó: borrar lo que alguien
+      // escribió sin haberlo apuntado es perderle el texto
+      if (d.ok) {
+        campo.value = '';
+        pintarNotas(d.lineas || []);
+      }
+    } catch (error) {
+      console.warn('No se pudo apuntar la nota:', error);
+    } finally {
+      campo.disabled = false;
+      campo.focus();
+    }
+  });
+
+  /* El tono. Se marca al tocarlo y se corrige si el servidor dice que no:
+     fingir que se guardó y hablarte igual al día siguiente sería peor que
+     tardar medio segundo en confirmarlo. */
+  const elegirTono = async (boton) => {
+    const tono = boton?.dataset.tono;
+    if (!tono) return;
+
+    const antes = $('iqTonos')?.querySelector('[aria-checked="true"]')?.dataset.tono;
+    marcarTono(tono);
+    boton.focus();
+
+    try {
+      const r = await fetch('/api/iq-memoria', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tono }),
+      });
+      if (fueraDeSesion(r)) return;
+      const d = await r.json();
+      if (!d.ok) marcarTono(antes);
+    } catch (error) {
+      console.warn('No se pudo cambiar el tono:', error);
+      marcarTono(antes);
+    }
+  };
+
+  $('iqTonos')?.addEventListener('click', (e) => elegirTono(e.target.closest('button[data-tono]')));
+  const grupoTonos = $('iqTonos');
+  if (grupoTonos) navegarConFlechas(grupoTonos, 'button[data-tono]', elegirTono);
 
   $('iqForm')?.addEventListener('submit', (e) => {
     e.preventDefault();

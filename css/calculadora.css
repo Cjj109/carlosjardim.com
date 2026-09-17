@@ -1685,6 +1685,120 @@ html { overflow-anchor: none; }
 /* Lo que el 60 IQ ha aprendido: plegado, porque no se consulta a diario */
 .calc-iq-memoria { margin-top: 1rem; }
 
+/* Una nota por línea, cada una con su ✕ */
+.calc-iq-notas { list-style: none; }
+
+.calc-iq-nota {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.calc-iq-nota + .calc-iq-nota { margin-top: 0.45rem; }
+
+.calc-iq-vacio { color: var(--calc-texto-tenue); }
+
+/* La ✕ no se pinta como un botón: es un tachón al margen de la nota, y hasta
+   que no pasas por encima no grita. Borrar lo que alguien aprendió de ti no
+   debería ser lo más llamativo del panel. */
+.calc-iq-quitar {
+  flex-shrink: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--calc-texto-tenue);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.calc-iq-quitar:hover,
+.calc-iq-quitar:focus-visible {
+  opacity: 1;
+  color: var(--calc-texto);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.calc-iq-quitar:disabled { opacity: 0.25; cursor: default; }
+
+/* Apuntar algo a mano, con la misma forma que la caja de preguntar */
+.calc-iq-anadir {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+.calc-iq-anadir input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--calc-radio-sm);
+  border: 1px solid var(--calc-borde);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--calc-texto);
+  font-family: inherit;
+  font-size: 0.78rem;
+}
+
+.calc-iq-anadir input:focus-visible {
+  outline: none;
+  border-color: var(--calc-borde-fuerte);
+}
+
+.calc-iq-anadir button {
+  flex-shrink: 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--calc-radio-sm);
+  border: 1px solid var(--calc-borde);
+  background: transparent;
+  color: var(--calc-texto-suave);
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.calc-iq-anadir button:hover { border-color: var(--calc-borde-fuerte); }
+
+.calc-iq-tono-titulo {
+  margin: 0.8rem 0 0.4rem;
+  font-size: 0.72rem;
+  color: var(--calc-texto-tenue);
+}
+
+.calc-iq-tonos {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.7rem;
+}
+
+.calc-iq-tonos button {
+  flex: 1;
+  padding: 0.4rem 0.3rem;
+  border-radius: var(--calc-radio-sm);
+  border: 1px solid var(--calc-borde);
+  background: transparent;
+  color: var(--calc-texto-tenue);
+  font-family: inherit;
+  font-size: 0.73rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.calc-iq-tonos button:hover { color: var(--calc-texto-suave); }
+
+.calc-iq-tonos button.is-activo {
+  color: var(--calc-texto);
+  border-color: var(--calc-borde-fuerte);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .calc-iq-memoria summary {
   font-size: 0.78rem;
   color: var(--calc-texto-tenue);
