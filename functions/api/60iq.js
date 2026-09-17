@@ -38,7 +38,7 @@ const OPENROUTER = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Gemini 3.5 Flash Lite: barato de sobra para una regla de tres y una pulla,
 // y admite structured_outputs, que aquí no es opcional.
-const MODELO_POR_DEFECTO = 'google/gemini-3.5-flash-lite';
+export const MODELO_POR_DEFECTO = 'google/gemini-3.5-flash-lite';
 
 const MAX_PREGUNTA = 400;
 
@@ -248,7 +248,7 @@ Esa tasa se llama "USDT p2p" o simplemente "USDT".
 explicacion: una línea diciendo qué se hizo y con qué tasa. Sin cifras de
 resultado, que las pone la app. Español de Venezuela.`;
 
-const ESQUEMA = {
+export const ESQUEMA = {
   type: 'object',
   additionalProperties: false,
   required: ['tipo', 'pulla', 'monto', 'tasa', 'tasa_destino', 'tasa_que_falta', 'opciones', 'operacion', 'unidad_entrada', 'unidad_salida', 'explicacion', 'aprendido'],
@@ -863,6 +863,29 @@ async function guardarMemoria(db, personaId, pregunta, respuesta, aprendido) {
   }
 }
 
+/**
+ * Los mensajes que se le mandan al modelo, tal cual.
+ *
+ * Suelta y exportada para que las pruebas del prompt (scripts/probar-modelo.mjs)
+ * midan LO QUE SE ENVÍA DE VERDAD y no una copia. Una copia se queda vieja a la
+ * primera: hoy mismo se le cambiaron las reglas cuatro veces, y unas pruebas
+ * que armaran su propio prompt habrían seguido dando el visto bueno a un texto
+ * que ya no existe.
+ */
+export function armarMensajes({ pregunta, tasas, contexto = '', quienEs = '', calculos = null, turnos = [] }) {
+  return [
+    {
+      role: 'system',
+      content: `${PERSONA}\n\n${contextoDeTasas(tasas)}${contextoDeLaApp(contexto)}${quienEs}${contextoDeCalculos(calculos)}`,
+    },
+    // Sin los turnos anteriores, un "a todas las tasas" no tenía a qué
+    // referirse y contestaba con una broma, porque literalmente no sabía
+    // de qué se le hablaba.
+    ...turnos,
+    { role: 'user', content: pregunta },
+  ];
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -942,17 +965,14 @@ export async function onRequestPost(context) {
           type: 'json_schema',
           json_schema: { name: 'decision', strict: true, schema: ESQUEMA },
         },
-        messages: [
-          {
-            role: 'system',
-            content: `${PERSONA}\n\n${contextoDeTasas(cuerpo?.tasas)}${contextoDeLaApp(cuerpo?.contexto)}${quienEs}${contextoDeCalculos(cuerpo?.calculos)}`,
-          },
-          // Sin los turnos anteriores, un "a todas las tasas" no tenía a qué
-          // referirse y contestaba con una broma, porque literalmente no sabía
-          // de qué se le hablaba.
-          ...contexto,
-          { role: 'user', content: pregunta },
-        ],
+        messages: armarMensajes({
+          pregunta,
+          tasas: cuerpo?.tasas,
+          contexto: cuerpo?.contexto,
+          quienEs,
+          calculos: cuerpo?.calculos,
+          turnos: contexto,
+        }),
       }),
     });
 
