@@ -892,6 +892,64 @@ function animarScroll(destino, { ancla = null, anclaFinal = null } = {}) {
   desplazando = requestAnimationFrame(paso);
 }
 
+/**
+ * Un golpecito en el teléfono, si el teléfono sabe darlo.
+ *
+ * No está en iOS —Safari no implementa vibrate— así que esto es un extra que
+ * se nota donde existe y no se echa de menos donde no. Con su try porque
+ * algunos navegadores lanzan si la página aún no ha recibido un gesto, y
+ * quedarse sin copiar por no poder vibrar sería absurdo.
+ */
+function toque(ms = 8) {
+  try {
+    navigator.vibrate?.(ms);
+  } catch {
+    // Sin vibración, la acción se hace igual
+  }
+}
+
+/* Cuánto dura el aviso de deshacer. Seis segundos: lo que se tarda en darse
+   cuenta de que uno tocó donde no era, sin quedarse tapando la pantalla. */
+const DESHACER_DURA = 6000;
+let deshacerEnCurso = null;
+
+/**
+ * Avisa de algo que se acaba de hacer y ofrece deshacerlo.
+ *
+ * El reparto: no preguntar antes y sí poder volver atrás después. Confirmar
+ * cada vez castiga a quien acierta, que son casi todas las veces; deshacer
+ * solo aparece cuando hizo falta y se va solo cuando no.
+ *
+ * El manejador se pone con onclick a propósito, no con addEventListener: así
+ * un aviso nuevo reemplaza al anterior en vez de apilarse, y no puede quedar
+ * un botón que deshaga dos cosas de golpe.
+ */
+function avisarDeshacer(texto, deshacer) {
+  const caja = $('calcDeshacer');
+  const etiqueta = $('calcDeshacerTexto');
+  const boton = $('calcDeshacerBoton');
+  if (!caja || !etiqueta || !boton) return;
+
+  clearTimeout(deshacerEnCurso);
+  etiqueta.textContent = texto;
+  caja.hidden = false;
+
+  const cerrar = () => {
+    clearTimeout(deshacerEnCurso);
+    deshacerEnCurso = null;
+    caja.hidden = true;
+    boton.onclick = null;
+  };
+
+  boton.onclick = () => {
+    deshacer();
+    toque(8);
+    cerrar();
+  };
+
+  deshacerEnCurso = setTimeout(cerrar, DESHACER_DURA);
+}
+
 const cortarScroll = () => cancelAnimationFrame(desplazando);
 window.addEventListener('touchstart', cortarScroll, { passive: true });
 window.addEventListener('wheel', cortarScroll, { passive: true });
@@ -2016,6 +2074,137 @@ document.addEventListener('DOMContentLoaded', () => {
   const panelPrincipal = document.querySelector('.calc-panel');
   if (panelPrincipal) deslizarEntreModos(panelPrincipal);
 
+  /* TIRAR PARA ACTUALIZAR
+     Existe el botón del pie, y se queda: es el camino seguro y el único que
+     tiene quien no usa un teléfono. Pero el gesto de tirar hacia abajo es el
+     que el pulgar intenta solo en una app que se abre veinte veces al día, y
+     hasta ahora no hacía nada.
+
+     Se aprovecha que el body ya lleva overscroll-behavior-y: contain, puesto
+     por otra razón: el tirón nativo de Chrome ya estaba desactivado, así que
+     este gesto no se pelea con nada.
+
+     Solo desde arriba del todo y solo hacia abajo: si la página está a medio
+     desplazar, el dedo está leyendo, no pidiendo tasas nuevas. */
+  const TIRON_MINIMO = 64;
+  const barraTiron = $('calcTiron');
+  let tirandoDesde = null;
+  let tironListo = false;
+
+  document.addEventListener('touchstart', (e) => {
+    // Un solo dedo y desde el tope: con dos es un pellizco, y a medio
+    // desplazar es lectura
+    tirandoDesde = window.scrollY <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null;
+    tironListo = false;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (tirandoDesde === null || !barraTiron) return;
+
+    const recorrido = e.touches[0].clientY - tirandoDesde;
+    // Hacia arriba es desplazarse normal: el gesto se cancela y no vuelve
+    // hasta que se levante el dedo
+    if (recorrido <= 0) {
+      tirandoDesde = null;
+      barraTiron.style.opacity = '';
+      barraTiron.classList.remove('es-listo');
+      return;
+    }
+
+    /* Se frena a la mitad y se corta en el doble del mínimo: sin tope, el
+       dedo podía arrastrar la barra media pantalla y el gesto parecía otra
+       cosa. Con freno, pasado el punto de no retorno ya casi no se mueve, que
+       es la señal de "ya está". */
+    const avance = Math.min(recorrido / 2, TIRON_MINIMO * 2);
+    const parte = Math.min(1, avance / TIRON_MINIMO);
+
+    barraTiron.style.opacity = String(Math.min(1, parte * 1.4));
+    barraTiron.style.setProperty('--tiron', `${parte * 100}%`);
+
+    if (parte >= 1 && !tironListo) {
+      tironListo = true;
+      barraTiron.classList.add('es-listo');
+      // Aquí ya vale soltar, y conviene saberlo sin mirar la barra
+      toque(10);
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    if (tirandoDesde === null || !barraTiron) return;
+    tirandoDesde = null;
+
+    if (tironListo) {
+      cargarTasas({ forzar: true });
+      if (fuentes) cargarFuentes();
+      programarRefresco();
+    }
+
+    tironListo = false;
+    barraTiron.classList.remove('es-listo');
+    barraTiron.classList.add('es-soltado');
+    barraTiron.style.opacity = '';
+    setTimeout(() => barraTiron.classList.remove('es-soltado'), 300);
+  }, { passive: true });
+
+  /* PULSACIÓN LARGA EN UNA TARJETA PARA ESCONDERLA
+     Esconder una tasa vivía en Ajustes → "Qué tasas ver", tres toques dentro
+     de un panel que casi nadie abre. La tarjeta está ahí delante y es donde
+     uno piensa "esta no la uso".
+
+     No pide confirmación y sí ofrece deshacer, que para algo reversible es
+     mejor reparto: preguntar antes molesta cada vez, deshacer después solo
+     cuando hace falta. */
+  const MANTENER = 500;
+  let pulsando = null;
+  let tarjetaPulsada = null;
+
+  const soltarTarjeta = () => {
+    clearTimeout(pulsando);
+    pulsando = null;
+    tarjetaPulsada?.classList.remove('es-pulsada');
+    tarjetaPulsada = null;
+  };
+
+  document.querySelector('.calc-tasas')?.addEventListener('pointerdown', (e) => {
+    const tarjeta = e.target.closest('.tasa');
+    if (!tarjeta) return;
+
+    tarjetaPulsada = tarjeta;
+    tarjeta.classList.add('es-pulsada');
+
+    pulsando = setTimeout(() => {
+      const id = tarjeta.dataset.tasa;
+      // La última que queda no se deja apagar: una calculadora sin ninguna
+      // tasa no calcula nada
+      if (!id || visibles.length <= 1) {
+        soltarTarjeta();
+        return;
+      }
+
+      const antes = [...visibles];
+      guardarVisibles(visibles.filter((t) => t !== id));
+      aplicarVisibles();
+      toque(14);
+      // El nombre se lee de la tarjeta, no de una tabla aparte: NOMBRE_EN_TIRA
+      // solo conoce el euro y el USDT, así que las demás habrían salido en
+      // crudo —"zelle escondida"—. En la tarjeta ya pone lo que hay que decir.
+      const nombre = tarjeta.querySelector('.tasa-nombre')?.textContent.trim() || id;
+      avisarDeshacer(`${nombre} escondida`, () => {
+        guardarVisibles(antes);
+        aplicarVisibles();
+      });
+      soltarTarjeta();
+    }, MANTENER);
+  });
+
+  for (const evento of ['pointerup', 'pointercancel', 'pointerleave']) {
+    document.querySelector('.calc-tasas')?.addEventListener(evento, soltarTarjeta);
+  }
+  // Desplazarse con el dedo empezando sobre una tarjeta no es mantener pulsado
+  document.querySelector('.calc-tasas')?.addEventListener('pointermove', (e) => {
+    if (pulsando && (Math.abs(e.movementX) > 4 || Math.abs(e.movementY) > 4)) soltarTarjeta();
+  });
+
   const modos = $('calcModos');
   modos?.addEventListener('click', (e) => {
     const boton = e.target.closest('.calc-modo');
@@ -2041,6 +2230,10 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       await navigator.clipboard.writeText(fila.dataset.copiar);
       fila.classList.add('is-copiado');
+      // Un golpecito: copiar es la acción más usada de la pantalla y se hace
+      // sin mirar, con la otra app ya en la cabeza. El aviso de "copiado" hay
+      // que leerlo; esto se siente.
+      toque(8);
       setTimeout(() => fila.classList.remove('is-copiado'), 1400);
     } catch (error) {
       console.warn('No se pudo copiar:', error);

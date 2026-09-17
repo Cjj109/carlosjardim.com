@@ -50,8 +50,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=79">
-  <link rel="stylesheet" href="/css/calculadora.css?r=79">
+  <link rel="stylesheet" href="/css/variables.css?r=80">
+  <link rel="stylesheet" href="/css/calculadora.css?r=80">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -171,6 +171,20 @@
   </noscript>
 
   <!-- Tasas del momento -->
+  <!-- El aviso de tirar para actualizar. Vive fuera del flujo y solo asoma
+       mientras se tira: con aria-hidden porque quien usa lector de pantalla
+       tiene el botón "Actualizar" del pie, que dice lo mismo y no depende de
+       un gesto. -->
+  <div class="calc-tiron" id="calcTiron" aria-hidden="true"><span></span></div>
+
+  <!-- El aviso de algo que se puede deshacer. Vacío y escondido hasta que hace
+       falta; role="status" para que un lector de pantalla lo anuncie sin
+       robarle el foco a nadie. -->
+  <div class="calc-deshacer" id="calcDeshacer" role="status" aria-live="polite" hidden>
+    <span id="calcDeshacerTexto"></span>
+    <button type="button" id="calcDeshacerBoton">Deshacer</button>
+  </div>
+
   <section class="calc-tasas" aria-label="Tasas actuales">
     <!-- data-tasa dice cuál es cada una: quien elige no verla la esconde, y
          el orden en el HTML es el orden en pantalla -->
@@ -312,7 +326,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v79</span>
+    <span class="calc-version" title="Versión de la app instalada">v80</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -528,7 +542,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=79" defer></script>
+<script src="/js/calculadora.js?r=80" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

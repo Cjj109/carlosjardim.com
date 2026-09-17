@@ -78,6 +78,102 @@ body {
   margin-bottom: 1.25rem;
 }
 
+/* TIRAR PARA ACTUALIZAR
+
+   El botón del pie sigue ahí y sigue siendo el camino seguro; esto es el gesto
+   que el pulgar ya intenta hacer solo. No hay flecha que gire ni texto: una
+   barra que crece con el dedo y se llena cuando ya vale el tirón, que es lo
+   que se entiende sin leer. */
+.calc-tiron {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: 4.5rem;
+  height: 3px;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+  background: var(--calc-borde);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.calc-tiron span {
+  display: block;
+  height: 100%;
+  width: var(--tiron, 0%);
+  border-radius: inherit;
+  background: var(--calc-texto-tenue);
+}
+
+/* Pasado el punto de no retorno, la barra se enciende: a partir de ahí,
+   soltar actualiza. Sin esto había que adivinar cuánto era suficiente. */
+.calc-tiron.es-listo span { background: var(--calc-usdt); }
+
+/* Soltando: la barra se va sola mientras las tasas se piden */
+.calc-tiron.es-soltado {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* Una tarjeta mientras se mantiene pulsada. No se "aprieta" del todo: se
+   hunde lo justo para que se note que el gesto está pasando algo, porque una
+   pulsación larga sin respuesta se siente como que la app se colgó. */
+.tasa.es-pulsada {
+  scale: 0.97;
+  border-color: var(--calc-borde-fuerte);
+  transition: scale 0.45s ease, border-color 0.2s ease;
+}
+
+/* EL AVISO DE DESHACER
+
+   Abajo y por encima de todo, donde llega el pulgar. Preguntar "¿seguro?"
+   antes de esconder una tarjeta molesta cada vez; ofrecer deshacer después
+   solo molesta cuando de verdad fue un error. */
+.calc-deshacer {
+  position: fixed;
+  left: 50%;
+  bottom: 1.1rem;
+  translate: -50% 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.6rem 0.7rem 0.6rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--calc-borde-fuerte);
+  background: var(--calc-superficie-alta);
+  color: var(--calc-texto-suave);
+  font-size: 0.8rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  animation: asomarDeshacer 0.2s ease;
+}
+
+.calc-deshacer button {
+  flex-shrink: 0;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--calc-borde);
+  background: transparent;
+  color: var(--calc-texto);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.calc-deshacer button:hover { border-color: var(--calc-borde-fuerte); }
+
+@keyframes asomarDeshacer {
+  from { opacity: 0; translate: -50% 0.5rem; }
+  to { opacity: 1; translate: -50% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calc-deshacer { animation: none; }
+}
+
 .tasa {
   position: relative;
   display: flex;
