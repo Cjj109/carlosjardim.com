@@ -201,6 +201,23 @@ SABES CON QUIÉN HABLAS. Más abajo va su nombre y lo que ya sabes de esa
 persona. Úsalo: llámala por su nombre de vez en cuando —no en cada frase, que
 cansa— y no le preguntes lo que ya está escrito ahí.
 
+SABES CÓMO VIENE LA TASA. Más abajo van los últimos días, si los hay. Con eso
+puedes contestar "¿subió?", "¿está mejor que ayer?", "¿me conviene esperar?" o
+"llevas tres días cambiando a peor tasa", que son preguntas de dinero de las de
+verdad y hasta ahora no tenían respuesta.
+
+Dos límites, y son firmes:
+
+- NO ADIVINAS EL FUTURO. Puedes decir lo que hizo la tasa; no lo que va a
+  hacer. "Lleva tres días subiendo" es un hecho; "mañana sigue subiendo" es un
+  invento, y con el dinero de otro no se inventa. Si te piden un pronóstico,
+  dilo claro: no lo sabes, y quien diga que lo sabe tampoco.
+- SOLO LOS DÍAS QUE TE DAN. Si abajo hay tres días, hablas de tres días. No
+  completes la serie de memoria ni te inventes la semana pasada.
+
+Si abajo no hay ninguna línea de días, es que todavía no se ha guardado
+historia: entonces contestas del día de hoy y ya, sin excusas largas.
+
 Y SABES LO QUE HA CALCULADO. Más abajo van sus últimos cálculos en la app, con
 cuándo los hizo. Eso es oro para responder como alguien que la conoce:
 
@@ -853,6 +870,98 @@ ironía, no con la misma moneda.`,
 
 const instruccionesDeTono = (tono) => TONOS[tono] ?? TONOS.sin_freno;
 
+/* Cuántos días de historia se le enseñan. Ocho cubren la semana entera y el
+   mismo día de la semana pasada, que es la comparación que se hace sola:
+   "el viernes pasado estaba a...". Más días alargan el prompt sin añadir nada
+   que alguien pregunte de verdad. */
+const DIAS_DE_HISTORIA = 8;
+
+/** Un número con dos decimales, o null si no hay nada que enseñar */
+const cifraCorta = (v) => (Number.isFinite(v) && v > 0 ? Math.round(v * 100) / 100 : null);
+
+/**
+ * Cómo viene la tasa estos días, en texto para el modelo.
+ *
+ * Hasta ahora solo sabía el instante: podía decir cuánto son 350 hoy, pero no
+ * si eso subió o bajó, que es la mitad de las preguntas de dinero. "¿Subió?",
+ * "¿me conviene esperar?", "¿estoy cambiando peor que la semana pasada?" no
+ * tenían respuesta posible, y la materia prima estaba a dos consultas.
+ *
+ * Se le da la serie y NADA MÁS: ni la tendencia calculada ni el porcentaje
+ * masticado. Que compare él es justo lo que sabe hacer; que adivine el
+ * futuro, no, y por eso el prompt se lo prohíbe expresamente.
+ *
+ * Pura y exportada como las demás: aquí se puede colar un "subió" cuando bajó,
+ * y eso en una calculadora de tasas es peor que no decir nada.
+ */
+export function contextoDeTasasPasadas(bcv = [], p2p = []) {
+  const linea = (fila, campos) =>
+    campos
+      .map(([id, nombre]) => {
+        const v = cifraCorta(Number(fila?.[id]));
+        return v ? `${nombre} ${v}` : null;
+      })
+      .filter(Boolean)
+      .join(', ');
+
+  const dias = new Map();
+
+  for (const fila of Array.isArray(bcv) ? bcv : []) {
+    if (!esFechaCorta(fila?.fecha)) continue;
+    const texto = linea(fila, [['usd', 'BCV'], ['eur', 'euro BCV']]);
+    if (texto) dias.set(fila.fecha, texto);
+  }
+
+  for (const fila of Array.isArray(p2p) ? p2p : []) {
+    if (!esFechaCorta(fila?.fecha)) continue;
+    const texto = linea(fila, [['usdt', 'USDT'], ['zelle', 'Zelle']]);
+    if (!texto) continue;
+    const previo = dias.get(fila.fecha);
+    dias.set(fila.fecha, previo ? `${previo}, ${texto}` : texto);
+  }
+
+  if (!dias.size) return '';
+
+  // De más viejo a más nuevo, que es como se lee una serie
+  const lineas = [...dias.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-DIAS_DE_HISTORIA)
+    .map(([fecha, texto]) => `- ${fecha}: ${texto}`);
+
+  return `\n\nCómo viene la tasa estos días (bolívares por unidad):\n${lineas.join('\n')}`;
+}
+
+const esFechaCorta = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+
+/**
+ * Los últimos días de las dos series, con su red.
+ *
+ * El BCV sale de bcv_vigencias, que existe desde antes y para otra cosa: saber
+ * qué tasa rige hoy. El p2p, de tasas_diarias, que puede no existir todavía
+ * —esto se despliega antes de correr la migración 0010—, así que cada consulta
+ * va por su lado: que falte una no puede llevarse la otra.
+ */
+async function historicoDe(db) {
+  if (!db) return { bcv: [], p2p: [] };
+
+  const pedir = async (sql) => {
+    try {
+      const r = await db.prepare(sql).bind(DIAS_DE_HISTORIA).all();
+      return r?.results || [];
+    } catch (e) {
+      console.warn('[60iq] sin histórico de tasas:', e?.message);
+      return [];
+    }
+  };
+
+  const [bcv, p2p] = await Promise.all([
+    pedir('SELECT fecha, usd, eur FROM bcv_vigencias ORDER BY fecha DESC LIMIT ?'),
+    pedir('SELECT fecha, usdt, zelle FROM tasas_diarias ORDER BY fecha DESC LIMIT ?'),
+  ]);
+
+  return { bcv, p2p };
+}
+
 /** Los tonos que existen. Vive aquí, y no en iq-memoria.js, para que la
     importación vaya en un solo sentido y no se crucen los dos archivos. */
 export const TONOS_VALIDOS = Object.keys(TONOS);
@@ -945,11 +1054,17 @@ async function guardarMemoria(db, personaId, pregunta, respuesta, aprendido) {
  * que armaran su propio prompt habrían seguido dando el visto bueno a un texto
  * que ya no existe.
  */
-export function armarMensajes({ pregunta, tasas, contexto = '', quienEs = '', calculos = null, turnos = [], tono = 'sin_freno' }) {
+export function armarMensajes({
+  pregunta, tasas, contexto = '', quienEs = '', calculos = null, turnos = [],
+  tono = 'sin_freno', historico = null,
+}) {
   return [
     {
       role: 'system',
-      content: `${PERSONA}${instruccionesDeTono(tono)}\n\n${contextoDeTasas(tasas)}${contextoDeLaApp(contexto)}${quienEs}${contextoDeCalculos(calculos)}`,
+      content:
+        `${PERSONA}${instruccionesDeTono(tono)}\n\n${contextoDeTasas(tasas)}` +
+        `${contextoDeTasasPasadas(historico?.bcv, historico?.p2p)}` +
+        `${contextoDeLaApp(contexto)}${quienEs}${contextoDeCalculos(calculos)}`,
     },
     // Sin los turnos anteriores, un "a todas las tasas" no tenía a qué
     // referirse y contestaba con una broma, porque literalmente no sabía
@@ -1005,6 +1120,9 @@ export async function onRequestPost(context) {
   // Cómo quiere esta persona que le hablen. Va en la misma ida a la base que
   // la memoria, no después: son dos consultas que no se estorban.
   const tono = await tonoDe(db, sesion?.id);
+  // Cómo viene la tasa estos días. Es del mercado, no de nadie, así que no
+  // depende de quién pregunte ni hace falta sesión para leerlo.
+  const historico = await historicoDe(db);
 
   const contexto = mezclarContexto(turnosGuardados, turnos);
 
@@ -1049,6 +1167,7 @@ export async function onRequestPost(context) {
           calculos: cuerpo?.calculos,
           turnos: contexto,
           tono,
+          historico,
         }),
       }),
     });

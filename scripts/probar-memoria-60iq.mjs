@@ -8,7 +8,13 @@
  *
  *   node scripts/probar-memoria-60iq.mjs
  */
-import { mezclarContexto, anadirNota, quitarNota, contextoDeCalculos } from '../functions/api/60iq.js';
+import {
+  mezclarContexto,
+  anadirNota,
+  quitarNota,
+  contextoDeCalculos,
+  contextoDeTasasPasadas,
+} from '../functions/api/60iq.js';
 
 let fallos = 0;
 const ok = (t, real, esp) => {
@@ -84,6 +90,47 @@ console.log('\nTACHAR UNA NOTA SUELTA');
   // Las líneas en blanco no cuentan como nota: si contaran, la ✕ de la
   // tercera borraría la cuarta
   ok('los huecos no cuentan como línea', quitarNota('- una\n\n- dos', 1), '- una');
+}
+
+console.log('\nCÓMO VIENE LA TASA ESTOS DÍAS');
+{
+  const bcv = [
+    { fecha: '2026-09-15', usd: 842.21, eur: 955.03 },
+    { fecha: '2026-09-16', usd: 845.1, eur: 958.4 },
+  ];
+  const p2p = [
+    { fecha: '2026-09-15', usdt: 956.66, zelle: 961.2 },
+    { fecha: '2026-09-16', usdt: 962.4, zelle: 968.1 },
+  ];
+  const renglones = (t) => (t.match(/^- /gm) || []).length;
+
+  const texto = contextoDeTasasPasadas(bcv, p2p);
+  ok('un día junta el BCV y el p2p en su línea',
+    texto.includes('- 2026-09-15: BCV 842.21, euro BCV 955.03, USDT 956.66, Zelle 961.2'), true);
+  ok('van de más viejo a más nuevo', texto.indexOf('09-15') < texto.indexOf('09-16'), true);
+
+  ok('sin nada, no se manda nada', contextoDeTasasPasadas([], []), '');
+  ok('lo que no es lista tampoco', contextoDeTasasPasadas(null, undefined), '');
+
+  // La tabla del p2p puede no existir todavía: que falte una serie no puede
+  // llevarse la otra por delante
+  ok('solo BCV: se manda igual', contextoDeTasasPasadas(bcv, []).includes('BCV 842.21'), true);
+  ok('  y sin nombrar el USDT', contextoDeTasasPasadas(bcv, []).includes('USDT'), false);
+  ok('solo p2p: también', contextoDeTasasPasadas([], p2p).includes('USDT 956.66'), true);
+
+  // Lo que llega de la base puede venir con huecos: una fila sin cifras no es
+  // un día, es ruido, y un "2026-09-14: " vacío invita a inventarse el número
+  ok('una fila sin cifras no sale', renglones(contextoDeTasasPasadas([{ fecha: '2026-09-14', usd: null, eur: null }], [])), 0);
+  ok('un cero tampoco cuenta', renglones(contextoDeTasasPasadas([{ fecha: '2026-09-14', usd: 0, eur: 0 }], [])), 0);
+  ok('una fecha rara se descarta', renglones(contextoDeTasasPasadas([{ fecha: 'ayer', usd: 842 }], [])), 0);
+  ok('media fila sí sale', contextoDeTasasPasadas([{ fecha: '2026-09-14', usd: 842.21, eur: null }], []).includes('- 2026-09-14: BCV 842.21'), true);
+
+  // Ocho días como mucho, y los ocho más nuevos
+  const muchos = Array.from({ length: 30 }, (_, i) => ({ fecha: `2026-08-${String(i + 1).padStart(2, '0')}`, usd: 800 + i }));
+  const recortado = contextoDeTasasPasadas(muchos, []);
+  ok('ocho días como mucho', renglones(recortado), 8);
+  ok('  y son los más nuevos', recortado.includes('2026-08-30'), true);
+  ok('  no los más viejos', recortado.includes('2026-08-01'), false);
 }
 
 console.log('\nSUS ÚLTIMOS CÁLCULOS, QUE VAN EN EL CONTEXTO');

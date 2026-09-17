@@ -299,6 +299,54 @@ async function leerBCVPuente() {
   return { usd: datos.usd ?? null, eur: datos.eur ?? null, fecha: datos.fecha ?? null };
 }
 
+/* Cada cuánto se apunta la foto del día. Un día entero: la fila se refresca
+   con lo último visto, y entre refresco y refresco no hace falta tocar la base
+   para volver a escribir el mismo número. */
+const FOTO_CADA = 6 * 3600;
+
+/**
+ * Apunta las tasas del mercado de hoy, para que se pueda mirar atrás.
+ *
+ * Con freno de caché, como el de Cotizave: sin él esto serían miles de
+ * escrituras al día —una por cada petición de cada calculadora abierta— para
+ * guardar el mismo número una y otra vez. Ese exceso ya costó un aviso una vez
+ * y no se repite.
+ *
+ * Va siempre en waitUntil: apuntar el histórico no puede retrasar ni tumbar la
+ * respuesta de las tasas, que es a lo que la gente vino. Si falla, hoy no hay
+ * fila y mañana sí; nadie se entera y nada se rompe.
+ */
+async function guardarTasaDiaria(db, hoy, tasas) {
+  if (!db || !tasas?.usdt?.rate) return;
+
+  const llave = new Request(`https://foto-tasas.local/${hoy}`);
+  try {
+    const cache = caches.default;
+    if (await cache.match(llave)) return;
+    await cache.put(llave, new Response('1', { headers: { 'Cache-Control': `max-age=${FOTO_CADA}` } }));
+  } catch {
+    // Sin caché —en local, por ejemplo— se escribe igual: mejor una fila de
+    // más que quedarse sin histórico por no poder llevar la cuenta
+  }
+
+  const valor = (id) => (Number.isFinite(tasas?.[id]?.rate) ? tasas[id].rate : null);
+
+  try {
+    await db
+      .prepare(
+        `INSERT INTO tasas_diarias (fecha, usdt, zelle, facebank, wally, zinli)
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON CONFLICT(fecha) DO UPDATE SET
+           usdt = excluded.usdt, zelle = excluded.zelle, facebank = excluded.facebank,
+           wally = excluded.wally, zinli = excluded.zinli, visto_en = datetime('now')`
+      )
+      .bind(hoy, valor('usdt'), valor('zelle'), valor('facebank'), valor('wally'), valor('zinli'))
+      .run();
+  } catch (e) {
+    console.warn('[bcv] no se pudo apuntar la foto del día:', e?.message);
+  }
+}
+
 export async function onRequestGet(context) {
   const hoy = hoyCaracas();
   const conDiagnostico = new URL(context.request.url).searchParams.has('debug');
@@ -491,6 +539,12 @@ export async function onRequestGet(context) {
             }
           : null,
     };
+
+    /* La foto del día, después de responder. El BCV ya tiene su histórico en
+       bcv_vigencias —quedó ahí sin querer, porque hacía falta para saber cuál
+       rige—, pero el p2p se leía y se tiraba: sin esto, el 60 IQ solo puede
+       hablar del instante y no de la semana. */
+    context.waitUntil(guardarTasaDiaria(context.env?.MONTOS, hoy, output));
 
     if (conDiagnostico) {
       output.diagnostico = {
