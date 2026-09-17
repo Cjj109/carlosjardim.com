@@ -911,12 +911,52 @@ function animarScroll(destino, { ancla = null, anclaFinal = null } = {}) {
  * algunos navegadores lanzan si la página aún no ha recibido un gesto, y
  * quedarse sin copiar por no poder vibrar sería absurdo.
  */
+/* El plan B para el iPhone.
+
+   Safari no implementa navigator.vibrate y no hay indicios de que vaya a
+   hacerlo, así que en iOS el golpecito no existía. Lo único que sí da háptico
+   ahí es un interruptor nativo: desde iOS 17.4, cambiar un
+   <input type="checkbox" switch> dispara la retroalimentación del sistema.
+
+   Así que se tiene uno escondido y se le da al interruptor cuando no hay
+   vibración de verdad. Es un truco y se sabe: si Apple lo quita, aquí no se
+   rompe nada —vuelve a no haber golpecito, que es donde estábamos. */
+let interruptorHaptico = null;
+
+function hapticoDeApple() {
+  try {
+    if (!interruptorHaptico) {
+      interruptorHaptico = document.createElement('input');
+      interruptorHaptico.type = 'checkbox';
+      interruptorHaptico.setAttribute('switch', '');
+      // Fuera de la vista pero dentro de la página: display:none no dispara nada
+      interruptorHaptico.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;opacity:0';
+      interruptorHaptico.setAttribute('aria-hidden', 'true');
+      interruptorHaptico.tabIndex = -1;
+      document.body.appendChild(interruptorHaptico);
+    }
+    interruptorHaptico.checked = !interruptorHaptico.checked;
+    interruptorHaptico.dispatchEvent(new Event('change', { bubbles: false }));
+  } catch {
+    // Sin háptico se sigue igual: nunca fue imprescindible
+  }
+}
+
+/**
+ * Un golpecito, con lo que tenga cada teléfono.
+ *
+ * Android tiene la API de vibración y con eso basta. En iPhone no existe, así
+ * que se prueba el interruptor de arriba. Con su try porque algunos
+ * navegadores lanzan si la página aún no ha recibido un gesto, y quedarse sin
+ * copiar por no poder vibrar sería absurdo.
+ */
 function toque(ms = 8) {
   try {
-    navigator.vibrate?.(ms);
+    if (typeof navigator.vibrate === 'function' && navigator.vibrate(ms)) return;
   } catch {
-    // Sin vibración, la acción se hace igual
+    // Cae al plan B
   }
+  hapticoDeApple();
 }
 
 /* Cuánto dura el aviso de deshacer. Seis segundos: lo que se tarda en darse
@@ -1748,7 +1788,17 @@ async function preguntarAl60IQ(pregunta) {
     }
 
     const dicho = burbuja('iq', datos.respuesta, { partes: datos.partes });
-    ponerAcciones(dicho, pregunta, datos.respuesta);
+
+    /* Los botones, con su propia red. Estaban dentro del try de la petición, y
+       eso significaba que un fallo al COLGARLOS borraba una respuesta que ya
+       había llegado bien: en pantalla salía "No se pudo preguntar" encima de
+       una cuenta perfecta. Adornar no puede tumbar lo adornado. */
+    try {
+      ponerAcciones(dicho, pregunta, datos.respuesta);
+    } catch (error) {
+      console.warn('No se pudieron poner las acciones:', error);
+    }
+
     iqCharlaPrevia.push({ rol: 'user', texto: pregunta }, { rol: 'assistant', texto: datos.respuesta });
     // Sin dejar que crezca sin freno: son turnos, no un historial
     if (iqCharlaPrevia.length > IQ_MAX_TURNOS * 2) iqCharlaPrevia.splice(0, 2);
@@ -2193,10 +2243,24 @@ document.addEventListener('DOMContentLoaded', () => {
   let tirandoDesde = null;
   let tironListo = false;
 
+  /* Lo que se desplaza por dentro: la charla del 60 IQ y el historial tienen
+     su propia altura máxima en el teléfono. Si el dedo empieza ahí y ese
+     cajón todavía tiene recorrido hacia arriba, el gesto es suyo, no mío.
+
+     Sin esto, el tirón le robaba el desplazamiento a la respuesta del 60 IQ:
+     como abrir el panel deja la página arriba del todo, arrastrar dentro de
+     la charla cumplía mi condición y sacaba la barra en vez de mover el
+     texto. Un gesto nuevo no puede comerse uno que ya existía. */
+  const cajonPropio = (nodo) => nodo?.closest?.('.calc-iq-charla, .calc-historial, .calc-ajustes');
+
   document.addEventListener('touchstart', (e) => {
     // Un solo dedo y desde el tope: con dos es un pellizco, y a medio
     // desplazar es lectura
-    tirandoDesde = window.scrollY <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null;
+    const dentro = cajonPropio(e.target);
+    const suyo = dentro && dentro.scrollTop > 0;
+
+    tirandoDesde =
+      !suyo && window.scrollY <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null;
     tironListo = false;
   }, { passive: true });
 
