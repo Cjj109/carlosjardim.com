@@ -68,6 +68,20 @@ console.log('\nDOS PRECIOS LOS DOS EN BOLÍVARES');
   ok('gana el más barato, sin convertir nada', r.partes.operacion, 'Te ahorras 1.000,00 Bs.');
 }
 
+console.log('\nUNA DECISIÓN MAL FORMADA NO PUEDE TUMBARLO');
+{
+  /* El esquema dice "lista o null", pero lo que llega es lo que el modelo
+     quiso mandar. Con un objeto ahí, `.map` no existe y esto reventaba
+     entero: una decisión rara tiene que salir pidiendo los datos, no por una
+     excepción que la persona ve como "no se pudo preguntar". */
+  ok('opciones como objeto: contesta, no revienta',
+    resolver({ tipo: 'comparar', pulla: 'x', opciones: { monto: 7.5 } }, tasas).texto.includes('Dime los dos precios'), true);
+  ok('opciones como texto, igual',
+    resolver({ tipo: 'comparar', pulla: 'x', opciones: 'dos' }, tasas).texto.includes('Dime los dos precios'), true);
+  ok('opciones con basura dentro, igual',
+    resolver({ tipo: 'comparar', pulla: 'x', opciones: [null, 'x', 7] }, tasas).texto.includes('Dime los dos precios'), true);
+}
+
 console.log('\nLAS TASAS QUE SE VEN, Y FACEBANK, WALLY Y ZINLI');
 {
   const t = { ...tasas, facebank: 894, wally: 900, zinli: 910 };
@@ -97,6 +111,14 @@ console.log('\nCUANDO LE HABLAN A ÉL, NO A LA CALCULADORA');
   ok('en "charla" manda lo suyo, tal cual', resolver({ tipo: 'charla', pulla: suyo }, tasas).texto, suyo);
   ok('  y no monta ninguna lista', resolver({ tipo: 'charla', pulla: suyo }, tasas).partes, undefined);
   ok('"fuera_de_tema" sigue como estaba', resolver({ tipo: 'fuera_de_tema', pulla: 'x' }, tasas).texto, 'x');
+
+  /* El fallo que se vio en pantalla: el modelo se quedó mudo al devolver un
+     insulto, la respuesta salió vacía y la app enseñó "No se pudo preguntar",
+     como si se hubiera caído el servidor. Quedarse sin palabras es un
+     resultado del modelo, no una avería, y se contesta igual. */
+  ok('mudo en "charla": contesta algo igual', resolver({ tipo: 'charla', pulla: '' }, tasas).texto.length > 0, true);
+  ok('  aunque solo mande espacios', resolver({ tipo: 'charla', pulla: '   ' }, tasas).texto.length > 0, true);
+  ok('  y lo mismo en "fuera_de_tema"', resolver({ tipo: 'fuera_de_tema', pulla: '' }, tasas).texto.length > 0, true);
 }
 
 console.log(fallos ? `\n${fallos} FALLIDAS\n` : '\nTodo correcto\n');

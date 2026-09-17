@@ -187,6 +187,13 @@ La app las lleva a bolívares, las compara y dice cuál gana y por cuánto. Tú
 solo pones los dos precios, su tasa y una etiqueta corta que ayude a
 reconocer cada uno ("en la tienda A", "a BCV", "por Zelle").
 
+NO HACE FALTA QUE TE DIGAN QUÉ SE COMPRA. "¿Es mejor 7.5 en divisas o 8.5
+BCV?" es una comparación completa tal como está: dos precios de lo mismo, y da
+igual si lo mismo es un control, una consulta o un kilo de queso. No preguntes
+qué es, no te inventes el producto y no te quedes sin contestar por eso. Si no
+hay tienda ni producto que poner de etiqueta, usa la tasa: "en divisas", "a
+BCV", "en USDT". La etiqueta es para reconocer cada precio, no para lucirse.
+
 Sirve para cualquier "¿qué me conviene?", "¿cuál es más barato?", "¿pago con
 esto o con lo otro?", y admite más de dos opciones si las da.
 
@@ -299,6 +306,12 @@ const ESQUEMA = {
   },
 };
 
+/* Lo que contesta cuando el modelo no escribe nada.
+   No es un error ni hay que enseñarlo como tal: es él quedándose sin palabras,
+   y en su boca eso también tiene gracia. Lo que no puede pasar es que la
+   pantalla diga "No se pudo preguntar" cuando el servidor contestó perfectamente. */
+const SIN_PALABRAS = 'Me dejaste sin palabras, y eso no me pasa nunca. Dale, repite.';
+
 const NOMBRE_TASA = {
   usd: 'dólar BCV',
   eur: 'euro BCV',
@@ -375,9 +388,17 @@ export function resolver(decision, tasas, visibles = TASAS) {
   const { tipo, monto, tasa, operacion } = decision;
   const seVe = (id) => visibles.includes(id);
 
-  // Las dos vías sin cuenta: lo que no le incumbe y lo que le hablan a él. En
-  // ambas manda lo que escribió, tal cual, que para eso es lo único suyo.
-  if (tipo === 'fuera_de_tema' || tipo === 'charla') return { texto: decision.pulla };
+  /* Las dos vías sin cuenta: lo que no le incumbe y lo que le hablan a él. En
+     ambas manda lo que escribió, tal cual, que para eso es lo único suyo.
+
+     Con una red debajo: aquí el texto del modelo es TODA la respuesta, y si
+     viene vacío la app se queda sin nada que pintar. Pasó a la primera de
+     cambio —un insulto de vuelta, "charla" con la pulla en blanco— y en
+     pantalla salía "No se pudo preguntar", como si se hubiera caído algo.
+     Quedarse mudo es un resultado posible del modelo, no una avería. */
+  if (tipo === 'fuera_de_tema' || tipo === 'charla') {
+    return { texto: String(decision.pulla ?? '').trim() || SIN_PALABRAS };
+  }
 
   /* COMPARAR DOS PRECIOS DE LO MISMO.
      "Un control vale 65 $ a BCV o 60 USDT, ¿cómo conviene pagarlo?"
@@ -390,7 +411,14 @@ export function resolver(decision, tasas, visibles = TASAS) {
      comparar, y gana la más barata. La diferencia se da en bolívares y en la
      moneda del que pierde, que es como se piensa: "me ahorro cinco dólares". */
   if (tipo === 'comparar') {
-    const ops = (decision.opciones || [])
+    /* Array.isArray y no `|| []`: el esquema dice lista o null, pero lo que
+       llega es lo que el modelo quiso mandar, y con un objeto ahí `.map` no
+       existe y esto reventaba entero. Una decisión rara tiene que salir por
+       "dime los dos precios", no por una excepción. */
+    const ops = (Array.isArray(decision.opciones) ? decision.opciones : [])
+      // Y lo de dentro tampoco es de fiar: con un null en la lista, leer
+      // o.tasa tumbaba la petición entera. Lo que no sea un objeto, fuera.
+      .filter((o) => o && typeof o === 'object')
       .map((o) => ({ ...o, valor: hay(tasas, o.tasa), monto: Number(o.monto) }))
       .filter((o) => o.valor && Number.isFinite(o.monto) && o.monto > 0)
       /* A bolívares, que es el único terreno donde se comparan. Lo que ya
@@ -954,6 +982,12 @@ export async function onRequestPost(context) {
       : TASAS;
 
     const resuelto = resolver(decision, cuerpo?.tasas, visibles);
+
+    /* Y la misma red al final, valga por donde valga la respuesta: nunca sale
+       de aquí una respuesta en blanco. Un 200 con el texto vacío es lo peor de
+       los dos mundos —el cliente no ve respuesta ni error, así que enseña su
+       mensaje de avería— y encima guardaría un turno vacío en la memoria. */
+    const texto = String(resuelto?.texto ?? '').trim() || SIN_PALABRAS;
 
     /* Se apunta después de contestar y sin esperar a que termine: guardar la
        memoria no puede retrasar la respuesta, y si falla tampoco puede
