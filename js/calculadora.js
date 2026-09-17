@@ -1029,6 +1029,22 @@ function apuntarEnHistorial(entrada) {
   lista.unshift(entrada);
   aportarMonto(entrada.modo, entrada.monto);
 
+  /* Y una copia para el 60 IQ, que vive en el servidor y no en este aparato.
+     Sin esperarla y sin que importe si falla: el cálculo ya está hecho y
+     guardado aquí, esto solo sirve para que el asistente te conozca igual
+     cuando abras desde otro teléfono. */
+  fetch('/api/calculos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fecha: entrada.fecha,
+      modo: entrada.modo,
+      monto: entrada.monto,
+      destino: entrada.destino,
+      resultado: entrada.resultado,
+    }),
+  }).catch(() => {});
+
   try {
     localStorage.setItem(HISTORIAL, JSON.stringify(lista.slice(0, HISTORIAL_MAX)));
   } catch {

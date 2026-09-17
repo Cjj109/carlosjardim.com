@@ -200,6 +200,9 @@ export async function onRequestDelete(context) {
     await db.batch([
       db.prepare('DELETE FROM iq_notas WHERE persona_id = ?').bind(sesion.id),
       db.prepare('DELETE FROM iq_turnos WHERE persona_id = ?').bind(sesion.id),
+      // También los cálculos guardados: olvidar dejando apuntado que mueves
+      // 350 dólares los viernes no es olvidar.
+      db.prepare('DELETE FROM calculos WHERE persona_id = ?').bind(sesion.id),
     ]);
   } catch (e) {
     // Decir "listo, olvidado" cuando no se borró nada sería mentir en lo único

@@ -1054,6 +1054,33 @@ async function guardarMemoria(db, personaId, pregunta, respuesta, aprendido) {
 }
 
 /**
+ * Los últimos cálculos de quien pregunta, leídos de la base.
+ *
+ * Antes solo llegaban los que mandaba el navegador, así que el 60 IQ te
+ * conocía en el teléfono donde calculabas y en ningún otro: sus notas y su
+ * conversación sí viajaban, el historial no. Medio conocido.
+ *
+ * Con su try, como todo lo que toca una tabla que puede no existir: esto se
+ * despliega antes de correr la migración 0011, y quedarse sin asistente por no
+ * tener historial sería peor que un asistente sin historial.
+ */
+async function calculosDe(db, personaId) {
+  if (!db || !personaId) return [];
+  try {
+    const r = await db
+      .prepare(
+        'SELECT fecha, modo, monto, destino, resultado FROM calculos WHERE persona_id = ? ORDER BY id DESC LIMIT ?'
+      )
+      .bind(personaId, IQ_CALCULOS)
+      .all();
+    return r?.results || [];
+  } catch (e) {
+    console.warn('[60iq] sin cálculos guardados:', e?.message);
+    return [];
+  }
+}
+
+/**
  * Los mensajes que se le mandan al modelo, tal cual.
  *
  * Suelta y exportada para que las pruebas del prompt (scripts/probar-modelo.mjs)
@@ -1200,6 +1227,11 @@ export async function onRequestPost(context) {
   // Cómo viene la tasa estos días. Es del mercado, no de nadie, así que no
   // depende de quién pregunte ni hace falta sesión para leerlo.
   const historico = await historicoDe(db);
+  /* Sus cálculos, de la base y no del navegador. Lo que manda el aparato sigue
+     valiendo de reserva: mientras la tabla se llena —y para quien entre desde
+     un teléfono que aún no ha apuntado nada— es lo único que hay. Con esto el
+     60 IQ te conoce igual en el teléfono que en la computadora. */
+  const calculosGuardados = await calculosDe(db, sesion?.id);
 
   const contexto = mezclarContexto(turnosGuardados, turnos);
 
@@ -1213,7 +1245,7 @@ export async function onRequestPost(context) {
       tasas: cuerpo?.tasas,
       contexto: cuerpo?.contexto,
       quienEs,
-      calculos: cuerpo?.calculos,
+      calculos: calculosGuardados.length ? calculosGuardados : cuerpo?.calculos,
       turnos: contexto,
       tono,
       historico,
