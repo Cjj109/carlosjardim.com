@@ -51,6 +51,13 @@ const CERRADO = [
      entorno tiene el proyecto. Nombres, no valores; pero es el plano de la
      puerta, y están escritos para nosotros, no para quien pase por aquí. */
   /\.md$/,
+  /* Y lo mismo con el taller. Pages publica la carpeta entera, así que desde
+     fuera se leían las migraciones —el esquema de personas, llaves, sesiones e
+     invitaciones— y los scripts de prueba, incluido probar-puerta.sh, que es
+     la lista de rutas que deben estar cerradas: el guion de por dónde
+     intentar colarse, servido en bandeja. Ninguna clave vive ahí, pero el
+     plano de la casa tampoco se regala. */
+  /^\/(scripts|migrations)\//,
 ];
 
 /**
