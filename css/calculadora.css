@@ -4785,3 +4785,46 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja input::placeholder {
   color: var(--calc-texto-suave);
 }
+
+/* ============================================================
+   LAS PÍLDORAS DE SUGERENCIA: SIN RELLENO Y SIN CHOCAR
+   ============================================================
+
+   DEJAN DE TENER RELLENO. Iban en carmesí con letra clara; ahora son solo
+   contorno, como una píldora vacía. De paso desaparece el problema que
+   arrastraban: su letra dejaba de apoyarse sobre un acento —donde en los
+   temas oscuros el acento es claro y obligaba a --turco-sobre-acento— y pasa
+   a apoyarse sobre la superficie de la tarjeta, que es el caso fácil.
+
+   El relleno no se pierde, se mueve al hover: la píldora lo ADQUIERE al
+   apuntarla. Es el gesto que ya usan .iq-acciones button:hover,
+   .calc-iq-borrar:hover y .calc-borrar:hover, con un emparejamiento ya
+   medido en los diez temas.
+
+   Y DEJAN DE CHOCAR. El contenedor las maqueta como texto en línea, separadas
+   por `line-height: 1.9`, que se calculó cuando eran texto con un punteado de
+   1px y sin cuerpo. Medido: con el contorno de 2px la píldora mide 30,6px de
+   alto y el renglón solo da 21,9px, así que el hueco entre una y la siguiente
+   es de 0,0px — se tocan, y esos 4px de tinta juntos son lo que se lee como
+   choque.
+
+   No se toca la regla base: ahí el punteado de 1px sí cabe en su renglón. El
+   arreglo va donde está la causa, que es el borde que añade esta familia. */
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-ejemplos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  line-height: 1.35;
+}
+
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-ejemplo {
+  background: transparent;
+  color: var(--calc-texto);
+}
+
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-ejemplo:hover {
+  background: var(--turco-rojo);
+  border-color: var(--turco-tinta);
+  color: var(--turco-sobre-acento);
+}
