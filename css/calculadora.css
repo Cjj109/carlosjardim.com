@@ -3848,7 +3848,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-borrar:hover {
   background: var(--turco-rojo);
   border-color: var(--turco-tinta);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
 }
 
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-borrar:active {
@@ -3859,7 +3859,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 /* El campo de preguntar al 60 IQ: blanco con su contorno, no el bloque
    oscuro de los temas de noche */
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja input {
-  background: #ffffff;
+  background: var(--calc-superficie-alta);
   border: 2px solid var(--turco-tinta);
   color: var(--calc-texto);
 }
@@ -3877,7 +3877,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   border: 2px solid var(--turco-tinta);
   border-style: solid;
   background: var(--turco-rojo);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
   font-family: var(--turco-display);
   font-size: 0.7rem;
   letter-spacing: 0.05em;
@@ -3893,7 +3893,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-ejemplo:hover {
   background: var(--turco-rojo-hondo, #8e1024);
   border-color: var(--turco-tinta);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
 }
 
 /* ============================================================
@@ -4030,10 +4030,20 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
      6px de crema detrás de cada pieza sobre un campo oscuro se leen como
      losas que brillan, no como profundidad (16,73:1 contra el campo — por
      eso gritaban). En oscuro la luz la pone el contorno y la sombra es un
-     vacío: 1,06 contra el campo, que es justo lo que se busca. */
-  --turco-pop: 6px 6px 0 #0d0314;
-  --turco-pop-md: 4px 4px 0 #0d0314;
-  --turco-pop-sm: 2px 2px 0 #0d0314;
+     vacío.
+
+     Pero a 6px ese vacío apenas se percibía: contra este campo da 1,06 de
+     contraste, así que la profundidad la insinuaba el contorno y no la
+     sombra. La respuesta no era subir el contraste —no hay margen: el campo
+     ya es casi negro— sino el DESPLAZAMIENTO. A 12px la pieza se despega de
+     verdad.
+
+     Comprobado que no estrecha la pantalla, que era la única pega: a 390 y
+     a 360px el ancho del documento sigue igualando al de la ventana y el
+     borde derecho del panel no se mueve. La sombra cae dentro, no empuja. */
+  --turco-pop: 12px 12px 0 #000000;
+  --turco-pop-md: 8px 8px 0 #000000;
+  --turco-pop-sm: 4px 4px 0 #000000;
 
   /* Aquí las monedas NO van cada una de su color.
      En los temas claros la barra del canto lleva siete colores distintos,
@@ -4070,11 +4080,6 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 
 /* El único color literal de la familia: un blanco fijo que sobre este tema
    quedaba como un bloque encendido en medio del panel. */
-:root[data-tema="turco-morado"] .calc-iq-caja input {
-  background: var(--calc-superficie-alta);
-  color: var(--calc-texto);
-}
-
 :root[data-tema="turco-morado"] body {
   background:
     radial-gradient(circle, rgba(255, 253, 247, 0.07) 1.1px, transparent 1.2px) 0 0 / 17px 17px,
@@ -4199,7 +4204,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
      Letra blanca y no ámbar: el ámbar sobre carmesí da 3,5:1 y no llega. */
   background: var(--turco-rojo);
   border: 2px solid var(--turco-tinta);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
   font-family: var(--turco-display);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -4338,14 +4343,14 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-acciones button:hover {
   background: var(--turco-rojo);
   border-color: var(--turco-tinta);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
 }
 
 /* Votado: se queda hundido y relleno, que es lo que dice "ya está dicho" */
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-acciones button.es-elegido {
   background: var(--turco-rojo);
   border-color: var(--turco-tinta);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
   transform: translate(2px, 2px);
   box-shadow: 0 0 0 var(--turco-tinta);
 }
@@ -4353,7 +4358,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-acciones button.es-elegido.es-fallo {
   background: var(--turco-rojo-hondo);
   border-color: var(--turco-tinta);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
 }
 
 /* Borrar seguía en Archivo 500 con borde de 1px. Va en Anton como los demás
@@ -4372,7 +4377,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-borrar:hover {
   background: var(--turco-rojo);
   border-color: var(--turco-tinta);
-  color: #fffdf7;
+  color: var(--turco-sobre-acento);
 }
 
 /* El rótulo de la sección de tono, como los demás rótulos del tema */
@@ -4718,3 +4723,26 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root[data-tema="turco-morado"] {
   --turco-rojo: #7c3aed;
 }
+
+/* ============================================================
+   LA LETRA QUE VA SOBRE EL RELLENO DE ACENTO
+   ============================================================
+
+   Las pildoras, el boton de preguntar y los estados rellenos llevaban
+   `color: #fffdf7` fijo sobre un fondo de var(--turco-rojo). Eso da por
+   supuesto que el acento es OSCURO, y solo es cierto en los temas claros.
+
+   En los cuatro oscuros el acento es un color CLARO —el violeta de Miguel,
+   el naranja de Halloween, el oro de Navidad, el azul de Oscuro—, asi que
+   la crema encima daba 1,81 a 2,92:1. Medido: con la tinta del propio tema
+   encima suben a 6,61, 10,19, 8,39 y 6,83.
+
+   Por defecto crema, que es lo correcto en los seis claros. */
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) {
+  --turco-sobre-acento: #fffdf7;
+}
+
+:root[data-tema="oscuro"] { --turco-sobre-acento: #0a0b0f; }
+:root[data-tema="navidad"] { --turco-sobre-acento: #0b1410; }
+:root[data-tema="halloween"] { --turco-sobre-acento: #0c0912; }
+:root[data-tema="miguel"] { --turco-sobre-acento: #0b0910; }
