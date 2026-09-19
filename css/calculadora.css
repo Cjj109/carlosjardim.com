@@ -3667,6 +3667,8 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
   --turco-tinta: #17110d;
   --turco-rojo: #c41e3a;
+  /* Su --rojo-profundo, para marcar una pieza ya roja sin aclararle la letra */
+  --turco-rojo-hondo: #8e1024;
   --turco-amarillo: #ffb800;
   --turco-crema: #fff6e8;
 
@@ -3816,17 +3818,32 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   color: var(--calc-texto-tenue);
 }
 
-/* Las sugerencias del 60 IQ, como sus etiquetas: píldora negra con el texto
-   en ámbar. Es el patrón que repiten al pie de cada tarjeta. */
+/* Las sugerencias del 60 IQ, en píldora carmesí con letra clara.
+   El patrón de la píldora es suyo —lo repiten al pie de cada tarjeta— y el
+   contorno sigue siendo negro, como en toda su página. Lo que cambia es el
+   relleno: en carmesí dan color a esa zona sin robarle jerarquía al botón de
+   preguntar, que se queda en tinta. Blanco sobre carmesí da 5,74:1. */
 :root[data-tema^="turco"] .calc-iq-ejemplo {
   border: 2px solid var(--turco-tinta);
   border-style: solid;
-  background: var(--turco-tinta);
-  color: var(--turco-amarillo);
+  background: var(--turco-rojo);
+  color: #fffdf7;
   font-family: var(--turco-display);
   font-size: 0.7rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+/* El hover de la regla base (línea 1537) pinta el texto con --calc-texto
+   —tinta casi negra— y el borde con --calc-usdt. Pensado para una píldora
+   transparente; sobre el carmesí deja la letra ilegible justo al apuntarla, y
+   el borde ámbar rompe la regla de que el contorno es siempre negro. Aquí se
+   oscurece el relleno en vez de aclarar la letra, que es como se marca una
+   pieza sólida. */
+:root[data-tema^="turco"] .calc-iq-ejemplo:hover {
+  background: var(--turco-rojo-hondo, #8e1024);
+  border-color: var(--turco-tinta);
+  color: #fffdf7;
 }
 
 /* ============================================================
