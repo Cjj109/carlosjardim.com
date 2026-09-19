@@ -26,6 +26,8 @@ const TEMAS = {
   halloween: '#0c0912',
   zachiro: '#ebe7dc',
   sasha: '#f3e8d9',
+  turco: '#fff6e8',
+  'turco-amarillo': '#ffb800',
 };
 
 /* ---------- Utilidades ---------- */

@@ -50,8 +50,8 @@
   <link rel="preload" href="/fonts/inter-latin.woff2?v=175a01e7" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2?v=cf32987d" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="/css/variables.css?r=83">
-  <link rel="stylesheet" href="/css/calculadora.css?r=83">
+  <link rel="stylesheet" href="/css/variables.css?r=84">
+  <link rel="stylesheet" href="/css/calculadora.css?r=84">
 
   <script>
     // Dos cosas que tienen que pasar ANTES de que pinte nada:
@@ -62,7 +62,7 @@
     //    hasta que el HTML está parseado; lanzándola aquí se adelanta y para
     //    cuando el código la necesita suele estar ya en camino.
     (function () {
-      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910', halloween: '#0c0912', zachiro: '#ebe7dc', sasha: '#f3e8d9' };
+      var COLORES = { oscuro: '#0a0b0f', claro: '#e6ebf3', navidad: '#0b1410', miguel: '#0b0910', halloween: '#0c0912', zachiro: '#ebe7dc', sasha: '#f3e8d9', turco: '#fff6e8', 'turco-amarillo': '#ffb800' };
       var tema = 'oscuro';
       try { tema = localStorage.getItem('calc-tema') || 'oscuro'; } catch (e) {}
       if (!COLORES[tema]) tema = 'oscuro';
@@ -326,7 +326,7 @@
 
   <footer class="calc-pie">
     <span id="calcActualizado">Cargando tasas…</span>
-    <span class="calc-version" title="Versión de la app instalada">v83</span>
+    <span class="calc-version" title="Versión de la app instalada">v84</span>
     <div class="calc-pie-botones">
       <button type="button" id="calc60iq" class="calc-refrescar calc-60iq" aria-expanded="false" aria-controls="calcPanel60iq">
         60 IQ
@@ -447,6 +447,14 @@
         <span class="tema-muestra muestra-sasha" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         Sasha
       </button>
+      <button type="button" class="tema" data-tema="turco" role="radio" aria-checked="false">
+        <span class="tema-muestra muestra-turco" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Turco
+      </button>
+      <button type="button" class="tema" data-tema="turco-amarillo" role="radio" aria-checked="false">
+        <span class="tema-muestra muestra-turco-amarillo" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Turco sol
+      </button>
     </div>
   </section>
 
@@ -542,7 +550,7 @@
   </section>
 </main>
 
-<script src="/js/calculadora.js?r=83" defer></script>
+<script src="/js/calculadora.js?r=84" defer></script>
 <script>
   // El service worker guarda la app para que abra al instante y funcione sin
   // señal. Las tasas siempre se piden a la red: una tasa vieja servida de

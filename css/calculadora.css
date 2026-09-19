@@ -3596,3 +3596,370 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 @media (pointer: coarse) {
   .ver { min-height: 40px; }
 }
+
+/* ============================================================
+   TEMA TURCO — dos variantes
+   ============================================================
+
+   La identidad de almacenturco.com, medida de su propia página y no de
+   memoria: carmesí #C41E3A, amarillo #FFB800, crema #FFF6E8, negro #17110D,
+   Anton para titulares y Archivo para el texto.
+
+   DOS GESTOS LO DEFINEN, y sin ellos esto sería solo un tema amarillo:
+
+     el contorno   línea negra gruesa alrededor de cada pieza
+     la sombra     plana y desplazada, sin difuminar, como una calcomanía
+
+   Los grosores están medidos de su sitio, no inventados. Su botón principal
+   y sus tarjetas llevan 3px de borde y 6px de sombra; las piezas anidadas y
+   las píldoras, 2px y 2-3px. El primer intento de este tema usó 2px y 5px y
+   se quedaba corto: el gesto se reconoce por lo gordo que es.
+
+   Y una regla suya de tipografía que no es obvia: EL INTERLETRAJE DE ANTON
+   CRECE CUANDO BAJA EL TAMAÑO. En su titular de 89px va a 0,45px (medio por
+   ciento); en una etiqueta de 15px, a 1,5px (un diez por ciento). Por eso sus
+   etiquetas pequeñas se leen como etiquetas y no como texto apretujado.
+
+   DOS VARIANTES, porque su página tiene dos fondos:
+
+     turco            el crema de sus secciones interiores
+     turco-amarillo   el amarillo de su portada, con su trama de puntos
+
+   Casi todo lo comparten; por eso la base va en [data-tema^="turco"] y cada
+   variante solo cambia el fondo y cómo se apoyan las piezas sobre él.
+
+   LAS CIFRAS NO PIERDEN LA ALINEACIÓN. Medidos los diez dígitos de Archivo:
+   los diez ocupan exactamente lo mismo (0,5em). Y el CSS ya aplica
+   `tabular-nums` a los valores, así que la columna no baila.
+
+   SU PALETA SON CUATRO COLORES Y AQUÍ HACEN FALTA SIETE, una por tasa. No dan
+   de sí, así que las que faltan se derivan de la misma familia cálida, todas
+   oscurecidas para pasar 4,5:1: su amarillo #FFB800 sobre blanco da 1,9:1 y
+   sería ilegible en una cifra. */
+
+:root[data-tema^="turco"] {
+  --calc-superficie: #ffffff;
+  --calc-superficie-alta: #fffdf7;
+
+  /* El borde tenue es para los separadores de dentro de los paneles. El
+     contorno negro va puesto a mano, y solo donde hay una pieza de verdad:
+     con negro sólido en cada línea divisoria, la pantalla se vuelve una reja. */
+  --calc-borde: rgba(23, 17, 13, 0.16);
+  --calc-borde-fuerte: #17110d;
+
+  --calc-texto: #17110d;
+  --calc-texto-suave: #55463a;
+  /* Medido: el tenue anterior (#857260) daba 4,59:1 sobre las tarjetas
+     blancas —pasaba— pero 4,29:1 sobre el crema del fondo, que es donde se
+     apoya el aviso del pie. Un mismo color puede pasar dentro de una tarjeta
+     y suspender fuera de ella; manda el sitio más exigente. */
+  --calc-texto-tenue: #786553;
+
+  --calc-usd: #c41e3a;
+  --calc-eur: #8e1024;
+  --calc-usdt: #8a5a00;
+
+  --calc-radio: 20px;
+  --calc-radio-sm: 14px;
+
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+  --turco-tinta: #17110d;
+  --turco-rojo: #c41e3a;
+  --turco-amarillo: #ffb800;
+  --turco-crema: #fff6e8;
+
+  /* Sus tres escalones de sombra, medidos */
+  --turco-pop: 6px 6px 0 var(--turco-tinta);
+  --turco-pop-md: 4px 4px 0 var(--turco-tinta);
+  --turco-pop-sm: 2px 2px 0 var(--turco-tinta);
+}
+
+:root[data-tema^="turco"] { --calc-zelle: #1a7a42; }
+:root[data-tema^="turco"] { --calc-facebank: #0f6b6b; }
+:root[data-tema^="turco"] { --calc-wally: #9c4a1a; }
+:root[data-tema^="turco"] { --calc-zinli: #5b4ba8; }
+
+/* ---------- Variante crema ---------- */
+:root[data-tema="turco"] {
+  --calc-fondo: var(--turco-crema);
+}
+
+:root[data-tema="turco"] body {
+  background:
+    radial-gradient(ellipse 70% 45% at 6% 0%, rgba(196, 30, 58, 0.05), transparent 70%),
+    radial-gradient(ellipse 65% 40% at 96% 4%, rgba(255, 184, 0, 0.16), transparent 70%),
+    var(--calc-fondo);
+}
+
+/* ---------- Variante amarilla ----------
+   Su portada: campo amarillo con una trama de puntos muy tenue. Las piezas
+   siguen siendo blancas y crema, que es como se apoyan las suyas sobre el
+   amarillo — el contraste lo pone el contorno negro, no el relleno. */
+:root[data-tema="turco-amarillo"] {
+  --calc-fondo: #ffb800;
+  --calc-superficie: #fffdf7;
+  --calc-superficie-alta: #ffffff;
+  /* Sobre amarillo, el texto tenue necesita más cuerpo: el gris cálido que
+     funciona sobre crema se pierde aquí. */
+  --calc-texto-suave: #4a3c2e;
+  /* Sobre el amarillo hace falta bajar bastante más: es un fondo muy claro
+     —más que el crema— y el tenue de la base se quedaba en 3,9:1. */
+  --calc-texto-tenue: #574433;
+}
+
+:root[data-tema="turco-amarillo"] body {
+  background:
+    radial-gradient(circle, rgba(23, 17, 13, 0.09) 1.1px, transparent 1.2px) 0 0 / 17px 17px,
+    radial-gradient(ellipse 60% 40% at 92% 2%, rgba(255, 210, 94, 0.55), transparent 70%),
+    var(--calc-fondo);
+}
+
+/* ============================================================
+   EL CONTORNO Y LA SOMBRA — lo que hace suyo el tema
+   ============================================================ */
+
+/* Las piezas grandes: 3px y 6px, como su tarjeta de servicio */
+:root[data-tema^="turco"] .calc-panel,
+:root[data-tema^="turco"] .calc-ajustes {
+  border: 3px solid var(--turco-tinta);
+  box-shadow: var(--turco-pop);
+}
+
+/* Las tarjetas de tasa: mismo borde, sombra un escalón menor */
+:root[data-tema^="turco"] .tasa {
+  border: 3px solid var(--turco-tinta);
+  box-shadow: var(--turco-pop-md);
+}
+
+/* El lomo de color de cada tasa.
+   Ensancharlo fue un error: a 7px chocaba contra el contorno negro y se veía
+   cortado en escuadra contra la esquina redondeada, como un fallo de dibujo.
+   El arreglo no es el ancho sino la forma — que siga la curva de la tarjeta
+   por su lado y se meta por dentro del borde, en vez de pelearse con él. */
+:root[data-tema^="turco"] .tasa::before {
+  inset: 3px auto 3px 3px;
+  width: 6px;
+  border-top-left-radius: inherit;
+  border-bottom-left-radius: inherit;
+}
+
+/* Las filas de resultado y las listas: 2px, sombra pequeña */
+:root[data-tema^="turco"] .res,
+:root[data-tema^="turco"] .fuente,
+:root[data-tema^="turco"] .hist,
+:root[data-tema^="turco"] .tema {
+  border: 2px solid var(--turco-tinta);
+  box-shadow: var(--turco-pop-sm);
+}
+
+:root[data-tema^="turco"] .calc-modos,
+:root[data-tema^="turco"] .calc-monto {
+  background: var(--calc-superficie-alta);
+  border: 3px solid var(--turco-tinta);
+  box-shadow: var(--turco-pop-md);
+}
+
+/* Al pulsar, la pieza se hunde HACIA su sombra. Es el gesto que convierte una
+   sombra plana en un botón que de verdad parece pulsable. */
+:root[data-tema^="turco"] .res:active,
+:root[data-tema^="turco"] .fuente:active,
+:root[data-tema^="turco"] .hist:active,
+:root[data-tema^="turco"] .tema:active,
+:root[data-tema^="turco"] .calc-rapidos button:active,
+:root[data-tema^="turco"] .calc-refrescar:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--turco-tinta);
+}
+
+/* ============================================================
+   LO QUE SE TOCA — botones, campos y píldoras
+   ============================================================
+   En el primer intento esto se quedó sin convertir: los botones rápidos eran
+   cajas grises sin contorno, el campo del 60 IQ un bloque gris macizo (lleva
+   `background: rgba(0,0,0,0.22)`, pensado para los temas oscuros) y los del
+   pie con borde fino. Media pantalla con personalidad y media con la de
+   antes, que es peor que no haber hecho el tema. */
+
+:root[data-tema^="turco"] .calc-rapidos button {
+  border: 2px solid var(--turco-tinta);
+  border-radius: 999px;
+  background: var(--calc-superficie-alta);
+  color: var(--turco-tinta);
+  font-family: var(--turco-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  box-shadow: var(--turco-pop-sm);
+}
+
+:root[data-tema^="turco"] .calc-refrescar {
+  border: 2px solid var(--turco-tinta);
+  border-radius: 999px;
+  background: var(--calc-superficie-alta);
+  color: var(--turco-tinta);
+  font-family: var(--turco-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: var(--turco-pop-sm);
+}
+
+/* El campo de preguntar al 60 IQ: blanco con su contorno, no el bloque
+   oscuro de los temas de noche */
+:root[data-tema^="turco"] .calc-iq-caja input {
+  background: #ffffff;
+  border: 2px solid var(--turco-tinta);
+  color: var(--calc-texto);
+}
+
+:root[data-tema^="turco"] .calc-iq-caja input::placeholder {
+  color: var(--calc-texto-tenue);
+}
+
+/* Las sugerencias del 60 IQ, como sus etiquetas: píldora negra con el texto
+   en ámbar. Es el patrón que repiten al pie de cada tarjeta. */
+:root[data-tema^="turco"] .calc-iq-ejemplo {
+  border: 2px solid var(--turco-tinta);
+  border-style: solid;
+  background: var(--turco-tinta);
+  color: var(--turco-amarillo);
+  font-family: var(--turco-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   TIPOGRAFÍA
+   ============================================================ */
+
+/* El título, en Anton con su sombra dura en carmesí. Interletraje casi nulo:
+   a este tamaño, Anton ya viene apretada de fábrica y es como la usan ellos. */
+:root[data-tema^="turco"] .calc-head h1 {
+  font-family: var(--turco-display);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 8.5vw, 3rem);
+  line-height: 0.96;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--turco-tinta);
+  text-shadow: 4px 4px 0 var(--turco-rojo);
+}
+
+:root[data-tema^="turco"] .calc-sub {
+  font-weight: 600;
+  color: var(--calc-texto-suave);
+}
+
+/* Las cabeceras de panel: Anton, y aquí el interletraje ya sube */
+:root[data-tema^="turco"] .calc-ajustes-cabecera h2,
+:root[data-tema^="turco"] .calc-grupo h3 {
+  font-family: var(--turco-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Las pestañas: tamaño pequeño, así que el interletraje va al máximo */
+:root[data-tema^="turco"] .calc-modo {
+  font-family: var(--turco-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* La pestaña activa en amarillo con su contorno. Es el único sitio donde el
+   amarillo puede ir de fondo sin pelearse con nada, porque encima solo hay
+   una palabra en negro. En la variante amarilla se invierte: sobre amarillo,
+   un amarillo no se ve, así que ahí la activa va en tinta con letra crema. */
+:root[data-tema="turco"] .calc-modo[aria-selected="true"] {
+  background: var(--turco-amarillo);
+  color: var(--turco-tinta);
+  border: 2px solid var(--turco-tinta);
+}
+
+:root[data-tema="turco-amarillo"] .calc-modo[aria-selected="true"] {
+  background: var(--turco-tinta);
+  color: var(--turco-crema);
+  border: 2px solid var(--turco-tinta);
+}
+
+/* El nombre de cada tasa, en versalitas espaciadas como sus etiquetas */
+:root[data-tema^="turco"] .tasa-nombre {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+}
+
+/* ============================================================
+   LAS MUESTRAS DEL SELECTOR
+   ============================================================ */
+
+.muestra-turco span:nth-child(1) { background: #fff6e8; }
+.muestra-turco span:nth-child(2) { background: #c41e3a; }
+.muestra-turco span:nth-child(3) { background: #ffb800; }
+.muestra-turco span:nth-child(4) { background: #17110d; }
+
+.muestra-turco-amarillo span:nth-child(1) { background: #ffb800; }
+.muestra-turco-amarillo span:nth-child(2) { background: #c41e3a; }
+.muestra-turco-amarillo span:nth-child(3) { background: #fff6e8; }
+.muestra-turco-amarillo span:nth-child(4) { background: #17110d; }
+
+/* Con movimiento reducido se queda el cambio de sombra y se va el
+   desplazamiento: lo que molesta es que la pieza salte, no que se apague. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-tema^="turco"] .res:active,
+  :root[data-tema^="turco"] .fuente:active,
+  :root[data-tema^="turco"] .hist:active,
+  :root[data-tema^="turco"] .tema:active,
+  :root[data-tema^="turco"] .calc-rapidos button:active,
+  :root[data-tema^="turco"] .calc-refrescar:active {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   LOS FONDOS TRANSLÚCIDOS DE LOS TEMAS DE NOCHE
+   ============================================================
+
+   Siete sitios del CSS pintan con `rgba(0,0,0,0.2)` o `rgba(255,255,255,0.06)`
+   —velos pensados para apoyarse sobre un fondo oscuro—. Sobre crema, los
+   negros salen como bloques grises macizos y los blancos no se ven. Le pasó
+   antes a Zachiro y a Sasha, que los parchean uno por uno; aquí van los
+   siete juntos para que no quede ninguno suelto. */
+
+:root[data-tema^="turco"] .calc-iq-anadir input,
+:root[data-tema^="turco"] .calc-iq-notas {
+  background: var(--calc-superficie-alta);
+  border: 2px solid var(--turco-tinta);
+  color: var(--calc-texto);
+}
+
+:root[data-tema^="turco"] .calc-iq-tonos button.is-activo {
+  background: var(--turco-tinta);
+  color: var(--turco-amarillo);
+  border-color: var(--turco-tinta);
+}
+
+:root[data-tema^="turco"] .calc-iq-quitar:focus-visible {
+  background: var(--turco-amarillo);
+  color: var(--turco-tinta);
+}
+
+/* El botón de preguntar, invertido como la píldora de sus etiquetas: tinta
+   de fondo y letra ámbar. Es el mismo recurso que usa Zachiro con el suyo. */
+:root[data-tema^="turco"] .calc-iq-caja button {
+  background: var(--turco-tinta);
+  border: 2px solid var(--turco-tinta);
+  color: var(--turco-amarillo);
+  font-family: var(--turco-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: var(--turco-pop-sm);
+}
+
+:root[data-tema^="turco"] .calc-iq-caja button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--turco-tinta);
+}
