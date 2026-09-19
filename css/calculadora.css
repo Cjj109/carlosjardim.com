@@ -4301,7 +4301,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-iq {
   background: var(--calc-superficie-alta);
   border: 2px solid var(--turco-tinta);
-  border-left: 6px solid var(--turco-rojo);
+  border-left: 6px solid var(--turco-acento-texto);
   box-shadow: var(--turco-pop-sm);
 }
 
@@ -4314,16 +4314,16 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    marca lo que importa. El peso y la familia se quedan como están. */
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-resultado,
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-veredicto {
-  color: var(--turco-rojo);
+  color: var(--turco-acento-texto);
 }
 
 /* La opción que gana se marcaba en ámbar */
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-fila.es-gana {
-  border-left-color: var(--turco-rojo);
+  border-left-color: var(--turco-acento-texto);
 }
 
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-fila.es-gana b {
-  color: var(--turco-rojo);
+  color: var(--turco-acento-texto);
 }
 
 /* Las acciones debajo de la respuesta. Siguen siendo secundarias —sin
@@ -4746,3 +4746,42 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 :root[data-tema="navidad"] { --turco-sobre-acento: #0b1410; }
 :root[data-tema="halloween"] { --turco-sobre-acento: #0c0912; }
 :root[data-tema="miguel"] { --turco-sobre-acento: #0b0910; }
+
+/* ============================================================
+   EL ACENTO CUANDO ES TEXTO SOBRE LA BURBUJA
+   ============================================================
+
+   La cifra, el veredicto, la fila ganadora y la barra de canto de la
+   respuesta se pintaban con var(--turco-rojo) directamente. Eso funciona
+   cuando el acento contrasta con la superficie de la burbuja, y medido en
+   los diez sale que falla en dos: navidad 3,86:1 y Merlina 2,77:1. En los
+   otros ocho va de 4,85 a 7,38.
+
+   Lo de Merlina lo introduje yo: al devolverle el acento a #7c3aed para
+   arreglar la pestaña activa, ese morado quedó sobre su tarjeta morada.
+   Arreglé un sitio y rompí otro porque la variable se usa con dos fondos
+   distintos. De ahí que esto sea una variable aparte y no el mismo acento.
+
+   La barra de canto entra también: con 2,77 no llega ni al 3:1 de un
+   elemento no textual, y es la firma de la burbuja. Arreglar solo el texto
+   la habría dejado invisible. */
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) {
+  --turco-acento-texto: var(--turco-rojo);
+}
+
+:root[data-tema="navidad"] { --turco-acento-texto: #ff7b7f; }   /* 6,04:1 sobre su tarjeta */
+:root[data-tema="turco-morado"] { --turco-acento-texto: #b197fc; } /* 6,54:1, la lavanda de sus barras */
+
+/* LOS GRISES APAGADOS DEL 60 IQ.
+   Mismo caso que .tasa-nombre y el pie, en seis hermanos que se me pasaron:
+   iban en --calc-texto-tenue y sobre las superficies oscuras caían a 2,99:1
+   en oscuro y 3,16 en Miguel. Van al gris de en medio, que existe en los
+   diez temas. */
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-fila i,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-operacion,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-ejemplos,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-vacio,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-memoria summary,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja input::placeholder {
+  color: var(--calc-texto-suave);
+}
