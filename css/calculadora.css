@@ -3878,9 +3878,14 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   border: 2px solid var(--turco-tinta);
 }
 
+/* Sobre amarillo va en carmesí, no en tinta. Es como jerarquizan ellos en su
+   portada: el fondo amarillo, el botón principal rojo con letra blanca y su
+   contorno negro, y el secundario blanco. El contorno sigue siendo negro
+   siempre —en su página no hay un solo contorno rojo—; lo que cambia con la
+   jerarquía es el relleno. */
 :root[data-tema="turco-amarillo"] .calc-modo[aria-selected="true"] {
-  background: var(--turco-tinta);
-  color: var(--turco-crema);
+  background: var(--turco-rojo);
+  color: #fffdf7;
   border: 2px solid var(--turco-tinta);
 }
 
