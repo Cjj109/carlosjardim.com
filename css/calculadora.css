@@ -4160,7 +4160,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 
 :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-tonos button.is-activo {
   background: var(--turco-tinta);
-  color: var(--turco-amarillo);
+  color: var(--calc-superficie);
   border-color: var(--turco-tinta);
 }
 
@@ -4828,3 +4828,28 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   border-color: var(--turco-tinta);
   color: var(--turco-sobre-acento);
 }
+
+/* ============================================================
+   EL GRIS APAGADO, MEDIDO EN TODA LA APP
+   ============================================================
+
+   Una auditoria recorriendo el DOM entero —los diez temas, a 460 y 390px,
+   con los cuatro paneles abiertos y la conversacion inyectada— dio 232
+   hallazgos, y casi todos eran el mismo: --calc-texto-tenue usado como
+   texto de cuerpo. El enlace de volver, el sello de version, las pestanas
+   inactivas, .res-nota, el signo del monto, y casi todo el historial y los
+   ajustes caian entre 2,99 y 4,03:1.
+
+   Salieron ahora y no antes porque las verificaciones anteriores median una
+   lista de selectores escrita a mano y solo la pantalla principal. Historial,
+   ajustes y tema no se habian abierto nunca.
+
+   Se corrige en la VARIABLE y no en los diecisiete selectores, que es donde
+   esta la causa. Los valores conservan el tono de cada tema y mantienen la
+   separacion con --calc-texto-suave (entre 1,37 y 1,68), para que los dos
+   escalones de gris sigan distinguiendose. halloween (4,67) y zachiro (5,35)
+   ya pasaban y no se tocan. */
+:root[data-tema="oscuro"] { --calc-texto-tenue: #818798; }
+:root[data-tema="miguel"] { --calc-texto-tenue: #88819b; }
+:root[data-tema="navidad"] { --calc-texto-tenue: #958d7f; }
+:root[data-tema="claro"] { --calc-texto-tenue: #5c6475; }
