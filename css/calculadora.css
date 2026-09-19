@@ -4008,6 +4008,48 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 }
 
 /* ============================================================
+   LAS CIFRAS DE RESULTADO, EN NEGRO
+   ============================================================
+
+   "Falta contraste, como que tengo que enfocar para leer bien las cifras."
+   Medido, y tenía razón: las cifras de resultado toman el color de la moneda
+   —el JS pone --color-res en línea— y en esta paleta eso son tonos medios.
+   Dólar 5,74:1, USDT 5,83:1, Zelle 5,28:1, contra los 18,4:1 del texto
+   corriente. Son lo más flojo de la pantalla y es justo lo que uno se queda
+   mirando.
+
+   Oscurecer los colores de moneda NO sirve, y esto está medido antes de
+   descartarlo: --calc-eur ya es un carmesí oscuro a 9,18:1, así que bajar
+   --calc-usd, que es del mismo tono, lo mete encima del euro. El par pasa de
+   dE 18,5 a dE 3,6 y dejan de distinguirse. Se arreglaría la lectura
+   rompiendo el código de colores.
+
+   Así que la cifra se va a negro y el color se queda donde ya estaba: la
+   barra de 3px del canto (.res::before, .hist::before) y el nombre de la
+   tarjeta. El código no se pierde —las barras conservan los tonos vivos, y
+   para un elemento no textual el mínimo es 3:1, que las siete superan— y de
+   paso esto IGUALA las tarjetas de resultado con las de tasa, que ya
+   mostraban sus cifras en negro a 18,7:1 y eran las únicas que se leían
+   sin esfuerzo. Es además lo que hace su propia página: titulares en negro,
+   acentos en rojo. */
+:root[data-tema^="turco"] .res-valor,
+:root[data-tema^="turco"] .hist-valor {
+  color: var(--calc-texto);
+}
+
+/* La unidad va pegada al número —"313,45 Bs."— así que es parte de la cifra
+   que cuesta leer, no una nota al margen. Iba en el gris más tenue. */
+:root[data-tema^="turco"] .res-unidad {
+  color: var(--calc-texto-suave);
+}
+
+/* El aviso de copiado ocupa el renglón de la nota y heredaba el color de la
+   moneda: mismo tono medio, mismo problema. */
+:root[data-tema^="turco"] .res.is-copiado .res-nota::after {
+  color: var(--calc-texto);
+}
+
+/* ============================================================
    LA CONVERSACIÓN DEL 60 IQ
    ============================================================
 
