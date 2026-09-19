@@ -3972,16 +3972,72 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 /* El botón de preguntar, invertido como la píldora de sus etiquetas: tinta
    de fondo y letra ámbar. Es el mismo recurso que usa Zachiro con el suyo. */
 :root[data-tema^="turco"] .calc-iq-caja button {
-  background: var(--turco-tinta);
+  /* Relleno carmesí con contorno negro y letra blanca: es su botón principal,
+     el de "COTIZAR MIS ENVÍOS" de la portada, tal cual.
+
+     Comparte color con las píldoras de sugerencia que tiene justo encima, así
+     que la jerarquía la marca el PESO DE LA SOMBRA, que es como la marcan
+     ellos: su botón principal lleva 6px y sus cápsulas 2-3px. Aquí el botón
+     lleva sombra y las píldoras no.
+
+     Letra blanca y no ámbar: el ámbar sobre carmesí da 3,5:1 y no llega. */
+  background: var(--turco-rojo);
   border: 2px solid var(--turco-tinta);
-  color: var(--turco-amarillo);
+  color: #fffdf7;
   font-family: var(--turco-display);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  box-shadow: var(--turco-pop-sm);
+  box-shadow: var(--turco-pop-md);
+}
+
+/* El hover de la regla base (línea 1609) cambia el fondo a un ámbar
+   translúcido: sobre el panel blanco convierte el botón en una mancha clara
+   con letra ámbar encima —ilegible— y se lleva por delante el contorno
+   carmesí. Aquí se marca subiendo el rojo del borde, que es lo que se está
+   señalando, y dejando el fondo de tinta quieto. */
+/* Ahora que el relleno es rojo, oscurecerlo vuelve a ser lo correcto: el mismo
+   gesto que en las píldoras. El contorno se queda negro. */
+:root[data-tema^="turco"] .calc-iq-caja button:hover {
+  background: var(--turco-rojo-hondo);
+  border-color: var(--turco-tinta);
 }
 
 :root[data-tema^="turco"] .calc-iq-caja button:active {
   transform: translate(2px, 2px);
   box-shadow: 0 0 0 var(--turco-tinta);
+}
+
+/* La pestaña activa arrastraba una sombra difuminada y oscura de su regla
+   base (línea 269): `0 4px 12px rgba(0,0,0,0.35)`, más un brillo interior
+   blanco pensado para los temas de noche. Estaba escondida debajo de mi regla
+   de color desde el primer pase, y contradice de frente la identidad entera:
+   aquí las sombras son planas y no se difuminan. */
+:root[data-tema^="turco"] .calc-modo.is-active,
+:root[data-tema^="turco"] .calc-modo[aria-selected="true"] {
+  box-shadow: var(--turco-pop-sm);
+}
+
+/* ---------- Lo elegido ----------
+   La fuente y el tema elegidos se marcaban con `border-color: var(--calc-usdt)`
+   —ámbar oscuro en este tema— y un fondo verde fijo, rgba(46,204,113,0.08),
+   que no pertenece a esta paleta. Las dos cosas rompen la regla de que el
+   contorno es siempre negro.
+
+   Aquí lo elegido se queda HUNDIDO hacia su sombra, como una pieza pulsada
+   que no vuelve a subir. Es el mismo gesto del :active y el lenguaje físico
+   del tema entero: lo seleccionado está apretado contra el papel. */
+:root[data-tema^="turco"] .fuente.is-elegida,
+:root[data-tema^="turco"] .tema.is-elegido {
+  border-color: var(--turco-tinta);
+  background: color-mix(in srgb, var(--turco-rojo) 12%, var(--calc-superficie-alta));
+  color: var(--calc-texto);
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--turco-tinta);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-tema^="turco"] .fuente.is-elegida,
+  :root[data-tema^="turco"] .tema.is-elegido {
+    transform: none;
+  }
 }
