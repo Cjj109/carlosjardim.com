@@ -4007,6 +4007,124 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   box-shadow: 0 0 0 var(--turco-tinta);
 }
 
+/* ============================================================
+   LA CONVERSACIÓN DEL 60 IQ
+   ============================================================
+
+   Hasta aquí el tema convertía la ENTRADA del panel —la caja, su botón, las
+   píldoras de sugerencia— y dejaba intacta la SALIDA, que es donde se pasa
+   el rato: los globos, la cifra, las acciones y el botón de borrar seguían
+   con el filete de 1px y el ámbar del tema de fábrica. Es la quinta vez en
+   este tema que convierto el reposo y me dejo el resto, así que aquí va la
+   familia entera junta en lugar de pieza a pieza.
+
+   La regla que sigue el resto de la página, medida y no supuesta:
+   Anton para rótulos y botones, Archivo 800 para las cifras. Por eso el
+   resultado NO se pasa a Anton —.calc-monto y .tasa-valor son Archivo 800—
+   y solo cambia de color. Y .iq-encabezado se queda en mono, que es una
+   decisión tomada a propósito más arriba para las líneas técnicas. */
+
+/* Lo que preguntas. El gris translúcido de la regla base —rgba(128,128,128,
+   0.14), pensado para apoyarse sobre un fondo oscuro— sobre crema sale como
+   un bloque sucio. Aquí es un recuadro crema con contorno de tinta. */
+:root[data-tema^="turco"] .calc-iq-tu {
+  background: var(--turco-crema);
+  border: 2px solid var(--turco-tinta);
+  color: var(--calc-texto);
+}
+
+/* La respuesta: tarjeta con contorno y sombra plana, y la barra de canto en
+   carmesí ancha como la de sus tarjetas, no el filete de 3px en ámbar. */
+:root[data-tema^="turco"] .calc-iq-iq {
+  background: var(--calc-superficie-alta);
+  border: 2px solid var(--turco-tinta);
+  border-left: 6px solid var(--turco-rojo);
+  box-shadow: var(--turco-pop-sm);
+}
+
+/* El rojo suave de fábrica (#e05c5c) no pertenece a esta paleta */
+:root[data-tema^="turco"] .calc-iq-iq.es-error {
+  border-left-color: var(--turco-rojo-hondo);
+}
+
+/* La cifra y el veredicto en carmesí: es el color con el que esta página
+   marca lo que importa. El peso y la familia se quedan como están. */
+:root[data-tema^="turco"] .iq-resultado,
+:root[data-tema^="turco"] .iq-veredicto {
+  color: var(--turco-rojo);
+}
+
+/* La opción que gana se marcaba en ámbar */
+:root[data-tema^="turco"] .iq-fila.es-gana {
+  border-left-color: var(--turco-rojo);
+}
+
+:root[data-tema^="turco"] .iq-fila.es-gana b {
+  color: var(--turco-rojo);
+}
+
+/* Las acciones debajo de la respuesta. Siguen siendo secundarias —sin
+   relleno y con sombra de 2px— para no competir con la cifra, que es a lo
+   que se viene: la jerarquía la marca el peso de la sombra, igual que en el
+   botón de preguntar. */
+:root[data-tema^="turco"] .iq-acciones button {
+  border: 2px solid var(--turco-tinta);
+  background: var(--calc-superficie-alta);
+  color: var(--calc-texto);
+  font-family: var(--turco-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: var(--turco-pop-sm);
+}
+
+:root[data-tema^="turco"] .iq-acciones button:hover {
+  background: var(--turco-rojo);
+  border-color: var(--turco-tinta);
+  color: #fffdf7;
+}
+
+/* Votado: se queda hundido y relleno, que es lo que dice "ya está dicho" */
+:root[data-tema^="turco"] .iq-acciones button.es-elegido {
+  background: var(--turco-rojo);
+  border-color: var(--turco-tinta);
+  color: #fffdf7;
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--turco-tinta);
+}
+
+:root[data-tema^="turco"] .iq-acciones button.es-elegido.es-fallo {
+  background: var(--turco-rojo-hondo);
+  border-color: var(--turco-tinta);
+  color: #fffdf7;
+}
+
+/* Borrar seguía en Archivo 500 con borde de 1px. Va en Anton como los demás
+   botones, pero sin relleno: se lleva la conversación entera por delante y
+   no debería ser lo más llamativo del panel. */
+:root[data-tema^="turco"] .calc-iq-borrar {
+  border: 2px solid var(--turco-tinta);
+  background: transparent;
+  color: var(--calc-texto);
+  font-family: var(--turco-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: var(--turco-pop-sm);
+}
+
+:root[data-tema^="turco"] .calc-iq-borrar:hover {
+  background: var(--turco-rojo);
+  border-color: var(--turco-tinta);
+  color: #fffdf7;
+}
+
+/* El rótulo de la sección de tono, como los demás rótulos del tema */
+:root[data-tema^="turco"] .calc-iq-tono-titulo {
+  font-family: var(--turco-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--calc-texto-suave);
+}
+
 /* La pestaña activa arrastraba una sombra difuminada y oscura de su regla
    base (línea 269): `0 4px 12px rgba(0,0,0,0.35)`, más un brillo interior
    blanco pensado para los temas de noche. Estaba escondida debajo de mi regla
