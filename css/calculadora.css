@@ -1362,12 +1362,19 @@ html { overflow-anchor: none; }
 :root[data-tema="navidad"] .calc-head h1::before {
   content: '';
   position: absolute;
-  top: -0.47em;
-  left: -0.24em;
-  width: 1.15em;
+  /* Recolocado para Anton. Estos valores estaban calculados para la
+     tipografía anterior; al pasar el título a Anton cambiaron la altura de
+     mayúsculas, el interletraje y los márgenes laterales, y el gorro se
+     quedó flotando arriba y a la izquierda de la C, con el pompón sobre la
+     A. Medido: la C de Anton mide 0,478em y empieza justo en el borde del
+     h1, mientras el gorro medía 1,15em —2,4 veces la letra— y arrancaba
+     0,24em más a la izquierda. */
+  top: -0.38em;
+  left: -0.12em;
+  width: 0.95em;
   aspect-ratio: 40 / 34;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff6b70'/%3E%3Cstop offset='0.55' stop-color='%23e5484d'/%3E%3Cstop offset='1' stop-color='%23a8262c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M5 26C7 15.5 13 6.5 23 4.3C29 3 34.2 6 36.8 12.6L33 14C31 10.4 28.6 9.2 26.2 10.2C27.6 15.2 29.6 20.4 31 26Z' fill='url(%23g)'/%3E%3Crect x='2' y='23' width='31' height='8.5' rx='4.25' fill='%23f4ede0'/%3E%3Ccircle cx='35.4' cy='14.6' r='4.3' fill='%23f4ede0'/%3E%3Cpath d='M5 27.5Q17 25.5 30 27.5' stroke='%23d9cfbf' stroke-width='1' fill='none' opacity='0.8'/%3E%3C/svg%3E") center / contain no-repeat;
-  rotate: -16deg;
+  rotate: -18deg;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
 }
 
@@ -3723,14 +3730,14 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    ============================================================ */
 
 /* Las piezas grandes: 3px y 6px, como su tarjeta de servicio */
-:root[data-tema^="turco"] .calc-panel,
-:root[data-tema^="turco"] .calc-ajustes {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-panel,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-ajustes {
   border: 3px solid var(--turco-tinta);
   box-shadow: var(--turco-pop);
 }
 
 /* Las tarjetas de tasa: mismo borde, sombra un escalón menor */
-:root[data-tema^="turco"] .tasa {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tasa {
   border: 3px solid var(--turco-tinta);
   box-shadow: var(--turco-pop-md);
 }
@@ -3740,7 +3747,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    cortado en escuadra contra la esquina redondeada, como un fallo de dibujo.
    El arreglo no es el ancho sino la forma — que siga la curva de la tarjeta
    por su lado y se meta por dentro del borde, en vez de pelearse con él. */
-:root[data-tema^="turco"] .tasa::before {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"]) .tasa::before {
   inset: 3px auto 3px 3px;
   width: 6px;
   border-top-left-radius: inherit;
@@ -3748,16 +3755,16 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 }
 
 /* Las filas de resultado y las listas: 2px, sombra pequeña */
-:root[data-tema^="turco"] .res,
-:root[data-tema^="turco"] .fuente,
-:root[data-tema^="turco"] .hist,
-:root[data-tema^="turco"] .tema {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .res,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .fuente,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .hist,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tema {
   border: 2px solid var(--turco-tinta);
   box-shadow: var(--turco-pop-sm);
 }
 
-:root[data-tema^="turco"] .calc-modos,
-:root[data-tema^="turco"] .calc-monto {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-modos,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-monto {
   background: var(--calc-superficie-alta);
   border: 3px solid var(--turco-tinta);
   box-shadow: var(--turco-pop-md);
@@ -3765,12 +3772,12 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 
 /* Al pulsar, la pieza se hunde HACIA su sombra. Es el gesto que convierte una
    sombra plana en un botón que de verdad parece pulsable. */
-:root[data-tema^="turco"] .res:active,
-:root[data-tema^="turco"] .fuente:active,
-:root[data-tema^="turco"] .hist:active,
-:root[data-tema^="turco"] .tema:active,
-:root[data-tema^="turco"] .calc-rapidos button:active,
-:root[data-tema^="turco"] .calc-refrescar:active {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .res:active,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .fuente:active,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .hist:active,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tema:active,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-rapidos button:active,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-refrescar:active {
   transform: translate(2px, 2px);
   box-shadow: 0 0 0 var(--turco-tinta);
 }
@@ -3784,7 +3791,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    pie con borde fino. Media pantalla con personalidad y media con la de
    antes, que es peor que no haber hecho el tema. */
 
-:root[data-tema^="turco"] .calc-rapidos button {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-rapidos button {
   border: 2px solid var(--turco-tinta);
   border-radius: 999px;
   background: var(--calc-superficie-alta);
@@ -3795,7 +3802,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   box-shadow: var(--turco-pop-sm);
 }
 
-:root[data-tema^="turco"] .calc-refrescar {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-refrescar {
   border: 2px solid var(--turco-tinta);
   border-radius: 999px;
   background: var(--calc-superficie-alta);
@@ -3806,15 +3813,58 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   box-shadow: var(--turco-pop-sm);
 }
 
+/* LA FRANJA DE COLOR DEL CANTO, FUERA.
+   Cada tarjeta llevaba una franja de 3px con el color de su moneda: el
+   dólar carmesí, el euro granate, el USDT ámbar. Era un código de otra
+   época del diseño y sobre esta paleta choca —son colores que no salen de
+   ninguna otra parte de la pantalla—, además de haber dejado de usarse.
+
+   Se anulan los tres ::before de base y con eso caen las nueve reglas que
+   los pintaban, incluidas las seis que dan color por moneda: esas solo
+   cambian el `background` de un pseudo-elemento que ya no se dibuja, así
+   que no hay que ir una por una ni tocar las variables de color, que
+   siguen sirviendo para otras cosas.
+
+   Consecuencia asumida: la identificación de cada tarjeta queda a cargo de
+   su nombre, que es lo que ya llevaba al lado. */
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"]) .tasa::before,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"]) .res::before,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"]) .hist::before {
+  display: none;
+}
+
+/* La × que vacía el monto se quedó sin convertir en los tres temas: llevaba
+   `background: rgba(128,128,128,0.16)` y `border: 0`, uno de los velos grises
+   de los temas de noche. Sobre las tarjetas claras se veía como una pastilla
+   sucia sin contorno, y salió a la luz al montar el tema oscuro. Va con el
+   idioma de la casa como las demás piezas que se tocan. */
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-borrar {
+  background: var(--calc-superficie-alta);
+  border: 2px solid var(--turco-tinta);
+  color: var(--turco-tinta);
+  box-shadow: var(--turco-pop-sm);
+}
+
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-borrar:hover {
+  background: var(--turco-rojo);
+  border-color: var(--turco-tinta);
+  color: #fffdf7;
+}
+
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-borrar:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 var(--turco-tinta);
+}
+
 /* El campo de preguntar al 60 IQ: blanco con su contorno, no el bloque
    oscuro de los temas de noche */
-:root[data-tema^="turco"] .calc-iq-caja input {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja input {
   background: #ffffff;
   border: 2px solid var(--turco-tinta);
   color: var(--calc-texto);
 }
 
-:root[data-tema^="turco"] .calc-iq-caja input::placeholder {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja input::placeholder {
   color: var(--calc-texto-tenue);
 }
 
@@ -3823,7 +3873,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    contorno sigue siendo negro, como en toda su página. Lo que cambia es el
    relleno: en carmesí dan color a esa zona sin robarle jerarquía al botón de
    preguntar, que se queda en tinta. Blanco sobre carmesí da 5,74:1. */
-:root[data-tema^="turco"] .calc-iq-ejemplo {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-ejemplo {
   border: 2px solid var(--turco-tinta);
   border-style: solid;
   background: var(--turco-rojo);
@@ -3840,7 +3890,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    el borde ámbar rompe la regla de que el contorno es siempre negro. Aquí se
    oscurece el relleno en vez de aclarar la letra, que es como se marca una
    pieza sólida. */
-:root[data-tema^="turco"] .calc-iq-ejemplo:hover {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-ejemplo:hover {
   background: var(--turco-rojo-hondo, #8e1024);
   border-color: var(--turco-tinta);
   color: #fffdf7;
@@ -3852,7 +3902,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 
 /* El título, en Anton con su sombra dura en carmesí. Interletraje casi nulo:
    a este tamaño, Anton ya viene apretada de fábrica y es como la usan ellos. */
-:root[data-tema^="turco"] .calc-head h1 {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-head h1 {
   font-family: var(--turco-display);
   font-weight: 400;
   font-size: clamp(2.1rem, 8.5vw, 3rem);
@@ -3863,14 +3913,14 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   text-shadow: 4px 4px 0 var(--turco-rojo);
 }
 
-:root[data-tema^="turco"] .calc-sub {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-sub {
   font-weight: 600;
   color: var(--calc-texto-suave);
 }
 
 /* Las cabeceras de panel: Anton, y aquí el interletraje ya sube */
-:root[data-tema^="turco"] .calc-ajustes-cabecera h2,
-:root[data-tema^="turco"] .calc-grupo h3 {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-ajustes-cabecera h2,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-grupo h3 {
   font-family: var(--turco-display);
   font-weight: 400;
   text-transform: uppercase;
@@ -3878,7 +3928,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 }
 
 /* Las pestañas: tamaño pequeño, así que el interletraje va al máximo */
-:root[data-tema^="turco"] .calc-modo {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-modo {
   font-family: var(--turco-display);
   font-weight: 400;
   text-transform: uppercase;
@@ -3907,7 +3957,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 }
 
 /* El nombre de cada tasa, en versalitas espaciadas como sus etiquetas */
-:root[data-tema^="turco"] .tasa-nombre {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tasa-nombre {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -3928,15 +3978,160 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 .muestra-turco-amarillo span:nth-child(3) { background: #fff6e8; }
 .muestra-turco-amarillo span:nth-child(4) { background: #17110d; }
 
+/* ============================================================
+   MERLINA — la variante morada
+   ============================================================
+
+   Misma tipografía y misma idea que Logan y Wolverine: campo de color,
+   piezas claras encima y el contraste puesto por el contorno negro, no por
+   el relleno. Lo que cambia es que aquí el campo es OSCURO, y eso obliga a
+   una cosa que las otras dos no necesitan.
+
+   --calc-texto-tenue sirve a la vez dentro de las tarjetas blancas y sobre
+   el fondo de la página (lo dice el comentario del bloque base). Con un
+   campo claro eso funciona; con uno oscuro, no puede: lo que se lee sobre
+   morado es ilegible sobre blanco y al revés. Así que la variable se queda
+   como está —manda el interior de las tarjetas, que es casi toda la
+   pantalla— y se tratan aparte, una por una, las piezas que se apoyan
+   directo en el campo.
+
+   Cuáles son no se dedujo leyendo el HTML: se midieron en el navegador
+   buscando todo elemento con texto cuyo fondo efectivo fuera el campo. Son
+   seis, y una —el enlace de volver— no la habría encontrado a ojo. */
+:root[data-tema="turco-morado"] {
+  --calc-fondo: #1a0726;
+  --calc-superficie: #2a0f3d;
+  --calc-superficie-alta: #331349;
+
+  /* LA INVERSIÓN.
+     La familia entera dibuja sus contornos y sus sombras planas con
+     --turco-tinta, y su texto con --calc-texto. Las dos eran casi negras,
+     que es lo correcto sobre crema y sobre ámbar y lo único que NO funciona
+     sobre morado oscuro: un contorno negro sobre este campo da 1,7:1 y
+     desaparece, y con él desaparece la firma del estilo.
+
+     Así que aquí la tinta es crema. Como las ~60 reglas de la familia usan
+     la variable y no el color, el cambio se propaga solo: contornos crema,
+     sombras planas crema, letra crema. */
+  --turco-tinta: #fffdf7;
+  --calc-texto: #fffdf7;
+  --calc-texto-suave: #d9c8e8;
+  --calc-texto-tenue: #b9a4cc;
+  --calc-borde: rgba(255, 253, 247, 0.18);
+  --calc-borde-fuerte: #fffdf7;
+
+  --turco-rojo: #a855f7;
+  --turco-rojo-hondo: #7c3aed;
+  --turco-amarillo: #ffd166;
+  --turco-crema: #2a0f3d;
+
+  /* La sombra dura, en hueco y no en crema.
+     Heredada de la familia sería del color de la tinta, que aquí es crema:
+     6px de crema detrás de cada pieza sobre un campo oscuro se leen como
+     losas que brillan, no como profundidad (16,73:1 contra el campo — por
+     eso gritaban). En oscuro la luz la pone el contorno y la sombra es un
+     vacío: 1,06 contra el campo, que es justo lo que se busca. */
+  --turco-pop: 6px 6px 0 #0d0314;
+  --turco-pop-md: 4px 4px 0 #0d0314;
+  --turco-pop-sm: 2px 2px 0 #0d0314;
+
+  /* Aquí las monedas NO van cada una de su color.
+     En los temas claros la barra del canto lleva siete colores distintos,
+     pero eso es un código que aquí no hace falta: cada tarjeta ya dice su
+     nombre al lado, y las cifras van todas del mismo crema. Un solo tono
+     uniforme deja la barra como lo que es en este tema, una marca de la
+     pieza, y no como una clave que haya que aprenderse.
+
+     Lavanda y no el morado del acento: el acento es el de los botones, y
+     con él la barra dejaba de leerse como marca de la tarjeta para parecer
+     el borde de un botón suelto. Este tono da 7,05:1 sobre la tarjeta.
+
+     El valor tiene que servir para dos cosas distintas, y por eso se midió
+     contra las dos: como barra sobre la tarjeta (pieza, mínimo 3:1) y como
+     TEXTO sobre el campo, porque --calc-eur es además el color del aviso de
+     tasa vieja en el pie. Ahí da 7,89:1. */
+  --calc-usd: #b197fc;
+  --calc-eur: #b197fc;
+  --calc-usdt: #b197fc;
+  --calc-zelle: #b197fc;
+  --calc-facebank: #b197fc;
+  --calc-wally: #b197fc;
+  --calc-zinli: #b197fc;
+}
+
+/* El título hueco, como el "SALE HOY." de su portada: la letra no tiene
+   relleno y el fondo asoma por dentro del contorno. Sin sombra: en su
+   cartel la palabra hueca va limpia y la sólida es la que lleva sombra. */
+:root[data-tema="turco-morado"] .calc-head h1 {
+  color: transparent;
+  -webkit-text-stroke: 2px #fffdf7;
+  text-shadow: none;
+}
+
+/* El único color literal de la familia: un blanco fijo que sobre este tema
+   quedaba como un bloque encendido en medio del panel. */
+:root[data-tema="turco-morado"] .calc-iq-caja input {
+  background: var(--calc-superficie-alta);
+  color: var(--calc-texto);
+}
+
+:root[data-tema="turco-morado"] body {
+  background:
+    radial-gradient(circle, rgba(255, 253, 247, 0.07) 1.1px, transparent 1.2px) 0 0 / 17px 17px,
+    radial-gradient(ellipse 60% 40% at 92% 2%, rgba(217, 70, 239, 0.22), transparent 70%),
+    var(--calc-fondo);
+}
+
+/* --- Lo que se apoya en el campo --- */
+
+:root[data-tema="turco-morado"] .calc-volver { color: #e4d7f5; }
+:root[data-tema="turco-morado"] .calc-volver:hover { color: #fffdf7; }
+
+/* El título lleva letra crema (10,69:1 sobre el campo) y su sombra dura.
+   El color de la sombra salió de una búsqueda, no del gusto: tiene que
+   despegarse del campo —si no, no se ve— Y de la propia letra crema —si no,
+   se funden en un borrón—. El acento morado da 1,91:1 contra el campo y el
+   ámbar de la familia 1,71:1 contra la letra; los dos fallan. Con una letra
+   muy clara sobre un campo muy oscuro el óptimo posible ronda 3,1, y el
+   magenta se planta ahí: 3,15 contra el campo y 3,40 contra la letra. */
+:root[data-tema="turco-morado"] .calc-sub { color: #e4d7f5; }
+
+:root[data-tema="turco-morado"] .calc-pie { color: #e4d7f5; }
+
+/* El sello de versión iba en el tenue Y con opacity 0.5: sobre morado
+   desaparecía dos veces. */
+:root[data-tema="turco-morado"] .calc-version {
+  color: #e4d7f5;
+  opacity: 0.75;
+}
+
+/* El aviso de tasa vieja iba en --calc-eur, un granate que sobre morado da
+   menos de 2:1. No sale en la medición porque solo aparece cuando la tasa
+   se queda atrás — que es justo cuando hay que poder leerlo. */
+:root[data-tema="turco-morado"] .calc-pie .is-viejo { color: #f9a8d4; }
+
+/* La pestaña activa, como en las otras dos: relleno de acento y letra
+   clara. Crema sobre el morado de acento da 5,60:1. */
+:root[data-tema="turco-morado"] .calc-modo[aria-selected="true"] {
+  background: var(--turco-rojo);
+  color: #fffdf7;
+  border: 2px solid var(--turco-tinta);
+}
+
+.muestra-turco-morado span:nth-child(1) { background: #581c87; }
+.muestra-turco-morado span:nth-child(2) { background: #d946ef; }
+.muestra-turco-morado span:nth-child(3) { background: #fff6e8; }
+.muestra-turco-morado span:nth-child(4) { background: #17110d; }
+
 /* Con movimiento reducido se queda el cambio de sombra y se va el
    desplazamiento: lo que molesta es que la pieza salte, no que se apague. */
 @media (prefers-reduced-motion: reduce) {
-  :root[data-tema^="turco"] .res:active,
-  :root[data-tema^="turco"] .fuente:active,
-  :root[data-tema^="turco"] .hist:active,
-  :root[data-tema^="turco"] .tema:active,
-  :root[data-tema^="turco"] .calc-rapidos button:active,
-  :root[data-tema^="turco"] .calc-refrescar:active {
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .res:active,
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .fuente:active,
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .hist:active,
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tema:active,
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-rapidos button:active,
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-refrescar:active {
     transform: none;
   }
 }
@@ -3951,27 +4146,48 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    antes a Zachiro y a Sasha, que los parchean uno por uno; aquí van los
    siete juntos para que no quede ninguno suelto. */
 
-:root[data-tema^="turco"] .calc-iq-anadir input,
-:root[data-tema^="turco"] .calc-iq-notas {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-anadir input,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-notas {
   background: var(--calc-superficie-alta);
   border: 2px solid var(--turco-tinta);
   color: var(--calc-texto);
 }
 
-:root[data-tema^="turco"] .calc-iq-tonos button.is-activo {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-tonos button.is-activo {
   background: var(--turco-tinta);
   color: var(--turco-amarillo);
   border-color: var(--turco-tinta);
 }
 
-:root[data-tema^="turco"] .calc-iq-quitar:focus-visible {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-quitar:focus-visible {
   background: var(--turco-amarillo);
   color: var(--turco-tinta);
 }
 
+/* Las dos reglas que la inversión de Merlina rompe, las dos por el ámbar:
+   la de arriba pone letra ámbar sobre la tinta —que en ese tema es crema— y
+   la de abajo letra de tinta sobre ámbar claro. En los dos sentidos queda
+   en 1,7:1.
+
+   Van AQUÍ y no arriba con el resto del tema a propósito: tienen la misma
+   especificidad que las dos reglas de familia que acaban de declararse, así
+   que lo único que decide es el orden del archivo. Puestas junto al bloque
+   de Merlina quedaban por encima y perdían —se midió: el botón de tono salía
+   crema con letra ámbar—. */
+:root[data-tema="turco-morado"] .calc-iq-tonos button.is-activo {
+  background: var(--turco-rojo);
+  color: #fffdf7;
+  border-color: var(--turco-tinta);
+}
+
+:root[data-tema="turco-morado"] .calc-iq-quitar:focus-visible {
+  background: var(--turco-rojo);
+  color: #fffdf7;
+}
+
 /* El botón de preguntar, invertido como la píldora de sus etiquetas: tinta
    de fondo y letra ámbar. Es el mismo recurso que usa Zachiro con el suyo. */
-:root[data-tema^="turco"] .calc-iq-caja button {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja button {
   /* Relleno carmesí con contorno negro y letra blanca: es su botón principal,
      el de "COTIZAR MIS ENVÍOS" de la portada, tal cual.
 
@@ -3997,12 +4213,12 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    señalando, y dejando el fondo de tinta quieto. */
 /* Ahora que el relleno es rojo, oscurecerlo vuelve a ser lo correcto: el mismo
    gesto que en las píldoras. El contorno se queda negro. */
-:root[data-tema^="turco"] .calc-iq-caja button:hover {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja button:hover {
   background: var(--turco-rojo-hondo);
   border-color: var(--turco-tinta);
 }
 
-:root[data-tema^="turco"] .calc-iq-caja button:active {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-caja button:active {
   transform: translate(2px, 2px);
   box-shadow: 0 0 0 var(--turco-tinta);
 }
@@ -4032,20 +4248,20 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    mostraban sus cifras en negro a 18,7:1 y eran las únicas que se leían
    sin esfuerzo. Es además lo que hace su propia página: titulares en negro,
    acentos en rojo. */
-:root[data-tema^="turco"] .res-valor,
-:root[data-tema^="turco"] .hist-valor {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .res-valor,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .hist-valor {
   color: var(--calc-texto);
 }
 
 /* La unidad va pegada al número —"313,45 Bs."— así que es parte de la cifra
    que cuesta leer, no una nota al margen. Iba en el gris más tenue. */
-:root[data-tema^="turco"] .res-unidad {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .res-unidad {
   color: var(--calc-texto-suave);
 }
 
 /* El aviso de copiado ocupa el renglón de la nota y heredaba el color de la
    moneda: mismo tono medio, mismo problema. */
-:root[data-tema^="turco"] .res.is-copiado .res-nota::after {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .res.is-copiado .res-nota::after {
   color: var(--calc-texto);
 }
 
@@ -4069,7 +4285,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 /* Lo que preguntas. El gris translúcido de la regla base —rgba(128,128,128,
    0.14), pensado para apoyarse sobre un fondo oscuro— sobre crema sale como
    un bloque sucio. Aquí es un recuadro crema con contorno de tinta. */
-:root[data-tema^="turco"] .calc-iq-tu {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-tu {
   background: var(--turco-crema);
   border: 2px solid var(--turco-tinta);
   color: var(--calc-texto);
@@ -4077,7 +4293,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 
 /* La respuesta: tarjeta con contorno y sombra plana, y la barra de canto en
    carmesí ancha como la de sus tarjetas, no el filete de 3px en ámbar. */
-:root[data-tema^="turco"] .calc-iq-iq {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-iq {
   background: var(--calc-superficie-alta);
   border: 2px solid var(--turco-tinta);
   border-left: 6px solid var(--turco-rojo);
@@ -4085,23 +4301,23 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 }
 
 /* El rojo suave de fábrica (#e05c5c) no pertenece a esta paleta */
-:root[data-tema^="turco"] .calc-iq-iq.es-error {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-iq.es-error {
   border-left-color: var(--turco-rojo-hondo);
 }
 
 /* La cifra y el veredicto en carmesí: es el color con el que esta página
    marca lo que importa. El peso y la familia se quedan como están. */
-:root[data-tema^="turco"] .iq-resultado,
-:root[data-tema^="turco"] .iq-veredicto {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-resultado,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-veredicto {
   color: var(--turco-rojo);
 }
 
 /* La opción que gana se marcaba en ámbar */
-:root[data-tema^="turco"] .iq-fila.es-gana {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-fila.es-gana {
   border-left-color: var(--turco-rojo);
 }
 
-:root[data-tema^="turco"] .iq-fila.es-gana b {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-fila.es-gana b {
   color: var(--turco-rojo);
 }
 
@@ -4109,7 +4325,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    relleno y con sombra de 2px— para no competir con la cifra, que es a lo
    que se viene: la jerarquía la marca el peso de la sombra, igual que en el
    botón de preguntar. */
-:root[data-tema^="turco"] .iq-acciones button {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-acciones button {
   border: 2px solid var(--turco-tinta);
   background: var(--calc-superficie-alta);
   color: var(--calc-texto);
@@ -4119,14 +4335,14 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   box-shadow: var(--turco-pop-sm);
 }
 
-:root[data-tema^="turco"] .iq-acciones button:hover {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-acciones button:hover {
   background: var(--turco-rojo);
   border-color: var(--turco-tinta);
   color: #fffdf7;
 }
 
 /* Votado: se queda hundido y relleno, que es lo que dice "ya está dicho" */
-:root[data-tema^="turco"] .iq-acciones button.es-elegido {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-acciones button.es-elegido {
   background: var(--turco-rojo);
   border-color: var(--turco-tinta);
   color: #fffdf7;
@@ -4134,7 +4350,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   box-shadow: 0 0 0 var(--turco-tinta);
 }
 
-:root[data-tema^="turco"] .iq-acciones button.es-elegido.es-fallo {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .iq-acciones button.es-elegido.es-fallo {
   background: var(--turco-rojo-hondo);
   border-color: var(--turco-tinta);
   color: #fffdf7;
@@ -4143,7 +4359,7 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 /* Borrar seguía en Archivo 500 con borde de 1px. Va en Anton como los demás
    botones, pero sin relleno: se lleva la conversación entera por delante y
    no debería ser lo más llamativo del panel. */
-:root[data-tema^="turco"] .calc-iq-borrar {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-borrar {
   border: 2px solid var(--turco-tinta);
   background: transparent;
   color: var(--calc-texto);
@@ -4153,14 +4369,14 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
   box-shadow: var(--turco-pop-sm);
 }
 
-:root[data-tema^="turco"] .calc-iq-borrar:hover {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-borrar:hover {
   background: var(--turco-rojo);
   border-color: var(--turco-tinta);
   color: #fffdf7;
 }
 
 /* El rótulo de la sección de tono, como los demás rótulos del tema */
-:root[data-tema^="turco"] .calc-iq-tono-titulo {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-iq-tono-titulo {
   font-family: var(--turco-display);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -4172,8 +4388,8 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    blanco pensado para los temas de noche. Estaba escondida debajo de mi regla
    de color desde el primer pase, y contradice de frente la identidad entera:
    aquí las sombras son planas y no se difuminan. */
-:root[data-tema^="turco"] .calc-modo.is-active,
-:root[data-tema^="turco"] .calc-modo[aria-selected="true"] {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-modo.is-active,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-modo[aria-selected="true"] {
   box-shadow: var(--turco-pop-sm);
 }
 
@@ -4186,8 +4402,8 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
    Aquí lo elegido se queda HUNDIDO hacia su sombra, como una pieza pulsada
    que no vuelve a subir. Es el mismo gesto del :active y el lenguaje físico
    del tema entero: lo seleccionado está apretado contra el papel. */
-:root[data-tema^="turco"] .fuente.is-elegida,
-:root[data-tema^="turco"] .tema.is-elegido {
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .fuente.is-elegida,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tema.is-elegido {
   border-color: var(--turco-tinta);
   background: color-mix(in srgb, var(--turco-rojo) 12%, var(--calc-superficie-alta));
   color: var(--calc-texto);
@@ -4196,8 +4412,309 @@ body { padding-bottom: var(--hueco-teclado, 0px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root[data-tema^="turco"] .fuente.is-elegida,
-  :root[data-tema^="turco"] .tema.is-elegido {
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .fuente.is-elegida,
+  :root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tema.is-elegido {
     transform: none;
   }
+}
+
+/* ============================================================
+   MIGUEL Y SASHA, CON LA IDENTIDAD DEL TURCO
+   ============================================================
+
+   Las 71 reglas estructurales de arriba ya los alcanzan, pero el juego de
+   variables --turco-* se declara en un bloque que sigue siendo solo de la
+   familia turco. Sin esas variables las reglas se aplican y no hacen nada:
+   medido en el navegador antes de escribir esto, los dos daban
+   `border-width: 0px`, `box-shadow: none` y la tipografía en Inter, porque
+   una declaración con un var() indefinido se descarta entera.
+
+   Así que cada tema trae SU juego completo, en SUS colores. Esta es la
+   unidad repetible: para sumar otro tema a esta identidad basta con
+   declararle estas mismas variables y añadirlo al selector.
+
+   Lo que NO se toca de cada uno: la bandera de las pestañas y el pádel de
+   Miguel, y la mascota, las huellas y sus estados de ánimo en Sasha. Nada
+   de eso comparte selector con las reglas de familia — se comprobó cruzando
+   los 60 selectores de la familia contra los suyos. */
+
+/* ---------- Miguel ----------
+   Campo casi negro (#0b0910). El hueco de Merlina aquí NO sirve: su campo
+   es aún más oscuro que el de ella (L 0,0030 contra 0,0051) y cualquier
+   sombra oscura da 1,02-1,06 contra él, o sea una sombra invisible y un
+   tema que parecería sin convertir. La sombra va en su propio violeta, que
+   ya es suyo —vive en --bandera y en su Zelle— y da 6,83 contra el campo.
+   A escala corta, que a 6px un violeta sólido detrás de cada pieza es la
+   misma losa que no gustó en crema. */
+:root[data-tema="miguel"] {
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+
+  --turco-tinta: #f2eef8;
+  --calc-borde-fuerte: #f2eef8;
+
+  --turco-rojo: #b57bff;
+  --turco-rojo-hondo: #8f5fd6;
+  --turco-amarillo: #ffd23f;
+  --turco-crema: #16131f;
+
+  --turco-pop: 4px 4px 0 #b57bff;
+  --turco-pop-md: 3px 3px 0 #b57bff;
+  --turco-pop-sm: 2px 2px 0 #b57bff;
+
+  --calc-radio: 20px;
+  --calc-radio-sm: 14px;
+}
+
+/* Sus halos por moneda se van.
+   Su .tasa llevaba `box-shadow: 0 0 26px -13px var(--halo)`, un resplandor
+   difuminado del color de cada tasa. Se probó conservarlo encadenado con la
+   sombra dura, y visto en pantalla las dos cosas se pelean: el halo se
+   diseñó para un tema de brillos y esta identidad es plana y de contornos,
+   así que cada tarjeta acababa con resplandor, contorno y sombra a la vez.
+
+   La regla se deja escrita en lugar de borrarla y confiar en que gane la de
+   la familia por orden de archivo: las dos tienen la misma especificidad
+   —:is() adopta la de su argumento más alto— y eso es demasiado sutil para
+   dejarlo implícito.
+
+   Sus declaraciones de --halo por moneda (línea ~2286) quedan sin consumir.
+   Se dejan estar: son suyas y no molestan. */
+:root[data-tema="miguel"] .tasa {
+  box-shadow: var(--turco-pop-sm);
+}
+
+/* Su título es un degradado de los seis colores recortado sobre la letra y
+   animado. La familia le pone color sólido y sombra, que lo mataría. Aquí
+   se queda con Anton Y con su arcoíris: la tipografía es de la familia, el
+   relleno es suyo. */
+:root[data-tema="miguel"] .calc-head h1 {
+  color: transparent;
+  text-shadow: none;
+}
+
+/* ---------- Sasha ----------
+   Tema claro, así que la sombra es normal: tinta sólida como en Logan. Su
+   --calc-borde-fuerte era rgba(158,95,44,0.45), translúcido, y como
+   contorno duro no vale; se solidifica en su propio marrón de texto, que da
+   11,80 sobre su campo y 13,18 sobre sus tarjetas. */
+:root[data-tema="sasha"] {
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+
+  --turco-tinta: #3a2618;
+  --calc-borde-fuerte: #3a2618;
+
+  --turco-rojo: #9a5a24;
+  --turco-rojo-hondo: #7a4419;
+  --turco-amarillo: #e8b04b;
+  --turco-crema: #f3e8d9;
+
+  --turco-pop: 6px 6px 0 #3a2618;
+  --turco-pop-md: 4px 4px 0 #3a2618;
+  --turco-pop-sm: 2px 2px 0 #3a2618;
+}
+
+/* Su h1 iba en bronce y la familia lo pasaría a tinta con sombra carmesí.
+   Se queda con Anton y con su bronce, y con la sombra en su propio marrón
+   en vez del carmesí del turco. */
+:root[data-tema="sasha"] .calc-head h1 {
+  color: var(--calc-usd);
+  text-shadow: 4px 4px 0 var(--turco-tinta);
+}
+
+/* ============================================================
+   LOS CINCO QUE FALTABAN
+   ============================================================
+
+   Mismo patrón que Miguel y Sasha: cada tema trae su propio juego de
+   --turco-*, en sus colores. Con estos, los diez temas comparten identidad.
+
+   EN LOS OSCUROS LA SOMBRA NO PUEDE SER UN HUECO. Medido sobre sus campos:
+   un negro da 1,07 en oscuro, 1,12 en navidad y 1,06 en halloween, o sea una
+   sombra invisible y un tema que parecería sin convertir. Cada uno lleva la
+   suya sacada de su propia paleta. */
+
+/* ---------- Claro ---------- */
+:root[data-tema="claro"] {
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+  /* Su --calc-borde-fuerte era rgba(16,24,40,0.24): translúcido, inservible
+     como contorno duro. Sólido da 13,75 sobre el campo. */
+  --turco-tinta: #101828;
+  --calc-borde-fuerte: #101828;
+  --turco-rojo: #2562e9;
+  --turco-rojo-hondo: #1c4fc0;
+  --turco-amarillo: #b05109;
+  --turco-crema: #f4f6fa;
+  --turco-pop: 6px 6px 0 #101828;
+  --turco-pop-md: 4px 4px 0 #101828;
+  --turco-pop-sm: 2px 2px 0 #101828;
+}
+
+/* ---------- Oscuro ----------
+   No tenía bloque propio: es el :root por defecto. El atributo sí se pone en
+   el html, así que este selector lo alcanza igual. Sombra en su azul (6,61
+   sobre el campo). */
+:root[data-tema="oscuro"] {
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+  --turco-tinta: #e8e9ee;
+  --calc-borde-fuerte: #e8e9ee;
+  --turco-rojo: #5b93ff;
+  --turco-rojo-hondo: #3f78e0;
+  --turco-amarillo: #f5b544;
+  --turco-crema: #1b1e27;
+  --turco-pop: 4px 4px 0 #5b93ff;
+  --turco-pop-md: 3px 3px 0 #5b93ff;
+  --turco-pop-sm: 2px 2px 0 #5b93ff;
+}
+
+/* ---------- Navidad ----------
+   Sombra en su oro (10,19 sobre el campo), que es su color de siempre. */
+:root[data-tema="navidad"] {
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+  --turco-tinta: #f4ede0;
+  --calc-borde-fuerte: #f4ede0;
+  --turco-rojo: #e5484d;
+  --turco-rojo-hondo: #c0393d;
+  --turco-amarillo: #e8b93a;
+  --turco-crema: #172a21;
+  --turco-pop: 4px 4px 0 #e8b93a;
+  --turco-pop-md: 3px 3px 0 #e8b93a;
+  --turco-pop-sm: 2px 2px 0 #e8b93a;
+}
+
+/* Su título es un degradado rojo-crema-verde recortado sobre la letra y
+   animado (brilloNavideno). La familia le pondría color sólido y sombra, que
+   lo mataría: se le devuelve el relleno transparente. Conserva Anton. */
+:root[data-tema="navidad"] .calc-head h1 {
+  color: transparent;
+  text-shadow: none;
+}
+
+/* ---------- Halloween ----------
+   Sombra en su naranja (8,39). Su `filter: drop-shadow` y la animación de
+   vela viven en su propia regla, que la familia no toca: la llama sigue. */
+:root[data-tema="halloween"] {
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+  --turco-tinta: #f3ece2;
+  --calc-borde-fuerte: #f3ece2;
+  --turco-rojo: #ff8a2a;
+  --turco-rojo-hondo: #d96f1c;
+  --turco-amarillo: #ffd166;
+  --turco-crema: #1e1728;
+  --turco-pop: 4px 4px 0 #ff8a2a;
+  --turco-pop-md: 3px 3px 0 #ff8a2a;
+  --turco-pop-sm: 2px 2px 0 #ff8a2a;
+}
+
+:root[data-tema="halloween"] .calc-head h1 {
+  color: transparent;
+  text-shadow: none;
+}
+
+/* ---------- Zachiro ----------
+   Ya estaba en esta identidad, en su idioma de manga. Sus variables se
+   mapean a SUS valores para que las reglas de familia reproduzcan lo que ya
+   tenía en vez de sustituirlo: su tinta, y sus sombras de 4/3/2px en lugar
+   de las 6/4/2 de la familia.
+
+   Queda fuera de las dos reglas del ::before —la que lo borra y la que le
+   mete inset y redondeo—, porque su canto no es una franja de color sino
+   cinco TRAMAS de manga, una por moneda. Esa exención está en el selector de
+   esas dos reglas, no aquí. */
+:root[data-tema="zachiro"] {
+  --font-sans: 'Archivo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --turco-display: 'Anton', 'Archivo', Impact, sans-serif;
+  --turco-tinta: #141418;
+  --turco-rojo: #c8102e;
+  --turco-rojo-hondo: #9e0c24;
+  --turco-amarillo: #c8102e;
+  --turco-crema: #fffdf8;
+  --turco-pop: 4px 4px 0 #141418;
+  --turco-pop-md: 3px 3px 0 #141418;
+  --turco-pop-sm: 2px 2px 0 #141418;
+}
+
+/* Su título NO pasa a Anton: es cursiva 900 con sombra dura en su rojo de
+   portada, y lleva la cartela 第1話 encima. Anton no tiene cursiva ni pesos,
+   así que imponerlo le quitaría lo que lo hace un tomo de manga. */
+:root[data-tema="zachiro"] .calc-head h1 {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: var(--calc-texto);
+  text-shadow: 2px 2px 0 var(--calc-eur);
+}
+
+/* Su pestaña activa se invierte en tinta y va plana a propósito, como un
+   recuadro rotulado. La familia le añadiría una sombra que no le pega. */
+:root[data-tema="zachiro"] .calc-modo.is-active,
+:root[data-tema="zachiro"] .calc-modo[aria-selected="true"] {
+  background: var(--calc-texto);
+  color: var(--calc-superficie);
+  box-shadow: none;
+}
+
+/* ============================================================
+   CORRECCIONES DE LA VERIFICACIÓN
+   ============================================================ */
+
+/* 1. LA SOMBRA DE DOS COLORES.
+   En los temas oscuros puse contorno claro MÁS sombra de color —crema y oro
+   en navidad, blanco y azul en oscuro—, así que cada pieza mostraba dos
+   colores apilados. Ahora contorno y sombra son el mismo tono, y a escala
+   corta: un solo color que sigue dando profundidad.
+
+   Merlina no entra aquí: su sombra es un hueco casi negro, o sea contorno
+   más vacío, no un segundo color. */
+:root[data-tema="oscuro"] {
+  --turco-pop: 3px 3px 0 #e8e9ee;
+  --turco-pop-md: 2px 2px 0 #e8e9ee;
+  --turco-pop-sm: 2px 2px 0 #e8e9ee;
+}
+
+:root[data-tema="navidad"] {
+  --turco-pop: 3px 3px 0 #f4ede0;
+  --turco-pop-md: 2px 2px 0 #f4ede0;
+  --turco-pop-sm: 2px 2px 0 #f4ede0;
+}
+
+:root[data-tema="halloween"] {
+  --turco-pop: 3px 3px 0 #f3ece2;
+  --turco-pop-md: 2px 2px 0 #f3ece2;
+  --turco-pop-sm: 2px 2px 0 #f3ece2;
+}
+
+:root[data-tema="miguel"] {
+  --turco-pop: 3px 3px 0 #f2eef8;
+  --turco-pop-md: 2px 2px 0 #f2eef8;
+  --turco-pop-sm: 2px 2px 0 #f2eef8;
+}
+
+/* 2. EL NOMBRE DE TASA Y EL PIE, EN EL GRIS DE EN MEDIO.
+   Los dos iban en --calc-texto-tenue, que es el tono más apagado de cada
+   tema. Medido en los diez: el nombre caía a 3,24:1 en oscuro y 3,37 en
+   Miguel, y el pie a 3,53 y 3,65 — por debajo del mínimo. Y el nombre
+   empeoró con este rediseño, porque la familia lo encoge a 0,68rem sin
+   tocarle el color.
+
+   Con --calc-texto-suave los diez pasan con holgura (6,89 y 7,47 en los dos
+   peores) sin salirse de la paleta de cada uno: es un tono que ya existe en
+   todos. */
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .tasa-nombre,
+:root:is([data-tema^="turco"],[data-tema="miguel"],[data-tema="sasha"],[data-tema="claro"],[data-tema="oscuro"],[data-tema="navidad"],[data-tema="halloween"],[data-tema="zachiro"]) .calc-pie {
+  color: var(--calc-texto-suave);
+}
+
+/* 3. LA PESTAÑA ACTIVA DE MERLINA.
+   Al subir su acento a #a855f7 la letra crema encima se quedó en 3,89:1.
+   El morado que tenía antes da 5,60 con la misma letra. Regresión mía,
+   introducida al cambiar el acento y detectada al medir los diez temas. */
+:root[data-tema="turco-morado"] {
+  --turco-rojo: #7c3aed;
 }

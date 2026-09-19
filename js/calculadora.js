@@ -28,6 +28,7 @@ const TEMAS = {
   sasha: '#f3e8d9',
   turco: '#fff6e8',
   'turco-amarillo': '#ffb800',
+  'turco-morado': '#581c87',
 };
 
 /* ---------- Utilidades ---------- */
